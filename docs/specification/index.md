@@ -140,5 +140,5 @@ Agent 视角：
 
 ## 下一步
 
-- 快速开始：参阅 [快速开始指南](../guides/getting-started.md)
 - 深入了解：阅读 [架构设计](architecture.md) 和 [事件定义](events.md)
+- 常见问题：查看 [FAQ](../appendix/faq.md)

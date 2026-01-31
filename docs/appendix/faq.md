@@ -209,4 +209,4 @@ logging.basicConfig(level=logging.DEBUG)
 
 - [事件定义](../specification/events.md)
 - [数据结构](../specification/data-structures.md)
-- [CLI 使用指南](../guides/cli-guide.md)
+- [错误处理](../specification/error-handling.md)

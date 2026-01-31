@@ -1,0 +1,113 @@
+# A2C-SMCP Protocol Specification - MkDocs 配置
+# 启用严格模式，在构建时发现死链和错误
+strict: true
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+site_name: A2C-SMCP Protocol
+site_description: Agent To Computer Socket.IO-based MCP Protocol Specification
+site_url: https://doc.turingfocus.cn/a2c-smcp/
+repo_url: https://github.com/A2C-SMCP/a2c-smcp-protocol
+repo_name: a2c-smcp-protocol
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/lightbulb-outline
+        name: "切换到深色模式"
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/lightbulb
+        name: "切换到浅色模式"
+  features:
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.copy
+    - announce.dismiss
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+  # logo: 'assets/logo.svg'  # 可选：添加 logo
+  # favicon: 'assets/favicon.png'  # 可选：添加 favicon
+
+plugins:
+  - search:
+      lang: zh
+  - mike:
+      alias_type: symlink
+      version_selector: true
+      canonical_version: latest
+
+extra:
+  version:
+    provider: mike
+    alias: true
+  announce: "A2C-SMCP 协议规范文档 - 最新版本：0.1.2-rc1"
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/A2C-SMCP
+
+markdown_extensions:
+  - tables
+  - toc:
+      permalink: true
+      title: 页面目录
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      pygments_lang_class: true
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.extra
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - abbr
+
+nav:
+  - 首页: index.md
+  - 协议规范:
+      - 概述: specification/index.md
+      - 架构设计: specification/architecture.md
+      - 事件定义: specification/events.md
+      - 数据结构: specification/data-structures.md
+      - 房间模型: specification/room-model.md
+      - 错误处理: specification/error-handling.md
+      - 安全考虑: specification/security.md
+  - 附录:
+      - 常见问题: appendix/faq.md
