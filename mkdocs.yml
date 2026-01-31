@@ -48,8 +48,8 @@ theme:
     - toc.follow
   icon:
     repo: fontawesome/brands/github
-  # logo: 'assets/logo.svg'  # 可选：添加 logo
-  # favicon: 'assets/favicon.png'  # 可选：添加 favicon
+  logo: assets/logo-white.svg
+  favicon: assets/favicon.png
 
 plugins:
   - search:
