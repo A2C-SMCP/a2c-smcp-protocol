@@ -114,10 +114,10 @@ inv docs.server-setup       # 查看服务器初始化步骤
 # ========== 必需配置 ==========
 
 # 文档服务器地址
-DOCS_SERVER_HOST=118.195.182.52
+DOCS_SERVER_HOST=<YOUR_SERVER_IP>
 
 # SSH 认证（二选一）
-DOCS_SERVER_PASSWORD=your_password
+DOCS_SERVER_PASSWORD=<YOUR_PASSWORD>
 # 或使用密钥文件
 # DOCS_SERVER_KEY_FILE=~/.ssh/id_rsa
 
@@ -163,7 +163,7 @@ inv docs.server-setup
 
 ```bash
 # 1. SSH 登录服务器
-ssh root@118.195.182.52
+ssh root@<YOUR_SERVER_IP>
 
 # 2. 创建文档目录
 cd /var/www/doc.turingfocus.cn/

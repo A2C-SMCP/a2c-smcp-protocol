@@ -141,7 +141,7 @@ def server_setup(c):
     print("🖥️  服务器初始化步骤：")
     print()
     print("1. SSH 登录服务器：")
-    print("   ssh root@118.195.182.52")
+    print("   ssh root@<YOUR_SERVER_IP>")
     print()
     print("2. 创建文档目录并克隆 gh-pages 分支：")
     print("   cd /var/www/doc.turingfocus.cn/")
