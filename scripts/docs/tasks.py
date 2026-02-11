@@ -5,7 +5,8 @@
 使用方式:
     inv docs.serve          # 本地预览
     inv docs.build          # 构建文档
-    inv docs.deploy         # 部署到服务器
+    inv docs.deploy         # 部署到公司服务器
+    inv docs.deploy-github  # 部署到 GitHub Pages
     inv docs.clean          # 清理构建产物
 """
 
@@ -240,3 +241,92 @@ def notify_wechat(message: str):
             )
         except Exception as e:
             print(f"⚠️  企业微信通知失败: {e}")
+
+
+# GitHub Pages 相关配置
+GITHUB_PAGES_URL = "https://a2c-smcp.github.io/a2c-smcp-protocol/"
+
+
+@task(name="deploy-github")
+def deploy_github(c, version=None, alias="latest", set_default=True):
+    """部署文档到 GitHub Pages。
+
+    工作流程:
+        1. 同步远程 gh-pages 分支
+        2. 使用 mike 构建指定版本
+        3. 设置默认版本
+        4. 推送到 GitHub（自动触发 GitHub Pages 部署）
+
+    Args:
+        version: 版本号（可选，默认使用 pyproject.toml 中的版本）
+        alias: 版本别名（默认 'latest'）
+        set_default: 是否设置为默认版本（默认 True）
+    """
+    target_version = version or get_project_version()
+
+    print(f"🚀 部署文档到 GitHub Pages (version={target_version})")
+    print(f"   目标 URL: {GITHUB_PAGES_URL}")
+
+    # 0. 同步远程 gh-pages 分支
+    sync_gh_pages(c)
+
+    # 1. 构建（mike deploy 到本地 gh-pages 分支）
+    build(c, version=target_version, alias=alias)
+
+    # 2. 设置默认版本
+    if set_default:
+        print(f"📌 设置默认版本为 '{alias}'...")
+        c.run(f"mike set-default {alias}", warn=True)
+
+    # 3. 推送到 GitHub
+    print("📤 推送到 GitHub...")
+    c.run("git push origin gh-pages", warn=False)
+
+    print(f"✅ GitHub Pages 部署完成")
+    print(f"   文档将在几分钟后可访问: {GITHUB_PAGES_URL}")
+
+
+@task(name="deploy-all")
+def deploy_all(c, version=None, alias="latest"):
+    """同时部署到 GitHub Pages 和公司服务器。
+
+    Args:
+        version: 版本号（可选，默认使用 pyproject.toml 中的版本）
+        alias: 版本别名（默认 'latest'）
+    """
+    target_version = version or get_project_version()
+
+    print(f"🚀 部署文档到所有目标 (version={target_version})")
+    print()
+
+    # 1. 部署到 GitHub Pages
+    print("=" * 50)
+    print("📦 Step 1: 部署到 GitHub Pages")
+    print("=" * 50)
+    deploy_github(c, version=target_version, alias=alias)
+    print()
+
+    # 2. 触发公司服务器更新
+    print("=" * 50)
+    print("📦 Step 2: 更新公司服务器")
+    print("=" * 50)
+
+    # 验证服务器配置
+    errors = config.validate()
+    if errors:
+        print("⚠️  公司服务器配置不完整，跳过服务器更新:")
+        for error in errors:
+            print(f"   - {error}")
+    else:
+        update_server()
+        if config.wechat:
+            notify_wechat(
+                f"✅ A2C-SMCP 文档部署成功\n"
+                f"版本: {target_version}\n"
+                f"别名: {alias}\n"
+                f"GitHub Pages: {GITHUB_PAGES_URL}\n"
+                f"公司服务器: {config.server.host}"
+            )
+
+    print()
+    print("✅ 全部部署完成")

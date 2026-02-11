@@ -24,6 +24,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/A2C-SMCP/a2c-smcp-protocol"
 Documentation = "https://doc.turingfocus.cn/a2c-smcp/"
+"Documentation (GitHub)" = "https://a2c-smcp.github.io/a2c-smcp-protocol/"
 Repository = "https://github.com/A2C-SMCP/a2c-smcp-protocol"
 
 [project.optional-dependencies]

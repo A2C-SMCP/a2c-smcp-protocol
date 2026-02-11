@@ -56,9 +56,105 @@ class SMCPTool(TypedDict):
 
 **说明**: 当 Computer 管理多个 MCP Server 时，可能存在工具名称冲突。此时可通过 `meta` 中的 `alias` 字段设置别名进行区分。
 
+### SMCPTool.meta 序列化规范 { #smcptoolmeta-序列化规范 }
+
+`SMCPTool.meta` 是工具的元数据字段，类型为 `Attributes = Mapping[str, AttributeValue]`。由于 `AttributeValue` 仅支持简单类型（`str | bool | int | float | Sequence[str]` 等），**所有复杂结构必须序列化为 JSON 字符串后存入**。
+
+#### meta 的命名空间结构
+
+`meta` 是一个多方写入的字段，不同来源的数据通过**命名空间 key** 隔离：
+
+| Key | 写入方 | 说明 |
+|-----|-------|------|
+| `a2c_tool_meta` | A2C 系统（Computer） | A2C 配置的工具元数据（tags、auto_apply、alias 等） |
+| `MCP_TOOL_ANNOTATION` | A2C 系统（Computer） | MCP 标准工具注解（destructive、readOnlyHint 等） |
+| 其他任意 key | MCP Server 自身 | MCP Server 在 `Tool._meta` 中设置的原生元数据 |
+
+!!! warning "为什么不将 a2c_tool_meta 展开到 meta 顶层？"
+
+    MCP 协议的 `Tool._meta` 是一个开放字段，MCP Server 可以自由设置任意 key-value。
+    如果将 `tags`、`auto_apply` 等 A2C 字段直接展开到 `meta` 顶层，一旦某个 MCP Server
+    也在 `_meta` 中使用了同名 key（如 `tags`），就会产生**命名冲突**，Agent 端无法区分
+    该字段来自 A2C 配置还是 MCP Server 自身。
+
+    此外，`ToolMeta` 中包含 `ret_object_mapper: dict` 等嵌套类型，无法直接作为
+    `AttributeValue` 存入。使用二级 key + JSON 字符串可以保证所有字段类型统一。
+
+#### a2c_tool_meta 的值格式
+
+`meta["a2c_tool_meta"]` 的值是一个 **JSON 字符串**（不是 dict），Agent 端需要 `json.loads()` 后使用：
+
+```python
+# Agent 端解析示例
+import json
+
+for tool in tools:
+    meta = tool.get("meta", {})
+    if "a2c_tool_meta" in meta:
+        tool_meta = json.loads(meta["a2c_tool_meta"])
+        tags = tool_meta.get("tags")          # list[str] | None
+        auto_apply = tool_meta.get("auto_apply")  # bool | None
+        alias = tool_meta.get("alias")        # str | None
+```
+
+#### 完整 JSON 示例
+
+**场景 1**: `default_tool_meta = null`（未配置元数据）
+
+```json
+{
+  "name": "hello",
+  "description": "Say hello to someone.",
+  "params_schema": {
+    "properties": {
+      "name": { "default": "World", "title": "Name", "type": "string" }
+    },
+    "title": "helloArguments",
+    "type": "object"
+  },
+  "return_schema": {
+    "properties": {
+      "result": { "title": "Result", "type": "string" }
+    },
+    "required": ["result"],
+    "title": "helloOutput",
+    "type": "object"
+  },
+  "meta": {}
+}
+```
+
+**场景 2**: `default_tool_meta = {"tags": ["browser"], "auto_apply": true}`
+
+```json
+{
+  "name": "browser_navigate",
+  "description": "Navigate to a URL.",
+  "params_schema": { "..." : "..." },
+  "return_schema": { "..." : "..." },
+  "meta": {
+    "a2c_tool_meta": "{\"auto_apply\": true, \"alias\": null, \"tags\": [\"browser\"], \"ret_object_mapper\": null}"
+  }
+}
+```
+
+!!! note "注意 a2c_tool_meta 的值类型"
+
+    `a2c_tool_meta` 的值是 **JSON 字符串**，不是嵌套对象。
+    对其执行 `json.loads()` 后得到如下 dict：
+
+    ```json
+    {
+      "auto_apply": true,
+      "alias": null,
+      "tags": ["browser"],
+      "ret_object_mapper": null
+    }
+    ```
+
 ### ToolMeta
 
-工具元数据配置。
+工具元数据配置。此结构定义了 `a2c_tool_meta` JSON 字符串解析后的字段。
 
 ```python
 class ToolMeta(TypedDict, total=False):

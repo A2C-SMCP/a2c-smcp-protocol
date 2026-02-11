@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **A2C-SMCP Protocol Specification** repository - a documentation-only repo defining how Agents and Computers communicate through a Socket.IO-based remote tool invocation protocol. The deliverable is the specification documents themselves, built using MkDocs and deployed to doc.turingfocus.cn.
+This is the **A2C-SMCP Protocol Specification** repository - a documentation-only repo defining how Agents and Computers communicate through a Socket.IO-based remote tool invocation protocol. The deliverable is the specification documents themselves, built using MkDocs and deployed to both GitHub Pages and doc.turingfocus.cn.
 
 **Current Version**: 0.1.2-rc1
 
@@ -12,6 +12,9 @@ This is the **A2C-SMCP Protocol Specification** repository - a documentation-onl
 
 ```
 a2c-smcp-protocol/
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml  # GitHub Pages 自动部署
 ├── docs/                      # 文档源文件 (MkDocs docs_dir)
 │   ├── index.md              # 首页
 │   ├── specification/        # 协议规范
@@ -100,8 +103,14 @@ inv docs.serve
 # Build versioned docs
 inv docs.build
 
-# Deploy to server
+# Deploy to GitHub Pages
+inv docs.deploy-github
+
+# Deploy to company server
 inv docs.deploy
+
+# Deploy to both platforms
+inv docs.deploy-all
 ```
 
 ### Version Management

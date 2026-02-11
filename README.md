@@ -15,7 +15,10 @@ A2C-SMCP (Agent To Computer SMCP) 是一种远程工具调用协议，定义了 
 
 ## 在线文档
 
-访问 [https://doc.turingfocus.cn/a2c-smcp/](https://doc.turingfocus.cn/a2c-smcp/) 查看在线文档。
+| 平台 | 地址 |
+|------|------|
+| GitHub Pages | [https://a2c-smcp.github.io/a2c-smcp-protocol/](https://a2c-smcp.github.io/a2c-smcp-protocol/) |
+| 公司服务器 | [https://doc.turingfocus.cn/a2c-smcp/](https://doc.turingfocus.cn/a2c-smcp/) |
 
 ## SDK 实现
 
@@ -81,12 +84,20 @@ inv docs.serve-versioned
 ### 部署文档
 
 ```bash
-# 完整部署流程（构建 + 推送 + 服务器更新）
+# 部署到公司服务器（构建 + 推送 + 服务器 Git pull）
 inv docs.deploy
+
+# 部署到 GitHub Pages
+inv docs.deploy-github
+
+# 同时部署到两个平台
+inv docs.deploy-all
 
 # 仅构建，不推送
 inv docs.deploy --push=false
 ```
+
+> **自动部署**：推送到 `main` 分支的文档变更会自动触发 GitHub Actions 部署到 GitHub Pages。
 
 ### 可用命令
 
@@ -95,7 +106,9 @@ inv --list                  # 查看所有可用任务
 inv docs.serve              # 本地预览（实时热重载）
 inv docs.serve-versioned    # 多版本预览
 inv docs.build              # 构建文档
-inv docs.deploy             # 部署到服务器
+inv docs.deploy             # 部署到公司服务器
+inv docs.deploy-github      # 部署到 GitHub Pages
+inv docs.deploy-all         # 同时部署到两个平台
 inv docs.clean              # 清理构建产物
 inv docs.server-setup       # 查看服务器初始化步骤
 ```
@@ -104,7 +117,20 @@ inv docs.server-setup       # 查看服务器初始化步骤
 
 ## 部署配置
 
-### 环境变量
+### GitHub Pages（自动）
+
+推送到 `main` 分支的文档变更会自动触发 GitHub Actions 部署：
+
+- **触发条件**：`docs/**`、`mkdocs.yml` 或 workflow 文件变更
+- **手动触发**：在 GitHub Actions 页面点击 "Run workflow"
+- **自定义版本**：手动触发时可指定版本号和别名
+
+仓库需要启用 GitHub Pages：
+1. 进入 Settings → Pages
+2. Source 选择 "Deploy from a branch"
+3. Branch 选择 `gh-pages`，路径选择 `/ (root)`
+
+### 公司服务器（环境变量）
 
 部署脚本通过环境变量配置，建议创建 `.env` 文件（已在 .gitignore 中排除）：
 
