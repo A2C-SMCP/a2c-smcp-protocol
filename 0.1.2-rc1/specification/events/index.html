@@ -1968,6 +1968,11 @@
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>             <span class="c1"># 请求 ID</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
 </code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Agent 端解析 meta 的注意事项</p>
+<p><code>SMCPTool.meta</code> 中的 <code>a2c_tool_meta</code> 字段值为 <strong>JSON 字符串</strong>，需要 <code>json.loads()</code> 后
+才能访问 <code>tags</code>、<code>auto_apply</code> 等字段。详见 <a href="../data-structures/#smcptoolmeta-序列化规范">SMCPTool.meta 序列化规范</a>。</p>
+</div>
 <h4 id="clientget_desktop"><code>client:get_desktop</code><a class="headerlink" href="#clientget_desktop" title="Permanent link">&para;</a></h4>
 <p>获取指定 Computer 的桌面信息（窗口资源聚合视图）。</p>
 <p><strong>请求数据 (GetDeskTopReq)</strong>:
