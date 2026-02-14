@@ -1,0 +1,2134 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Agent To Computer Socket.IO-based MCP Protocol Specification">
+      
+      
+      
+        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/desktop/">
+      
+      
+        <link rel="prev" href="../data-structures/">
+      
+      
+        <link rel="next" href="../room-model/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Desktop 桌面系统 - A2C-SMCP Protocol</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#desktop-桌面系统" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            A2C-SMCP Protocol
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Desktop 桌面系统
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  协议规范
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../appendix/faq/" class="md-tabs__link">
+          
+  
+  
+  附录
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    A2C-SMCP Protocol
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议规范
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    协议规范
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件定义
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-structures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据结构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#window-uri-规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window URI 规范
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Window URI 规范">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uri-格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URI 格式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#组成部分" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        组成部分
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#校验规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        校验规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#构建示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        构建示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-内容格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 内容格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 内容格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#类型定义" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        类型定义
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#渲染规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        渲染规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-组织策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 组织策略
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 组织策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#概述_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-1过滤与分组" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：过滤与分组
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-2服务器优先级排序" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：服务器优先级排序
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-3窗口优先级排序" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：窗口优先级排序
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-4全屏处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：全屏处理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-5尺寸截断" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：尺寸截断
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#算法流程图" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        算法流程图
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-更新机制" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 更新机制
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 更新机制">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#变化检测computer-端" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变化检测（Computer 端）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="变化检测（Computer 端）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-资源列表变化resourcelistchangednotification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 资源列表变化（ResourceListChangedNotification）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-资源内容更新resourceupdatednotification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 资源内容更新（ResourceUpdatedNotification）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-agent-主动拉取" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Agent 主动拉取
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#事件流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        事件流
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#完整生命周期时序图" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完整生命周期时序图
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="完整生命周期时序图">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#初始拉取流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        初始拉取流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#窗口列表变化触发流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        窗口列表变化触发流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#窗口内容变化触发流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        窗口内容变化触发流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-实现指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server 实现指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP Server 实现指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#前提条件" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#暴露窗口资源" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        暴露窗口资源
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#提供窗口内容" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        提供窗口内容
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#变更通知" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变更通知
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#最佳实践" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最佳实践
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../room-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    房间模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    错误处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安全考虑
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    附录
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    附录
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendix/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    常见问题
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#window-uri-规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window URI 规范
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Window URI 规范">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uri-格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        URI 格式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#组成部分" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        组成部分
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#校验规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        校验规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#构建示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        构建示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-内容格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 内容格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 内容格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#类型定义" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        类型定义
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#渲染规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        渲染规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-组织策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 组织策略
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 组织策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#概述_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-1过滤与分组" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：过滤与分组
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-2服务器优先级排序" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：服务器优先级排序
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-3窗口优先级排序" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：窗口优先级排序
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-4全屏处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：全屏处理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-5尺寸截断" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：尺寸截断
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#算法流程图" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        算法流程图
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-更新机制" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop 更新机制
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop 更新机制">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#变化检测computer-端" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变化检测（Computer 端）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="变化检测（Computer 端）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-资源列表变化resourcelistchangednotification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 资源列表变化（ResourceListChangedNotification）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-资源内容更新resourceupdatednotification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 资源内容更新（ResourceUpdatedNotification）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-agent-主动拉取" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Agent 主动拉取
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#事件流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        事件流
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#完整生命周期时序图" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完整生命周期时序图
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="完整生命周期时序图">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#初始拉取流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        初始拉取流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#窗口列表变化触发流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        窗口列表变化触发流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#窗口内容变化触发流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        窗口内容变化触发流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-实现指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server 实现指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP Server 实现指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#前提条件" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#暴露窗口资源" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        暴露窗口资源
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#提供窗口内容" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        提供窗口内容
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#变更通知" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变更通知
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#最佳实践" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        最佳实践
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    协议规范
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="desktop-桌面系统">Desktop 桌面系统<a class="headerlink" href="#desktop-桌面系统" title="Permanent link">&para;</a></h1>
+<h2 id="概述">概述<a class="headerlink" href="#概述" title="Permanent link">&para;</a></h2>
+<p>Desktop 是 A2C-SMCP 协议中工具调用之外的<strong>上下文信息通道</strong>。它将多个 MCP Server 暴露的 <code>window://</code> 资源聚合为统一的桌面视图，供 Agent 在工具调用前后获取辅助信息（例如当前网页内容、编辑器状态、日志输出等）。</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                          Computer                                │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                                                                  │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ┌──────────┐   ┌──────────┐   ┌──────────┐                   │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   │MCP Srv A │   │MCP Srv B │   │MCP Srv C │                   │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   │window://a│   │window://b│   │(无窗口)   │                   │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │  /editor │   │  /log    │   │          │                   │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │  /status │   │          │   │          │                   │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   └────┬─────┘   └────┬─────┘   └──────────┘                   │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│        │              │                                          │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│        ▼              ▼                                          │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   ┌─────────────────────────┐                                   │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   Desktop Organizer     │ ← 过滤、排序、截断                 │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   │   (organize_desktop)    │                                   │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   └───────────┬─────────────┘                                   │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│               │                                                  │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>└───────────────┼──────────────────────────────────────────────────┘
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                ▼
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>           ┌─────────┐
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>           │  Agent   │  ← 通过 client:get_desktop 获取
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>           └─────────┘
+</code></pre></div>
+<p>Desktop 的核心理念是：<strong>MCP Server 只需按 MCP 标准暴露 <code>window://</code> 资源，无需任何 SMCP 特定改动</strong>，Computer 自动完成聚合与组织。</p>
+<hr />
+<h2 id="window-uri-规范">Window URI 规范<a class="headerlink" href="#window-uri-规范" title="Permanent link">&para;</a></h2>
+<h3 id="uri-格式">URI 格式<a class="headerlink" href="#uri-格式" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>window://host/path1/path2?priority=P&amp;fullscreen=F
+</code></pre></div>
+<h3 id="组成部分">组成部分<a class="headerlink" href="#组成部分" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>必需</th>
+<th>说明</th>
+<th>约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scheme</code></td>
+<td>是</td>
+<td>固定为 <code>window</code></td>
+<td>必须为 <code>window</code>，否则解析失败</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>是</td>
+<td>MCP 唯一标识</td>
+<td>不能为空；推荐使用反向域名风格，如 <code>com.example.mcp</code></td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>否</td>
+<td>0..N 个路径段</td>
+<td>每段 URL 编码；<code>c%2Fd</code> 保持为单段，解码为 <code>c/d</code></td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>否</td>
+<td>布局排序优先级</td>
+<td>整数 <code>[0, 100]</code>；默认 <code>0</code>；仅在同一 MCP Server 内部窗口间比较</td>
+</tr>
+<tr>
+<td><code>fullscreen</code></td>
+<td>否</td>
+<td>全屏渲染标记</td>
+<td>布尔值（<code>true</code>/<code>1</code>/<code>yes</code>/<code>on</code> 或 <code>false</code>/<code>0</code>/<code>no</code>/<code>off</code>）；同一 Server 内仅首个生效</td>
+</tr>
+</tbody>
+</table>
+<h3 id="校验规则">校验规则<a class="headerlink" href="#校验规则" title="Permanent link">&para;</a></h3>
+<ol>
+<li><code>scheme</code> 必须为 <code>window</code></li>
+<li><code>host</code> 不能为空</li>
+<li><code>priority</code> 若存在，必须为 <code>[0, 100]</code> 范围内的整数</li>
+<li><code>fullscreen</code> 若存在，必须可解析为布尔值（<code>true</code>/<code>1</code>/<code>yes</code>/<code>on</code> 或 <code>false</code>/<code>0</code>/<code>no</code>/<code>off</code>）</li>
+<li>路径段使用 URL 编码，<code>c%2Fd</code> 保持为单段，解码为 <code>c/d</code></li>
+</ol>
+<h3 id="构建示例">构建示例<a class="headerlink" href="#构建示例" title="Permanent link">&para;</a></h3>
+<p><strong>带完整参数的 URI</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>window://com.example.browser/main/tab1?priority=80&amp;fullscreen=true
+</code></pre></div>
+<ul>
+<li><code>host</code>: <code>com.example.browser</code></li>
+<li><code>path</code>: <code>["main", "tab1"]</code></li>
+<li><code>priority</code>: <code>80</code></li>
+<li><code>fullscreen</code>: <code>true</code></li>
+</ul>
+<p><strong>无路径的最简 URI</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>window://com.example.logger
+</code></pre></div>
+<ul>
+<li><code>host</code>: <code>com.example.logger</code></li>
+<li><code>path</code>: <code>[]</code>（空）</li>
+<li><code>priority</code>: <code>None</code>（默认为 <code>0</code>）</li>
+<li><code>fullscreen</code>: <code>None</code>（默认不全屏）</li>
+</ul>
+<p><strong>含特殊字符的路径段</strong>:</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>window://com.example.editor/src%2Fmain/file%20name
+</code></pre></div>
+<ul>
+<li><code>host</code>: <code>com.example.editor</code></li>
+<li><code>path</code>: <code>["src/main", "file name"]</code>（URL 解码后）</li>
+</ul>
+<hr />
+<h2 id="desktop-内容格式">Desktop 内容格式<a class="headerlink" href="#desktop-内容格式" title="Permanent link">&para;</a></h2>
+<h3 id="类型定义">类型定义<a class="headerlink" href="#类型定义" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Desktop</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="nb">str</span>
+</code></pre></div>
+<p><code>Desktop</code> 是一个字符串类型别名，每个 Desktop 条目代表一个窗口的渲染结果。</p>
+<h3 id="渲染规则">渲染规则<a class="headerlink" href="#渲染规则" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>有文本内容</strong>: <code>{URI}\n\n{body}</code><ul>
+<li><code>body</code> 由窗口资源中所有 <code>TextResourceContents</code> 的 <code>text</code> 以 <code>\n\n</code> 连接</li>
+</ul>
+</li>
+<li><strong>无文本内容</strong>: 仅 <code>{URI}</code></li>
+<li><strong>BlobResourceContents</strong>: 当前不支持渲染，遇到时会产生警告并跳过</li>
+<li><strong>空内容的窗口</strong>: 在组织阶段即被过滤，不会出现在最终结果中</li>
+</ol>
+<h3 id="示例">示例<a class="headerlink" href="#示例" title="Permanent link">&para;</a></h3>
+<p>一个包含两个窗口的 Desktop 返回值：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;desktops&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="s2">&quot;window://com.example.browser/main?priority=80</span><span class="se">\n\n</span><span class="s2">&lt;html&gt;当前页面内容...&lt;/html&gt;&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="s2">&quot;window://com.example.logger</span><span class="se">\n\n</span><span class="s2">[2026-02-14 10:30:01] INFO: 操作完成&quot;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="p">],</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="s2">&quot;req-001&quot;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="desktop-组织策略">Desktop 组织策略<a class="headerlink" href="#desktop-组织策略" title="Permanent link">&para;</a></h2>
+<h3 id="概述_1">概述<a class="headerlink" href="#概述_1" title="Permanent link">&para;</a></h3>
+<p>Computer 通过 <code>organize_desktop(windows, size, history)</code> 函数对原始窗口资源进行组织，输出经过过滤、排序和截断的 Desktop 列表。</p>
+<h3 id="步骤-1过滤与分组">步骤 1：过滤与分组<a class="headerlink" href="#步骤-1过滤与分组" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>过滤</strong>: 跳过以下窗口：<ul>
+<li>内容为空的窗口（<code>contents</code> 为空列表或不存在）</li>
+<li>URI 无效（非 <code>window://</code> 或解析失败）的窗口</li>
+<li>仅含 <code>BlobResourceContents</code> 的窗口（当前不支持渲染）</li>
+</ul>
+</li>
+<li><strong>分组</strong>: 按所属 MCP Server 名称分组</li>
+</ul>
+<h3 id="步骤-2服务器优先级排序">步骤 2：服务器优先级排序<a class="headerlink" href="#步骤-2服务器优先级排序" title="Permanent link">&para;</a></h3>
+<p>根据工具调用历史确定 Server 的展示顺序：</p>
+<ol>
+<li><strong>反向遍历</strong>工具调用历史记录，去重后得到最近使用的 Server 列表（最近使用的排在前面）</li>
+<li><strong>未出现在历史中的 Server</strong> 按名称字母序追加到末尾</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">ToolCallRecord</p>
+<p>Computer 内部通过 <code>ToolCallRecord</code>（定义在 <code>computer/types.py</code>）维护最近的工具调用记录，用于服务器优先级排序。该类型为 Computer 的内部实现细节，不属于 A2C-SMCP 协议数据结构。</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ToolCallRecord</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">server</span><span class="p">:</span> <span class="nb">str</span>       <span class="c1"># MCP Server 名称，用于优先级排序</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+</div>
+<h3 id="步骤-3窗口优先级排序">步骤 3：窗口优先级排序<a class="headerlink" href="#步骤-3窗口优先级排序" title="Permanent link">&para;</a></h3>
+<p>同一 Server 内的窗口按 <code>priority</code> <strong>降序</strong>排列（高优先级在前）。未指定 <code>priority</code> 的窗口默认为 <code>0</code>。</p>
+<h3 id="步骤-4全屏处理">步骤 4：全屏处理<a class="headerlink" href="#步骤-4全屏处理" title="Permanent link">&para;</a></h3>
+<p>fullscreen 是 <strong>per-Server</strong> 的概念，不是全局的。对每个 Server 独立判断：</p>
+<ol>
+<li>若该 Server 内存在 <code>fullscreen=true</code> 的窗口，<strong>仅保留第一个</strong>全屏窗口（按原始资源列表序号最小者）</li>
+<li>该 Server 的<strong>其他所有窗口被排除</strong></li>
+<li>处理继续至下一个 Server</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">跨 Server 的 fullscreen</p>
+<p>如果多个 Server 各自拥有 fullscreen 窗口，每个 Server 都会贡献一个全屏窗口到最终结果中。fullscreen 仅约束同一 Server 内的窗口选择，不会阻止其他 Server 的窗口出现。</p>
+</div>
+<h3 id="步骤-5尺寸截断">步骤 5：尺寸截断<a class="headerlink" href="#步骤-5尺寸截断" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>size=None</code> → 不限制，返回所有窗口</li>
+<li><code>size≤0</code> → 返回空列表</li>
+<li><code>size&gt;0</code> → 截断为全局上限（跨所有 Server 累计）</li>
+</ul>
+<h3 id="算法流程图">算法流程图<a class="headerlink" href="#算法流程图" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>flowchart TD
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    A[输入: windows, size, history] --&gt; B{size ≤ 0?}
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    B -- 是 --&gt; C[返回空列表]
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    B -- 否 --&gt; D[过滤无效/空窗口]
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    D --&gt; E[按 Server 名称分组]
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    E --&gt; F[根据工具调用历史排序 Server]
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    F --&gt; G[每个 Server 内按 priority 降序排序]
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    G --&gt; H{遍历每个 Server}
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    H --&gt; I{Server 内有 fullscreen 窗口?}
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    I -- 是 --&gt; J[仅取第一个 fullscreen 窗口]
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    I -- 否 --&gt; K[按优先级依次取窗口]
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    J --&gt; L{达到 size 上限?}
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    K --&gt; L
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    L -- 否 --&gt; H
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    L -- 是 --&gt; M[渲染并返回 Desktop 列表]
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    H -- 遍历完毕 --&gt; M
+</code></pre></div>
+<hr />
+<h2 id="desktop-更新机制">Desktop 更新机制<a class="headerlink" href="#desktop-更新机制" title="Permanent link">&para;</a></h2>
+<h3 id="变化检测computer-端">变化检测（Computer 端）<a class="headerlink" href="#变化检测computer-端" title="Permanent link">&para;</a></h3>
+<p>Computer 通过监听 MCP Server 的资源变更通知来检测桌面变化：</p>
+<h4 id="1-资源列表变化resourcelistchangednotification">1. 资源列表变化（ResourceListChangedNotification）<a class="headerlink" href="#1-资源列表变化resourcelistchangednotification" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>MCP Server 发出 ResourceListChangedNotification
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    → Computer 收集当前所有 window:// URI
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    → 与缓存的 URI 集合比较
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    → 集合不同 → 触发桌面刷新
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    → 集合相同 → 跳过（仅记录日志）
+</code></pre></div>
+<h4 id="2-资源内容更新resourceupdatednotification">2. 资源内容更新（ResourceUpdatedNotification）<a class="headerlink" href="#2-资源内容更新resourceupdatednotification" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>MCP Server 发出 ResourceUpdatedNotification (携带具体 URI)
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    → Computer 检查该 URI 是否为 window://
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    → 是 → 直接触发桌面刷新（无需集合比较，降低延迟）
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    → 否 → 忽略
+</code></pre></div>
+<h4 id="3-agent-主动拉取">3. Agent 主动拉取<a class="headerlink" href="#3-agent-主动拉取" title="Permanent link">&para;</a></h4>
+<p>Agent 可在任何时候通过 <code>client:get_desktop</code> 事件主动获取最新桌面，无需等待通知。</p>
+<h3 id="事件流">事件流<a class="headerlink" href="#事件流" title="Permanent link">&para;</a></h3>
+<p>当 Computer 检测到桌面变化时，通过以下事件链通知 Agent：</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Computer ──[server:update_desktop]──→ Server ──[notify:update_desktop]──→ Agent
+</code></pre></div>
+<p>两个事件均复用 <code>UpdateComputerConfigReq</code> 数据结构：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># Computer 名称</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>Agent 收到 <code>notify:update_desktop</code> 后，建议自动调用 <code>client:get_desktop</code> 获取最新桌面。</p>
+<h3 id="完整生命周期时序图">完整生命周期时序图<a class="headerlink" href="#完整生命周期时序图" title="Permanent link">&para;</a></h3>
+<h4 id="初始拉取流程">初始拉取流程<a class="headerlink" href="#初始拉取流程" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sequenceDiagram
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    participant A as Agent
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    participant S as Server
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    participant C as Computer
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    S-&gt;&gt;A: GetDeskTopRet
+</code></pre></div>
+<h4 id="窗口列表变化触发流程">窗口列表变化触发流程<a class="headerlink" href="#窗口列表变化触发流程" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sequenceDiagram
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    participant M as MCP Server
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    participant C as Computer
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    participant S as Server
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    participant A as Agent
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    Note over M: 窗口增删（如新增 window:// 资源）
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    C-&gt;&gt;C: 收集 window:// URI 集合
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    C-&gt;&gt;C: 与缓存比较 → 集合不同
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>    S-&gt;&gt;A: GetDeskTopRet
+</code></pre></div>
+<h4 id="窗口内容变化触发流程">窗口内容变化触发流程<a class="headerlink" href="#窗口内容变化触发流程" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sequenceDiagram
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    participant M as MCP Server
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    participant C as Computer
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    participant S as Server
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    participant A as Agent
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    Note over M: 窗口内容更新
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    M-&gt;&gt;C: ResourceUpdatedNotification (uri=window://...)
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    C-&gt;&gt;C: 确认为 window:// URI
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>    S-&gt;&gt;A: GetDeskTopRet
+</code></pre></div>
+<hr />
+<h2 id="mcp-server-实现指南">MCP Server 实现指南<a class="headerlink" href="#mcp-server-实现指南" title="Permanent link">&para;</a></h2>
+<h3 id="前提条件">前提条件<a class="headerlink" href="#前提条件" title="Permanent link">&para;</a></h3>
+<p>MCP Server 若要参与 Desktop，必须声明 <code>resources.subscribe</code> 能力。否则 Computer 不会枚举该 Server 的窗口资源，也不会收到该 Server 的资源变更通知。</p>
+<h3 id="暴露窗口资源">暴露窗口资源<a class="headerlink" href="#暴露窗口资源" title="Permanent link">&para;</a></h3>
+<p>在 <code>resources/list</code> 响应中返回 <code>window://</code> URI 的 Resource：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_resources</span><span class="p">():</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>        <span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;应用状态&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;当前应用的运行状态&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>        <span class="p">)</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    <span class="p">]</span>
+</code></pre></div>
+<p>每个 Resource 的 <code>uri</code> 必须是有效的 <code>window://</code> URI（参见 <a href="#uri-格式">URI 格式</a>）。</p>
+<h3 id="提供窗口内容">提供窗口内容<a class="headerlink" href="#提供窗口内容" title="Permanent link">&para;</a></h3>
+<p>实现 <code>resources/read</code>，返回 <code>TextResourceContents</code>：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">read_resource</span><span class="p">()</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_resource</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="k">if</span> <span class="n">uri</span> <span class="o">==</span> <span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">:</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>            <span class="n">contents</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>                <span class="n">TextResourceContents</span><span class="p">(</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>                    <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>                    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>                    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;运行中 | CPU: 45% | 内存: 2.1GB&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>                <span class="p">)</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>            <span class="p">]</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>        <span class="p">)</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">BlobResourceContents 不被渲染</p>
+<p>Desktop 当前仅渲染 <code>TextResourceContents</code>。如果返回 <code>BlobResourceContents</code>，该内容会被跳过并产生警告日志。</p>
+</div>
+<h3 id="变更通知">变更通知<a class="headerlink" href="#变更通知" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>窗口增删时</strong>: 发出 <code>ResourceListChangedNotification</code></li>
+<li><strong>窗口内容变化时</strong>: 发出 <code>ResourceUpdatedNotification</code>（携带具体 <code>window://</code> URI）</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># 窗口列表变化</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_list_changed</span><span class="p">()</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># 窗口内容更新</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_updated</span><span class="p">(</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.myapp</code>）以避免与其他 MCP Server 冲突</li>
+<li><strong>合理分配 priority</strong>，避免所有窗口使用同一优先级（默认 <code>0</code>）</li>
+<li><strong>fullscreen 仅用于需要完整展示的主窗口</strong>，如当前浏览器页面或全屏编辑器</li>
+<li><strong>窗口内容保持简洁、文本化</strong>，便于 LLM 消费；避免嵌入大量原始 HTML 或二进制数据</li>
+<li><strong>及时发送变更通知</strong>，确保 Agent 获取到最新桌面状态</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/A2C-SMCP" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/room-model/">
       
       
-        <link rel="prev" href="../data-structures/">
+        <link rel="prev" href="../desktop/">
       
       
         <link rel="next" href="../error-handling/">
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#a2c-smcp" class="md-skip">
+        <a href="#a2c-smcp-房间隔离模型" class="md-skip">
           跳转至
         </a>
       
@@ -527,6 +527,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -592,7 +620,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#概述" class="md-nav__link">
     <span class="md-ellipsis">
       
         概述
@@ -603,7 +631,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#房间标识" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间标识
@@ -614,7 +642,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#房间成员" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间成员
@@ -626,7 +654,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#成员类型" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员类型
@@ -637,7 +665,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#成员状态" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员状态
@@ -653,7 +681,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#加入房间" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入房间
@@ -665,7 +693,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#加入流程" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入流程
@@ -676,7 +704,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#请求数据" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求数据
@@ -687,7 +715,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#验证规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         验证规则
@@ -699,7 +727,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#agent" class="md-nav__link">
+  <a href="#agent-加入规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Agent 加入规则
@@ -710,7 +738,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#computer" class="md-nav__link">
+  <a href="#computer-加入规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Computer 加入规则
@@ -731,7 +759,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#离开房间" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开房间
@@ -743,7 +771,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#离开流程" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开流程
@@ -754,7 +782,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#请求数据_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求数据
@@ -765,7 +793,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#自动离开场景" class="md-nav__link">
     <span class="md-ellipsis">
       
         自动离开场景
@@ -781,7 +809,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#隔离保障" class="md-nav__link">
     <span class="md-ellipsis">
       
         隔离保障
@@ -793,7 +821,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
+  <a href="#隔离约束表" class="md-nav__link">
     <span class="md-ellipsis">
       
         隔离约束表
@@ -804,7 +832,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
+  <a href="#跨房间访问防护" class="md-nav__link">
     <span class="md-ellipsis">
       
         跨房间访问防护
@@ -820,7 +848,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
+  <a href="#成员变更通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员变更通知
@@ -832,7 +860,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
+  <a href="#加入通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入通知
@@ -843,7 +871,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_19" class="md-nav__link">
+  <a href="#离开通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开通知
@@ -859,7 +887,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_20" class="md-nav__link">
+  <a href="#房间查询" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间查询
@@ -871,7 +899,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_21" class="md-nav__link">
+  <a href="#请求" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求
@@ -882,7 +910,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_22" class="md-nav__link">
+  <a href="#响应" class="md-nav__link">
     <span class="md-ellipsis">
       
         响应
@@ -898,7 +926,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_23" class="md-nav__link">
+  <a href="#最佳实践" class="md-nav__link">
     <span class="md-ellipsis">
       
         最佳实践
@@ -910,7 +938,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#id" class="md-nav__link">
+  <a href="#房间-id-设计" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间 ID 设计
@@ -921,7 +949,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#agent_1" class="md-nav__link">
+  <a href="#agent-连接管理" class="md-nav__link">
     <span class="md-ellipsis">
       
         Agent 连接管理
@@ -932,7 +960,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_24" class="md-nav__link">
+  <a href="#资源清理" class="md-nav__link">
     <span class="md-ellipsis">
       
         资源清理
@@ -948,7 +976,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_25" class="md-nav__link">
+  <a href="#参考" class="md-nav__link">
     <span class="md-ellipsis">
       
         参考
@@ -1148,7 +1176,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#概述" class="md-nav__link">
     <span class="md-ellipsis">
       
         概述
@@ -1159,7 +1187,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#房间标识" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间标识
@@ -1170,7 +1198,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#房间成员" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间成员
@@ -1182,7 +1210,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#成员类型" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员类型
@@ -1193,7 +1221,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#成员状态" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员状态
@@ -1209,7 +1237,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#加入房间" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入房间
@@ -1221,7 +1249,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#加入流程" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入流程
@@ -1232,7 +1260,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#请求数据" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求数据
@@ -1243,7 +1271,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_9" class="md-nav__link">
+  <a href="#验证规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         验证规则
@@ -1255,7 +1283,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#agent" class="md-nav__link">
+  <a href="#agent-加入规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Agent 加入规则
@@ -1266,7 +1294,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#computer" class="md-nav__link">
+  <a href="#computer-加入规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Computer 加入规则
@@ -1287,7 +1315,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_10" class="md-nav__link">
+  <a href="#离开房间" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开房间
@@ -1299,7 +1327,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
+  <a href="#离开流程" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开流程
@@ -1310,7 +1338,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#请求数据_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求数据
@@ -1321,7 +1349,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_13" class="md-nav__link">
+  <a href="#自动离开场景" class="md-nav__link">
     <span class="md-ellipsis">
       
         自动离开场景
@@ -1337,7 +1365,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_14" class="md-nav__link">
+  <a href="#隔离保障" class="md-nav__link">
     <span class="md-ellipsis">
       
         隔离保障
@@ -1349,7 +1377,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_15" class="md-nav__link">
+  <a href="#隔离约束表" class="md-nav__link">
     <span class="md-ellipsis">
       
         隔离约束表
@@ -1360,7 +1388,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_16" class="md-nav__link">
+  <a href="#跨房间访问防护" class="md-nav__link">
     <span class="md-ellipsis">
       
         跨房间访问防护
@@ -1376,7 +1404,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_17" class="md-nav__link">
+  <a href="#成员变更通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         成员变更通知
@@ -1388,7 +1416,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_18" class="md-nav__link">
+  <a href="#加入通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         加入通知
@@ -1399,7 +1427,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_19" class="md-nav__link">
+  <a href="#离开通知" class="md-nav__link">
     <span class="md-ellipsis">
       
         离开通知
@@ -1415,7 +1443,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_20" class="md-nav__link">
+  <a href="#房间查询" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间查询
@@ -1427,7 +1455,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_21" class="md-nav__link">
+  <a href="#请求" class="md-nav__link">
     <span class="md-ellipsis">
       
         请求
@@ -1438,7 +1466,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_22" class="md-nav__link">
+  <a href="#响应" class="md-nav__link">
     <span class="md-ellipsis">
       
         响应
@@ -1454,7 +1482,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_23" class="md-nav__link">
+  <a href="#最佳实践" class="md-nav__link">
     <span class="md-ellipsis">
       
         最佳实践
@@ -1466,7 +1494,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#id" class="md-nav__link">
+  <a href="#房间-id-设计" class="md-nav__link">
     <span class="md-ellipsis">
       
         房间 ID 设计
@@ -1477,7 +1505,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#agent_1" class="md-nav__link">
+  <a href="#agent-连接管理" class="md-nav__link">
     <span class="md-ellipsis">
       
         Agent 连接管理
@@ -1488,7 +1516,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_24" class="md-nav__link">
+  <a href="#资源清理" class="md-nav__link">
     <span class="md-ellipsis">
       
         资源清理
@@ -1504,7 +1532,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_25" class="md-nav__link">
+  <a href="#参考" class="md-nav__link">
     <span class="md-ellipsis">
       
         参考
@@ -1582,16 +1610,16 @@
   
 
 
-<h1 id="a2c-smcp">A2C-SMCP 房间隔离模型<a class="headerlink" href="#a2c-smcp" title="Permanent link">&para;</a></h1>
+<h1 id="a2c-smcp-房间隔离模型">A2C-SMCP 房间隔离模型<a class="headerlink" href="#a2c-smcp-房间隔离模型" title="Permanent link">&para;</a></h1>
 <p>本文档详细描述 A2C-SMCP 协议的房间（Office/Room）隔离机制。</p>
-<h2 id="_1">概述<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="概述">概述<a class="headerlink" href="#概述" title="Permanent link">&para;</a></h2>
 <p>房间是 A2C-SMCP 协议中的逻辑隔离单元，用于约束 Agent 与 Computer 的协作范围。房间机制确保：</p>
 <ul>
 <li><strong>安全隔离</strong>: 不同房间的成员无法相互访问</li>
 <li><strong>资源边界</strong>: 工具调用只能在同一房间内进行</li>
 <li><strong>消息隔离</strong>: 通知只广播给同一房间的成员</li>
 </ul>
-<h2 id="_2">房间标识<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="房间标识">房间标识<a class="headerlink" href="#房间标识" title="Permanent link">&para;</a></h2>
 <p>每个房间通过 <code>office_id</code> 唯一标识：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># 房间唯一标识符</span>
 </code></pre></div>
@@ -1599,8 +1627,8 @@
 - 使用 UUID 或业务相关的唯一标识
 - 避免使用可预测的序列号
 - 考虑包含环境标识（如 <code>prod-</code>, <code>test-</code>）</p>
-<h2 id="_3">房间成员<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="_4">成员类型<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h2 id="房间成员">房间成员<a class="headerlink" href="#房间成员" title="Permanent link">&para;</a></h2>
+<h3 id="成员类型">成员类型<a class="headerlink" href="#成员类型" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1622,7 +1650,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_5">成员状态<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h3 id="成员状态">成员状态<a class="headerlink" href="#成员状态" title="Permanent link">&para;</a></h3>
 <p>每个成员在房间中维护以下状态：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">sid</span><span class="p">:</span> <span class="nb">str</span>                    <span class="c1"># Socket.IO 会话 ID</span>
@@ -1630,8 +1658,8 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;computer&quot;</span><span class="p">]</span>  <span class="c1"># 角色</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>       <span class="c1"># 当前所在房间</span>
 </code></pre></div>
-<h2 id="_6">加入房间<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<h3 id="_7">加入流程<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h2 id="加入房间">加入房间<a class="headerlink" href="#加入房间" title="Permanent link">&para;</a></h2>
+<h3 id="加入流程">加入流程<a class="headerlink" href="#加入流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sequenceDiagram
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    participant C as Client (Agent/Computer)
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    participant S as Server
@@ -1647,14 +1675,14 @@
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        S-&gt;&gt;C: 返回错误
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    end
 </code></pre></div>
-<h3 id="_8">请求数据<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<h3 id="请求数据">请求数据<a class="headerlink" href="#请求数据" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EnterOfficeReq</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">]</span>  <span class="c1"># 角色</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                           <span class="c1"># 名称</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 目标房间 ID</span>
 </code></pre></div>
-<h3 id="_9">验证规则<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<h4 id="agent">Agent 加入规则<a class="headerlink" href="#agent" title="Permanent link">&para;</a></h4>
+<h3 id="验证规则">验证规则<a class="headerlink" href="#验证规则" title="Permanent link">&para;</a></h3>
+<h4 id="agent-加入规则">Agent 加入规则<a class="headerlink" href="#agent-加入规则" title="Permanent link">&para;</a></h4>
 <ol>
 <li>检查房间是否已有 Agent</li>
 <li>若已有 Agent，拒绝加入（返回错误）</li>
@@ -1667,7 +1695,7 @@
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Room already has an agent&quot;</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span>
 </code></pre></div>
-<h4 id="computer">Computer 加入规则<a class="headerlink" href="#computer" title="Permanent link">&para;</a></h4>
+<h4 id="computer-加入规则">Computer 加入规则<a class="headerlink" href="#computer-加入规则" title="Permanent link">&para;</a></h4>
 <ol>
 <li>检查 Computer 是否已在其他房间</li>
 <li>若在其他房间，先自动离开旧房间</li>
@@ -1680,8 +1708,8 @@
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="k">await</span> <span class="n">leave_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">current_room</span><span class="p">)</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">await</span> <span class="n">join_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">office_id</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="_10">离开房间<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
-<h3 id="_11">离开流程<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<h2 id="离开房间">离开房间<a class="headerlink" href="#离开房间" title="Permanent link">&para;</a></h2>
+<h3 id="离开流程">离开流程<a class="headerlink" href="#离开流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sequenceDiagram
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    participant C as Client
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    participant S as Server
@@ -1692,19 +1720,19 @@
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    S-&gt;&gt;R: 移除成员
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    S-&gt;&gt;C: 返回成功
 </code></pre></div>
-<h3 id="_12">请求数据<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<h3 id="请求数据_1">请求数据<a class="headerlink" href="#请求数据_1" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">LeaveOfficeReq</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># 要离开的房间 ID</span>
 </code></pre></div>
-<h3 id="_13">自动离开场景<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<h3 id="自动离开场景">自动离开场景<a class="headerlink" href="#自动离开场景" title="Permanent link">&para;</a></h3>
 <p>以下场景会触发自动离开：</p>
 <ol>
 <li><strong>连接断开</strong>: Socket.IO 连接断开时</li>
 <li><strong>房间切换</strong>: Computer 加入新房间时（自动离开旧房间）</li>
 <li><strong>服务器关闭</strong>: Server 关闭时</li>
 </ol>
-<h2 id="_14">隔离保障<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
-<h3 id="_15">隔离约束表<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<h2 id="隔离保障">隔离保障<a class="headerlink" href="#隔离保障" title="Permanent link">&para;</a></h2>
+<h3 id="隔离约束表">隔离约束表<a class="headerlink" href="#隔离约束表" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1736,7 +1764,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_16">跨房间访问防护<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<h3 id="跨房间访问防护">跨房间访问防护<a class="headerlink" href="#跨房间访问防护" title="Permanent link">&para;</a></h3>
 <p>Server 在处理 <code>client:*</code> 事件时必须验证：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 伪代码</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_client_tool_call</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -1751,8 +1779,8 @@
 <a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="c1"># 继续处理...</span>
 </code></pre></div>
-<h2 id="_17">成员变更通知<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h2>
-<h3 id="_18">加入通知<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<h2 id="成员变更通知">成员变更通知<a class="headerlink" href="#成员变更通知" title="Permanent link">&para;</a></h2>
+<h3 id="加入通知">加入通知<a class="headerlink" href="#加入通知" title="Permanent link">&para;</a></h3>
 <p>当成员加入房间后，Server 广播 <code>notify:enter_office</code>：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EnterOfficeNotification</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -1764,7 +1792,7 @@
 <li>Agent 收到 Computer 加入通知后，应调用 <code>client:get_tools</code> 获取工具列表</li>
 <li>Computer 收到 Agent 加入通知后，可进行初始化准备</li>
 </ul>
-<h3 id="_19">离开通知<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h3>
+<h3 id="离开通知">离开通知<a class="headerlink" href="#离开通知" title="Permanent link">&para;</a></h3>
 <p>当成员即将离开房间时，Server 广播 <code>notify:leave_office</code>：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">LeaveOfficeNotification</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -1776,15 +1804,15 @@
 <li>Agent 收到 Computer 离开通知后，应清理该 Computer 的工具</li>
 <li>Computer 收到 Agent 离开通知后，可进行资源清理</li>
 </ul>
-<h2 id="_20">房间查询<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h2>
+<h2 id="房间查询">房间查询<a class="headerlink" href="#房间查询" title="Permanent link">&para;</a></h2>
 <p>Agent 可通过 <code>server:list_room</code> 事件查询房间内的所有会话：</p>
-<h3 id="_21">请求<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h3>
+<h3 id="请求">请求<a class="headerlink" href="#请求" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ListRoomReq</span><span class="p">(</span><span class="n">AgentCallData</span><span class="p">):</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">agent</span><span class="p">:</span> <span class="nb">str</span>      <span class="c1"># Agent 名称</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 请求 ID</span>
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># 房间 ID</span>
 </code></pre></div>
-<h3 id="_22">响应<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h3>
+<h3 id="响应">响应<a class="headerlink" href="#响应" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SessionInfo</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">sid</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -1795,8 +1823,8 @@
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">sessions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">]</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div>
-<h2 id="_23">最佳实践<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h2>
-<h3 id="id">房间 ID 设计<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
+<h2 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h2>
+<h3 id="房间-id-设计">房间 ID 设计<a class="headerlink" href="#房间-id-设计" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># 推荐：使用 UUID</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">office_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
@@ -1806,7 +1834,7 @@
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># 不推荐：使用可预测的序列</span>
 <a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">office_id</span> <span class="o">=</span> <span class="s2">&quot;room-1&quot;</span>  <span class="c1"># 安全风险</span>
 </code></pre></div>
-<h3 id="agent_1">Agent 连接管理<a class="headerlink" href="#agent_1" title="Permanent link">&para;</a></h3>
+<h3 id="agent-连接管理">Agent 连接管理<a class="headerlink" href="#agent-连接管理" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># 推荐：连接前检查房间状态</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_computers_in_office</span><span class="p">(</span><span class="n">office_id</span><span class="p">)</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;agent&quot;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sessions</span><span class="p">):</span>
@@ -1814,14 +1842,14 @@
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
 <a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">join_office</span><span class="p">(</span><span class="n">office_id</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="_24">资源清理<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h3>
+<h3 id="资源清理">资源清理<a class="headerlink" href="#资源清理" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># 推荐：离开房间时清理资源</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">():</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">leave_office</span><span class="p">(</span><span class="n">office_id</span><span class="p">)</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="c1"># 清理本地工具缓存</span>
 <a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">tools_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="_25">参考<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h2>
+<h2 id="参考">参考<a class="headerlink" href="#参考" title="Permanent link">&para;</a></h2>
 <ul>
 <li>房间管理实现: <code>a2c_smcp/server/namespace.py</code></li>
 <li>工具函数: <code>a2c_smcp/server/utils.py</code></li>
