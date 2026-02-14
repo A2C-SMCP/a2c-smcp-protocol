@@ -110,6 +110,7 @@ Agent ──→ Computer ─┬─→ Excel MCP
 - [架构设计](architecture.md) - 角色关系与通信模型
 - [事件定义](events.md) - 完整事件列表与规范
 - [数据结构](data-structures.md) - 请求/响应数据结构定义
+- [Desktop 桌面系统](desktop.md) - Window URI 规范、桌面组织策略与更新机制
 - [房间模型](room-model.md) - 房间隔离机制详解
 - [错误处理](error-handling.md) - 错误码与响应格式
 - [安全考虑](security.md) - 安全性要求与建议
@@ -118,7 +119,7 @@ Agent ──→ Computer ─┬─→ Excel MCP
 
 A2C-SMCP 构建于 MCP 协议之上：
 
-- **MCP Server 开发者**: 无需任何改动，现有 MCP Server 可直接被 Computer 管理
+- **MCP Server 开发者**: 无需任何改动，现有 MCP Server 可直接被 Computer 管理；MCP Server 还可通过暴露 `window://` 资源参与 [Desktop 桌面系统](desktop.md)，同样无需任何 SMCP 特定改动
 - **Agent 开发者**: 仅需实现 SMCP 协议接口，无需关心底层 MCP 细节
 - **工具调用**: Agent → SMCP → Computer → MCP → 工具
 

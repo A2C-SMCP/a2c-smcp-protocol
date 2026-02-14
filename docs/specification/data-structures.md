@@ -277,12 +277,20 @@ class ListRoomRet(TypedDict):
 
 ### UpdateComputerConfigReq
 
-配置更新请求。
+配置更新请求。同时被 Desktop 更新事件（`server:update_desktop` / `notify:update_desktop`）复用。
 
 ```python
 class UpdateComputerConfigReq(TypedDict):
     computer: str       # Computer 名称
 ```
+
+**复用说明**: 此数据结构被以下事件共用：
+
+| 事件 | 用途 |
+|------|------|
+| `server:update_config` | Computer 配置更新请求 |
+| `server:update_desktop` | 桌面更新通知请求 |
+| `notify:update_desktop` | 桌面更新广播通知 |
 
 ### UpdateMCPConfigNotification
 
@@ -340,13 +348,38 @@ class GetDeskTopReq(AgentCallData, total=True):
     window: NotRequired[str]        # 可选：指定获取的 WindowURI
 ```
 
+### Desktop
+
+桌面内容类型别名。每个 `Desktop` 条目是一个字符串，代表一个窗口的渲染结果。
+
+```python
+Desktop: TypeAlias = str
+```
+
+**内容格式**:
+
+- 有文本内容时：`{window:// URI}\n\n{body}`（多个 `TextResourceContents` 的 `text` 用 `\n\n` 连接）
+- 无文本内容时：仅 `{window:// URI}`
+
+**示例**:
+
+```
+window://com.example.browser/main?priority=80
+
+<html>当前页面内容...</html>
+```
+
+详见 [Desktop 桌面系统](desktop.md) 中的完整规范。
+
+!!! note "Desktop 更新事件的数据结构"
+
+    `server:update_desktop` 和 `notify:update_desktop` 事件均复用 [`UpdateComputerConfigReq`](#updatecomputerconfigreq) 结构（仅包含 `computer: str` 字段），与 `server:update_config` 共享同一数据结构。
+
 ### GetDeskTopRet
 
 获取桌面信息响应。
 
 ```python
-Desktop: TypeAlias = str
-
 class GetDeskTopRet(TypedDict, total=False):
     desktops: list[Desktop]     # 桌面内容列表（字符串形式）
     req_id: str                 # 请求 ID

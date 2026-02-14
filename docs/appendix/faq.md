@@ -94,6 +94,31 @@
 - 没有 MCP Server 暴露 `window://` 资源
 - `desktop_size` 设置为 0 或负数
 - MCP Server 未启动
+- MCP Server 未声明 `resources.subscribe` 能力
+
+### Q: Window URI 的格式是什么？
+
+**格式**: `window://host/path1/path2?priority=P&fullscreen=F`
+
+- `host`（必需）: MCP 唯一标识，推荐反向域名风格如 `com.example.mcp`
+- `path`（可选）: 0..N 个路径段，URL 编码
+- `priority`（可选）: 整数 `[0, 100]`，同一 MCP 内比较，越大越靠前
+- `fullscreen`（可选）: 布尔值，全屏渲染标记
+
+详见 [Desktop 桌面系统 - Window URI 规范](../specification/desktop.md#window-uri-规范)。
+
+### Q: 如何让 MCP Server 的内容出现在 Desktop 上？
+
+MCP Server 参与 Desktop 需满足以下条件：
+
+1. 声明 `resources.subscribe` 能力
+2. 在 `resources/list` 中返回有效的 `window://` URI 的 Resource
+3. 实现 `resources/read`，返回 `TextResourceContents`
+4. 在窗口增删/内容变化时发出对应的 MCP 通知
+
+详见 [Desktop 桌面系统 - MCP Server 实现指南](../specification/desktop.md#mcp-server-实现指南)。
+
+详见 [Desktop 桌面系统](../specification/desktop.md) 完整规范。
 
 ---
 

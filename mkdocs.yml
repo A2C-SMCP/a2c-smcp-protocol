@@ -106,6 +106,7 @@ nav:
       - 架构设计: specification/architecture.md
       - 事件定义: specification/events.md
       - 数据结构: specification/data-structures.md
+      - Desktop 桌面系统: specification/desktop.md
       - 房间模型: specification/room-model.md
       - 错误处理: specification/error-handling.md
       - 安全考虑: specification/security.md

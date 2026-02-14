@@ -43,7 +43,7 @@ SMCP_NAMESPACE = "/smcp"
 | `LEAVE_OFFICE_EVENT` | `server:leave_office` | Agent/Computer | 离开房间 | `LeaveOfficeReq` |
 | `UPDATE_CONFIG_EVENT` | `server:update_config` | Computer | 配置更新通知请求 | `UpdateComputerConfigReq` |
 | `UPDATE_TOOL_LIST_EVENT` | `server:update_tool_list` | Computer | 工具列表更新通知请求 | `UpdateToolListNotification` |
-| `UPDATE_DESKTOP_EVENT` | `server:update_desktop` | Computer | 桌面更新通知请求 | *(待定义)* |
+| `UPDATE_DESKTOP_EVENT` | `server:update_desktop` | Computer | 桌面更新通知请求 | `UpdateComputerConfigReq` |
 | `CANCEL_TOOL_CALL_EVENT` | `server:tool_call_cancel` | Agent | 取消工具调用 | `AgentCallData` |
 | `LIST_ROOM_EVENT` | `server:list_room` | Agent | 列出房间内所有会话 | `ListRoomReq` |
 
@@ -57,7 +57,7 @@ SMCP_NAMESPACE = "/smcp"
 | `LEAVE_OFFICE_NOTIFICATION` | `notify:leave_office` | 成员离开房间通知 | `LeaveOfficeNotification` |
 | `UPDATE_CONFIG_NOTIFICATION` | `notify:update_config` | 配置更新通知 | `UpdateMCPConfigNotification` |
 | `UPDATE_TOOL_LIST_NOTIFICATION` | `notify:update_tool_list` | 工具列表更新通知 | `UpdateToolListNotification` |
-| `UPDATE_DESKTOP_NOTIFICATION` | `notify:update_desktop` | 桌面更新通知 | *(待定义)* |
+| `UPDATE_DESKTOP_NOTIFICATION` | `notify:update_desktop` | 桌面更新通知 | `UpdateComputerConfigReq` |
 | `CANCEL_TOOL_CALL_NOTIFICATION` | `notify:tool_call_cancel` | 工具调用取消通知 | `AgentCallData` |
 
 ---
@@ -256,6 +256,22 @@ Computer 通知 Server 其工具列表已更新，Server 随后广播 `notify:up
 
 Computer 通知 Server 其桌面内容已更新，Server 随后广播 `notify:update_desktop`。
 
+**触发条件**（由 Computer 端检测）:
+
+- MCP Server 发出 `ResourceListChangedNotification` 且 `window://` URI 集合发生变化
+- MCP Server 发出 `ResourceUpdatedNotification` 且目标 URI 为 `window://`
+
+**请求数据**: 复用 `UpdateComputerConfigReq`（与 `server:update_config` 共享同一数据结构）:
+```python
+{
+    "computer": str     # Computer 名称
+}
+```
+
+**Server 处理**: 接收后向该 Computer 所在房间广播 `notify:update_desktop`。
+
+详见 [Desktop 桌面系统](desktop.md) 中的 [更新机制](desktop.md#desktop-更新机制)。
+
 ---
 
 ### 通知事件
@@ -318,7 +334,16 @@ Server 广播：某 Computer 的工具列表已更新。
 
 Server 广播：某 Computer 的桌面内容已更新。
 
-**Agent 响应建议**: 收到此通知后，可按需调用 `client:get_desktop` 获取最新桌面。
+**数据结构**: 复用 `UpdateComputerConfigReq`（与 `notify:update_config` 结构一致）:
+```python
+{
+    "computer": str     # 桌面发生变化的 Computer 名称
+}
+```
+
+**Agent 响应建议**: 收到此通知后，推荐自动调用 `client:get_desktop` 获取最新桌面。
+
+详见 [Desktop 桌面系统](desktop.md) 中的 [完整生命周期时序图](desktop.md#完整生命周期时序图)。
 
 #### `notify:tool_call_cancel`
 
@@ -384,6 +409,29 @@ sequenceDiagram
     C->>S: 工具列表
     S->>A: GetToolsRet
 ```
+
+### 桌面更新流程
+
+```mermaid
+sequenceDiagram
+    participant M as MCP Server
+    participant C as Computer
+    participant S as Server
+    participant A as Agent
+
+    Note over M: 窗口资源变化
+    M->>C: ResourceListChangedNotification
+    C->>C: 比较 window:// URI 集合
+    C->>S: server:update_desktop
+    S->>A: notify:update_desktop
+    A->>S: client:get_desktop
+    S->>C: client:get_desktop (转发)
+    C->>C: organize_desktop()
+    C->>S: GetDeskTopRet
+    S->>A: GetDeskTopRet
+```
+
+详见 [Desktop 桌面系统](desktop.md)。
 
 ---
 

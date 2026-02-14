@@ -275,13 +275,37 @@ Computer 作为 MCP Server 的宿主，实现了与 MCP 协议的桥接：
 3. 通过别名机制解决工具名冲突
 4. 对外暴露统一的工具视图
 
-### 资源映射
+### Desktop 桌面系统
 
-MCP Resources 被映射为 Desktop 能力：
+Computer 将多个 MCP Server 暴露的 `window://` 资源聚合为统一的桌面视图，为 Agent 提供工具调用之外的上下文信息。
 
-- `resources/list` → 筛选 `window://` 资源
-- `resources/read` → 读取窗口内容
-- `resources/subscribe` → 触发桌面刷新通知
+```
+MCP Server A ──┐
+  window://a/.. │    ┌─────────────────┐         ┌─────────┐
+               ├───→│    Computer      │────────→│  Agent   │
+MCP Server B ──┤    │ Desktop Organizer│         │          │
+  window://b/.. │    └─────────────────┘         └─────────┘
+               │         过滤/排序/截断
+MCP Server C ──┘
+  (无窗口资源)
+```
+
+**MCP 操作到 Desktop 的映射**:
+
+| MCP 操作 | Desktop 用途 |
+|----------|-------------|
+| `resources/list` | 枚举并筛选 `window://` 资源 |
+| `resources/read` | 读取窗口的文本内容 |
+| `resources.subscribe` 能力 | 前提条件，Computer 据此决定是否枚举该 Server 的窗口 |
+| `ResourceListChangedNotification` | 触发窗口集合变化检测 |
+| `ResourceUpdatedNotification` | 触发窗口内容变化刷新 |
+
+**核心组件**:
+
+- `desktop/organize.py` — 桌面组织策略（过滤、排序、全屏处理、截断）
+- `utils/window_uri.py` — `window://` URI 解析与构建
+
+详见 [Desktop 桌面系统](desktop.md) 完整规范。
 
 ---
 
