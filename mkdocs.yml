@@ -73,6 +73,9 @@ markdown_extensions:
   - toc:
       permalink: true
       title: 页面目录
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - admonition
   - pymdownx.details
   - pymdownx.superfences:
