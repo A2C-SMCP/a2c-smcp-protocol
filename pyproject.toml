@@ -73,3 +73,8 @@ replace = "**版本**: {new_version}"
 filename = "mkdocs.yml"
 search = "最新版本：{current_version}"
 replace = "最新版本：{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "docs/index.md"
+search = "当前协议版本：**{current_version}**"
+replace = "当前协议版本：**{new_version}**"
