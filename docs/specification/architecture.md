@@ -307,6 +307,40 @@ MCP Server C ──┘
 
 详见 [Desktop 桌面系统](desktop.md) 完整规范。
 
+### Finder 文档系统
+
+Computer 将多个 MCP Server 暴露的 `dpe://` 资源聚合为统一的文档目录视图，为 Agent 提供结构化文档的渐进式导航能力。
+
+```
+MCP Server A ──┐
+  dpe://a/..   │    ┌─────────────────┐         ┌─────────┐
+               ├───→│    Computer     │────────→│  Agent  │
+MCP Server B ──┤    │ Finder Organizer│         │         │
+  dpe://b/..   │    └─────────────────┘         └─────────┘
+               │         过滤/排序/分页
+MCP Server C ──┘
+  (无文档资源)
+```
+
+**MCP 操作到 Finder 的映射**:
+
+| MCP 操作 | Finder 用途 |
+|----------|------------|
+| `resources/list` | 枚举并筛选 `dpe://` 资源 |
+| `resources/read` | 按 URI 级别读取文档/页面/元素内容 |
+| `resources/templates` | 声明 `pages/{N}` 和 `elements/{ID}` 子路径模板 |
+| `resources.subscribe` 能力 | 前提条件，Computer 据此决定是否枚举该 Server 的文档 |
+| `ResourceListChangedNotification` | 触发文档集合变化检测 |
+| `ResourceUpdatedNotification` | 触发文档内容变化刷新 |
+| `completion/complete` | 可选：`dpe://` 资源模板参数自动补全 |
+
+**核心组件**:
+
+- `finder/organize.py` — Finder 组织策略（过滤、排序、分页）
+- `utils/dpe_uri.py` — `dpe://` URI 解析与构建
+
+详见 [Finder 文档系统](finder.md) 完整规范。
+
 ---
 
 ## 同步/异步双栈

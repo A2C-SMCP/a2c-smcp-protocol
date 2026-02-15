@@ -110,8 +110,12 @@ nav:
       - 事件定义: specification/events.md
       - 数据结构: specification/data-structures.md
       - Desktop 桌面系统: specification/desktop.md
+      - Finder 文档系统: specification/finder.md
       - 房间模型: specification/room-model.md
       - 错误处理: specification/error-handling.md
       - 安全考虑: specification/security.md
+  - 开发指南:
+      - Finder SDK 实现指南: guides/finder-sdk-guide.md
   - 附录:
       - 常见问题: appendix/faq.md
+      - DPE 标准化提案: specification/dpe-standardization-proposal.md

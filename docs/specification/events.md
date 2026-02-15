@@ -32,6 +32,7 @@ SMCP_NAMESPACE = "/smcp"
 | `GET_CONFIG_EVENT` | `client:get_config` | 获取 Computer 配置 | `GetComputerConfigReq` | `GetComputerConfigRet` |
 | `GET_TOOLS_EVENT` | `client:get_tools` | 获取工具列表 | `GetToolsReq` | `GetToolsRet` |
 | `GET_DESKTOP_EVENT` | `client:get_desktop` | 获取桌面信息 | `GetDeskTopReq` | `GetDeskTopRet` |
+| `GET_FINDER_EVENT` | `client:get_finder` | 获取文档目录 | `GetFinderReq` | `GetFinderRet` |
 
 ### Server 事件（客户端 → Server）
 
@@ -44,6 +45,7 @@ SMCP_NAMESPACE = "/smcp"
 | `UPDATE_CONFIG_EVENT` | `server:update_config` | Computer | 配置更新通知请求 | `UpdateComputerConfigReq` |
 | `UPDATE_TOOL_LIST_EVENT` | `server:update_tool_list` | Computer | 工具列表更新通知请求 | `UpdateToolListNotification` |
 | `UPDATE_DESKTOP_EVENT` | `server:update_desktop` | Computer | 桌面更新通知请求 | `UpdateComputerConfigReq` |
+| `UPDATE_FINDER_EVENT` | `server:update_finder` | Computer | 文档目录更新通知请求 | `UpdateComputerConfigReq` |
 | `CANCEL_TOOL_CALL_EVENT` | `server:tool_call_cancel` | Agent | 取消工具调用 | `AgentCallData` |
 | `LIST_ROOM_EVENT` | `server:list_room` | Agent | 列出房间内所有会话 | `ListRoomReq` |
 
@@ -58,6 +60,7 @@ SMCP_NAMESPACE = "/smcp"
 | `UPDATE_CONFIG_NOTIFICATION` | `notify:update_config` | 配置更新通知 | `UpdateMCPConfigNotification` |
 | `UPDATE_TOOL_LIST_NOTIFICATION` | `notify:update_tool_list` | 工具列表更新通知 | `UpdateToolListNotification` |
 | `UPDATE_DESKTOP_NOTIFICATION` | `notify:update_desktop` | 桌面更新通知 | `UpdateComputerConfigReq` |
+| `UPDATE_FINDER_NOTIFICATION` | `notify:update_finder` | 文档目录更新通知 | `UpdateComputerConfigReq` |
 | `CANCEL_TOOL_CALL_NOTIFICATION` | `notify:tool_call_cancel` | 工具调用取消通知 | `AgentCallData` |
 
 ---
@@ -139,6 +142,34 @@ Agent ←───────────────────────�
     "req_id": str           # 请求 ID
 }
 ```
+
+#### `client:get_finder`
+
+获取指定 Computer 的文档目录（DPE 文档聚合视图）。
+
+**请求数据 (GetFinderReq)**:
+```python
+{
+    "agent": str,           # Agent 标识
+    "req_id": str,          # 请求 ID
+    "computer": str,        # 目标 Computer 名称
+    "keywords": list[str],  # 可选：关键词过滤
+    "file_type": str,       # 可选：文件类型过滤
+    "offset": int,          # 可选：分页偏移（默认 0）
+    "limit": int            # 可选：分页限制（默认 20）
+}
+```
+
+**响应数据 (GetFinderRet)**:
+```python
+{
+    "documents": list[DPEDocumentSummary],  # 文档摘要列表
+    "total_count": int,                     # 总文档数
+    "req_id": str                           # 请求 ID
+}
+```
+
+详见 [Finder 文档系统](finder.md)。
 
 #### `client:get_config`
 
@@ -272,6 +303,26 @@ Computer 通知 Server 其桌面内容已更新，Server 随后广播 `notify:up
 
 详见 [Desktop 桌面系统](desktop.md) 中的 [更新机制](desktop.md#desktop-更新机制)。
 
+#### `server:update_finder`
+
+Computer 通知 Server 其文档目录已更新，Server 随后广播 `notify:update_finder`。
+
+**触发条件**（由 Computer 端检测）:
+
+- MCP Server 发出 `ResourceListChangedNotification` 且 `dpe://` URI 集合发生变化
+- MCP Server 发出 `ResourceUpdatedNotification` 且目标 URI 为 `dpe://`
+
+**请求数据**: 复用 `UpdateComputerConfigReq`（与 `server:update_config` 共享同一数据结构）:
+```python
+{
+    "computer": str     # Computer 名称
+}
+```
+
+**Server 处理**: 接收后向该 Computer 所在房间广播 `notify:update_finder`。
+
+详见 [Finder 文档系统](finder.md) 中的 [更新机制](finder.md#更新机制)。
+
 ---
 
 ### 通知事件
@@ -344,6 +395,21 @@ Server 广播：某 Computer 的桌面内容已更新。
 **Agent 响应建议**: 收到此通知后，推荐自动调用 `client:get_desktop` 获取最新桌面。
 
 详见 [Desktop 桌面系统](desktop.md) 中的 [完整生命周期时序图](desktop.md#完整生命周期时序图)。
+
+#### `notify:update_finder`
+
+Server 广播：某 Computer 的文档目录已更新。
+
+**数据结构**: 复用 `UpdateComputerConfigReq`（与 `notify:update_config` 结构一致）:
+```python
+{
+    "computer": str     # 文档目录发生变化的 Computer 名称
+}
+```
+
+**Agent 响应建议**: 收到此通知后，推荐自动调用 `client:get_finder` 获取最新文档目录。
+
+详见 [Finder 文档系统](finder.md) 中的 [完整通知链时序图](finder.md#完整通知链时序图)。
 
 #### `notify:tool_call_cancel`
 
@@ -433,6 +499,29 @@ sequenceDiagram
 
 详见 [Desktop 桌面系统](desktop.md)。
 
+### 文档目录更新流程
+
+```mermaid
+sequenceDiagram
+    participant M as MCP Server
+    participant C as Computer
+    participant S as Server
+    participant A as Agent
+
+    Note over M: 文档资源变化
+    M->>C: ResourceListChangedNotification
+    C->>C: 比较 dpe:// URI 集合
+    C->>S: server:update_finder
+    S->>A: notify:update_finder
+    A->>S: client:get_finder
+    S->>C: client:get_finder (转发)
+    C->>C: organize_finder()
+    C->>S: GetFinderRet
+    S->>A: GetFinderRet
+```
+
+详见 [Finder 文档系统](finder.md)。
+
 ---
 
 ## 实现要求
@@ -453,6 +542,7 @@ sequenceDiagram
 - `notify:enter_office` - 自动获取新 Computer 的工具
 - `notify:leave_office` - 清理离开 Computer 的工具
 - `notify:update_config` / `notify:update_tool_list` - 刷新工具列表
+- `notify:update_finder` - 刷新文档目录
 
 ---
 

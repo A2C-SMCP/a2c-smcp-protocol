@@ -40,6 +40,15 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4103 | Not In Room | 未加入房间 |
 | 4104 | Cross Room Access | 跨房间访问被拒绝 |
 
+### Finder 文档系统错误码
+
+| 代码 | 名称 | 含义 |
+|------|------|------|
+| 4201 | Document Not Found | 文档引用（`doc_ref`）不存在 |
+| 4202 | Page Out of Range | 页码超出文档的 `page_count` 范围 |
+| 4203 | Element Not Found | 元素 ID 不存在 |
+| 4204 | Invalid DPE URI | `dpe://` URI 格式错误或校验失败 |
+
 ## 错误响应格式
 
 ### 标准错误响应

@@ -291,6 +291,8 @@ class UpdateComputerConfigReq(TypedDict):
 | `server:update_config` | Computer 配置更新请求 |
 | `server:update_desktop` | 桌面更新通知请求 |
 | `notify:update_desktop` | 桌面更新广播通知 |
+| `server:update_finder` | 文档目录更新通知请求 |
+| `notify:update_finder` | 文档目录更新广播通知 |
 
 ### UpdateMCPConfigNotification
 
@@ -384,6 +386,89 @@ class GetDeskTopRet(TypedDict, total=False):
     desktops: list[Desktop]     # 桌面内容列表（字符串形式）
     req_id: str                 # 请求 ID
 ```
+
+---
+
+## Finder 相关结构
+
+### GetFinderReq
+
+获取文档目录请求。
+
+```python
+class GetFinderReq(AgentCallData, total=True):
+    agent: str                          # Agent 名称
+    req_id: str                         # 请求 ID
+    computer: str                       # 目标 Computer 名称
+    keywords: NotRequired[list[str]]    # 可选：关键词过滤
+    file_type: NotRequired[str]         # 可选：文件类型过滤
+    offset: NotRequired[int]            # 可选：分页偏移（默认 0）
+    limit: NotRequired[int]             # 可选：分页限制（默认 20）
+```
+
+### DPEDocumentSummary
+
+DPE 文档摘要，用于文档目录展示。
+
+```python
+class DPEDocumentSummary(TypedDict):
+    doc_ref: str                        # 文档引用键（MCP Server 分配的不透明短键）
+    uri: str                            # 完整 dpe:// URI
+    file_uri: str                       # 原始文件 URI
+    file_type: str                      # 文件类型（xlsx, pdf, pptx 等）
+    title: str                          # 文档标题
+    page_count: int                     # 总页数
+    keywords: NotRequired[list[str]]    # 关键词列表
+    summary: NotRequired[str]           # 文档摘要
+    server: str                         # 来源 MCP Server 名称
+    last_modified: NotRequired[str]     # 最后修改时间（ISO 8601）
+```
+
+### DPEPageSummary
+
+DPE 页面摘要，用于文档内页面索引。
+
+```python
+class DPEPageSummary(TypedDict):
+    page_index: int                     # 页码（从 0 开始）
+    title: str                          # 页面标题
+    element_count: int                  # 元素数量
+    uri: str                            # 页面的 dpe:// URI
+    doc_ref: NotRequired[str]           # 所属文档引用键
+```
+
+### DPEElementDetail
+
+DPE 元素详情。
+
+```python
+class DPEElementDetail(TypedDict):
+    element_id: str                     # 元素唯一标识
+    category: str                       # 元素类型
+    summary: NotRequired[str]           # 元素摘要
+    content: dict                       # 元素内容（结构因类型而异）
+    doc_ref: NotRequired[str]           # 所属文档引用键
+    page_index: NotRequired[int]        # 所属页码
+    uri: NotRequired[str]              # 元素的 dpe:// URI
+    metadata: NotRequired[dict]         # 附加元数据
+```
+
+### GetFinderRet
+
+获取文档目录响应。
+
+```python
+class GetFinderRet(TypedDict, total=False):
+    documents: list[DPEDocumentSummary]  # 文档摘要列表
+    total_count: int                     # 总文档数（用于分页）
+    req_id: str                          # 请求 ID
+```
+
+!!! note "Finder 更新事件的数据结构"
+
+    `server:update_finder` 和 `notify:update_finder` 事件均复用 [`UpdateComputerConfigReq`](#updatecomputerconfigreq) 结构（仅包含 `computer: str` 字段），与 `server:update_config`、`server:update_desktop` 共享同一数据结构。
+
+详见 [Finder 文档系统](finder.md) 完整规范。
 
 ---
 
