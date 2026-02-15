@@ -2,7 +2,7 @@
 
 **适用 SDK**: [python-sdk](https://github.com/A2C-SMCP/python-sdk) / [rust-sdk](https://github.com/A2C-SMCP/rust-sdk)
 
-**协议版本**: 0.1.2-rc1
+**协议版本**: 0.2.0
 
 !!! info "前置阅读"
 

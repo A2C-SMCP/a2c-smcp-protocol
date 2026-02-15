@@ -63,7 +63,7 @@ extra:
   version:
     provider: mike
     alias: true
-  announce: "A2C-SMCP 协议规范文档 - 最新版本：0.1.2-rc1"
+  announce: "A2C-SMCP 协议规范文档 - 最新版本：0.2.0"
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/A2C-SMCP
