@@ -115,6 +115,7 @@ nav:
       - 错误处理: specification/error-handling.md
       - 安全考虑: specification/security.md
   - 开发指南:
+      - Computer MCP 配置指南: guides/computer-mcp-config-guide.md
       - Finder SDK 实现指南: guides/finder-sdk-guide.md
   - 附录:
       - 常见问题: appendix/faq.md
