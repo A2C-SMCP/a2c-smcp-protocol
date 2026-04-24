@@ -291,6 +291,26 @@
     
     
       <li class="md-tabs__item">
+        <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
+          
+  
+  
+  迁移指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
         <a href="../../appendix/faq/" class="md-tabs__link">
           
   
@@ -752,10 +772,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#四级渐进式寻址" class="md-nav__link">
+  <a href="#三级渐进式寻址" class="md-nav__link">
     <span class="md-ellipsis">
       
-        四级渐进式寻址
+        三级渐进式寻址
       
     </span>
   </a>
@@ -763,10 +783,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#查询参数" class="md-nav__link">
+  <a href="#content-control-查询参数" class="md-nav__link">
     <span class="md-ellipsis">
       
-        查询参数
+        Content-Control 查询参数
       
     </span>
   </a>
@@ -801,6 +821,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dpe-文档资源元数据" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPE 文档资源元数据
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DPE 文档资源元数据">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a2c-专用字段_meta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2C 专用字段（_meta）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-标准字段" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP 标准字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#校验规则_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        校验规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-完整声明示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource 完整声明示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#finder-内容格式" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -811,17 +892,6 @@
   
     <nav class="md-nav" aria-label="Finder 内容格式">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#level-0--文档目录" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 0 — 文档目录
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#level-1--文档元数据--页面索引" class="md-nav__link">
@@ -857,10 +927,71 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#level-1-响应体与-resource-元数据的一致性" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Level 1 响应体与 Resource 元数据的一致性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#markdown-渲染规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Markdown 渲染规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#元数据与-uri-职责划分与-desktop-对照" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        元数据与 URI 职责划分（与 Desktop 对照）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="元数据与 URI 职责划分（与 Desktop 对照）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#职责映射" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        职责映射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例对照" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例对照
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#实现指引" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实现指引
       
     </span>
   </a>
@@ -889,6 +1020,17 @@
     <span class="md-ellipsis">
       
         概述
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#数据来源" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        数据来源
       
     </span>
   </a>
@@ -1100,6 +1242,17 @@
     <span class="md-ellipsis">
       
         协议职责边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#读写边界v1只读" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        读写边界（v1：只读）
       
     </span>
   </a>
@@ -1382,6 +1535,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议版本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../error-handling/" class="md-nav__link">
         
   
@@ -1587,7 +1768,7 @@
   <span class="md-ellipsis">
     
   
-    附录
+    迁移指南
   
 
     
@@ -1600,6 +1781,95 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    迁移指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2 URI 元数据重构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    附录
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1813,10 +2083,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#四级渐进式寻址" class="md-nav__link">
+  <a href="#三级渐进式寻址" class="md-nav__link">
     <span class="md-ellipsis">
       
-        四级渐进式寻址
+        三级渐进式寻址
       
     </span>
   </a>
@@ -1824,10 +2094,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#查询参数" class="md-nav__link">
+  <a href="#content-control-查询参数" class="md-nav__link">
     <span class="md-ellipsis">
       
-        查询参数
+        Content-Control 查询参数
       
     </span>
   </a>
@@ -1862,6 +2132,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dpe-文档资源元数据" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPE 文档资源元数据
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DPE 文档资源元数据">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a2c-专用字段_meta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2C 专用字段（_meta）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-标准字段" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP 标准字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#校验规则_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        校验规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-完整声明示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource 完整声明示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#finder-内容格式" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1872,17 +2203,6 @@
   
     <nav class="md-nav" aria-label="Finder 内容格式">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#level-0--文档目录" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Level 0 — 文档目录
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#level-1--文档元数据--页面索引" class="md-nav__link">
@@ -1918,10 +2238,71 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#level-1-响应体与-resource-元数据的一致性" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Level 1 响应体与 Resource 元数据的一致性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#markdown-渲染规则" class="md-nav__link">
     <span class="md-ellipsis">
       
         Markdown 渲染规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#元数据与-uri-职责划分与-desktop-对照" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        元数据与 URI 职责划分（与 Desktop 对照）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="元数据与 URI 职责划分（与 Desktop 对照）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#职责映射" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        职责映射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例对照" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例对照
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#实现指引" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实现指引
       
     </span>
   </a>
@@ -1950,6 +2331,17 @@
     <span class="md-ellipsis">
       
         概述
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#数据来源" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        数据来源
       
     </span>
   </a>
@@ -2161,6 +2553,17 @@
     <span class="md-ellipsis">
       
         协议职责边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#读写边界v1只读" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        读写边界（v1：只读）
       
     </span>
   </a>
@@ -2469,7 +2872,7 @@
 
 <h1 id="finder-文档系统">Finder 文档系统<a class="headerlink" href="#finder-文档系统" title="Permanent link">&para;</a></h1>
 <h2 id="概述">概述<a class="headerlink" href="#概述" title="Permanent link">&para;</a></h2>
-<p>Finder 是 A2C-SMCP 协议中管理<strong>结构化持久文档</strong>的子系统。它将多个 MCP Server 暴露的 <code>dpe://</code> 资源聚合为统一的文档目录视图，支持 Agent 对文档进行<strong>渐进式导航</strong>（逐层钻入：目录 → 文档 → 页面 → 元素），适用于多页文档、表格、演示文稿等大型结构化内容。</p>
+<p>Finder 是 A2C-SMCP 协议中管理<strong>结构化持久文档</strong>的子系统。它将多个 MCP Server 暴露的 <code>dpe://</code> 资源聚合为统一的文档目录视图，支持 Agent 对文档进行<strong>渐进式导航</strong>（逐层钻入：文档 → 页面 → 元素），适用于多页文档、表格、演示文稿等大型结构化内容。</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────┐
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                          Computer                                │
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                                                                  │
@@ -2490,7 +2893,7 @@
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                │
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                ▼
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>           ┌─────────┐
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>           │  Agent   │  ← 通过 client:get_finder + MCP resources/read 访问
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>           │  Agent   │  ← 通过 client:list_finder + MCP resources/read 访问
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>           └─────────┘
 </code></pre></div>
 <h3 id="desktop-vs-finder">Desktop vs Finder<a class="headerlink" href="#desktop-vs-finder" title="Permanent link">&para;</a></h3>
@@ -2681,14 +3084,16 @@
 </tbody>
 </table>
 <h3 id="元数据体系">元数据体系<a class="headerlink" href="#元数据体系" title="Permanent link">&para;</a></h3>
-<p>每个 DPE 层级都携带元数据，用于描述内容的属性和上下文信息：</p>
-<p><strong>文档级元数据</strong>:</p>
+<p>每个 DPE 层级都携带元数据，用于描述内容的属性和上下文信息。</p>
+<p><strong>文档级元数据</strong>在 MCP Resource 对象上声明（<code>resources/list</code> 返回），详见 <a href="#dpe-文档资源元数据">DPE 文档资源元数据</a>。<strong>页面级</strong>与<strong>元素级</strong>元数据嵌入在 <code>resources/read</code> 响应体中（见 <a href="#finder-内容格式">Finder 内容格式</a>）。</p>
+<p><strong>文档级元数据（Agent 视图）</strong>:</p>
 <table>
 <thead>
 <tr>
 <th>字段</th>
 <th>类型</th>
 <th>说明</th>
+<th>声明位置（MCP Server 侧）</th>
 </tr>
 </thead>
 <tbody>
@@ -2696,39 +3101,47 @@
 <td><code>title</code></td>
 <td><code>str</code></td>
 <td>文档标题</td>
-</tr>
-<tr>
-<td><code>file_type</code></td>
-<td><code>str</code></td>
-<td>文件类型（<code>xlsx</code>、<code>pdf</code>、<code>pptx</code> 等）</td>
-</tr>
-<tr>
-<td><code>page_count</code></td>
-<td><code>int</code></td>
-<td>总页数</td>
-</tr>
-<tr>
-<td><code>keywords</code></td>
-<td><code>list[str]</code></td>
-<td>关键词列表</td>
+<td><code>Resource.name</code></td>
 </tr>
 <tr>
 <td><code>summary</code></td>
 <td><code>str</code></td>
 <td>文档摘要</td>
+<td><code>Resource.description</code></td>
 </tr>
 <tr>
-<td><code>last_modified</code></td>
+<td><code>file_type</code></td>
 <td><code>str</code></td>
-<td>最后修改时间（ISO 8601）</td>
+<td>文件类型（<code>xlsx</code>、<code>pdf</code>、<code>pptx</code> 等）</td>
+<td><code>Resource._meta.file_type</code></td>
+</tr>
+<tr>
+<td><code>page_count</code></td>
+<td><code>int</code></td>
+<td>总页数</td>
+<td><code>Resource._meta.page_count</code></td>
+</tr>
+<tr>
+<td><code>keywords</code></td>
+<td><code>list[str]</code></td>
+<td>关键词列表</td>
+<td><code>Resource._meta.keywords</code></td>
 </tr>
 <tr>
 <td><code>file_uri</code></td>
 <td><code>str</code></td>
 <td>原始文件 URI</td>
+<td><code>Resource._meta.file_uri</code></td>
+</tr>
+<tr>
+<td><code>last_modified</code></td>
+<td><code>str</code></td>
+<td>最后修改时间（ISO 8601）</td>
+<td><code>Resource.annotations.lastModified</code></td>
 </tr>
 </tbody>
 </table>
+<p>Computer 从 <code>resources/list</code> 返回的 <code>Resource</code> 对象上读取这些字段，合成 <code>DPEDocumentSummary</code> 后通过 <code>ListFinderRet</code> 返回给 Agent。Agent 看到的字段形态保持扁平（不变），与 MCP Server 侧的分布式声明位置解耦。</p>
 <p><strong>页面级元数据</strong>:</p>
 <table>
 <thead>
@@ -2786,8 +3199,9 @@
 <hr />
 <h2 id="dpe-uri-协议">dpe:// URI 协议<a class="headerlink" href="#dpe-uri-协议" title="Permanent link">&para;</a></h2>
 <h3 id="uri-格式">URI 格式<a class="headerlink" href="#uri-格式" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dpe://{host}/{doc-ref}[/sub-path][?query-params]
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dpe://{host}/{doc-ref}[/sub-path][?content-control]
 </code></pre></div>
+<p>URI 的 <code>host + doc-ref + sub-path</code> 部分是<strong>纯标识符</strong>；<code>content-control</code> query 参数由 <strong>Agent 在调用 <code>resources/read</code> 时</strong>构造附加，用于控制返回内容的格式与裁剪。文档元数据（keywords、file_type 等）<strong>不</strong>通过 URI 承载，而是通过 MCP Resource 的 <code>_meta</code> / <code>annotations</code> 声明（见 <a href="#dpe-文档资源元数据">DPE 文档资源元数据</a>）。</p>
 <h3 id="组成部分">组成部分<a class="headerlink" href="#组成部分" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2809,13 +3223,13 @@
 <td><code>host</code></td>
 <td>是</td>
 <td>MCP Server 唯一标识</td>
-<td>不能为空；推荐反向域名风格，如 <code>com.example.mcp</code></td>
+<td>不能为空；<strong>在同一 Computer 作用域内 MUST 全局唯一</strong>；推荐反向域名风格，如 <code>com.example.mcp</code></td>
 </tr>
 <tr>
 <td><code>doc-ref</code></td>
-<td>否</td>
+<td>是</td>
 <td>文档引用键（MCP Server 分配的不透明短键）</td>
-<td>URL-safe 或 URL-encoded</td>
+<td>URL-safe 或 URL-encoded；<strong>不允许</strong>缺省</td>
 </tr>
 <tr>
 <td><code>sub-path</code></td>
@@ -2825,12 +3239,11 @@
 </tr>
 </tbody>
 </table>
-<h3 id="四级渐进式寻址">四级渐进式寻址<a class="headerlink" href="#四级渐进式寻址" title="Permanent link">&para;</a></h3>
-<p>DPE URI 支持四个级别的渐进式寻址，Agent 可以从目录开始逐层深入：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Level 0: dpe://host                        → 文档目录
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Level 1: dpe://host/doc-ref                → 文档元数据 + 页面索引
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Level 2: dpe://host/doc-ref/pages/{N}      → 页面内容（元素列表）
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Level 3: dpe://host/doc-ref/elements/{ID}  → 元素详情
+<h3 id="三级渐进式寻址">三级渐进式寻址<a class="headerlink" href="#三级渐进式寻址" title="Permanent link">&para;</a></h3>
+<p>DPE URI 支持三个级别的渐进式寻址，Agent 从 <code>client:list_finder</code> 取得文档列表后，按 URI 层级逐层深入：</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Level 1: dpe://host/doc-ref                → 文档元数据 + 页面索引
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Level 2: dpe://host/doc-ref/pages/{N}      → 页面内容（元素列表）
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Level 3: dpe://host/doc-ref/elements/{ID}  → 元素详情
 </code></pre></div>
 <table>
 <thead>
@@ -2842,12 +3255,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>Level 0</td>
-<td><code>dpe://com.example.docs</code></td>
-<td>该 Server 下所有文档的摘要列表</td>
-<td>浏览可用文档</td>
-</tr>
 <tr>
 <td>Level 1</td>
 <td><code>dpe://com.example.docs/rpt-2026</code></td>
@@ -2868,7 +3275,12 @@
 </tr>
 </tbody>
 </table>
-<h3 id="查询参数">查询参数<a class="headerlink" href="#查询参数" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">为什么没有 Level 0</p>
+<p>Level 0（<code>dpe://host</code> 文档目录）在 v0.2 起<strong>已移除</strong>。文档发现走 MCP 标准 <code>resources/list</code>（由 Computer 调用），文档元数据通过 <code>Resource._meta</code> / <code>annotations</code> 声明；Computer 无需额外读取聚合端点即可完成 Finder 过滤、排序、分页。</p>
+</div>
+<h3 id="content-control-查询参数">Content-Control 查询参数<a class="headerlink" href="#content-control-查询参数" title="Permanent link">&para;</a></h3>
+<p>下列参数由 <strong>Agent</strong> 在 <code>resources/read</code> 调用时附加，<strong>MCP Server MUST 识别并按参数裁剪/格式化响应</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -2921,6 +3333,8 @@
 <ol>
 <li><code>scheme</code> 必须为 <code>dpe</code></li>
 <li><code>host</code> 不能为空</li>
+<li><code>host</code> 在同一 Computer 作用域内 <strong>MUST</strong> 全局唯一；当两个 MCP Server 声明相同 host 时，Computer <strong>MUST</strong> 报错并拒绝后注册的 Server 参与 Finder 聚合（仅保留先注册的一方）</li>
+<li><code>doc-ref</code> 必须存在（不再支持 Level 0 寻址；<code>dpe://host</code> 形式的 URI 视为无效）</li>
 <li><code>sub-path</code> 若存在，必须匹配 <code>pages/{非负整数}</code> 或 <code>elements/{非空字符串}</code></li>
 <li><code>format</code> 若存在，必须为 <code>json</code>、<code>markdown</code>、<code>text</code> 之一</li>
 <li><code>depth</code> 若存在，必须为 <code>metadata</code> 或 <code>pages</code></li>
@@ -2929,51 +3343,142 @@
 <li><code>categories</code> 若存在，必须是合法的元素类型（见 <a href="#元素类型">元素类型</a>）的逗号分隔列表</li>
 </ol>
 <h3 id="uri-示例">URI 示例<a class="headerlink" href="#uri-示例" title="Permanent link">&para;</a></h3>
-<p><strong>Level 0 — 文档目录</strong>:</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dpe://com.example.docs
-</code></pre></div>
 <p><strong>Level 1 — 文档元数据（含页面索引）</strong>:</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dpe://com.example.docs/rpt-2026?depth=pages&amp;offset=0&amp;limit=10
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dpe://com.example.docs/rpt-2026?depth=pages&amp;offset=0&amp;limit=10
 </code></pre></div>
 <p><strong>Level 2 — 页面内容（仅表格元素）</strong>:</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dpe://com.example.docs/rpt-2026/pages/0?categories=table,pivot_table&amp;format=markdown
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dpe://com.example.docs/rpt-2026/pages/0?categories=table,pivot_table&amp;format=markdown
 </code></pre></div>
 <p><strong>Level 3 — 元素详情</strong>:</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dpe://com.example.docs/rpt-2026/elements/tbl-001?format=json
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dpe://com.example.docs/rpt-2026/elements/tbl-001?format=json
+</code></pre></div>
+<hr />
+<h2 id="dpe-文档资源元数据">DPE 文档资源元数据<a class="headerlink" href="#dpe-文档资源元数据" title="Permanent link">&para;</a></h2>
+<p>MCP Server 通过 <code>resources/list</code> 返回的 <code>Resource</code> 对象上的 <code>_meta</code> 和 <code>annotations</code> 字段声明 DPE 文档的元数据。Computer 据此完成 Finder 的过滤、排序、分页，<strong>不需要读取 Level 0 或任何聚合端点</strong>。</p>
+<h3 id="a2c-专用字段_meta">A2C 专用字段（<code>_meta</code>）<a class="headerlink" href="#a2c-专用字段_meta" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_meta.keywords</code></td>
+<td><code>list[str]</code></td>
+<td>否</td>
+<td>关键词列表；<code>ListFinderReq.tags</code> 过滤对 <code>title + keywords + summary</code> 做 fuzzy 命中</td>
+</tr>
+<tr>
+<td><code>_meta.file_type</code></td>
+<td><code>str</code></td>
+<td>否</td>
+<td>文件类型（<code>xlsx</code>、<code>pdf</code>、<code>pptx</code> 等）；<code>ListFinderReq.file_type</code> 精确匹配此字段</td>
+</tr>
+<tr>
+<td><code>_meta.page_count</code></td>
+<td><code>int</code></td>
+<td>是</td>
+<td>文档总页数；Agent 依据此值规划翻页范围</td>
+</tr>
+<tr>
+<td><code>_meta.file_uri</code></td>
+<td><code>str</code></td>
+<td>否</td>
+<td>原始文件 URI（如 <code>file:///data/reports/xxx.xlsx</code>）；仅用于 Agent 展示</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mcp-标准字段">MCP 标准字段<a class="headerlink" href="#mcp-标准字段" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Resource.name</code></td>
+<td><code>str</code></td>
+<td>是</td>
+<td>文档标题（<code>title</code>）</td>
+</tr>
+<tr>
+<td><code>Resource.description</code></td>
+<td><code>str</code></td>
+<td>否</td>
+<td>文档摘要（<code>summary</code>）</td>
+</tr>
+<tr>
+<td><code>Resource.mimeType</code></td>
+<td><code>str</code></td>
+<td>否</td>
+<td>推荐 <code>application/json</code>（Level 1 响应体为 JSON）</td>
+</tr>
+<tr>
+<td><code>annotations.lastModified</code></td>
+<td>ISO 8601 字符串</td>
+<td>否</td>
+<td>文档最后修改时间；<strong>Finder Organizer 按此字段降序排列</strong></td>
+</tr>
+<tr>
+<td><code>annotations.audience</code></td>
+<td><code>["user"]</code> / <code>["assistant"]</code> / <code>["user","assistant"]</code></td>
+<td>否</td>
+<td>MCP 标准；A2C v1 Computer 透传但不做过滤</td>
+</tr>
+</tbody>
+</table>
+<h3 id="校验规则_1">校验规则<a class="headerlink" href="#校验规则_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><code>_meta.page_count</code> <strong>MUST</strong> 存在且为非负整数；缺失时 Computer 记录警告并将该文档视为 <code>page_count=0</code>（Agent 侧不会遍历页面）</li>
+<li><code>_meta.keywords</code> 若存在，必须为字符串数组</li>
+<li><code>_meta.file_type</code> 若存在，推荐使用小写（如 <code>xlsx</code>、<code>pdf</code>）</li>
+<li><code>annotations.lastModified</code> 若存在，必须为 ISO 8601 格式；缺失时该文档在 Server 内排序时排在末尾</li>
+<li>未声明 <code>_meta</code> 的 Resource 视为没有任何 A2C 元数据，组织时仍能参与但无法通过 tags/file_type 过滤</li>
+</ol>
+<h3 id="resource-完整声明示例">Resource 完整声明示例<a class="headerlink" href="#resource-完整声明示例" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>                              <span class="c1"># = title</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>              <span class="c1"># = summary</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>                       <span class="c1"># 可选</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>          <span class="c1"># 用于排序</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="p">),</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span> <span class="s2">&quot;年报&quot;</span><span class="p">],</span>                  <span class="c1"># 用于 tag 过滤</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>        <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>                          <span class="c1"># 用于 file_type 过滤</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="s2">&quot;page_count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>                             <span class="c1"># 必需</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>        <span class="s2">&quot;file_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>  <span class="c1"># 可选</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="p">},</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">)</span>
 </code></pre></div>
 <hr />
 <h2 id="finder-内容格式">Finder 内容格式<a class="headerlink" href="#finder-内容格式" title="Permanent link">&para;</a></h2>
-<h3 id="level-0--文档目录">Level 0 — 文档目录<a class="headerlink" href="#level-0--文档目录" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;documents&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="nt">&quot;file_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nt">&quot;file_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">      </span><span class="nt">&quot;page_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;年报&quot;</span><span class="p">],</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">      </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;contract-a1&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/contract-a1&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">      </span><span class="nt">&quot;file_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///data/contracts/a1.pdf&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">      </span><span class="nt">&quot;file_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A1 合同&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">      </span><span class="nt">&quot;page_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">      </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;合同&quot;</span><span class="p">],</span>
-<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A1 项目服务合同&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">      </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-02-01T14:00:00Z&quot;</span>
-<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">  </span><span class="nt">&quot;total_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
-<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="p">}</span>
-</code></pre></div>
+<p>本节描述各级 <code>resources/read</code> 响应体的 JSON 结构。文档目录不再通过 <code>resources/read</code> 暴露，改由 <code>client:list_finder</code> 事件返回（Computer 从 <code>resources/list</code> 合成，见 <a href="#finder-organizer-策略">Finder Organizer 策略</a>）。</p>
 <h3 id="level-1--文档元数据--页面索引">Level 1 — 文档元数据 + 页面索引<a class="headerlink" href="#level-1--文档元数据--页面索引" title="Permanent link">&para;</a></h3>
 <p><strong><code>depth=metadata</code></strong>（默认）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;file_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;file_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nt">&quot;page_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;年报&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong><code>depth=pages</code></strong>:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
@@ -2983,118 +3488,113 @@
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nt">&quot;page_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;年报&quot;</span><span class="p">],</span>
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">}</span>
-</code></pre></div>
-<p><strong><code>depth=pages</code></strong>:</p>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;file_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&quot;file_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="nt">&quot;page_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;年报&quot;</span><span class="p">],</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span><span class="nt">&quot;pages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">      </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;概览&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">      </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/0&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">      </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;收入分析&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">      </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/1&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span>
-<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">  </span><span class="nt">&quot;page_offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">  </span><span class="nt">&quot;page_limit&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="w">  </span><span class="nt">&quot;page_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
-<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="p">}</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">  </span><span class="nt">&quot;pages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">      </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;概览&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">      </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/0&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">      </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;收入分析&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">      </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/1&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">      </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">  </span><span class="nt">&quot;page_offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">  </span><span class="nt">&quot;page_limit&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="w">  </span><span class="nt">&quot;page_total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="level-2--页面内容">Level 2 — 页面内容<a class="headerlink" href="#level-2--页面内容" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;概览&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/0&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">&quot;elements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;h-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;heading&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度总结&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度总结&quot;</span>
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">      </span><span class="p">}</span>
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txt-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;报告引言段落&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;本报告总结了 2026 年度公司在各业务领域的运营情况...&quot;</span>
-<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">      </span><span class="p">}</span>
-<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tbl-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入对比表（4行3列）&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a><span class="w">        </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;季度&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;收入（万元）&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;同比增长&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a><span class="w">        </span><span class="nt">&quot;rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,250&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+12%&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,380&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+15%&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,420&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+8%&quot;</span><span class="p">],</span>
-<a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,560&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+18%&quot;</span><span class="p">]</span>
-<a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a><span class="w">        </span><span class="p">]</span>
-<a id="__codelineno-11-36" name="__codelineno-11-36" href="#__codelineno-11-36"></a><span class="w">      </span><span class="p">}</span>
-<a id="__codelineno-11-37" name="__codelineno-11-37" href="#__codelineno-11-37"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-11-38" name="__codelineno-11-38" href="#__codelineno-11-38"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-11-39" name="__codelineno-11-39" href="#__codelineno-11-39"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chart-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-40" name="__codelineno-11-40" href="#__codelineno-11-40"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chart&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-41" name="__codelineno-11-41" href="#__codelineno-11-41"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入趋势图&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-42" name="__codelineno-11-42" href="#__codelineno-11-42"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-43" name="__codelineno-11-43" href="#__codelineno-11-43"></a><span class="w">        </span><span class="nt">&quot;chart_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;line&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-44" name="__codelineno-11-44" href="#__codelineno-11-44"></a><span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入趋势&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-45" name="__codelineno-11-45" href="#__codelineno-11-45"></a><span class="w">        </span><span class="nt">&quot;data_summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q1-Q4 收入呈上升趋势，Q4 达到最高点 1,560 万元&quot;</span>
-<a id="__codelineno-11-46" name="__codelineno-11-46" href="#__codelineno-11-46"></a><span class="w">      </span><span class="p">}</span>
-<a id="__codelineno-11-47" name="__codelineno-11-47" href="#__codelineno-11-47"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-11-48" name="__codelineno-11-48" href="#__codelineno-11-48"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-11-49" name="__codelineno-11-49" href="#__codelineno-11-49"></a><span class="w">  </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
-<a id="__codelineno-11-50" name="__codelineno-11-50" href="#__codelineno-11-50"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;概览&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/pages/0&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">&quot;elements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;h-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;heading&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度总结&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">        </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026 年度总结&quot;</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txt-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;报告引言段落&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">        </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;本报告总结了 2026 年度公司在各业务领域的运营情况...&quot;</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tbl-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入对比表（4行3列）&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="w">        </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;季度&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;收入（万元）&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;同比增长&quot;</span><span class="p">],</span>
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="w">        </span><span class="nt">&quot;rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,250&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+12%&quot;</span><span class="p">],</span>
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,380&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+15%&quot;</span><span class="p">],</span>
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,420&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+8%&quot;</span><span class="p">],</span>
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="w">          </span><span class="p">[</span><span class="s2">&quot;Q4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,560&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+18%&quot;</span><span class="p">]</span>
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="w">        </span><span class="p">]</span>
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="w">      </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chart-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chart&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="w">      </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入趋势图&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a><span class="w">        </span><span class="nt">&quot;chart_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;line&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入趋势&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="w">        </span><span class="nt">&quot;data_summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q1-Q4 收入呈上升趋势，Q4 达到最高点 1,560 万元&quot;</span>
+<a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a><span class="w">  </span><span class="nt">&quot;element_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+<a id="__codelineno-10-50" name="__codelineno-10-50" href="#__codelineno-10-50"></a><span class="p">}</span>
 </code></pre></div>
 <h3 id="level-3--元素详情">Level 3 — 元素详情<a class="headerlink" href="#level-3--元素详情" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tbl-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/elements/tbl-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入对比表（4行3列）&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;季度&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;收入（万元）&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;同比增长&quot;</span><span class="p">],</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="nt">&quot;rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,250&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+12%&quot;</span><span class="p">],</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,380&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+15%&quot;</span><span class="p">],</span>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,420&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+8%&quot;</span><span class="p">],</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,560&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+18%&quot;</span><span class="p">]</span>
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="p">],</span>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">    </span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
-<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">    </span><span class="nt">&quot;total_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
-<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">    </span><span class="nt">&quot;source_range&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A1:C5&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">    </span><span class="nt">&quot;has_formulas&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tbl-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;doc_ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rpt-2026&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">&quot;page_index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026/elements/tbl-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;季度收入对比表（4行3列）&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;季度&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;收入（万元）&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;同比增长&quot;</span><span class="p">],</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="nt">&quot;rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,250&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+12%&quot;</span><span class="p">],</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,380&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+15%&quot;</span><span class="p">],</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,420&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+8%&quot;</span><span class="p">],</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">      </span><span class="p">[</span><span class="s2">&quot;Q4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;1,560&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;+18%&quot;</span><span class="p">]</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="p">],</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">    </span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">    </span><span class="nt">&quot;total_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">    </span><span class="nt">&quot;source_range&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A1:C5&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">    </span><span class="nt">&quot;has_formulas&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="p">}</span>
 </code></pre></div>
+<h3 id="level-1-响应体与-resource-元数据的一致性">Level 1 响应体与 Resource 元数据的一致性<a class="headerlink" href="#level-1-响应体与-resource-元数据的一致性" title="Permanent link">&para;</a></h3>
+<p>Level 1 响应体中的扁平字段（<code>title</code>、<code>summary</code>、<code>file_type</code>、<code>page_count</code>、<code>keywords</code>、<code>last_modified</code>、<code>file_uri</code>）与 MCP Server 在 <code>resources/list</code> 时声明的 <code>Resource.name</code> / <code>Resource.description</code> / <code>Resource._meta.*</code> / <code>Resource.annotations.lastModified</code> <strong>MUST 保持一致</strong>。</p>
+<ul>
+<li><strong>来源</strong>：真值存储在 <code>Resource._meta</code> 与 <code>annotations</code>（MCP Server 设置）</li>
+<li><strong>Level 1 body 职责</strong>：作为 Agent 直接读取的扁平视图；MCP Server 实现时应从同一数据源填充，避免漂移</li>
+<li><strong>Computer 行为</strong>：Computer 不改写 Level 1 响应体（Agent 通过 <code>resources/read</code> 拿到的就是 MCP Server 原样返回的 JSON）；但 <code>client:list_finder</code> 返回的 <code>DPEDocumentSummary</code> 由 Computer 从 <code>Resource</code> 元数据合成，<strong>以 Resource 元数据为准</strong></li>
+</ul>
+<p>若 Level 1 body 与 Resource 元数据出现不一致（MCP Server 实现 bug），Agent 通过 <code>list_finder</code> 看到的字段以 Resource 元数据为准；通过直接 <code>resources/read</code> 看到的字段以 body 为准。实现者应避免这种分叉。</p>
 <h3 id="markdown-渲染规则">Markdown 渲染规则<a class="headerlink" href="#markdown-渲染规则" title="Permanent link">&para;</a></h3>
 <p>当 <code>format=markdown</code> 时，各元素按以下规则渲染为 Markdown 文本：</p>
 <table>
@@ -3148,15 +3648,91 @@
 </tbody>
 </table>
 <hr />
+<h2 id="元数据与-uri-职责划分与-desktop-对照">元数据与 URI 职责划分（与 Desktop 对照）<a class="headerlink" href="#元数据与-uri-职责划分与-desktop-对照" title="Permanent link">&para;</a></h2>
+<p>自 v0.2 起，A2C 将"Server 声明的元数据"与"Agent 运行时控制参数"<strong>落在不同位置</strong>：前者下沉到 MCP Resource 的 <code>_meta</code> / <code>annotations</code> 字段；后者仍以 URI query 形式出现（仅 DPE 用到，Window 不用）。<code>window://</code> 与 <code>dpe://</code> 两种 scheme 的 URI 都是<strong>纯标识符</strong>。</p>
+<h3 id="职责映射">职责映射<a class="headerlink" href="#职责映射" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Server-declared Metadata</th>
+<th>Agent-driven Content Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>承载位置</td>
+<td><code>Resource._meta</code> + <code>Resource.annotations</code></td>
+<td>URI query 参数</td>
+</tr>
+<tr>
+<td>代表字段</td>
+<td>Window: <code>_meta.priority</code>、<code>_meta.fullscreen</code>；DPE: <code>_meta.keywords</code>、<code>_meta.file_type</code>、<code>_meta.page_count</code>、<code>_meta.file_uri</code>、<code>annotations.lastModified</code></td>
+<td>DPE: <code>format</code>、<code>depth</code>、<code>offset</code>、<code>limit</code>、<code>categories</code>；Window 无</td>
+</tr>
+<tr>
+<td>声明方</td>
+<td><strong>MCP Server</strong> 在 <code>resources/list</code> 响应的 <code>Resource</code> 对象上声明</td>
+<td><strong>Agent</strong> 在调用 <code>resources/read</code> 时构造附加</td>
+</tr>
+<tr>
+<td>消费方</td>
+<td><strong>Computer</strong>（用于组织、排序、过滤）</td>
+<td><strong>MCP Server</strong>（用于裁剪、格式化响应体）</td>
+</tr>
+<tr>
+<td>传输语义</td>
+<td>不进入 URI，不 round-trip 给 MCP Server；Server 已在 <code>resources/list</code> 时自己设置，无需再从 URI 读取</td>
+<td>进入 URI，MCP Server <strong>MUST 识别并按参数裁剪</strong>；无法识别应回退到默认行为</td>
+</tr>
+<tr>
+<td>生命周期</td>
+<td>静态：随资源声明产生，随资源下线消失</td>
+<td>动态：按每次读取请求变化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="示例对照">示例对照<a class="headerlink" href="#示例对照" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># Server-declared Metadata（Window + DPE 均在 Resource 上声明）
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Resource(
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    uri=&quot;window://com.example.browser/main&quot;,    # URI 纯标识符
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    _meta={&quot;priority&quot;: 80, &quot;fullscreen&quot;: true}, # 元数据在 _meta
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>)
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Resource(
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    uri=&quot;dpe://com.example.docs/rpt-2026&quot;,      # URI 纯标识符
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    annotations=Annotations(lastModified=&quot;2026-01-15T08:30:00Z&quot;),
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    _meta={&quot;keywords&quot;: [...], &quot;file_type&quot;: &quot;xlsx&quot;, &quot;page_count&quot;: 12},
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>)
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a># Agent-driven Content Control（仅 DPE 使用，Agent 在读取时附加）
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>dpe://com.example.docs/rpt-2026/pages/0?format=markdown&amp;categories=table
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>  ↑                                     ↑
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>  host/doc-ref/sub-path 身份标识         format/categories Agent 构造
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>                                        MCP Server 解释
+</code></pre></div>
+<h3 id="实现指引">实现指引<a class="headerlink" href="#实现指引" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MCP Server 在 <code>resources/list</code> 时<strong>MUST</strong>把所有文档/窗口元数据放在 <code>Resource._meta</code> / <code>annotations</code>，<strong>不得</strong>将其编码进 URI query</li>
+<li>Agent 构造 <code>resources/read</code> URI 时<strong>不应</strong>附加 <code>_meta.*</code> 风格的元数据参数；只应附加 content-control 参数（DPE 的 <code>format</code> / <code>depth</code> / <code>offset</code> / <code>limit</code> / <code>categories</code>）</li>
+<li>Computer 透传 Agent 的 <code>resources/read</code> 请求时<strong>不应</strong>剥离 content-control 参数，也<strong>不应</strong>注入任何元数据参数</li>
+<li>MCP Server 解析 <code>resources/read</code> URI 时<strong>应</strong>只以 <code>host + doc-ref + sub-path</code> 定位资源，用 query 参数裁剪响应体；<strong>不应</strong>期望从 URI 读取 <code>_meta</code> 字段</li>
+</ul>
+<hr />
 <h2 id="finder-organizer-策略">Finder Organizer 策略<a class="headerlink" href="#finder-organizer-策略" title="Permanent link">&para;</a></h2>
 <h3 id="概述_1">概述<a class="headerlink" href="#概述_1" title="Permanent link">&para;</a></h3>
-<p>Computer 通过 <code>organize_finder(documents, keywords, file_type, history)</code> 函数对来自多个 MCP Server 的文档进行组织，输出经过过滤、排序和分页的文档目录。</p>
+<p>Computer 通过 <code>organize_finder(resources, tags, file_type, history)</code> 函数对来自多个 MCP Server 的 <code>Resource</code> 对象进行组织，合成为 <code>DPEDocumentSummary</code> 列表，输出经过过滤、排序和分页的文档目录。</p>
+<h3 id="数据来源">数据来源<a class="headerlink" href="#数据来源" title="Permanent link">&para;</a></h3>
+<p>Computer 从 MCP <code>resources/list</code> 拉取各 Server 的资源列表（仅保留 <code>dpe://</code> URI），<strong>直接</strong>从 <code>Resource.name</code>、<code>Resource.description</code>、<code>Resource.annotations</code>、<code>Resource._meta</code> 读取元数据，合成 Agent-facing 的 <code>DPEDocumentSummary</code>。整个 Organizer 流程<strong>不需要调用 <code>resources/read</code></strong>（后者由 Agent 自行在导航阶段触发）。</p>
 <h3 id="步骤-1过滤">步骤 1：过滤<a class="headerlink" href="#步骤-1过滤" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>关键词过滤</strong>（<code>keywords</code>）: 匹配文档的 <code>title</code>、<code>keywords</code>、<code>summary</code> 字段（任一命中即保留）</li>
-<li><strong>文件类型过滤</strong>（<code>file_type</code>）: 精确匹配文档的 <code>file_type</code> 字段</li>
-<li><strong>无效文档过滤</strong>: 跳过 URI 无效（非 <code>dpe://</code> 或解析失败）的文档</li>
+<li><strong>标签过滤</strong>（<code>tags</code>）: <code>tags: list[str]</code> 中的每个标签对文档的 <code>title</code>（= <code>Resource.name</code>）、<code>keywords</code>（= <code>_meta.keywords</code>）、<code>summary</code>（= <code>Resource.description</code>）字段做<strong>子串/精确匹配</strong>（fuzzy），<strong>任一标签在任一字段命中即保留</strong>。<code>tags</code> 为空或缺省时不应用标签过滤</li>
+<li><strong>文件类型过滤</strong>（<code>file_type</code>）: 精确匹配 <code>Resource._meta.file_type</code></li>
+<li><strong>无效资源过滤</strong>: 跳过 URI 无效（非 <code>dpe://</code> 或解析失败）的资源；跳过 <code>_meta.page_count</code> 缺失的资源（降级为警告日志）</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">为什么不新增独立 <code>tags</code> 元数据字段</p>
+<p>Tag 与关键词在语义上是<strong>同一类信号</strong>（描述文档主题的离散词）。为避免"精确分类"与"全文检索"两套元数据并存导致 MCP Server 实现混乱，协议约定：<strong>文档元数据中只有 <code>_meta.keywords: list[str]</code> 一个字段承载标签信息</strong>；Agent 端通过 <code>ListFinderReq.tags</code> 参数做过滤，匹配时覆盖 <code>title</code>/<code>keywords</code>/<code>summary</code> 三个字段（即"标签"在协议中表现为对文档文本元数据的 fuzzy 命中）。</p>
+</div>
 <h3 id="步骤-2mcp-server-优先级排序">步骤 2：MCP Server 优先级排序<a class="headerlink" href="#步骤-2mcp-server-优先级排序" title="Permanent link">&para;</a></h3>
 <p>与 Desktop 一致，根据工具调用历史确定 Server 的展示顺序：</p>
 <ol>
@@ -3164,7 +3740,7 @@
 <li><strong>未出现在历史中的 Server</strong> 按名称字母序追加到末尾</li>
 </ol>
 <h3 id="步骤-3server-内排序">步骤 3：Server 内排序<a class="headerlink" href="#步骤-3server-内排序" title="Permanent link">&para;</a></h3>
-<p>同一 Server 内的文档按 <code>last_modified</code> <strong>降序</strong>排列（最近修改的在前）。未指定 <code>last_modified</code> 的文档排在末尾。</p>
+<p>同一 Server 内的文档按 <code>annotations.lastModified</code> <strong>降序</strong>排列（最近修改的在前）。未声明 <code>lastModified</code> 的文档排在末尾。</p>
 <h3 id="步骤-4分页">步骤 4：分页<a class="headerlink" href="#步骤-4分页" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>offset</code> 指定起始位置（默认 <code>0</code>）</li>
@@ -3173,17 +3749,18 @@
 </ul>
 <h3 id="算法流程图">算法流程图<a class="headerlink" href="#算法流程图" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>flowchart TD
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    A[输入: documents, keywords, file_type, history] --&gt; B[过滤无效文档]
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    B --&gt; C{keywords 非空?}
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    C -- 是 --&gt; D[关键词匹配过滤]
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    A[输入: resources, tags, file_type, history] --&gt; B[过滤无效资源 &amp; 缺 page_count]
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    B --&gt; C{tags 非空?}
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    C -- 是 --&gt; D[标签 fuzzy 命中 title/keywords/summary]
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    C -- 否 --&gt; E{file_type 非空?}
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    D --&gt; E
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    E -- 是 --&gt; F[文件类型过滤]
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    E -- 是 --&gt; F[_meta.file_type 精确匹配]
 <a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    E -- 否 --&gt; G[按 Server 优先级排序]
 <a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    F --&gt; G
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    G --&gt; H[Server 内按 last_modified 降序]
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    H --&gt; I[应用 offset/limit 分页]
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    I --&gt; J[返回文档列表 + total_count]
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    G --&gt; H[Server 内按 annotations.lastModified 降序]
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    H --&gt; I[合成 DPEDocumentSummary 列表]
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    I --&gt; J[应用 offset/limit 分页]
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    J --&gt; K[返回文档列表 + total_count]
 </code></pre></div>
 <hr />
 <h2 id="更新机制">更新机制<a class="headerlink" href="#更新机制" title="Permanent link">&para;</a></h2>
@@ -3203,7 +3780,7 @@
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    → 否 → 忽略
 </code></pre></div>
 <h4 id="3-agent-主动拉取">3. Agent 主动拉取<a class="headerlink" href="#3-agent-主动拉取" title="Permanent link">&para;</a></h4>
-<p>Agent 可在任何时候通过 <code>client:get_finder</code> 事件主动获取最新文档目录，无需等待通知。</p>
+<p>Agent 可在任何时候通过 <code>client:list_finder</code> 事件主动获取最新文档目录，无需等待通知。</p>
 <h3 id="事件流">事件流<a class="headerlink" href="#事件流" title="Permanent link">&para;</a></h3>
 <p>当 Computer 检测到文档变化时，通过以下事件链通知 Agent：</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Computer ──[server:update_finder]──→ Server ──[notify:update_finder]──→ Agent
@@ -3213,7 +3790,13 @@
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># Computer 名称</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="p">}</span>
 </code></pre></div>
-<p>Agent 收到 <code>notify:update_finder</code> 后，建议自动调用 <code>client:get_finder</code> 获取最新文档目录。</p>
+<p>Agent 收到 <code>notify:update_finder</code> 后，建议自动调用 <code>client:list_finder</code> 获取最新文档目录。</p>
+<div class="admonition info">
+<p class="admonition-title">v1 约定：粗粒度全量失效语义</p>
+<p><code>server:update_finder</code> 与 <code>notify:update_finder</code> 当前<strong>不携带 <code>changed_uris</code> 或版本号</strong>，其语义为"上游文档成像已失效，请全量重新拉取"。该设计与 MCP 的 <code>ResourceListChangedNotification</code> 对齐（MCP 同样不携带具体变更列表）。</p>
+<p><strong>Agent 缓存策略</strong>：v1 协议<strong>不约束</strong> Agent 对 Level 2/3 内容的缓存。建议实现者在收到 <code>notify:update_finder</code> 时保守地失效本地缓存，或自行设计版本探测机制。</p>
+<p><strong>TODO（v2 方向）</strong>：未来版本考虑在 <code>ListFinderRet</code>/<code>DPEDocumentSummary</code> 与各级 <code>resources/read</code> 响应中加入可选 <code>etag</code> / <code>version</code> 字段，并在更新事件中可选携带 <code>changed_uris: list[str]</code>，实现精准增量刷新与缓存版本校验。届时本小节将升级为规范性约束。</p>
+</div>
 <h3 id="完整通知链时序图">完整通知链时序图<a class="headerlink" href="#完整通知链时序图" title="Permanent link">&para;</a></h3>
 <h4 id="初始拉取流程">初始拉取流程<a class="headerlink" href="#初始拉取流程" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sequenceDiagram
@@ -3221,11 +3804,11 @@
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    participant S as Server
 <a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    participant C as Computer
 <a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    A-&gt;&gt;S: client:get_finder (GetFinderReq)
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    S-&gt;&gt;C: client:get_finder (转发)
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    A-&gt;&gt;S: client:list_finder (ListFinderReq)
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    S-&gt;&gt;C: client:list_finder (转发)
 <a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    C-&gt;&gt;C: organize_finder()
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    C-&gt;&gt;S: GetFinderRet
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    S-&gt;&gt;A: GetFinderRet
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    C-&gt;&gt;S: ListFinderRet
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    S-&gt;&gt;A: ListFinderRet
 </code></pre></div>
 <h4 id="文档列表变化触发流程">文档列表变化触发流程<a class="headerlink" href="#文档列表变化触发流程" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>sequenceDiagram
@@ -3240,11 +3823,11 @@
 <a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>    C-&gt;&gt;C: 与缓存比较 → 集合不同
 <a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>    C-&gt;&gt;S: server:update_finder {&quot;computer&quot;: &quot;...&quot;}
 <a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>    S-&gt;&gt;A: notify:update_finder {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>    A-&gt;&gt;S: client:get_finder (GetFinderReq)
-<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>    S-&gt;&gt;C: client:get_finder (转发)
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>    A-&gt;&gt;S: client:list_finder (ListFinderReq)
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>    S-&gt;&gt;C: client:list_finder (转发)
 <a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>    C-&gt;&gt;C: organize_finder()
-<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>    C-&gt;&gt;S: GetFinderRet
-<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>    S-&gt;&gt;A: GetFinderRet
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>    C-&gt;&gt;S: ListFinderRet
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>    S-&gt;&gt;A: ListFinderRet
 </code></pre></div>
 <h4 id="文档内容变化触发流程">文档内容变化触发流程<a class="headerlink" href="#文档内容变化触发流程" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>sequenceDiagram
@@ -3258,11 +3841,11 @@
 <a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    C-&gt;&gt;C: 确认为 dpe:// URI
 <a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    C-&gt;&gt;S: server:update_finder {&quot;computer&quot;: &quot;...&quot;}
 <a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    S-&gt;&gt;A: notify:update_finder {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    A-&gt;&gt;S: client:get_finder (GetFinderReq)
-<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>    S-&gt;&gt;C: client:get_finder (转发)
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    A-&gt;&gt;S: client:list_finder (ListFinderReq)
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>    S-&gt;&gt;C: client:list_finder (转发)
 <a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>    C-&gt;&gt;C: organize_finder()
-<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    C-&gt;&gt;S: GetFinderRet
-<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>    S-&gt;&gt;A: GetFinderRet
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    C-&gt;&gt;S: ListFinderRet
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>    S-&gt;&gt;A: ListFinderRet
 </code></pre></div>
 <hr />
 <h2 id="agent-端导航">Agent 端导航<a class="headerlink" href="#agent-端导航" title="Permanent link">&para;</a></h2>
@@ -3270,36 +3853,48 @@
 <p>Finder 协议<strong>仅定义</strong>以下内容：</p>
 <ol>
 <li><strong>DPE 数据格式</strong>：Document-Page-Element 三层结构及其元数据体系</li>
-<li><strong><code>dpe://</code> URI 寻址</strong>：四级渐进式 URI 规范</li>
-<li><strong>传输事件</strong>：<code>client:get_finder</code> / <code>server:update_finder</code> / <code>notify:update_finder</code></li>
+<li><strong><code>dpe://</code> URI 寻址</strong>：三级渐进式 URI 规范（Level 1/2/3）</li>
+<li><strong>Resource 元数据声明</strong>：文档元数据通过 MCP <code>Resource._meta</code> 与 <code>annotations</code> 暴露</li>
+<li><strong>传输事件</strong>：<code>client:list_finder</code> / <code>server:update_finder</code> / <code>notify:update_finder</code></li>
 <li><strong>MCP 资源读取</strong>：通过标准 MCP <code>resources/read</code> 按 URI 级别获取内容</li>
 </ol>
 <p>Agent 内部的导航实现（如分页遍历、关键词搜索、格式转换、缓存策略等）<strong>不在协议范围内</strong>，由各 Agent 自行决定。</p>
+<h3 id="读写边界v1只读">读写边界（v1：只读）<a class="headerlink" href="#读写边界v1只读" title="Permanent link">&para;</a></h3>
+<p><strong>当前协议版本（v1）中，Finder 仅定义读取与导航语义，不支持写操作。</strong> 文档的创建、编辑、删除等变更应由以下途径承担：</p>
+<ul>
+<li><strong>MCP Tools</strong>：MCP Server 可通过暴露领域工具（如 <code>create_report</code>、<code>append_page</code>）完成写操作；这些工具通过 <code>client:tool_call</code> 事件调用，不经过 <code>dpe://</code> URI</li>
+<li><strong>Canvas / 其他子系统</strong>：若未来引入专门的文档编辑通道，将以独立 scheme 或独立事件定义，不扩展 <code>dpe://</code></li>
+</ul>
+<p><code>resources/read</code> 的幂等性、纯读语义是 Finder 与 MCP 生态兼容的基础约定，<strong>MCP Server 实现者 MUST NOT 在 <code>resources/read</code> 中包含副作用</strong>。</p>
 <h3 id="设计理由">设计理由<a class="headerlink" href="#设计理由" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>避免工具冲突</strong>: 当 Agent 同时连接多个 Computer 时，每个 Computer 注册同名内置工具会产生冲突</li>
-<li><strong>DPE 数据完整可获取</strong>: <code>client:get_finder</code> 已返回完整文档目录，<code>resources/read</code> 可按 URI 逐级读取任何内容，Agent 无需额外工具即可完成导航</li>
+<li><strong>DPE 数据完整可获取</strong>: <code>client:list_finder</code> 已返回完整文档目录，<code>resources/read</code> 可按 URI 逐级读取任何内容，Agent 无需额外工具即可完成导航</li>
 <li><strong>Agent 差异化</strong>: 不同 Agent 对导航体验的需求不同（如有的需要搜索，有的只需顺序翻页），协议不应强制统一</li>
 </ul>
 <h3 id="渐进式导航流程">渐进式导航流程<a class="headerlink" href="#渐进式导航流程" title="Permanent link">&para;</a></h3>
-<p>Agent 通过以下四步完成从文档目录到具体元素的逐层钻入，每一步的返回值都包含进入下一步所需的信息，<strong>无需猜测或试错</strong>：</p>
+<p>Agent 通过以下四步（协议事件 + 三级 URI 读取）完成从文档目录到具体元素的逐层钻入，每一步的返回值都包含进入下一步所需的信息，<strong>无需猜测或试错</strong>：</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Step 1                    Step 2                  Step 3                  Step 4
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>client:get_finder    →    resources/read L1   →   resources/read L2   →   resources/read L3
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>client:list_finder    →    resources/read L1   →   resources/read L2   →   resources/read L3
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>获取文档列表              获取文档元数据+页面索引    读取页面内容              读取元素详情
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>                          ▲                       ▲                       ▲
 <a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>返回每个文档的             返回 page_count          返回每个元素的            返回元素
 <a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>doc_ref, uri,             + pages[] 数组           element_id              完整内容
 <a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>page_count 等              (含标题、元素数)
 </code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Step 1 的数据来源</p>
+<p><code>client:list_finder</code> 返回的 <code>DPEDocumentSummary</code> 列表由 Computer 从 MCP <code>resources/list</code> 返回的 <code>Resource._meta</code> / <code>annotations</code> 合成。Agent 不直接接触 MCP Resource 对象；面向 Agent 的结构（<code>title</code>、<code>keywords</code>、<code>page_count</code> 等扁平字段）保持不变。</p>
+</div>
 <h4 id="step-1-获取文档列表">Step 1: 获取文档列表<a class="headerlink" href="#step-1-获取文档列表" title="Permanent link">&para;</a></h4>
-<p>通过 <code>client:get_finder</code> 获取经 Organizer 排序后的文档目录。每个文档摘要中包含 <code>page_count</code>，Agent 无需额外请求即可知道文档有多少页。</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">finder_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_finder</span><span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">)</span>
+<p>通过 <code>client:list_finder</code> 获取经 Organizer 排序后的文档目录。每个文档摘要中包含 <code>page_count</code>，Agent 无需额外请求即可知道文档有多少页。</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">finder_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">list_finder</span><span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">)</span>
 <a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">finder_ret</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">]:</span>
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;page_count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> 页&quot;</span><span class="p">)</span>
 <a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="c1"># → &quot;2026 年度报告: 12 页&quot;</span>
 <a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="c1"># → &quot;A1 合同: 5 页&quot;</span>
 </code></pre></div>
-<p>可选过滤参数：<code>keywords</code>、<code>file_type</code>、<code>offset</code>、<code>limit</code>。</p>
+<p>可选过滤参数：<code>tags</code>（每个 tag 在 <code>title</code>/<code>keywords</code>/<code>summary</code> 中 fuzzy 命中即保留）、<code>file_type</code>、<code>offset</code>、<code>limit</code>。</p>
 <h4 id="step-2-打开文档读取-level-1">Step 2: 打开文档（读取 Level 1）<a class="headerlink" href="#step-2-打开文档读取-level-1" title="Permanent link">&para;</a></h4>
 <p>用文档 URI 调用 <code>resources/read</code>，获取元数据。添加 <code>?depth=pages</code> 可同时获取页面索引（含标题和元素数），用于展示目录或让用户选择页面。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># 仅元数据（默认 depth=metadata）</span>
@@ -3351,7 +3946,7 @@
 </code></pre></div>
 <h4 id="完整示例遍历文档所有页面">完整示例：遍历文档所有页面<a class="headerlink" href="#完整示例遍历文档所有页面" title="Permanent link">&para;</a></h4>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># 1. 获取文档目录</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">finder_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_finder</span><span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">)</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">finder_ret</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">list_finder</span><span class="p">(</span><span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">)</span>
 <a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">doc</span> <span class="o">=</span> <span class="n">finder_ret</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># 选择第一个文档</span>
 <a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>
 <a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="c1"># 2. 已知 page_count，遍历所有页面</span>
@@ -3376,24 +3971,41 @@
 <h3 id="前提条件">前提条件<a class="headerlink" href="#前提条件" title="Permanent link">&para;</a></h3>
 <p>MCP Server 若要参与 Finder，必须声明 <code>resources.subscribe</code> 能力。否则 Computer 不会枚举该 Server 的文档资源，也不会收到该 Server 的资源变更通知。</p>
 <h3 id="资源声明">资源声明<a class="headerlink" href="#资源声明" title="Permanent link">&para;</a></h3>
-<p>在 <code>resources/list</code> 响应中返回 <code>dpe://</code> URI 的 Resource。每个文档对应一个 Level 1 URI：</p>
+<p>在 <code>resources/list</code> 响应中返回 <code>dpe://</code> URI 的 Resource。每个文档对应一个 Level 1 URI，元数据通过 <code>_meta</code>（A2C 字段）与 <code>annotations</code>（MCP 标准）声明：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_resources</span><span class="p">():</span>
 <a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>    <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>        <span class="n">Resource</span><span class="p">(</span>
 <a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>                              <span class="c1"># = DPE title</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>              <span class="c1"># = DPE summary</span>
 <a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>        <span class="p">),</span>
-<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>        <span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://com.example.docs/contract-a1&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;A1 合同&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A1 项目服务合同&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>        <span class="p">),</span>
-<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>    <span class="p">]</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>                <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>                <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>          <span class="c1"># 用于排序</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>            <span class="p">),</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>                <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span> <span class="s2">&quot;年报&quot;</span><span class="p">],</span>                  <span class="c1"># 用于 tag 过滤</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>                <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>                <span class="s2">&quot;page_count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>                             <span class="c1"># 必需</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a>                <span class="s2">&quot;file_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a>            <span class="p">},</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>        <span class="p">),</span>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a>        <span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://com.example.docs/contract-a1&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;A1 合同&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A1 项目服务合同&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-02-01T14:00:00Z&quot;</span><span class="p">),</span>
+<a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a>                <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;合同&quot;</span><span class="p">],</span>
+<a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a>                <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pdf&quot;</span><span class="p">,</span>
+<a id="__codelineno-28-29" name="__codelineno-28-29" href="#__codelineno-28-29"></a>                <span class="s2">&quot;page_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-28-30" name="__codelineno-28-30" href="#__codelineno-28-30"></a>            <span class="p">},</span>
+<a id="__codelineno-28-31" name="__codelineno-28-31" href="#__codelineno-28-31"></a>        <span class="p">),</span>
+<a id="__codelineno-28-32" name="__codelineno-28-32" href="#__codelineno-28-32"></a>    <span class="p">]</span>
 </code></pre></div>
+<p>各字段语义详见 <a href="#dpe-文档资源元数据">DPE 文档资源元数据</a>。</p>
 <h3 id="资源模板">资源模板<a class="headerlink" href="#资源模板" title="Permanent link">&para;</a></h3>
 <p>声明 <code>pages/{N}</code> 和 <code>elements/{ID}</code> 模板，使 Agent 和 Computer 能够发现文档内的子资源路径：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resource_templates</span><span class="p">()</span>
@@ -3412,52 +4024,46 @@
 <a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>    <span class="p">]</span>
 </code></pre></div>
 <h3 id="内容提供">内容提供<a class="headerlink" href="#内容提供" title="Permanent link">&para;</a></h3>
-<p>实现 <code>resources/read</code>，根据 URI 级别返回对应 JSON 内容：</p>
+<p>实现 <code>resources/read</code>，根据 URI 级别返回对应 JSON 内容。<strong>不再需要处理 Level 0（<code>dpe://host</code>）</strong>；若收到该形态应返回 <code>-32002 Resource not found</code> 错误：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">read_resource</span><span class="p">()</span>
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_resource</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parse_dpe_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
 <a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
 <a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>        <span class="c1"># Level 0: 文档目录</span>
-<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
-<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_document_catalog</span><span class="p">()),</span>
-<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>            <span class="p">)</span>
-<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>        <span class="p">])</span>
-<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>
-<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>        <span class="c1"># Level 1: 文档元数据</span>
-<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
-<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_document_metadata</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">)),</span>
-<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>            <span class="p">)</span>
-<a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a>        <span class="p">])</span>
-<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>
-<a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;pages/&quot;</span><span class="p">):</span>
-<a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a>        <span class="c1"># Level 2: 页面内容</span>
-<a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a>        <span class="n">page_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-<a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
-<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_page_content</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">,</span> <span class="n">page_index</span><span class="p">)),</span>
-<a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a>            <span class="p">)</span>
-<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>        <span class="p">])</span>
-<a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a>
-<a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;elements/&quot;</span><span class="p">):</span>
-<a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a>        <span class="c1"># Level 3: 元素详情</span>
-<a id="__codelineno-30-38" name="__codelineno-30-38" href="#__codelineno-30-38"></a>        <span class="n">element_id</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-30-39" name="__codelineno-30-39" href="#__codelineno-30-39"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-30-40" name="__codelineno-30-40" href="#__codelineno-30-40"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
-<a id="__codelineno-30-41" name="__codelineno-30-41" href="#__codelineno-30-41"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-30-42" name="__codelineno-30-42" href="#__codelineno-30-42"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-30-43" name="__codelineno-30-43" href="#__codelineno-30-43"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_element_detail</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">,</span> <span class="n">element_id</span><span class="p">)),</span>
-<a id="__codelineno-30-44" name="__codelineno-30-44" href="#__codelineno-30-44"></a>            <span class="p">)</span>
-<a id="__codelineno-30-45" name="__codelineno-30-45" href="#__codelineno-30-45"></a>        <span class="p">])</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>        <span class="c1"># Level 0 已移除：dpe://host 形式无效</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>        <span class="k">raise</span> <span class="n">ResourceNotFoundError</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>        <span class="c1"># Level 1: 文档元数据（含可选页面索引，取决于 ?depth= 参数）</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_document_metadata</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">query</span><span class="p">)),</span>
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a>            <span class="p">)</span>
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>        <span class="p">])</span>
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>
+<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;pages/&quot;</span><span class="p">):</span>
+<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a>        <span class="c1"># Level 2: 页面内容</span>
+<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>        <span class="n">page_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
+<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
+<a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_page_content</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">,</span> <span class="n">page_index</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">query</span><span class="p">)),</span>
+<a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a>            <span class="p">)</span>
+<a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a>        <span class="p">])</span>
+<a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a>
+<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>    <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;elements/&quot;</span><span class="p">):</span>
+<a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a>        <span class="c1"># Level 3: 元素详情</span>
+<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>        <span class="n">element_id</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">sub_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>            <span class="n">TextResourceContents</span><span class="p">(</span>
+<a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a>                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
+<a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a>                <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+<a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a>                <span class="n">text</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">get_element_detail</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">doc_ref</span><span class="p">,</span> <span class="n">element_id</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">query</span><span class="p">)),</span>
+<a id="__codelineno-30-38" name="__codelineno-30-38" href="#__codelineno-30-38"></a>            <span class="p">)</span>
+<a id="__codelineno-30-39" name="__codelineno-30-39" href="#__codelineno-30-39"></a>        <span class="p">])</span>
 </code></pre></div>
 <h3 id="变更通知">变更通知<a class="headerlink" href="#变更通知" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3607,16 +4213,17 @@
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">可选能力</p>
-<p><code>completion/complete</code> 是 MCP 规范中的可选能力。未实现此方法的 MCP Server 仍然可以正常参与 Finder 系统，Agent 只需通过 <code>client:get_finder</code> 和 <code>resources/read</code> 完成导航。</p>
+<p><code>completion/complete</code> 是 MCP 规范中的可选能力。未实现此方法的 MCP Server 仍然可以正常参与 Finder 系统，Agent 只需通过 <code>client:list_finder</code> 和 <code>resources/read</code> 完成导航。</p>
 </div>
 <h3 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.docs</code>）以避免与其他 MCP Server 冲突</li>
+<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.docs</code>）并<strong>确保在同一 Computer 作用域内全局唯一</strong>（协议层约束，违反会导致该 Server 被 Computer 拒绝参与 Finder 聚合）</li>
 <li><strong>doc-ref 保持简短且 URL-safe</strong>，避免使用长路径或特殊字符</li>
+<li><strong>所有文档元数据在 <code>resources/list</code> 时通过 <code>_meta</code> / <code>annotations</code> 声明完整</strong>，让 Computer 无需 <code>resources/read</code> 即可完成 Finder 过滤与排序</li>
+<li><strong><code>_meta.page_count</code> 必须准确</strong>，帮助 Agent 规划翻页策略；其他字段（<code>keywords</code>、<code>file_type</code>）若缺省则该文档无法被对应过滤条件命中</li>
 <li><strong>页面内容按需加载</strong>，Level 1 默认仅返回元数据，避免传输大量页面数据</li>
 <li><strong>元素 summary 保持精简</strong>，便于 Agent 快速判断是否需要深入查看</li>
 <li><strong>及时发送变更通知</strong>，确保 Agent 获取到最新文档状态</li>
-<li><strong>合理设置 page_count</strong>，在元数据中准确报告页数，帮助 Agent 规划翻页策略</li>
 <li><strong>支持 categories 过滤</strong>，在 Level 2 响应中按 <code>categories</code> 参数过滤元素，减少不必要的数据传输</li>
 <li><strong>考虑实现 <code>completion/complete</code></strong>，为 URI 模板参数提供自动补全，提升 Agent 的导航效率</li>
 </ol>
