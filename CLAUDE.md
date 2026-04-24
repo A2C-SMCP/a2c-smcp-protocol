@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **A2C-SMCP Protocol Specification** repository - a documentation-only repo defining how Agents and Computers communicate through a Socket.IO-based remote tool invocation protocol. The deliverable is the specification documents themselves, built using MkDocs and deployed to both GitHub Pages and doc.turingfocus.cn.
 
-**Current Version**: 0.1.2-rc1
+**Current Version**: 0.2.0
 
 ## Repository Structure
 
@@ -38,6 +38,33 @@ a2c-smcp-protocol/
 └── README.md                 # 开发指南
 ```
 
+## Core Design Philosophy
+
+### Agent-User Capability Equivalence
+
+**A2C-SMCP treats Agent and User as capability-equivalent entities.** The "Agent" vs "User" distinction is an **identity label**, not a **capability boundary** — neither role has privileged operations the other cannot perform.
+
+**At the protocol level, there is no "User" role.** When User actions (triggered via UI co-deployed with Server) need to reach Computer, they go through the **Business Layer User Proxy Pattern**:
+
+```
+UI → HTTP(Server business layer) → emit client:* with real Agent identity → Computer
+```
+
+From A2C protocol's perspective, every `client:*` event is **always Agent-originated**. The User-to-Agent translation (Agent name lookup, audit logging, response gating) lives entirely in the **business layer**, invisible to the protocol. This keeps the three-role model pure and decouples protocol evolution from User features.
+
+**Invariants of the proxy pattern** (do not violate):
+- `AgentCallData.agent` MUST contain the room's **real** Agent name (business layer maintains it; no sentinel names)
+- Room MUST have an Agent; no Agent → user operation rejected at business layer
+- Agent is **not informed** of User's intermediate operations; results reach Agent only via a separate business action when User explicitly sends chosen content
+- Protocol-level audit records Agent-origin; User session/audit is a business-layer concern
+- Spec prose MUST NOT relax `client:*` source semantics ("MAY be originated by Server" etc.) — the protocol definition stays "Agent → Server → Computer"
+
+Full pattern details and evolution notes live in memory: `business_layer_user_proxy_pattern.md`.
+
+**Tension with MCP**: MCP protocol defines `audience=["user"]` vs `audience=["assistant"]` as meaningful routing distinctions. A2C-SMCP treats `audience` as a **hint** (UX/rendering preference), **not** a capability gate. When protocol behavior diverges from MCP's audience semantics, **spec must explicitly note** the divergence is intentional — this prevents future contributors from "fixing" it back to MCP's stricter interpretation.
+
+**Do not erode this principle by accident**: adding role-gated capabilities (e.g., "only Agent MAY call X"), `origin` fields, `user:*` prefixes, or a "User" role requires an explicit, non-role-semantic justification (isolation, credential boundary, etc.) — bring such proposals up before coding them.
+
 ## Architecture Essentials
 
 ### Three-Role Model
@@ -51,6 +78,8 @@ a2c-smcp-protocol/
 | `client:*` | Agent → Server → Computer | Computer processes, Server routes |
 | `server:*` | Client → Server | Server handles room/config management |
 | `notify:*` | Server → Broadcast | Room-scoped notifications |
+
+Protocol convention: `client:*` is always Agent-originated at protocol level. If a User action needs to reach Computer, it goes through the Business Layer User Proxy Pattern described above — the translation is business-layer concern and is invisible to Computer. Do not describe User as a protocol source in spec prose.
 
 ### Room Isolation Rules
 - One Agent maximum per room (exclusive)

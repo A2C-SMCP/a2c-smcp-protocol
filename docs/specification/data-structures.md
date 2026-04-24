@@ -196,9 +196,34 @@ class GetToolsRet(TypedDict):
 
 ## 房间管理结构
 
+### 连接握手参数
+
+Socket.IO 连接阶段的参数分**两个位置**承载，遵循"协议层放 URL、业务层放 auth"的分层原则：
+
+#### URL Query 参数（协议层）
+
+| 参数 | 必需 | 说明 |
+|---|---|---|
+| `a2c_version` | 是 | 协议版本号，格式 `MAJOR.MINOR.PATCH`，如 `0.2.0` |
+
+由 Server **在 HTTP 中间件层** 校验；不兼容时返回 HTTP 400 携带 [`4008`](error-handling.md#协议版本不匹配4008) 错误 body。具体规则见 [协议版本与握手](versioning.md)。
+
+#### `auth` 对象（业务层，ConnectAuth）
+
+Socket.IO 连接握手阶段的 `auth` 对象。**所有客户端**（Agent / Computer）在连接 Server 时必须提供。由 Server 在 `connect` handler 中处理。
+
+```python
+class ConnectAuth(TypedDict):
+    role: Literal["computer", "agent"]  # 必需：客户端角色
+```
+
+!!! note "为什么 a2c_version 不在 auth 里"
+
+    协议版本校验必须在任何业务代码之前完成，不能受 `connect` handler 实现的影响。因此 `a2c_version` 放在 URL query（HTTP 层），由独立中间件校验；`auth` 仅承载业务身份数据。详见 [协议版本与握手 § 设计取向](versioning.md#设计取向)。
+
 ### EnterOfficeReq
 
-加入房间请求。
+加入房间请求。**不再**携带版本信息——版本校验已在连接建立前完成（HTTP 层），身份通过 `auth.role` 声明。
 
 ```python
 class EnterOfficeReq(TypedDict):
@@ -259,7 +284,15 @@ class SessionInfo(TypedDict, total=False):
     name: str                               # 会话名称
     role: Literal["computer", "agent"]      # 角色
     office_id: str                          # 所属房间 ID
+    a2c_version: str                        # 协议版本号（Server 在 HTTP 握手阶段从 URL query 记录）
 ```
+
+!!! note "a2c_version 字段"
+
+    - Server 在客户端 Socket.IO 连接的 HTTP 校验阶段从 URL query 的 `a2c_version` 读取并存入 Session
+    - 同房间内 `a2c_version` 必然兼容（Server 在 HTTP 层已校验）；此字段仅用于**展示与诊断**（如 UI 显示成员版本、日志定位）
+    - 不用于二次校验
+    - 详见 [协议版本与握手](versioning.md)
 
 ### ListRoomRet
 
@@ -366,7 +399,7 @@ Desktop: TypeAlias = str
 **示例**:
 
 ```
-window://com.example.browser/main?priority=80
+window://com.example.browser/main
 
 <html>当前页面内容...</html>
 ```
@@ -391,16 +424,16 @@ class GetDeskTopRet(TypedDict, total=False):
 
 ## Finder 相关结构
 
-### GetFinderReq
+### ListFinderReq
 
 获取文档目录请求。
 
 ```python
-class GetFinderReq(AgentCallData, total=True):
+class ListFinderReq(AgentCallData, total=True):
     agent: str                          # Agent 名称
     req_id: str                         # 请求 ID
     computer: str                       # 目标 Computer 名称
-    keywords: NotRequired[list[str]]    # 可选：关键词过滤
+    tags: NotRequired[list[str]]        # 可选：标签过滤；每个 tag 在文档 title/keywords/summary 中做 fuzzy 命中，任一命中即保留
     file_type: NotRequired[str]         # 可选：文件类型过滤
     offset: NotRequired[int]            # 可选：分页偏移（默认 0）
     limit: NotRequired[int]             # 可选：分页限制（默认 20）
@@ -408,21 +441,25 @@ class GetFinderReq(AgentCallData, total=True):
 
 ### DPEDocumentSummary
 
-DPE 文档摘要，用于文档目录展示。
+DPE 文档摘要，用于文档目录展示。**这是 Agent-facing 结构**，由 Computer 从 MCP `resources/list` 返回的 `Resource` 对象合成：
 
 ```python
 class DPEDocumentSummary(TypedDict):
-    doc_ref: str                        # 文档引用键（MCP Server 分配的不透明短键）
-    uri: str                            # 完整 dpe:// URI
-    file_uri: str                       # 原始文件 URI
-    file_type: str                      # 文件类型（xlsx, pdf, pptx 等）
-    title: str                          # 文档标题
-    page_count: int                     # 总页数
-    keywords: NotRequired[list[str]]    # 关键词列表
-    summary: NotRequired[str]           # 文档摘要
-    server: str                         # 来源 MCP Server 名称
-    last_modified: NotRequired[str]     # 最后修改时间（ISO 8601）
+    doc_ref: str                        # 从 URI 解析得出
+    uri: str                            # = Resource.uri
+    file_uri: NotRequired[str]          # = Resource._meta["file_uri"]
+    file_type: NotRequired[str]         # = Resource._meta["file_type"]
+    title: str                          # = Resource.name
+    page_count: int                     # = Resource._meta["page_count"]（必需）
+    keywords: NotRequired[list[str]]    # = Resource._meta["keywords"]
+    summary: NotRequired[str]           # = Resource.description
+    server: str                         # 由 Computer 注入：来源 MCP Server 名称
+    last_modified: NotRequired[str]     # = Resource.annotations.lastModified
 ```
+
+!!! note "字段合成规则"
+
+    Computer 在响应 `client:list_finder` 时，从每个 `dpe://` Resource 合成一份 `DPEDocumentSummary`。具体映射见 [Finder 规范 → DPE 文档资源元数据](finder.md#dpe-文档资源元数据)。Agent 看到的字段形态保持扁平、稳定，与 MCP Server 侧的分布式声明位置解耦。
 
 ### DPEPageSummary
 
@@ -453,12 +490,12 @@ class DPEElementDetail(TypedDict):
     metadata: NotRequired[dict]         # 附加元数据
 ```
 
-### GetFinderRet
+### ListFinderRet
 
 获取文档目录响应。
 
 ```python
-class GetFinderRet(TypedDict, total=False):
+class ListFinderRet(TypedDict, total=False):
     documents: list[DPEDocumentSummary]  # 文档摘要列表
     total_count: int                     # 总文档数（用于分页）
     req_id: str                          # 请求 ID

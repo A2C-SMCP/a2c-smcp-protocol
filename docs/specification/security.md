@@ -119,6 +119,53 @@ export API_KEY="your_api_key"
 api_key = "your_api_key"  # 危险！
 ```
 
+### MCP 上游授权（OAuth 2.0 等）
+
+MCP 协议自身支持 OAuth 2.0 等授权机制以访问工具服务器的受保护资源。A2C-SMCP **不**在协议层介入该握手过程——这是"零凭证传播原则"在 MCP 集成上的直接推论。
+
+#### 边界划分
+
+```
+┌───────────────┐        ┌───────────────┐        ┌──────────────────┐
+│     Agent     │◀──────▶│   Computer    │◀──────▶│   MCP Server     │
+│               │  SMCP  │               │  MCP   │  (受保护资源)     │
+│ ✗ 不参与授权  │        │ ✓ 执行 OAuth  │        │                  │
+│ ✗ 不持有 Token│        │ ✓ 存储 Token  │        │                  │
+│               │        │ ✓ 负责刷新    │        │                  │
+└───────────────┘        └───────────────┘        └──────────────────┘
+```
+
+#### Computer 实现要求
+
+| 要求 | 说明 |
+|------|------|
+| **本地完成握手** | OAuth 流程（Authorization Code、Device Code 等）**必须**在 Computer 宿主环境内完成，不通过 A2C-SMCP 信道承载授权参数 |
+| **凭证不外传** | Access Token、Refresh Token、`client_secret`、`code_verifier` 等**禁止**经由 A2C-SMCP 协议传输 |
+| **用户引导本地化** | 需要用户完成浏览器授权或显示设备码时，**应**在 Computer 所在宿主环境呈现，不应通过 Agent 侧 UI 中转敏感 URL 参数 |
+| **刷新透明** | Token 过期由 Computer 自动刷新；若刷新失败，返回 `4007 Tool Authorization Failed`（见 `error-handling.md`） |
+| **授权缺失显式告知** | 工具首次调用前未完成授权时，返回 `4006 Tool Authorization Required`，不要泛化为一般工具执行错误 |
+
+#### Agent 行为约束
+
+- **禁止**在调用参数中尝试注入 Token、授权码或任何 OAuth 字段——这些字段即使被传输也不会被 Computer 信任。
+- 收到 `4006/4007` 时，**不应**自动重试，应将 Computer 返回的 `auth_hint.message`（非敏感文案）透传给上层。
+- 授权完成的判定由 Computer 负责；Agent **仅在用户显式重试**后再次发起 `client:tool_call`，不得基于启发式（如等待固定时间）自动重试。
+
+#### 工具元数据提示（建议，非强制）
+
+Computer 在向 Agent 暴露工具列表时，**建议**对需要授权的工具附加非敏感标注，便于 Agent 判断调用前置条件：
+
+```python
+{
+    "name": "github_create_issue",
+    "description": "...",
+    "requires_auth": True,        # 建议字段
+    "auth_provider": "github"     # 建议字段，仅用于展示，禁止包含 scope 之外的敏感细节
+}
+```
+
+该字段在当前版本中**不是**协议强制字段，Agent **不应**依赖其存在；Computer SDK 可根据实现粒度自行决定是否暴露。后续版本会评估将其纳入 `tool` 数据结构。
+
 ## 房间隔离
 
 ### 隔离要求

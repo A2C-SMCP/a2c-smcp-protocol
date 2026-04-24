@@ -30,11 +30,14 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4003 | Tool Execution Failed | 工具执行失败 |
 | 4004 | Tool Timeout | 工具执行超时 |
 | 4005 | Tool Requires Confirmation | 工具需要二次确认 |
+| 4006 | Tool Authorization Required | 工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权 |
+| 4007 | Tool Authorization Failed | MCP 上游授权流程失败、Token 已失效或刷新失败 |
 
-### 房间管理错误码
+### 连接与房间管理错误码
 
 | 代码 | 名称 | 含义 |
 |------|------|------|
+| 4008 | Protocol Version Mismatch | HTTP 握手阶段，URL query 中的 `a2c_version` 与 Server 不兼容 |
 | 4101 | Room Full | 房间已有 Agent |
 | 4102 | Room Not Found | 房间不存在 |
 | 4103 | Not In Room | 未加入房间 |
@@ -212,6 +215,74 @@ logger.error(
 )
 ```
 
+## 协议版本不匹配（4008）
+
+**触发时机**：客户端（Agent / Computer）通过 Socket.IO 连接 Server，**HTTP 中间件层**校验 URL query 中的 `a2c_version` 发现与 Server 不兼容。校验发生在 Socket.IO 处理之前，业务代码无法影响。
+
+**传递方式**：Server 返回 HTTP 400，body 为结构化 JSON。Socket.IO 客户端在 `connect_error` 事件收到该 body：
+
+```json
+{
+  "code": 4008,
+  "message": "Protocol version mismatch",
+  "server_version": "0.2.0",
+  "client_version": "0.1.5"
+}
+```
+
+### 字段说明
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4008` |
+| `message` | 是 | 人类可读的错误信息 |
+| `server_version` | 是 | Server 当前支持的协议版本（Client 据此决定是否升级） |
+| `client_version` | 是 | Server 从 URL query 读取的客户端版本（回显供诊断） |
+
+### SDK 实现要求
+
+- Client SDK **必须**解析 HTTP 400 的响应 body，识别 `code: 4008`，转化为专属异常（如 `ProtocolVersionError`），**禁止**静默重试
+- 异常信息应明确告知用户两边版本，便于快速判断应升级哪端
+- 可选：SDK 在本地日志中打印诊断信息（当前 SDK 声称的 PROTOCOL_VERSION 常量、接收到的 server_version）
+
+详细的版本语义、兼容性规则与握手流程见 [协议版本与握手](versioning.md)。
+
+---
+
+## MCP 上游授权错误响应
+
+MCP 协议自身定义了工具服务器的 OAuth 2.0 授权流程。A2C-SMCP 不介入该握手过程；本章仅定义**授权结果如何向 Agent 反馈**，使 Agent 能够区分"工具坏了"与"工具需要用户授权"。
+
+> **完整的安全边界、Computer 实现要求与 Agent 行为约束，见 [`security.md` → MCP 上游授权（OAuth 2.0 等）](security.md#mcp-上游授权oauth-20-等)。** 本章仅承载**响应结构与错误码**，行为层约束以 `security.md` 为准，避免重复维护。
+
+### 授权失败的响应结构
+
+当 Computer 调用 MCP 工具因上游授权问题失败时，使用 `CallToolResult` 返回错误，并在 `meta` 中携带结构化提示：
+
+```python
+CallToolResult(
+    content=[TextContent(text="此工具需要授权 GitHub 账号后方可使用")],
+    isError=True,
+    meta={
+        "error_code": 4006,  # 或 4007
+        "mcp_server": "github-mcp",
+        "auth_hint": {
+            # 可选：引导用户完成授权的提示信息
+            "action": "user_authorization_required",
+            "message": "请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"
+        }
+    }
+)
+```
+
+### 字段说明
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `meta.error_code` | 是 | `4006`（未授权）或 `4007`（授权失效） |
+| `meta.mcp_server` | 是 | 触发授权错误的 MCP Server 标识，便于 Agent 定位 |
+| `meta.auth_hint` | 否 | 面向用户的非敏感提示信息，**禁止**包含授权 URL 参数、state、client_secret 等敏感字段 |
+
 ## TODO
 
 > 以下功能尚未实现，计划在后续版本中完善：
@@ -220,6 +291,7 @@ logger.error(
 - [ ] 错误码国际化支持
 - [ ] 错误追踪 ID（trace_id）
 - [ ] 错误统计和监控接口
+- [ ] 工具元数据层面的 `requires_auth` 标注（见 `security.md`）
 
 ## 参考
 

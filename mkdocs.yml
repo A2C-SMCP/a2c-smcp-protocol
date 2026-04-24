@@ -112,11 +112,14 @@ nav:
       - Desktop 桌面系统: specification/desktop.md
       - Finder 文档系统: specification/finder.md
       - 房间模型: specification/room-model.md
+      - 协议版本: specification/versioning.md
       - 错误处理: specification/error-handling.md
       - 安全考虑: specification/security.md
   - 开发指南:
       - Computer MCP 配置指南: guides/computer-mcp-config-guide.md
       - Finder SDK 实现指南: guides/finder-sdk-guide.md
+  - 迁移指南:
+      - v0.2 URI 元数据重构: migrations/v0.2-uri-metadata-refactor.md
   - 附录:
       - 常见问题: appendix/faq.md
       - DPE 标准化提案: specification/dpe-standardization-proposal.md

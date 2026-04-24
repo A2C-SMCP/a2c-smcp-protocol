@@ -29,7 +29,7 @@ A2C-SMCP (Agent To Computer SMCP) 是一种远程工具调用协议，定义了 
 
 ## 版本
 
-当前协议版本: **0.1.2-rc1**
+当前协议版本: **0.2.0**
 
 ---
 
@@ -75,7 +75,7 @@ inv docs.serve
 inv docs.build
 
 # 构建指定版本
-inv docs.build --version 0.1.2-rc1
+inv docs.build --version 0.2.0
 
 # 预览多版本文档
 inv docs.serve-versioned

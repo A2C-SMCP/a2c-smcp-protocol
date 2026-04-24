@@ -98,14 +98,17 @@
 
 ### Q: Window URI 的格式是什么？
 
-**格式**: `window://host/path1/path2?priority=P&fullscreen=F`
+**格式**: `window://host/path1/path2`（纯标识符，不含 query 参数）
 
-- `host`（必需）: MCP 唯一标识，推荐反向域名风格如 `com.example.mcp`
+- `host`（必需）: MCP Server 唯一标识，在 Computer 作用域内 **MUST 全局唯一**，推荐反向域名风格如 `com.example.mcp`
 - `path`（可选）: 0..N 个路径段，URL 编码
-- `priority`（可选）: 整数 `[0, 100]`，同一 MCP 内比较，越大越靠前
-- `fullscreen`（可选）: 布尔值，全屏渲染标记
 
-详见 [Desktop 桌面系统 - Window URI 规范](../specification/desktop.md#window-uri-规范)。
+布局元数据（priority、fullscreen）自 v0.2 起改为通过 MCP Resource 的 `_meta` 字段声明：
+
+- `_meta.priority`（可选）: 整数 `[0, 100]`，同一 MCP Server 内比较，越大越靠前
+- `_meta.fullscreen`（可选）: 布尔值，全屏渲染标记
+
+详见 [Desktop 桌面系统 - Window URI 规范](../specification/desktop.md#window-uri-规范) 与 [Window 资源元数据](../specification/desktop.md#window-资源元数据)。
 
 ### Q: 如何让 MCP Server 的内容出现在 Desktop 上？
 
@@ -136,18 +139,19 @@ DPE 代表 Document-Page-Element 三层结构：
 - **Page**: 文档内的一个逻辑页面（如一个工作表）
 - **Element**: 页面内的一个内容单元（如一个表格、一段文本）
 
-这种模型通过 `dpe://` URI 四级寻址支持从目录到元素的渐进式导航。
+这种模型通过 `dpe://` URI 三级寻址支持从文档到元素的渐进式导航；文档发现走 MCP 标准 `resources/list`（不再有 Level 0 URI）。
 
 ### Q: dpe:// URI 的格式是什么？
 
-**格式**: `dpe://{host}/{doc-ref}[/sub-path][?query-params]`
+**格式**: `dpe://{host}/{doc-ref}[/sub-path][?content-control]`
 
-四级寻址：
+三级寻址：
 
-- Level 0: `dpe://host` → 文档目录
 - Level 1: `dpe://host/doc-ref` → 文档元数据 + 页面索引
 - Level 2: `dpe://host/doc-ref/pages/{N}` → 页面内容
 - Level 3: `dpe://host/doc-ref/elements/{ID}` → 元素详情
+
+文档目录由 `client:list_finder` 事件返回（Computer 从 `resources/list` 合成），不通过 URI 暴露。文档元数据（keywords、file_type 等）在 MCP Resource 的 `_meta` / `annotations` 声明，不在 URI query 中。
 
 详见 [Finder 文档系统 - dpe:// URI 协议](../specification/finder.md#dpe-uri-协议)。
 
@@ -167,8 +171,8 @@ MCP Server 参与 Finder 需满足以下条件：
 
 Agent 通过两种机制导航文档：
 
-1. **`client:get_finder` 事件**: 获取经 Organizer 过滤、排序、分页后的文档目录
-2. **MCP `resources/read`**: 按 `dpe://` URI 四级寻址逐层读取内容（目录 → 文档 → 页面 → 元素）
+1. **`client:list_finder` 事件**: 获取经 Organizer 过滤、排序、分页后的文档目录
+2. **MCP `resources/read`**: 按 `dpe://` URI 三级寻址逐层读取内容（文档 → 页面 → 元素）
 
 具体的导航逻辑（分页遍历、关键词搜索、格式转换、缓存等）由 Agent 内部实现，不在协议范围内。详见 [Finder 文档系统 - Agent 端导航](../specification/finder.md#agent-端导航)。
 
