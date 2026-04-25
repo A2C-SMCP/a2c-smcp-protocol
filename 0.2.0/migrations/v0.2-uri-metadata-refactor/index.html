@@ -1713,6 +1713,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="7.1 协议层：硬切换">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#不内建-v01-mcp-server-fallback协议级决议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        不内建 v0.1 MCP Server fallback（协议级决议）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2816,6 +2833,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="7.1 协议层：硬切换">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#不内建-v01-mcp-server-fallback协议级决议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        不内建 v0.1 MCP Server fallback（协议级决议）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3094,6 +3128,16 @@
 <p><strong>协议版本</strong>：0.1.x → <strong>0.2.0</strong>
 <strong>目标读者</strong>：python-sdk / rust-sdk 实现工程师
 <strong>发布节奏</strong>：破坏性升级，需同步发布三方（Agent / Computer / MCP Server helper）</p>
+<div class="admonition tip">
+<p class="admonition-title">对从未实现 v0.1 的 SDK——按 Greenfield 实现规范阅读</p>
+<p>本指南默认 SDK 已实现 v0.1 完整功能并据此描述"迁移路径"。如果你所维护的 SDK <strong>从未</strong>实现某个子系统（典型如 Finder），那么本指南中相关章节（特别是 §4.2 DPE URI 重构、§4.3 Finder 事件重命名、§5/§6 中所有 <code>organize_finder</code> 相关条目）应按 <strong>Greenfield 实现规范</strong>阅读：</p>
+<ul>
+<li>关于"旧形式"的描述可作为反面参考（避免按 v0.1 模式实现）</li>
+<li>关于"新形式"和"行为约束"是 SDK 必须实现的目标</li>
+<li>"迁移步骤"中提到的"修改 X 文件"对你来说是"新建 X 文件"</li>
+</ul>
+<p>对未实现 Window URI 解析器、<code>organize_desktop</code> 的 SDK 同理处理。</p>
+</div>
 <hr />
 <h2 id="1-摘要">1. 摘要<a class="headerlink" href="#1-摘要" title="Permanent link">&para;</a></h2>
 <p>v0.2 是一次<strong>破坏性</strong>协议升级，包含三组变更：</p>
@@ -3116,11 +3160,14 @@
 <hr />
 <h2 id="2-受影响范围">2. 受影响范围<a class="headerlink" href="#2-受影响范围" title="Permanent link">&para;</a></h2>
 <h3 id="21-代码影响矩阵">2.1 代码影响矩阵<a class="headerlink" href="#21-代码影响矩阵" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>Python SDK 路径基于 <code>python-sdk</code> 仓库实际现状；Rust SDK 列<strong>仅作示意</strong>——<code>rust-sdk</code> 实际目录结构由 rust-sdk 实现方维护，本文档不锚定具体路径，仅描述需要修改/新建的<strong>职能模块</strong>。</p>
+</blockquote>
 <table>
 <thead>
 <tr>
-<th>模块</th>
-<th>Python SDK</th>
+<th>职能模块</th>
+<th>Python SDK 路径</th>
 <th>Rust SDK</th>
 <th>说明</th>
 </tr>
@@ -3129,85 +3176,85 @@
 <tr>
 <td><strong>WindowURI 解析器</strong></td>
 <td><code>a2c_smcp/computer/utils/window_uri.py</code></td>
-<td><code>crates/computer/src/uri/window.rs</code></td>
+<td>rust-sdk 决定</td>
 <td>移除 <code>priority</code> / <code>fullscreen</code> query 解析</td>
 </tr>
 <tr>
 <td><strong>DPE URI 解析器</strong></td>
 <td><code>a2c_smcp/computer/utils/dpe_uri.py</code></td>
-<td><code>crates/computer/src/uri/dpe.rs</code></td>
+<td>rust-sdk 决定（v0.2 待新建）</td>
 <td>拒绝 <code>dpe://host</code> 形式（Level 0）</td>
 </tr>
 <tr>
 <td><strong>organize_desktop</strong></td>
 <td><code>a2c_smcp/computer/desktop/organize.py</code></td>
-<td><code>crates/computer/src/desktop/organize.rs</code></td>
+<td>rust-sdk 决定</td>
 <td>从 <code>Resource.annotations.priority</code> 读优先级（float [0,1]）；<code>Resource._meta.fullscreen</code> 读全屏标记</td>
 </tr>
 <tr>
 <td><strong>organize_finder</strong></td>
 <td><code>a2c_smcp/computer/finder/organize.py</code></td>
-<td><code>crates/computer/src/finder/organize.rs</code></td>
+<td>rust-sdk 决定（v0.2 待新建）</td>
 <td>输入改为 <code>list[Resource]</code>，合成 <code>DPEDocumentSummary</code></td>
 </tr>
 <tr>
 <td><strong>MCP Manager</strong></td>
 <td><code>a2c_smcp/computer/mcp_clients/manager.py</code></td>
-<td><code>crates/computer/src/mcp/manager.rs</code></td>
+<td>rust-sdk 决定</td>
 <td>新增 host 唯一性校验与拒绝注册逻辑；Finder 不再读 Level 0</td>
 </tr>
 <tr>
 <td><strong>Socket.IO Client</strong></td>
 <td><code>a2c_smcp/computer/socketio/client.py</code></td>
-<td><code>crates/computer/src/socketio.rs</code></td>
+<td>rust-sdk 决定</td>
 <td><code>on_list_finder</code> 改用新 <code>tags</code> 字段</td>
 </tr>
 <tr>
 <td><strong>数据类型</strong></td>
 <td><code>a2c_smcp/smcp.py</code></td>
-<td><code>crates/core/src/types.rs</code></td>
+<td>rust-sdk 决定</td>
 <td><code>ListFinderReq.keywords</code> → <code>tags</code></td>
 </tr>
 <tr>
 <td><strong>Agent SDK</strong></td>
 <td><code>a2c_smcp/agent/</code></td>
-<td><code>crates/agent/</code></td>
+<td>rust-sdk 决定</td>
 <td>发送 <code>list_finder</code> 请求时字段名改为 <code>tags</code></td>
 </tr>
 <tr>
 <td><strong>MCP Server Helper</strong>（若有）</td>
 <td><code>a2c_smcp/computer/mcp_clients/helpers.py</code></td>
-<td><code>crates/computer/src/mcp/helpers.rs</code></td>
+<td>rust-sdk 决定</td>
 <td>提供 <code>make_window_resource</code> / <code>make_dpe_resource</code> 构造器</td>
 </tr>
 <tr>
 <td><strong>错误码枚举</strong></td>
 <td><code>a2c_smcp/smcp.py::ErrorCode</code></td>
-<td><code>crates/core/src/errors.rs</code></td>
+<td>rust-sdk 决定</td>
 <td>新增 <code>4006</code> / <code>4007</code> / <code>4008</code></td>
 </tr>
 <tr>
 <td><strong>协议版本常量</strong></td>
 <td><code>a2c_smcp/__init__.py::PROTOCOL_VERSION</code></td>
-<td><code>crates/core/src/lib.rs</code> PROTOCOL_VERSION</td>
-<td>新增导出；每次协议变更需同步</td>
+<td>rust-sdk 决定</td>
+<td>新增导出；SDK 包版本 MAJOR.MINOR MUST 锁定协议 MAJOR.MINOR（见 <a href="../../specification/versioning/#sdk-仓库">versioning.md SDK 仓库</a>）</td>
 </tr>
 <tr>
 <td><strong>Agent/Computer 连接逻辑</strong></td>
 <td><code>a2c_smcp/agent/socketio/client.py</code>、<code>a2c_smcp/computer/socketio/client.py</code></td>
-<td><code>crates/agent/src/client.rs</code>、<code>crates/computer/src/socketio.rs</code></td>
-<td>连接时 URL 拼 <code>?a2c_version=...</code>，<code>auth</code> 传 <code>role</code>；解析 HTTP 400 body 识别 <code>4008</code> → 抛 <code>ProtocolVersionError</code></td>
+<td>rust-sdk 决定</td>
+<td>连接时 URL 拼 <code>?a2c_version=...</code>，<code>auth</code> 默认仅传 <code>role</code>（业务字段由用户回调注入，详见 <a href="../../specification/data-structures/#auth-对象业务层connectauth">data-structures.md ConnectAuth</a>）；解析 HTTP 400 body 识别 <code>4008</code> → 主动 <code>disconnect()</code> → 抛 <code>ProtocolVersionError</code></td>
 </tr>
 <tr>
 <td><strong>Server 连接处理</strong></td>
 <td><code>a2c_smcp/server/</code> 的 HTTP 中间件 + <code>connect</code> handler</td>
-<td><code>crates/server/</code></td>
-<td>新增 HTTP 中间件在 Socket.IO 之前校验 <code>a2c_version</code>；<code>connect</code> handler 处理 <code>auth.role</code> + 从 QUERY_STRING 提取 <code>a2c_version</code> 存入 session；<code>server:list_room</code> 返回含版本</td>
+<td>rust-sdk 决定（socketioxide 默认 HTTP 路径 <code>/socket.io/</code>）</td>
+<td>在 Socket.IO handler 之前于 HTTP 层校验 <code>a2c_version</code>；<code>connect</code> handler 处理 <code>auth.role</code>；<code>server:list_room</code> 返回含版本</td>
 </tr>
 <tr>
 <td><strong>测试</strong></td>
 <td><code>tests/unit_tests/computer/</code>、<code>tests/integration_tests/</code></td>
-<td><code>crates/*/tests/</code></td>
+<td>rust-sdk 决定</td>
 <td>所有涉及 URI query 解析、Level 0、<code>keywords</code> 参数的测试要重写；新增版本握手矩阵测试</td>
 </tr>
 </tbody>
@@ -3510,7 +3557,7 @@
 </code></pre></div>
 <h4 id="过滤逻辑">过滤逻辑<a class="headerlink" href="#过滤逻辑" title="Permanent link">&para;</a></h4>
 <ul>
-<li><strong>无效资源过滤</strong>：URI 不是 <code>dpe://</code> 或解析失败 → 跳过；<code>_meta.page_count</code> 缺失 → 跳过并记录警告</li>
+<li><strong>无效资源过滤</strong>：URI 不是 <code>dpe://</code> 或解析失败 → 跳过；<code>_meta.page_count</code> 缺失或 <code>0</code> → 跳过并记录 WARN（与 <a href="../../specification/finder/#校验规则">finder.md 校验规则</a> 一致；详见 finder.md 的 page_count 边界场景表）</li>
 <li><strong>tags 过滤</strong>（原 keywords）：每个 tag 在 <code>Resource.name</code> / <code>Resource._meta.keywords</code> / <code>Resource.description</code> 中做<strong>大小写不敏感的子串命中</strong>，任一命中即保留（空 tags 视为不过滤）</li>
 <li><strong>file_type 过滤</strong>：<code>Resource._meta.file_type</code> 精确匹配（小写化后比较）</li>
 </ul>
@@ -3679,51 +3726,55 @@
 <a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>        <span class="p">)</span>
 </code></pre></div>
 <ol>
-<li><strong>禁止</strong>在收到 4008 时自动重试；异常必须向上层抛出</li>
+<li><strong>禁止</strong>在收到 4008 时自动重试。SDK 处理流程：解析 HTTP 400 body → 识别 <code>code:4008</code> → <strong>主动调用底层客户端 <code>disconnect()</code></strong>（避免库默认重连导致死循环）→ 抛 <code>ProtocolVersionError</code> 给业务层。详见 <a href="../../specification/versioning/#4-client-sdk-must-主动断开连接">versioning.md § Client SDK MUST 主动断开连接</a></li>
 </ol>
 <h4 id="server-侧-sdk-实现">Server 侧 SDK 实现<a class="headerlink" href="#server-侧-sdk-实现" title="Permanent link">&para;</a></h4>
 <ol>
-<li><strong>挂载 HTTP 中间件，在 Socket.IO 之前校验</strong>：</li>
+<li><strong>挂载 HTTP 中间件，在 Socket.IO 之前校验</strong>（HTTP 拦截路径与所选 SDK 的 <code>socketio_path</code> 配置一致——下例使用 Python <code>socketio_path="smcp"</code> 的实现选择，<strong>非协议常量</strong>；Rust <code>socketioxide</code> 默认路径是 <code>/socket.io/</code>，参见 <a href="../../specification/versioning/#http-拦截路径由实现决定非协议常量">versioning.md HTTP 拦截路径由实现决定</a>）：</li>
 </ol>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseHTTPMiddleware</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CVersionMiddleware</span><span class="p">(</span><span class="n">BaseHTTPMiddleware</span><span class="p">):</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">):</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/smcp&quot;</span><span class="p">):</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>            <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="n">client_ver_str</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a2c_version&quot;</span><span class="p">)</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">client_ver_str</span><span class="p">:</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>                <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing a2c_version query parameter&quot;</span><span class="p">},</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>            <span class="p">)</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>            <span class="n">client_ver</span> <span class="o">=</span> <span class="n">ProtocolVersion</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">client_ver_str</span><span class="p">)</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>                <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Invalid a2c_version: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>            <span class="p">)</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_compatible</span><span class="p">(</span><span class="n">client_ver</span><span class="p">,</span> <span class="n">SERVER_VERSION</span><span class="p">):</span>
-<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
-<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>                <span class="p">{</span>
-<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">4008</span><span class="p">,</span>
-<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Protocol version mismatch&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>                    <span class="s2">&quot;server_version&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">SERVER_VERSION</span><span class="p">),</span>
-<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>                    <span class="s2">&quot;client_version&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">client_ver</span><span class="p">),</span>
-<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>                <span class="p">},</span>
-<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
-<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>            <span class="p">)</span>
-<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a>        <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-<a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a>
-<a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a><span class="c1"># ASGI 组装</span>
-<a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Starlette</span><span class="p">(</span>
-<a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">Middleware</span><span class="p">(</span><span class="n">A2CVersionMiddleware</span><span class="p">)],</span>
-<a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>    <span class="n">routes</span><span class="o">=</span><span class="p">[</span><span class="n">Mount</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">socketio</span><span class="o">.</span><span class="n">ASGIApp</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;smcp&quot;</span><span class="p">))],</span>
-<a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># Python 实现选择：把 socketio_path 设为 &quot;smcp&quot;，故 HTTP 路径前缀也是 /smcp</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="c1"># 其他 SDK（Rust socketioxide / Node socket.io）通常用 /socket.io/，对应调整下方过滤</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">SMCP_HTTP_PATH</span> <span class="o">=</span> <span class="s2">&quot;/smcp&quot;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CVersionMiddleware</span><span class="p">(</span><span class="n">BaseHTTPMiddleware</span><span class="p">):</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">):</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">SMCP_HTTP_PATH</span><span class="p">):</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>            <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        <span class="n">client_ver_str</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a2c_version&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">client_ver_str</span><span class="p">:</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>                <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing a2c_version query parameter&quot;</span><span class="p">},</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>            <span class="p">)</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>            <span class="n">client_ver</span> <span class="o">=</span> <span class="n">ProtocolVersion</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">client_ver_str</span><span class="p">)</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>                <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Invalid a2c_version: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>            <span class="p">)</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_compatible</span><span class="p">(</span><span class="n">client_ver</span><span class="p">,</span> <span class="n">SERVER_VERSION</span><span class="p">):</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>                <span class="p">{</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="mi">4008</span><span class="p">,</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Protocol version mismatch&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>                    <span class="s2">&quot;server_version&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">SERVER_VERSION</span><span class="p">),</span>
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a>                    <span class="s2">&quot;client_version&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">client_ver</span><span class="p">),</span>
+<a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a>                <span class="p">},</span>
+<a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a>                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+<a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>            <span class="p">)</span>
+<a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>        <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>
+<a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="c1"># ASGI 组装</span>
+<a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Starlette</span><span class="p">(</span>
+<a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a>    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">Middleware</span><span class="p">(</span><span class="n">A2CVersionMiddleware</span><span class="p">)],</span>
+<a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a>    <span class="n">routes</span><span class="o">=</span><span class="p">[</span><span class="n">Mount</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">socketio</span><span class="o">.</span><span class="n">ASGIApp</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;smcp&quot;</span><span class="p">))],</span>
+<a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a><span class="p">)</span>
 </code></pre></div>
 <ol>
 <li><strong><code>connect</code> handler 只处理 <code>auth.role</code></strong>，不再校验版本：</li>
@@ -4183,12 +4234,25 @@
 <hr />
 <h2 id="7-兼容性策略">7. 兼容性策略<a class="headerlink" href="#7-兼容性策略" title="Permanent link">&para;</a></h2>
 <h3 id="71-协议层硬切换">7.1 协议层：<strong>硬切换</strong><a class="headerlink" href="#71-协议层硬切换" title="Permanent link">&para;</a></h3>
-<p>v0.1.x 与 v0.2.0 在 URI、ListFinderReq 字段等层面<strong>无法互通</strong>。建议实现方式：</p>
+<p>v0.1.x 与 v0.2.0 在 URI、ListFinderReq 字段等层面<strong>无法互通</strong>。SDK 行为：</p>
 <ol>
-<li>SDK 启动时检查对端协议版本（通过 <code>server:list_room</code> 或自定义握手）</li>
-<li>版本不匹配则拒绝入房间并回告 Agent/Computer（错误码建议新增 <code>4008 Protocol Version Mismatch</code>，但本次 v0.2 <strong>不包含</strong>此错误码）</li>
-<li>短期容忍策略（可选）：Computer SDK 对 v0.1 MCP Server 做<strong>单向兼容读取</strong>——若 <code>Resource.annotations.priority</code> 与 <code>Resource._meta.fullscreen</code> 均缺失且 URI 含 <code>?priority=</code>/<code>?fullscreen=</code>，解析 URI query 作为 fallback（旧 int priority 需 <code>new = old / 100</code> 归一化到 float），并记录 deprecation warning；deprecation warning 保留一个次要版本后移除</li>
+<li><strong>HTTP 层版本握手</strong>：客户端在 Socket.IO 连接 URL query 中携带 <code>?a2c_version=...</code>；Server 中间件层校验，不兼容时返回 HTTP 400 + 错误码 <code>4008 Protocol Version Mismatch</code>（详见 <a href="../../specification/versioning/"><code>versioning.md</code></a>）。这是 v0.2 引入的标准机制</li>
+<li><strong><code>server:list_room</code></strong> 返回的 <code>SessionInfo</code> 含 <code>a2c_version</code> 字段，便于 Agent/Computer 在房间内做二次确认（兜底诊断用）</li>
 </ol>
+<h4 id="不内建-v01-mcp-server-fallback协议级决议">不内建 v0.1 MCP Server fallback（协议级决议）<a class="headerlink" href="#不内建-v01-mcp-server-fallback协议级决议" title="Permanent link">&para;</a></h4>
+<p>v0.2 SDK <strong>MUST NOT</strong> 内建针对 v0.1 MCP Server 的 URI query fallback 解析。即：当 v0.2 Computer 遇到只在 URI query 中携带 <code>?priority=</code> / <code>?fullscreen=</code> 的 v0.1 MCP Server 时，<strong>MUST</strong>：</p>
+<ul>
+<li>按 v0.2 校验规则丢弃 URI query 部分（仅记录 WARN）</li>
+<li>不读取 <code>_meta</code> / <code>annotations</code> 之外的元数据来源</li>
+<li>Desktop 中该窗口降级显示为 <code>priority=0.0, fullscreen=false</code></li>
+</ul>
+<p><strong>理由</strong>（保持协议纯粹）：</p>
+<ul>
+<li>内建 fallback 会让"v0.2 协议是什么"在不同 SDK 实现间产生歧义（实现 A 兼容 v0.1 query、实现 B 不兼容）</li>
+<li>用户感知到降级行为后会主动升级 MCP Server 到 v0.2，比静默兼容更早暴露问题</li>
+<li>v0.2 协议升级周期短，长期维护两套元数据通路收益低、复杂度高</li>
+</ul>
+<p><strong>SDK 实现方若有强烈业务诉求</strong>，可在 SDK 之外的应用层提供"v0.1 MCP Server 适配器"作为可选扩展，不要污染协议核心代码。</p>
 <h3 id="72-数据层agent-视角兼容">7.2 数据层：Agent 视角兼容<a class="headerlink" href="#72-数据层agent-视角兼容" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>DPEDocumentSummary</code> 字段形态<strong>不变</strong>，Agent 端消费代码无需改造</li>
@@ -4197,7 +4261,7 @@
 </ul>
 <h3 id="73-mcp-server-生态兼容">7.3 MCP Server 生态兼容<a class="headerlink" href="#73-mcp-server-生态兼容" title="Permanent link">&para;</a></h3>
 <ul>
-<li>旧 MCP Server（只输出 URI query 形态）在 v0.2 Computer 下 Desktop 会<strong>降级为 priority=0.0, fullscreen=false</strong>（若不实现 fallback），但不至于崩溃</li>
+<li>旧 MCP Server（只输出 URI query 形态）在 v0.2 Computer 下 Desktop <strong>MUST 降级为 <code>priority=0.0, fullscreen=false</code></strong> 并记录 WARN（协议禁止 fallback，见 §7.1），不会崩溃；用户因此感知到降级会主动升级 MCP Server</li>
 <li>旧 MCP Server（实现 Level 0）在 v0.2 Computer 下，Level 0 响应会被<strong>忽略</strong>（Computer 不再调用），不会报错</li>
 </ul>
 <p><strong>结论</strong>：v0.2 Computer 对旧 MCP Server 宽容（降级运行），但 v0.1 Computer <strong>无法</strong>消费 v0.2 MCP Server（因元数据在 URI 之外，旧 Computer 看不到）。因此<strong>升级顺序是 Computer 先于 MCP Server</strong>。</p>

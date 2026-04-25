@@ -2079,7 +2079,7 @@
 <p><strong>排序规则</strong>:
 - <strong>size 截断</strong>: <code>desktop_size</code> 参数控制数量上限
 - <strong>server 优先级</strong>: 最近调用过工具的 Server 优先
-- <strong>窗口排序</strong>: 同一 server 内按 <code>priority</code> 降序
+- <strong>窗口排序</strong>: 同一 server 内按 <code>annotations.priority</code>（float <code>[0.0, 1.0]</code>）降序
 - <strong>fullscreen 规则</strong>: fullscreen 窗口独占该 Server 的显示</p>
 <h3 id="q-为什么-desktop-返回为空">Q: 为什么 Desktop 返回为空？<a class="headerlink" href="#q-为什么-desktop-返回为空" title="Permanent link">&para;</a></h3>
 <p><strong>可能原因</strong>:
@@ -2090,13 +2090,14 @@
 <h3 id="q-window-uri-的格式是什么">Q: Window URI 的格式是什么？<a class="headerlink" href="#q-window-uri-的格式是什么" title="Permanent link">&para;</a></h3>
 <p><strong>格式</strong>: <code>window://host/path1/path2</code>（纯标识符，不含 query 参数）</p>
 <ul>
-<li><code>host</code>（必需）: MCP Server 唯一标识，在 Computer 作用域内 <strong>MUST 全局唯一</strong>，推荐反向域名风格如 <code>com.example.mcp</code></li>
+<li><code>host</code>（必需）: MCP Server 唯一标识，在<strong>同一 Computer 进程范围内 MUST 全局唯一</strong>（跨 Office/Room 也唯一），推荐反向域名风格如 <code>com.example.mcp</code></li>
 <li><code>path</code>（可选）: 0..N 个路径段，URL 编码</li>
 </ul>
-<p>布局元数据（priority、fullscreen）自 v0.2 起改为通过 MCP Resource 的 <code>_meta</code> 字段声明：</p>
+<p>布局元数据自 v0.2 起改为通过 MCP Resource 的 <code>annotations</code>（MCP 标准字段）与 <code>_meta</code>（A2C 扩展字段）声明，<strong>不再写入 URI query</strong>：</p>
 <ul>
-<li><code>_meta.priority</code>（可选）: 整数 <code>[0, 100]</code>，同一 MCP Server 内比较，越大越靠前</li>
-<li><code>_meta.fullscreen</code>（可选）: 布尔值，全屏渲染标记</li>
+<li><code>annotations.priority</code>（可选）: 浮点数 <code>[0.0, 1.0]</code>，<strong>MCP 标准字段</strong>，同一 MCP Server 内比较，越大越靠前</li>
+<li><code>annotations.audience</code>（推荐）: Window 面向 Agent，<strong>SHOULD</strong> 声明 <code>["assistant"]</code>；声明 <code>["user"]</code> 在 v0.2 仅触发 WARN 不过滤</li>
+<li><code>_meta.fullscreen</code>（可选）: 布尔值，<strong>A2C 扩展字段</strong>，全屏渲染标记</li>
 </ul>
 <p>详见 <a href="../../specification/desktop/#window-uri-规范">Desktop 桌面系统 - Window URI 规范</a> 与 <a href="../../specification/desktop/#window-资源元数据">Window 资源元数据</a>。</p>
 <h3 id="q-如何让-mcp-server-的内容出现在-desktop-上">Q: 如何让 MCP Server 的内容出现在 Desktop 上？<a class="headerlink" href="#q-如何让-mcp-server-的内容出现在-desktop-上" title="Permanent link">&para;</a></h3>

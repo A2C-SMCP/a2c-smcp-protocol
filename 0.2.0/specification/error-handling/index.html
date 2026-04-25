@@ -1095,6 +1095,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#40064007-判定决策表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4006/4007 判定决策表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#字段说明_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1102,6 +1113,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="字段说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auth_hint-安全边界" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auth_hint 安全边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1879,6 +1907,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#40064007-判定决策表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4006/4007 判定决策表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#字段说明_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1886,6 +1925,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="字段说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auth_hint-安全边界" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auth_hint 安全边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2079,12 +2135,12 @@
 <tr>
 <td>4006</td>
 <td>Tool Authorization Required</td>
-<td>工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权</td>
+<td>工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权（见下方<a href="#40064007-判定决策表">4006/4007 判定决策表</a>）</td>
 </tr>
 <tr>
 <td>4007</td>
 <td>Tool Authorization Failed</td>
-<td>MCP 上游授权流程失败、Token 已失效或刷新失败</td>
+<td>MCP 上游授权流程失败、Token 已失效、刷新失败、或权限不足（见下方<a href="#40064007-判定决策表">4006/4007 判定决策表</a>）</td>
 </tr>
 </tbody>
 </table>
@@ -2411,33 +2467,138 @@
 <a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="p">}</span>
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">)</span>
 </code></pre></div>
+<h3 id="40064007-判定决策表">4006/4007 判定决策表<a class="headerlink" href="#40064007-判定决策表" title="Permanent link">&para;</a></h3>
+<p>为消除"未授权 vs 授权失败"的边界歧义，Computer <strong>MUST</strong> 按下表把上游 MCP Server / OAuth Provider 的具体表现映射到协议错误码：</p>
+<table>
+<thead>
+<tr>
+<th>上游表现</th>
+<th>错误码</th>
+<th>语义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Computer 从未为该 MCP Server 配置授权（无 token / 无 client credentials）</td>
+<td><strong>4006</strong></td>
+<td>用户<strong>首次</strong>授权</td>
+</tr>
+<tr>
+<td>上游返回 HTTP 401 Unauthorized（凭证缺失、非法、未提供）</td>
+<td><strong>4006</strong></td>
+<td>用户<strong>重新</strong>授权</td>
+</tr>
+<tr>
+<td>上游返回 HTTP 403 Forbidden（已登录但权限/scope 不足）</td>
+<td><strong>4007</strong></td>
+<td>已授权但能力不足，用户调整 scope 或换账号</td>
+</tr>
+<tr>
+<td>Token 过期 + 刷新失败（refresh_token 无效 / 被撤销）</td>
+<td><strong>4007</strong></td>
+<td>历史授权失效，用户需重新走 OAuth 流程</td>
+</tr>
+<tr>
+<td>用户已主动 revoke OAuth 授权</td>
+<td><strong>4007</strong></td>
+<td>历史授权已被撤销</td>
+</tr>
+<tr>
+<td>凭证存在但 scope 不足（上游未明确返回 401/403，但断言权限不够）</td>
+<td><strong>4007</strong></td>
+<td>同 403 类，归"已授权但失败"</td>
+</tr>
+<tr>
+<td>OAuth provider 自身故障（5xx / 网络）</td>
+<td><strong>4003 Tool Execution Failed</strong></td>
+<td>不属于授权语义，按通用工具失败处理</td>
+</tr>
+</tbody>
+</table>
+<p><strong>简明判别</strong>：</p>
+<ul>
+<li>区分点是"<strong>用户是否曾经授权</strong>"——<code>4006</code> = 没授权过 / 凭证不存在；<code>4007</code> = 曾授权但当前不可用</li>
+<li>当 Computer 无法可靠判别时，倾向于报 <code>4006</code>（提示用户重新走授权流程是稳妥兜底）</li>
+</ul>
+<p><strong>Agent 行为差异</strong>：Agent 收到 <code>4006</code> 应引导用户<strong>首次/重新</strong>完成授权；收到 <code>4007</code> 应引导用户<strong>检查权限设置或重新授权</strong>——区别仅在 UX 文案，机器路由可统一。</p>
 <h3 id="字段说明_2">字段说明<a class="headerlink" href="#字段说明_2" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>字段</th>
-<th>必需</th>
+<th>强度</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>meta.error_code</code></td>
-<td>是</td>
-<td><code>4006</code>（未授权）或 <code>4007</code>（授权失效）</td>
+<td><strong>MUST</strong></td>
+<td><code>4006</code>（未授权）或 <code>4007</code>（授权失效），按上方<a href="#40064007-判定决策表">判定决策表</a>映射</td>
 </tr>
 <tr>
 <td><code>meta.mcp_server</code></td>
-<td>是</td>
+<td><strong>MUST</strong></td>
 <td>触发授权错误的 MCP Server 标识，便于 Agent 定位</td>
 </tr>
 <tr>
 <td><code>meta.auth_hint</code></td>
-<td>否</td>
-<td>面向用户的非敏感提示信息，<strong>禁止</strong>包含授权 URL 参数、state、client_secret 等敏感字段</td>
+<td><strong>SHOULD</strong></td>
+<td>面向用户的非敏感提示对象。Computer <strong>SHOULD</strong> 提供以协助 Agent/Host 引导用户；缺失时 Agent 仍能基于 <code>error_code</code> 做兜底处理</td>
+</tr>
+<tr>
+<td><code>meta.auth_hint.action</code></td>
+<td>MAY</td>
+<td>机器可读动作标识（如 <code>user_authorization_required</code> / <code>token_refresh_required</code>），便于 Host 路由到不同 UI</td>
+</tr>
+<tr>
+<td><code>meta.auth_hint.message</code></td>
+<td><strong>SHOULD</strong></td>
+<td>用户可读的一句话引导（如"请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"）；强烈建议提供以满足最小可用 UX</td>
 </tr>
 </tbody>
 </table>
+<h4 id="auth_hint-安全边界">auth_hint 安全边界<a class="headerlink" href="#auth_hint-安全边界" title="Permanent link">&para;</a></h4>
+<p><code>auth_hint</code> 是协议层<strong>唯一</strong>面向 Agent 暴露的授权相关字段。为防止凭证经此通道泄漏给 Agent，Computer <strong>MUST NOT</strong> 在 <code>auth_hint</code>（任何子字段）中包含以下任何一类内容：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>禁止字段示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问凭证</td>
+<td><code>access_token</code> / <code>refresh_token</code> / <code>id_token</code> / <code>bearer_token</code> / 任何形式的 Token</td>
+</tr>
+<tr>
+<td>OAuth 流程参数</td>
+<td><code>code</code> / <code>code_verifier</code> / <code>code_challenge</code> / <code>state</code> / <code>nonce</code></td>
+</tr>
+<tr>
+<td>客户端凭证</td>
+<td><code>client_id</code> / <code>client_secret</code> / <code>assertion</code> / <code>client_assertion</code></td>
+</tr>
+<tr>
+<td>完整授权 URL</td>
+<td>任何包含上述 query 参数的完整 URL（即使已经 url-encode 也禁止）</td>
+</tr>
+<tr>
+<td>用户敏感数据</td>
+<td>用户密码、TOTP/OTP、安全问题答案</td>
+</tr>
+</tbody>
+</table>
+<p>允许包含：</p>
+<ul>
+<li>自然语言描述（"需要登录 GitHub 后重试"）</li>
+<li>MCP Server 名称、工具名称</li>
+<li>不含敏感参数的着陆页 URL（如 <code>https://example.com/login</code>，无 query）</li>
+</ul>
+<blockquote>
+<p>完整凭证传播禁令见 <a href="../security/#零凭证传播原则"><code>security.md</code> → 零凭证传播原则</a>。<code>auth_hint</code> 是该原则下的<strong>唯一豁免</strong>——豁免范围严格限于上表"允许包含"部分。</p>
+</blockquote>
 <h2 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p>以下功能尚未实现，计划在后续版本中完善：</p>

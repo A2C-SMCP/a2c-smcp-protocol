@@ -716,10 +716,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a2c-专用字段_meta" class="md-nav__link">
+  <a href="#mcp-标准字段annotations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A2C 专用字段（_meta）
+        MCP 标准字段（annotations）
       
     </span>
   </a>
@@ -727,10 +727,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mcp-标准字段annotations可选" class="md-nav__link">
+  <a href="#a2c-扩展字段_meta" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP 标准字段（annotations，可选）
+        A2C 扩展字段（_meta）
       
     </span>
   </a>
@@ -1700,10 +1700,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a2c-专用字段_meta" class="md-nav__link">
+  <a href="#mcp-标准字段annotations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A2C 专用字段（_meta）
+        MCP 标准字段（annotations）
       
     </span>
   </a>
@@ -1711,10 +1711,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mcp-标准字段annotations可选" class="md-nav__link">
+  <a href="#a2c-扩展字段_meta" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP 标准字段（annotations，可选）
+        A2C 扩展字段（_meta）
       
     </span>
   </a>
@@ -2214,7 +2214,7 @@
 <td><code>host</code></td>
 <td>是</td>
 <td>MCP Server 唯一标识</td>
-<td>不能为空；<strong>在同一 Computer 作用域内 MUST 全局唯一</strong>；推荐反向域名风格，如 <code>com.example.mcp</code></td>
+<td>不能为空；<strong>在同一 Computer 进程范围内 MUST 全局唯一</strong>（跨 Office/Room 也唯一，房间隔离不消歧 host）；推荐反向域名风格，如 <code>com.example.mcp</code></td>
 </tr>
 <tr>
 <td><code>path</code></td>
@@ -2228,7 +2228,7 @@
 <ol>
 <li><code>scheme</code> 必须为 <code>window</code></li>
 <li><code>host</code> 不能为空</li>
-<li><code>host</code> 在同一 Computer 作用域内 <strong>MUST</strong> 全局唯一；当两个 MCP Server 声明相同 host 时，Computer <strong>MUST</strong> 报错并拒绝后注册的 Server 参与 Desktop 聚合（仅保留先注册的一方）</li>
+<li><code>host</code> 在<strong>同一 Computer 进程范围内 MUST 全局唯一</strong>；当两个 MCP Server 声明相同 host 时，Computer <strong>MUST</strong> 报错并拒绝后注册的 Server 参与 Desktop 聚合（仅保留先注册的一方）。该唯一性约束跨 Office / Room 生效——不同 Computer 实例（即使在同一 Room）允许 host 重复，房间隔离层不参与 host 消歧。<strong>作用域生命周期</strong>：（a）host 索引仅存活于 <strong>Computer 进程生命周期内</strong>，进程重启后清空重建；（b）Computer 切换 office（先离开后加入另一 office）时 <strong>不重置</strong> host 索引——MCP Server 注册关系与 office 解耦，host 唯一性贯穿整个进程生命周期；（c）当 MCP Server 主动断开（如 Computer 卸载某个 MCP Server）时，host 占用解除，可被新注册的 Server 复用</li>
 <li>路径段使用 URL 编码，<code>c%2Fd</code> 保持为单段，解码为 <code>c/d</code></li>
 <li>Window URI <strong>不允许</strong>携带 query 参数；若 Computer 检测到 query，应记录警告并丢弃 query 部分，仅用 host+path 作为标识</li>
 </ol>
@@ -2256,8 +2256,9 @@
 </ul>
 <hr />
 <h2 id="window-资源元数据">Window 资源元数据<a class="headerlink" href="#window-资源元数据" title="Permanent link">&para;</a></h2>
-<p>MCP Server 通过 <code>resources/list</code> 返回的 <code>Resource</code> 对象上的 <code>_meta</code> 和 <code>annotations</code> 字段声明 Window 的布局与展示属性。Computer 在组织 Desktop 时直接读取这些字段，<strong>不再解析 URI query</strong>。</p>
-<h3 id="a2c-专用字段_meta">A2C 专用字段（<code>_meta</code>）<a class="headerlink" href="#a2c-专用字段_meta" title="Permanent link">&para;</a></h3>
+<p>MCP Server 通过 <code>resources/list</code> 返回的 <code>Resource</code> 对象上的 <code>annotations</code> 与 <code>_meta</code> 字段声明 Window 的布局与展示属性。Computer 在组织 Desktop 时直接读取这些字段，<strong>不再解析 URI query</strong>。</p>
+<p>A2C v0.2 的元数据<strong>字段分工原则</strong>：语义与 MCP 标准 <code>annotations</code> 对齐的字段（<code>priority</code> / <code>audience</code> / <code>lastModified</code>）<strong>MUST</strong> 放入 <code>annotations</code>；A2C 自定义、无对应 MCP 标准的字段（<code>fullscreen</code> 等）放入 <code>_meta</code>。</p>
+<h3 id="mcp-标准字段annotations">MCP 标准字段（<code>annotations</code>）<a class="headerlink" href="#mcp-标准字段annotations" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2270,54 +2271,56 @@
 </thead>
 <tbody>
 <tr>
-<td><code>_meta.priority</code></td>
-<td>int <code>[0, 100]</code></td>
+<td><code>annotations.priority</code></td>
+<td>float <code>[0, 1]</code></td>
 <td>否</td>
-<td><code>0</code></td>
-<td>布局排序优先级；<strong>仅在同一 MCP Server 内部窗口间比较</strong>；值越大越靠前</td>
+<td><code>0.0</code></td>
+<td><strong>MCP 标准</strong>；布局排序优先级；<strong>仅在同一 MCP Server 内部窗口间比较</strong>；值越大越靠前</td>
 </tr>
 <tr>
-<td><code>_meta.fullscreen</code></td>
-<td>bool</td>
+<td><code>annotations.audience</code></td>
+<td><code>["assistant"]</code> / <code>["user"]</code> / <code>["user","assistant"]</code></td>
+<td>推荐</td>
+<td>—</td>
+<td><strong>MCP 标准</strong>；Window 资源面向 Agent 渲染，<strong>SHOULD</strong> 显式声明 <code>["assistant"]</code>；声明 <code>["user"]</code> 时 v0.2 仅记录 WARN 不过滤（v0.3+ 可能升级为硬过滤）</td>
+</tr>
+<tr>
+<td><code>annotations.lastModified</code></td>
+<td>ISO 8601 字符串</td>
 <td>否</td>
-<td><code>false</code></td>
-<td>全屏渲染标记；同一 Server 内仅首个 <code>fullscreen=true</code> 的窗口生效，其他窗口被排除</td>
+<td>—</td>
+<td>MCP 标准：资源最后修改时间；A2C v0.2 透传不用于组织排序</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">为什么不复用 <code>annotations.priority</code></p>
-<p>MCP 标准 <code>annotations.priority</code> 的语义是"<strong>Client 决定哪些资源优先纳入 LLM context</strong>"，消费者通常是 Agent 或 Host。A2C 的 Window priority 语义是"<strong>Computer 在 Desktop 聚合时的展示排序</strong>"，消费者是 Computer。两者方向相近但消费者与使用场景不同，为避免开发者混淆、也避免未来 MCP 标准演化带来的耦合，A2C 使用<strong>独立的 <code>_meta.priority</code></strong>。</p>
-</div>
-<h3 id="mcp-标准字段annotations可选">MCP 标准字段（<code>annotations</code>，可选）<a class="headerlink" href="#mcp-标准字段annotations可选" title="Permanent link">&para;</a></h3>
-<p>下列字段若声明，Computer 会透传给 Agent 但<strong>当前不参与 Desktop 组织逻辑</strong>。为向未来场景（多 audience、缓存失效）留出空间，<strong>允许</strong>MCP Server 声明。</p>
+<h3 id="a2c-扩展字段_meta">A2C 扩展字段（<code>_meta</code>）<a class="headerlink" href="#a2c-扩展字段_meta" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>字段</th>
 <th>类型</th>
+<th>必需</th>
+<th>默认</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>annotations.audience</code></td>
-<td><code>["user"]</code> / <code>["assistant"]</code> / <code>["user","assistant"]</code></td>
-<td>MCP 标准：目标受众提示；A2C v1 不做 audience 过滤</td>
-</tr>
-<tr>
-<td><code>annotations.lastModified</code></td>
-<td>ISO 8601 字符串</td>
-<td>MCP 标准：资源最后修改时间；A2C v1 不用于组织排序</td>
+<td><code>_meta.fullscreen</code></td>
+<td>bool</td>
+<td>否</td>
+<td><code>false</code></td>
+<td><strong>A2C 扩展</strong>（无对应 MCP 标准字段）；全屏渲染标记；同一 Server 内仅首个 <code>fullscreen=true</code> 的窗口生效，其他窗口被排除</td>
 </tr>
 </tbody>
 </table>
 <h3 id="校验规则_1">校验规则<a class="headerlink" href="#校验规则_1" title="Permanent link">&para;</a></h3>
 <ol>
-<li><code>_meta.priority</code> 若存在，必须为 <code>[0, 100]</code> 范围内的整数；越界时 Computer 记录警告并视为 <code>0</code></li>
+<li><code>annotations.priority</code> 若存在，必须为 <code>[0.0, 1.0]</code> 范围内的浮点数；越界时 Computer 记录警告并视为 <code>0.0</code></li>
 <li><code>_meta.fullscreen</code> 若存在，必须为布尔值；其他类型视为 <code>false</code> 并记录警告</li>
+<li><code>annotations.audience</code> 若声明 <code>["user"]</code>（即不含 <code>"assistant"</code>），Computer <strong>MUST</strong> 记录 WARN 但仍纳入 Desktop 聚合；v0.3+ 可能升级为硬过滤</li>
 <li><code>annotations</code> 字段若存在，必须符合 MCP 规范（见 <a href="https://modelcontextprotocol.io/specification/2025-06-18/server/resources#annotations">MCP Resource annotations</a>）</li>
-<li>未声明 <code>_meta</code> 的 Resource 视为 <code>priority=0, fullscreen=false</code>，不影响组织</li>
+<li><strong>缺失值同义</strong>：<code>annotations is None</code> 与 <code>annotations.priority is None</code> 等价，统一按 <code>priority=0.0</code> 处理；<code>_meta is None</code> 与 <code>_meta.fullscreen is None</code> 等价，统一按 <code>fullscreen=false</code> 处理。Computer 不区分两种缺失原因（DEBUG 级日志即可，避免噪声）</li>
 </ol>
 <h3 id="resource-完整声明示例">Resource 完整声明示例<a class="headerlink" href="#resource-完整声明示例" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Resource</span><span class="p">(</span>
@@ -2326,12 +2329,12 @@
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;当前浏览器主标签页内容&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/html&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>               <span class="c1"># 可选</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>  <span class="c1"># 可选</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">),</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>     <span class="c1"># A2C：布局排序</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># A2C：全屏渲染</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="n">priority</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>                         <span class="c1"># MCP 标准：布局排序（[0.0, 1.0]）</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>               <span class="c1"># MCP 标准：Window 面向 Agent，SHOULD [&quot;assistant&quot;]</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>  <span class="c1"># MCP 标准：透传，不参与排序</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">),</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># A2C 扩展：全屏渲染（无对应 MCP 标准字段）</span>
 <a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">},</span>
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">)</span>
 </code></pre></div>
@@ -2400,10 +2403,10 @@
 </code></pre></div>
 </div>
 <h3 id="步骤-3窗口优先级排序">步骤 3：窗口优先级排序<a class="headerlink" href="#步骤-3窗口优先级排序" title="Permanent link">&para;</a></h3>
-<p>同一 Server 内的窗口按 <strong><code>Resource._meta.priority</code></strong> 降序排列（高优先级在前）。未声明或越界时默认为 <code>0</code>。</p>
+<p>同一 Server 内的窗口按 <strong><code>Resource.annotations.priority</code></strong> 降序排列（高优先级在前）。未声明、为 <code>None</code> 或越界时默认为 <code>0.0</code>。</p>
 <div class="admonition important">
 <p class="admonition-title">priority 来源</p>
-<p>Computer <strong>从 <code>Resource._meta.priority</code> 读取优先级</strong>，不再解析 URI 中的 <code>?priority=</code> query（自 v0.2 起已移除）。</p>
+<p>Computer <strong>从 <code>Resource.annotations.priority</code>（MCP 标准字段，<code>float [0.0, 1.0]</code>）读取优先级</strong>，不再解析 URI 中的 <code>?priority=</code> query（自 v0.2 起已移除）。<code>annotations is None</code> 与 <code>annotations.priority is None</code> 等价处理为 <code>0.0</code>。</p>
 </div>
 <h3 id="步骤-4全屏处理">步骤 4：全屏处理<a class="headerlink" href="#步骤-4全屏处理" title="Permanent link">&para;</a></h3>
 <p>fullscreen 是 <strong>per-Server</strong> 的概念，不是全局的。对每个 Server 独立判断：</p>
@@ -2524,7 +2527,7 @@
 <h3 id="前提条件">前提条件<a class="headerlink" href="#前提条件" title="Permanent link">&para;</a></h3>
 <p>MCP Server 若要参与 Desktop，必须声明 <code>resources.subscribe</code> 能力。否则 Computer 不会枚举该 Server 的窗口资源，也不会收到该 Server 的资源变更通知。</p>
 <h3 id="暴露窗口资源">暴露窗口资源<a class="headerlink" href="#暴露窗口资源" title="Permanent link">&para;</a></h3>
-<p>在 <code>resources/list</code> 响应中返回 <code>window://</code> URI 的 Resource，并通过 <code>_meta</code> 声明布局元数据：</p>
+<p>在 <code>resources/list</code> 响应中返回 <code>window://</code> URI 的 Resource，并通过 <code>annotations</code> 声明 MCP 标准字段、<code>_meta</code> 声明 A2C 扩展字段：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_resources</span><span class="p">():</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="k">return</span> <span class="p">[</span>
@@ -2533,21 +2536,24 @@
 <a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;应用状态&quot;</span><span class="p">,</span>
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;当前应用的运行状态&quot;</span><span class="p">,</span>
 <a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>                <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>       <span class="c1"># 可选：布局排序（0-100）</span>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>                <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># 可选：是否全屏</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>            <span class="p">},</span>
-<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>        <span class="p">),</span>
-<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>        <span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/console&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;控制台输出&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;实时控制台日志&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
-<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>        <span class="p">),</span>
-<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>    <span class="p">]</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>                <span class="n">priority</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>             <span class="c1"># 可选：布局排序（[0.0, 1.0]）</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>                <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>   <span class="c1"># 推荐：Window 面向 Agent</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>            <span class="p">),</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>                <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># 可选：是否全屏（A2C 扩展）</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>            <span class="p">},</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>        <span class="p">),</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>        <span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/console&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;控制台输出&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;实时控制台日志&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">priority</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">]),</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>        <span class="p">),</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>    <span class="p">]</span>
 </code></pre></div>
-<p>每个 Resource 的 <code>uri</code> 必须是有效的 <code>window://</code> URI（参见 <a href="#uri-格式">URI 格式</a>）。<code>_meta</code> 字段语义见 <a href="#window-资源元数据">Window 资源元数据</a>。</p>
+<p>每个 Resource 的 <code>uri</code> 必须是有效的 <code>window://</code> URI（参见 <a href="#uri-格式">URI 格式</a>）。字段语义见 <a href="#window-资源元数据">Window 资源元数据</a>。</p>
 <h3 id="提供窗口内容">提供窗口内容<a class="headerlink" href="#提供窗口内容" title="Permanent link">&para;</a></h3>
 <p>实现 <code>resources/read</code>，返回 <code>TextResourceContents</code>：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">read_resource</span><span class="p">()</span>
@@ -2582,10 +2588,11 @@
 </code></pre></div>
 <h3 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.myapp</code>）并<strong>确保在同一 Computer 作用域内全局唯一</strong>（协议层约束，违反会导致该 Server 被 Computer 拒绝参与 Desktop 聚合）</li>
-<li><strong>通过 <code>Resource._meta.priority</code> 合理分配优先级</strong>（0-100），避免所有窗口使用同一优先级（默认 <code>0</code>）</li>
+<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.myapp</code>）并<strong>确保在同一 Computer 进程范围内全局唯一</strong>（跨 Office/Room 也唯一；协议层约束，违反会导致该 Server 被 Computer 拒绝参与 Desktop 聚合）</li>
+<li><strong>通过 <code>Resource.annotations.priority</code> 合理分配优先级</strong>（[0.0, 1.0]，越大越靠前），避免所有窗口使用默认 <code>0.0</code></li>
 <li><strong><code>Resource._meta.fullscreen</code> 仅用于需要完整展示的主窗口</strong>，如当前浏览器页面或全屏编辑器</li>
-<li><strong>不要在 URI 中附加 query 参数</strong>：所有元数据通过 <code>_meta</code> / <code>annotations</code> 声明；URI 只表示身份</li>
+<li><strong><code>Resource.annotations.audience</code> SHOULD 显式声明 <code>["assistant"]</code></strong>：Window 面向 Agent 渲染；声明 <code>["user"]</code> 在 v0.2 仅触发 WARN 但不过滤</li>
+<li><strong>不要在 URI 中附加 query 参数</strong>：所有元数据通过 <code>annotations</code> / <code>_meta</code> 声明；URI 只表示身份</li>
 <li><strong>窗口内容保持简洁、文本化</strong>，便于 LLM 消费；避免嵌入大量原始 HTML 或二进制数据</li>
 <li><strong>及时发送变更通知</strong>，确保 Agent 获取到最新桌面状态</li>
 </ol>

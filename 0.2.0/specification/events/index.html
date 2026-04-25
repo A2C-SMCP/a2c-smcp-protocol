@@ -2812,6 +2812,20 @@
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_finder</code>。</p>
+<p><strong>触发粒度补充</strong>：仅 <code>dpe://</code> URI 集合（文档增删）或具体 <code>dpe://</code> 文档资源元数据更新触发该通知；DPE Level 2/3 的页面/元素 body 内容变化<strong>不</strong>触发——后者属于 Agent 主动 <code>resources/read</code> 范畴。</p>
+<p><strong>Computer 端去重 / 防抖（SHOULD）</strong>：</p>
+<ul>
+<li>Computer <strong>SHOULD</strong> 在 50–100ms 时间窗内合并多个起因相同的 MCP <code>notifications/resources/list_changed</code> 与 <code>ResourceUpdatedNotification</code>，对外只广播一次 <code>server:update_finder</code>，避免高频变更场景下淹没 Agent</li>
+<li>Computer <strong>MAY</strong> 在窗内做 URI 集合 diff——若 dpe:// URI 集合与上次广播时一致且无元数据变化则跳过广播</li>
+<li>协议<strong>不强制</strong>实现去重/防抖；不实现也合规（Agent 侧应假设可能收到冗余通知，幂等处理）</li>
+</ul>
+<p><strong>Agent 后续行为</strong>：</p>
+<ul>
+<li>Agent 收到 <code>notify:update_finder</code> 后 <strong>SHOULD</strong> 调用 <code>client:list_finder</code> 重新拉取最新文档目录</li>
+<li>通知本身<strong>不携带</strong>分页游标或差异；Agent 维护自己的 <code>offset</code> / <code>limit</code> / <code>tags</code> / <code>file_type</code> 过滤参数，重拉取时可按需复用或重置</li>
+<li>Computer 与 Server <strong>不维护</strong> Agent 侧的分页状态——重拉取语义由 Agent 决策，不是协议状态机</li>
+<li>Agent <strong>SHOULD</strong> 容忍冗余通知（同一变更可能触发多次广播），以最终一致为准——不应在 notification 中携带或推断 diff</li>
+</ul>
 <p>详见 <a href="../finder/">Finder 文档系统</a> 中的 <a href="../finder/#更新机制">更新机制</a>。</p>
 <hr />
 <h3 id="通知事件">通知事件<a class="headerlink" href="#通知事件" title="Permanent link">&para;</a></h3>

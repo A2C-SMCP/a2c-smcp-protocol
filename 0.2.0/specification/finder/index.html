@@ -3380,9 +3380,9 @@
 </tr>
 <tr>
 <td><code>_meta.page_count</code></td>
-<td><code>int</code></td>
+<td><code>int (≥1)</code></td>
 <td>是</td>
-<td>文档总页数；Agent 依据此值规划翻页范围</td>
+<td>文档<strong>逻辑块数 / 最小可独立寻址的代理单元数</strong>；Agent 依据此值规划翻页范围。单页文档约定 <code>page_count=1</code>；<code>0</code> 与 missing 同义视为无效（被 Organizer 过滤）</td>
 </tr>
 <tr>
 <td><code>_meta.file_uri</code></td>
@@ -3437,7 +3437,18 @@
 </table>
 <h3 id="校验规则_1">校验规则<a class="headerlink" href="#校验规则_1" title="Permanent link">&para;</a></h3>
 <ol>
-<li><code>_meta.page_count</code> <strong>MUST</strong> 存在且为非负整数；缺失时 Computer 记录警告并将该文档视为 <code>page_count=0</code>（Agent 侧不会遍历页面）</li>
+<li><code>_meta.page_count</code> <strong>MUST</strong> 存在且为<strong>正整数（≥ 1）</strong>；缺失或 <code>0</code> 视为无效——Computer 记录 WARN 并把该文档<strong>从 Finder Organizer 输出中过滤</strong>（不会出现在 <code>client:list_finder</code> 响应中）。<code>0</code> 与 missing <strong>不区分</strong>——两者都意味着"该资源不应作为 DPE 文档参与代理"</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">page_count 边界场景</p>
+<ul>
+<li><strong>多页文档</strong>（PDF / Excel / PPT / Markdown 长文）：<code>page_count=N</code>，N 为页/sheet/slide/section 数量</li>
+<li><strong>单页 / 不可分页文档</strong>（单页 JSON、短文本、原子配置）：约定 <code>page_count=1</code>，并把全部内容放在 Level 2 <code>pages/0</code> 下</li>
+<li><strong>真正不应分页的资源</strong>（流式日志、二进制对象、未结构化数据）：<strong>不应使用 <code>dpe://</code> scheme</strong>——改用 MCP 的 <code>text://</code> / <code>resource://</code> 等其他 scheme，从 <code>resources/list</code> 暴露但不参与 Finder Organizer</li>
+</ul>
+<p><code>page_count=0</code> 不是合法值——它无法与"missing/未声明"区分，会让 Agent 困惑该文档是"加载失败"还是"故意空"。</p>
+</div>
+<ol>
 <li><code>_meta.keywords</code> 若存在，必须为字符串数组</li>
 <li><code>_meta.file_type</code> 若存在，推荐使用小写（如 <code>xlsx</code>、<code>pdf</code>）</li>
 <li><code>annotations.lastModified</code> 若存在，必须为 ISO 8601 格式；缺失时该文档在 Server 内排序时排在末尾</li>
@@ -3662,12 +3673,12 @@
 <tbody>
 <tr>
 <td>承载位置</td>
-<td><code>Resource._meta</code> + <code>Resource.annotations</code></td>
+<td><code>Resource.annotations</code> + <code>Resource._meta</code></td>
 <td>URI query 参数</td>
 </tr>
 <tr>
 <td>代表字段</td>
-<td>Window: <code>_meta.priority</code>、<code>_meta.fullscreen</code>；DPE: <code>_meta.keywords</code>、<code>_meta.file_type</code>、<code>_meta.page_count</code>、<code>_meta.file_uri</code>、<code>annotations.lastModified</code></td>
+<td>Window: <code>annotations.priority</code>（MCP 标准）、<code>annotations.audience</code>、<code>_meta.fullscreen</code>（A2C 扩展）；DPE: <code>annotations.audience</code>、<code>annotations.lastModified</code>、<code>_meta.keywords</code>、<code>_meta.file_type</code>、<code>_meta.page_count</code>、<code>_meta.file_uri</code></td>
 <td>DPE: <code>format</code>、<code>depth</code>、<code>offset</code>、<code>limit</code>、<code>categories</code>；Window 无</td>
 </tr>
 <tr>
@@ -3696,19 +3707,26 @@
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># Server-declared Metadata（Window + DPE 均在 Resource 上声明）
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Resource(
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    uri=&quot;window://com.example.browser/main&quot;,    # URI 纯标识符
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    _meta={&quot;priority&quot;: 80, &quot;fullscreen&quot;: true}, # 元数据在 _meta
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>)
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Resource(
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    uri=&quot;dpe://com.example.docs/rpt-2026&quot;,      # URI 纯标识符
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    annotations=Annotations(lastModified=&quot;2026-01-15T08:30:00Z&quot;),
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    _meta={&quot;keywords&quot;: [...], &quot;file_type&quot;: &quot;xlsx&quot;, &quot;page_count&quot;: 12},
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>)
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a># Agent-driven Content Control（仅 DPE 使用，Agent 在读取时附加）
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>dpe://com.example.docs/rpt-2026/pages/0?format=markdown&amp;categories=table
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>  ↑                                     ↑
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>  host/doc-ref/sub-path 身份标识         format/categories Agent 构造
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>                                        MCP Server 解释
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    annotations=Annotations(
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>        priority=0.8,                            # MCP 标准：[0.0, 1.0]
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>        audience=[&quot;assistant&quot;],                  # MCP 标准：Window 面向 Agent
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    ),
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    _meta={&quot;fullscreen&quot;: true},                  # A2C 扩展：无对应 MCP 标准字段
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>)
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>Resource(
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    uri=&quot;dpe://com.example.docs/rpt-2026&quot;,      # URI 纯标识符
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    annotations=Annotations(
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>        audience=[&quot;user&quot;],                       # MCP 标准：DPE 文档面向 User
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>        lastModified=&quot;2026-01-15T08:30:00Z&quot;,     # MCP 标准：Finder 排序依据
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>    ),
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>    _meta={&quot;keywords&quot;: [...], &quot;file_type&quot;: &quot;xlsx&quot;, &quot;page_count&quot;: 12},
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>)
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a># Agent-driven Content Control（仅 DPE 使用，Agent 在读取时附加）
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>dpe://com.example.docs/rpt-2026/pages/0?format=markdown&amp;categories=table
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>  ↑                                     ↑
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>  host/doc-ref/sub-path 身份标识         format/categories Agent 构造
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>                                        MCP Server 解释
 </code></pre></div>
 <h3 id="实现指引">实现指引<a class="headerlink" href="#实现指引" title="Permanent link">&para;</a></h3>
 <ul>

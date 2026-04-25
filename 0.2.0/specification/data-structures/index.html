@@ -808,6 +808,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="auth 对象（业务层，ConnectAuth）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#协议层最小契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        协议层最小契约
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#业务层扩展空间" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        业务层扩展空间
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1997,6 +2025,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="auth 对象（业务层，ConnectAuth）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#协议层最小契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        协议层最小契约
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#业务层扩展空间" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        业务层扩展空间
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -2702,13 +2758,45 @@
 </table>
 <p>由 Server <strong>在 HTTP 中间件层</strong> 校验；不兼容时返回 HTTP 400 携带 <a href="../error-handling/#协议版本不匹配4008"><code>4008</code></a> 错误 body。具体规则见 <a href="../versioning/">协议版本与握手</a>。</p>
 <h4 id="auth-对象业务层connectauth"><code>auth</code> 对象（业务层，ConnectAuth）<a class="headerlink" href="#auth-对象业务层connectauth" title="Permanent link">&para;</a></h4>
-<p>Socket.IO 连接握手阶段的 <code>auth</code> 对象。<strong>所有客户端</strong>（Agent / Computer）在连接 Server 时必须提供。由 Server 在 <code>connect</code> handler 中处理。</p>
+<p>Socket.IO 连接握手阶段的 <code>auth</code> 对象。<strong>所有客户端</strong>（Agent / Computer）在连接 Server 时必须提供。由 Server 在 <code>connect</code> handler（业务代码）中处理。</p>
+<h5 id="协议层最小契约">协议层最小契约<a class="headerlink" href="#协议层最小契约" title="Permanent link">&para;</a></h5>
+<p>协议在 ConnectAuth 上的<strong>唯一规范要求</strong>是 <code>role</code> 字段：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ConnectAuth</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">]</span>  <span class="c1"># 必需：客户端角色</span>
 </code></pre></div>
+<table>
+<thead>
+<tr>
+<th>强度</th>
+<th>行为约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MUST</strong></td>
+<td>Client 提供 <code>role</code> 字段，取值为 <code>"agent"</code> 或 <code>"computer"</code>；Server 据此路由</td>
+</tr>
+<tr>
+<td><strong>协议未表态</strong></td>
+<td>其他字段（如 token、api_key、business_meta 等）——是否存在、是否被消费由<strong>业务层</strong>（Server 实现方）自决</td>
+</tr>
+<tr>
+<td><strong>SHOULD</strong></td>
+<td>避免把"已有协议事件承载的字段"重复塞进 <code>auth</code>。例如 <code>office_id</code> / <code>name</code> 已由 <a href="#enterofficereq">EnterOfficeReq</a> 承载，重复放入 <code>auth</code> 会造成职责重叠与一致性维护负担；建议 <code>auth</code> 仅承载真正的认证数据（token / API key / 用户标识等）</td>
+</tr>
+</tbody>
+</table>
+<h5 id="业务层扩展空间">业务层扩展空间<a class="headerlink" href="#业务层扩展空间" title="Permanent link">&para;</a></h5>
+<p><code>connect</code> handler 是 Server 实现方编写的业务代码，A2C-SMCP 协议<strong>不约束</strong>业务层在 <code>auth</code> 中放什么、怎么校验。常见扩展场景：</p>
+<ul>
+<li>鉴权 token：<code>auth = {"role": "agent", "token": "..."}</code></li>
+<li>多租户标识：<code>auth = {"role": "computer", "tenant_id": "..."}</code></li>
+<li>网关签名：<code>auth = {"role": "agent", "signature": "..."}</code></li>
+</ul>
+<p>这些都属于业务层职责，协议不评价。SDK 实现方提供的默认行为应只发送 <code>role</code>，并提供回调让用户注入业务字段。</p>
 <div class="admonition note">
 <p class="admonition-title">为什么 a2c_version 不在 auth 里</p>
-<p>协议版本校验必须在任何业务代码之前完成，不能受 <code>connect</code> handler 实现的影响。因此 <code>a2c_version</code> 放在 URL query（HTTP 层），由独立中间件校验；<code>auth</code> 仅承载业务身份数据。详见 <a href="../versioning/#设计取向">协议版本与握手 § 设计取向</a>。</p>
+<p>协议版本校验必须在任何业务代码之前完成，不能受 <code>connect</code> handler 实现的影响。因此 <code>a2c_version</code> 放在 URL query（HTTP 层），由独立中间件校验；<code>auth</code> 仅承载业务层数据。详见 <a href="../versioning/#设计取向">协议版本与握手 § 设计取向</a>。</p>
 </div>
 <h3 id="enterofficereq">EnterOfficeReq<a class="headerlink" href="#enterofficereq" title="Permanent link">&para;</a></h3>
 <p>加入房间请求。<strong>不再</strong>携带版本信息——版本校验已在连接建立前完成（HTTP 层），身份通过 <code>auth.role</code> 声明。</p>
