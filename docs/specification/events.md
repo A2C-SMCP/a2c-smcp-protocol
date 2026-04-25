@@ -404,6 +404,21 @@ Computer 通知 Server 其文档目录已更新，Server 随后广播 `notify:up
 
 **Server 处理**: 接收后向该 Computer 所在房间广播 `notify:update_finder`。
 
+**触发粒度补充**：仅 `dpe://` URI 集合（文档增删）或具体 `dpe://` 文档资源元数据更新触发该通知；DPE Level 2/3 的页面/元素 body 内容变化**不**触发——后者属于 Agent 主动 `resources/read` 范畴。
+
+**Computer 端去重 / 防抖（SHOULD）**：
+
+- Computer **SHOULD** 在 50–100ms 时间窗内合并多个起因相同的 MCP `notifications/resources/list_changed` 与 `ResourceUpdatedNotification`，对外只广播一次 `server:update_finder`，避免高频变更场景下淹没 Agent
+- Computer **MAY** 在窗内做 URI 集合 diff——若 dpe:// URI 集合与上次广播时一致且无元数据变化则跳过广播
+- 协议**不强制**实现去重/防抖；不实现也合规（Agent 侧应假设可能收到冗余通知，幂等处理）
+
+**Agent 后续行为**：
+
+- Agent 收到 `notify:update_finder` 后 **SHOULD** 调用 `client:list_finder` 重新拉取最新文档目录
+- 通知本身**不携带**分页游标或差异；Agent 维护自己的 `offset` / `limit` / `tags` / `file_type` 过滤参数，重拉取时可按需复用或重置
+- Computer 与 Server **不维护** Agent 侧的分页状态——重拉取语义由 Agent 决策，不是协议状态机
+- Agent **SHOULD** 容忍冗余通知（同一变更可能触发多次广播），以最终一致为准——不应在 notification 中携带或推断 diff
+
 详见 [Finder 文档系统](finder.md) 中的 [更新机制](finder.md#更新机制)。
 
 ---

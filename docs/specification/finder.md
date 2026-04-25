@@ -228,7 +228,7 @@ MCP Server 通过 `resources/list` 返回的 `Resource` 对象上的 `_meta` 和
 |------|------|------|------|
 | `_meta.keywords` | `list[str]` | 否 | 关键词列表；`ListFinderReq.tags` 过滤对 `title + keywords + summary` 做 fuzzy 命中 |
 | `_meta.file_type` | `str` | 否 | 文件类型（`xlsx`、`pdf`、`pptx` 等）；`ListFinderReq.file_type` 精确匹配此字段 |
-| `_meta.page_count` | `int` | 是 | 文档总页数；Agent 依据此值规划翻页范围 |
+| `_meta.page_count` | `int (≥1)` | 是 | 文档**逻辑块数 / 最小可独立寻址的代理单元数**；Agent 依据此值规划翻页范围。单页文档约定 `page_count=1`；`0` 与 missing 同义视为无效（被 Organizer 过滤）|
 | `_meta.file_uri` | `str` | 否 | 原始文件 URI（如 `file:///data/reports/xxx.xlsx`）；仅用于 Agent 展示 |
 
 ### MCP 标准字段
@@ -243,7 +243,15 @@ MCP Server 通过 `resources/list` 返回的 `Resource` 对象上的 `_meta` 和
 
 ### 校验规则
 
-1. `_meta.page_count` **MUST** 存在且为非负整数；缺失时 Computer 记录警告并将该文档视为 `page_count=0`（Agent 侧不会遍历页面）
+1. `_meta.page_count` **MUST** 存在且为**正整数（≥ 1）**；缺失或 `0` 视为无效——Computer 记录 WARN 并把该文档**从 Finder Organizer 输出中过滤**（不会出现在 `client:list_finder` 响应中）。`0` 与 missing **不区分**——两者都意味着"该资源不应作为 DPE 文档参与代理"
+
+!!! tip "page_count 边界场景"
+
+    - **多页文档**（PDF / Excel / PPT / Markdown 长文）：`page_count=N`，N 为页/sheet/slide/section 数量
+    - **单页 / 不可分页文档**（单页 JSON、短文本、原子配置）：约定 `page_count=1`，并把全部内容放在 Level 2 `pages/0` 下
+    - **真正不应分页的资源**（流式日志、二进制对象、未结构化数据）：**不应使用 `dpe://` scheme**——改用 MCP 的 `text://` / `resource://` 等其他 scheme，从 `resources/list` 暴露但不参与 Finder Organizer
+
+    `page_count=0` 不是合法值——它无法与"missing/未声明"区分，会让 Agent 困惑该文档是"加载失败"还是"故意空"。
 2. `_meta.keywords` 若存在，必须为字符串数组
 3. `_meta.file_type` 若存在，推荐使用小写（如 `xlsx`、`pdf`）
 4. `annotations.lastModified` 若存在，必须为 ISO 8601 格式；缺失时该文档在 Server 内排序时排在末尾
@@ -449,8 +457,8 @@ Level 1 响应体中的扁平字段（`title`、`summary`、`file_type`、`page_
 
 | 维度 | Server-declared Metadata | Agent-driven Content Control |
 |------|--------------------------|-------------------------------|
-| 承载位置 | `Resource._meta` + `Resource.annotations` | URI query 参数 |
-| 代表字段 | Window: `_meta.priority`、`_meta.fullscreen`；DPE: `_meta.keywords`、`_meta.file_type`、`_meta.page_count`、`_meta.file_uri`、`annotations.lastModified` | DPE: `format`、`depth`、`offset`、`limit`、`categories`；Window 无 |
+| 承载位置 | `Resource.annotations` + `Resource._meta` | URI query 参数 |
+| 代表字段 | Window: `annotations.priority`（MCP 标准）、`annotations.audience`、`_meta.fullscreen`（A2C 扩展）；DPE: `annotations.audience`、`annotations.lastModified`、`_meta.keywords`、`_meta.file_type`、`_meta.page_count`、`_meta.file_uri` | DPE: `format`、`depth`、`offset`、`limit`、`categories`；Window 无 |
 | 声明方 | **MCP Server** 在 `resources/list` 响应的 `Resource` 对象上声明 | **Agent** 在调用 `resources/read` 时构造附加 |
 | 消费方 | **Computer**（用于组织、排序、过滤） | **MCP Server**（用于裁剪、格式化响应体） |
 | 传输语义 | 不进入 URI，不 round-trip 给 MCP Server；Server 已在 `resources/list` 时自己设置，无需再从 URI 读取 | 进入 URI，MCP Server **MUST 识别并按参数裁剪**；无法识别应回退到默认行为 |
@@ -462,11 +470,18 @@ Level 1 响应体中的扁平字段（`title`、`summary`、`file_type`、`page_
 # Server-declared Metadata（Window + DPE 均在 Resource 上声明）
 Resource(
     uri="window://com.example.browser/main",    # URI 纯标识符
-    _meta={"priority": 80, "fullscreen": true}, # 元数据在 _meta
+    annotations=Annotations(
+        priority=0.8,                            # MCP 标准：[0.0, 1.0]
+        audience=["assistant"],                  # MCP 标准：Window 面向 Agent
+    ),
+    _meta={"fullscreen": true},                  # A2C 扩展：无对应 MCP 标准字段
 )
 Resource(
     uri="dpe://com.example.docs/rpt-2026",      # URI 纯标识符
-    annotations=Annotations(lastModified="2026-01-15T08:30:00Z"),
+    annotations=Annotations(
+        audience=["user"],                       # MCP 标准：DPE 文档面向 User
+        lastModified="2026-01-15T08:30:00Z",     # MCP 标准：Finder 排序依据
+    ),
     _meta={"keywords": [...], "file_type": "xlsx", "page_count": 12},
 )
 

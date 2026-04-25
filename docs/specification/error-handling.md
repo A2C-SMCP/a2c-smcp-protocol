@@ -30,8 +30,8 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4003 | Tool Execution Failed | 工具执行失败 |
 | 4004 | Tool Timeout | 工具执行超时 |
 | 4005 | Tool Requires Confirmation | 工具需要二次确认 |
-| 4006 | Tool Authorization Required | 工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权 |
-| 4007 | Tool Authorization Failed | MCP 上游授权流程失败、Token 已失效或刷新失败 |
+| 4006 | Tool Authorization Required | 工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权（见下方[4006/4007 判定决策表](#40064007-判定决策表)）|
+| 4007 | Tool Authorization Failed | MCP 上游授权流程失败、Token 已失效、刷新失败、或权限不足（见下方[4006/4007 判定决策表](#40064007-判定决策表)）|
 
 ### 连接与房间管理错误码
 
@@ -275,13 +275,56 @@ CallToolResult(
 )
 ```
 
+### 4006/4007 判定决策表
+
+为消除"未授权 vs 授权失败"的边界歧义，Computer **MUST** 按下表把上游 MCP Server / OAuth Provider 的具体表现映射到协议错误码：
+
+| 上游表现 | 错误码 | 语义 |
+|---|---|---|
+| Computer 从未为该 MCP Server 配置授权（无 token / 无 client credentials）| **4006** | 用户**首次**授权 |
+| 上游返回 HTTP 401 Unauthorized（凭证缺失、非法、未提供）| **4006** | 用户**重新**授权 |
+| 上游返回 HTTP 403 Forbidden（已登录但权限/scope 不足）| **4007** | 已授权但能力不足，用户调整 scope 或换账号 |
+| Token 过期 + 刷新失败（refresh_token 无效 / 被撤销）| **4007** | 历史授权失效，用户需重新走 OAuth 流程 |
+| 用户已主动 revoke OAuth 授权 | **4007** | 历史授权已被撤销 |
+| 凭证存在但 scope 不足（上游未明确返回 401/403，但断言权限不够）| **4007** | 同 403 类，归"已授权但失败" |
+| OAuth provider 自身故障（5xx / 网络）| **4003 Tool Execution Failed** | 不属于授权语义，按通用工具失败处理 |
+
+**简明判别**：
+
+- 区分点是"**用户是否曾经授权**"——`4006` = 没授权过 / 凭证不存在；`4007` = 曾授权但当前不可用
+- 当 Computer 无法可靠判别时，倾向于报 `4006`（提示用户重新走授权流程是稳妥兜底）
+
+**Agent 行为差异**：Agent 收到 `4006` 应引导用户**首次/重新**完成授权；收到 `4007` 应引导用户**检查权限设置或重新授权**——区别仅在 UX 文案，机器路由可统一。
+
 ### 字段说明
 
-| 字段 | 必需 | 说明 |
+| 字段 | 强度 | 说明 |
 |------|------|------|
-| `meta.error_code` | 是 | `4006`（未授权）或 `4007`（授权失效） |
-| `meta.mcp_server` | 是 | 触发授权错误的 MCP Server 标识，便于 Agent 定位 |
-| `meta.auth_hint` | 否 | 面向用户的非敏感提示信息，**禁止**包含授权 URL 参数、state、client_secret 等敏感字段 |
+| `meta.error_code` | **MUST** | `4006`（未授权）或 `4007`（授权失效），按上方[判定决策表](#40064007-判定决策表)映射 |
+| `meta.mcp_server` | **MUST** | 触发授权错误的 MCP Server 标识，便于 Agent 定位 |
+| `meta.auth_hint` | **SHOULD** | 面向用户的非敏感提示对象。Computer **SHOULD** 提供以协助 Agent/Host 引导用户；缺失时 Agent 仍能基于 `error_code` 做兜底处理 |
+| `meta.auth_hint.action` | MAY | 机器可读动作标识（如 `user_authorization_required` / `token_refresh_required`），便于 Host 路由到不同 UI |
+| `meta.auth_hint.message` | **SHOULD** | 用户可读的一句话引导（如"请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"）；强烈建议提供以满足最小可用 UX |
+
+#### auth_hint 安全边界
+
+`auth_hint` 是协议层**唯一**面向 Agent 暴露的授权相关字段。为防止凭证经此通道泄漏给 Agent，Computer **MUST NOT** 在 `auth_hint`（任何子字段）中包含以下任何一类内容：
+
+| 类别 | 禁止字段示例 |
+|---|---|
+| 访问凭证 | `access_token` / `refresh_token` / `id_token` / `bearer_token` / 任何形式的 Token |
+| OAuth 流程参数 | `code` / `code_verifier` / `code_challenge` / `state` / `nonce` |
+| 客户端凭证 | `client_id` / `client_secret` / `assertion` / `client_assertion` |
+| 完整授权 URL | 任何包含上述 query 参数的完整 URL（即使已经 url-encode 也禁止） |
+| 用户敏感数据 | 用户密码、TOTP/OTP、安全问题答案 |
+
+允许包含：
+
+- 自然语言描述（"需要登录 GitHub 后重试"）
+- MCP Server 名称、工具名称
+- 不含敏感参数的着陆页 URL（如 `https://example.com/login`，无 query）
+
+> 完整凭证传播禁令见 [`security.md` → 零凭证传播原则](security.md#零凭证传播原则)。`auth_hint` 是该原则下的**唯一豁免**——豁免范围严格限于上表"允许包含"部分。
 
 ## TODO
 

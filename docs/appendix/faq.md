@@ -85,7 +85,7 @@
 **排序规则**:
 - **size 截断**: `desktop_size` 参数控制数量上限
 - **server 优先级**: 最近调用过工具的 Server 优先
-- **窗口排序**: 同一 server 内按 `priority` 降序
+- **窗口排序**: 同一 server 内按 `annotations.priority`（float `[0.0, 1.0]`）降序
 - **fullscreen 规则**: fullscreen 窗口独占该 Server 的显示
 
 ### Q: 为什么 Desktop 返回为空？
@@ -100,13 +100,14 @@
 
 **格式**: `window://host/path1/path2`（纯标识符，不含 query 参数）
 
-- `host`（必需）: MCP Server 唯一标识，在 Computer 作用域内 **MUST 全局唯一**，推荐反向域名风格如 `com.example.mcp`
+- `host`（必需）: MCP Server 唯一标识，在**同一 Computer 进程范围内 MUST 全局唯一**（跨 Office/Room 也唯一），推荐反向域名风格如 `com.example.mcp`
 - `path`（可选）: 0..N 个路径段，URL 编码
 
-布局元数据（priority、fullscreen）自 v0.2 起改为通过 MCP Resource 的 `_meta` 字段声明：
+布局元数据自 v0.2 起改为通过 MCP Resource 的 `annotations`（MCP 标准字段）与 `_meta`（A2C 扩展字段）声明，**不再写入 URI query**：
 
-- `_meta.priority`（可选）: 整数 `[0, 100]`，同一 MCP Server 内比较，越大越靠前
-- `_meta.fullscreen`（可选）: 布尔值，全屏渲染标记
+- `annotations.priority`（可选）: 浮点数 `[0.0, 1.0]`，**MCP 标准字段**，同一 MCP Server 内比较，越大越靠前
+- `annotations.audience`（推荐）: Window 面向 Agent，**SHOULD** 声明 `["assistant"]`；声明 `["user"]` 在 v0.2 仅触发 WARN 不过滤
+- `_meta.fullscreen`（可选）: 布尔值，**A2C 扩展字段**，全屏渲染标记
 
 详见 [Desktop 桌面系统 - Window URI 规范](../specification/desktop.md#window-uri-规范) 与 [Window 资源元数据](../specification/desktop.md#window-资源元数据)。
 

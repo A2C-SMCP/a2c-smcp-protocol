@@ -210,16 +210,36 @@ Socket.IO 连接阶段的参数分**两个位置**承载，遵循"协议层放 U
 
 #### `auth` 对象（业务层，ConnectAuth）
 
-Socket.IO 连接握手阶段的 `auth` 对象。**所有客户端**（Agent / Computer）在连接 Server 时必须提供。由 Server 在 `connect` handler 中处理。
+Socket.IO 连接握手阶段的 `auth` 对象。**所有客户端**（Agent / Computer）在连接 Server 时必须提供。由 Server 在 `connect` handler（业务代码）中处理。
+
+##### 协议层最小契约
+
+协议在 ConnectAuth 上的**唯一规范要求**是 `role` 字段：
 
 ```python
 class ConnectAuth(TypedDict):
     role: Literal["computer", "agent"]  # 必需：客户端角色
 ```
 
+| 强度 | 行为约束 |
+|------|---------|
+| **MUST** | Client 提供 `role` 字段，取值为 `"agent"` 或 `"computer"`；Server 据此路由 |
+| **协议未表态** | 其他字段（如 token、api_key、business_meta 等）——是否存在、是否被消费由**业务层**（Server 实现方）自决 |
+| **SHOULD** | 避免把"已有协议事件承载的字段"重复塞进 `auth`。例如 `office_id` / `name` 已由 [EnterOfficeReq](#enterofficereq) 承载，重复放入 `auth` 会造成职责重叠与一致性维护负担；建议 `auth` 仅承载真正的认证数据（token / API key / 用户标识等）|
+
+##### 业务层扩展空间
+
+`connect` handler 是 Server 实现方编写的业务代码，A2C-SMCP 协议**不约束**业务层在 `auth` 中放什么、怎么校验。常见扩展场景：
+
+- 鉴权 token：`auth = {"role": "agent", "token": "..."}`
+- 多租户标识：`auth = {"role": "computer", "tenant_id": "..."}`
+- 网关签名：`auth = {"role": "agent", "signature": "..."}`
+
+这些都属于业务层职责，协议不评价。SDK 实现方提供的默认行为应只发送 `role`，并提供回调让用户注入业务字段。
+
 !!! note "为什么 a2c_version 不在 auth 里"
 
-    协议版本校验必须在任何业务代码之前完成，不能受 `connect` handler 实现的影响。因此 `a2c_version` 放在 URL query（HTTP 层），由独立中间件校验；`auth` 仅承载业务身份数据。详见 [协议版本与握手 § 设计取向](versioning.md#设计取向)。
+    协议版本校验必须在任何业务代码之前完成，不能受 `connect` handler 实现的影响。因此 `a2c_version` 放在 URL query（HTTP 层），由独立中间件校验；`auth` 仅承载业务层数据。详见 [协议版本与握手 § 设计取向](versioning.md#设计取向)。
 
 ### EnterOfficeReq
 
