@@ -33,6 +33,14 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4006 | Tool Authorization Required | 工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权（见下方[4006/4007 判定决策表](#40064007-判定决策表)）|
 | 4007 | Tool Authorization Failed | MCP 上游授权流程失败、Token 已失效、刷新失败、或权限不足（见下方[4006/4007 判定决策表](#40064007-判定决策表)）|
 
+### DPE 错误码
+
+| 代码 | 名称 | 含义 |
+|------|------|------|
+| 4011 | DPE Resolver Not Configured | Computer 未注册 DPE Resolver hook，无法处理 `client:open_dpe`（见 [`dpe.md` Resolver 章节](dpe.md#dpe-resolver-hook业务层)）|
+| 4012 | Invalid DPE URI | URI 不符合 `dpe://` scheme 规范（缺 doc-ref、sub-path 形态非法、scheme 错等）|
+| 4013 | DPE Resolution Failed | Resolver 执行失败（业务上传/落盘异常、上游 MCP Server 不可用、`resources/read` 失败等）|
+
 ### 连接与房间管理错误码
 
 | 代码 | 名称 | 含义 |
@@ -325,6 +333,74 @@ CallToolResult(
 - 不含敏感参数的着陆页 URL（如 `https://example.com/login`，无 query）
 
 > 完整凭证传播禁令见 [`security.md` → 零凭证传播原则](security.md#零凭证传播原则)。`auth_hint` 是该原则下的**唯一豁免**——豁免范围严格限于上表"允许包含"部分。
+
+## DPE 资源访问错误
+
+### DPE Resolver 未配置（4011）
+
+**触发时机**：Agent 调用 `client:open_dpe`，Computer 检查发现未注册 DPE Resolver hook。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4011,
+  "message": "DPE Resolver Not Configured",
+  "uri": "dpe://com.example.docs/rpt-2026"
+}
+```
+
+**说明**：
+
+- A2C 协议**不允许**在未注册 Resolver 时降级到 inline 透传 ResourceContents——这是设计意图（避免 Socket.IO 承载大体量 DPE 内容）
+- Computer 业务方**MUST**在启动时显式注册 Resolver（见 [DPE Resolver Hook](dpe.md#dpe-resolver-hook业务层)）
+- 业务实现自由度高：上传对象存储 / 落本地缓存 / 任意 URI scheme 都可
+
+### 无效 DPE URI（4012）
+
+**触发时机**：Agent 提供的 `uri` 不符合 [`dpe://` URI 规范](dpe.md#dpe-uri-规范)。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4012,
+  "message": "Invalid DPE URI",
+  "uri": "dpe://host",
+  "reason": "missing doc-ref"
+}
+```
+
+**常见违规**：
+
+- scheme 不是 `dpe`
+- `host` 为空
+- 缺少 `doc-ref`（如 `dpe://host` 形式）
+- `sub-path` 形态非法（不是 `pages/{N}` 或 `elements/{ID}`）
+- 携带 query 参数（v0.2 起 DPE URI **不允许** query）
+
+### DPE 解析失败（4013）
+
+**触发时机**：DPE Resolver hook 已注册并被调用，但执行过程中失败。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4013,
+  "message": "DPE Resolution Failed",
+  "uri": "dpe://com.example.docs/rpt-2026",
+  "reason": "upstream MCP Server unreachable"
+}
+```
+
+**常见原因**：
+
+- 上游 MCP Server 的 `resources/read` 调用失败（Server 离线、URI 不存在等）
+- Resolver 业务逻辑抛异常（对象存储上传失败、本地落盘 IO 错误等）
+- Resolver 返回非法 URI（空 / 格式错误）
+
+Agent 行为建议：把错误暴露给上层（不要静默重试——这是业务层故障），由用户/运维介入排查。
 
 ## TODO
 

@@ -344,8 +344,6 @@ class UpdateComputerConfigReq(TypedDict):
 | `server:update_config` | Computer 配置更新请求 |
 | `server:update_desktop` | 桌面更新通知请求 |
 | `notify:update_desktop` | 桌面更新广播通知 |
-| `server:update_finder` | 文档目录更新通知请求 |
-| `notify:update_finder` | 文档目录更新广播通知 |
 
 ### UpdateMCPConfigNotification
 
@@ -442,90 +440,38 @@ class GetDeskTopRet(TypedDict, total=False):
 
 ---
 
-## Finder 相关结构
+## DPE 文档相关结构
 
-### ListFinderReq
+### OpenDPEReq
 
-获取文档目录请求。
+打开 DPE 文档请求——把一个 DPE URI 转成 Agent 可访问的 URI（业务 Resolver 实现）。
 
 ```python
-class ListFinderReq(AgentCallData, total=True):
+class OpenDPEReq(AgentCallData, total=True):
     agent: str                          # Agent 名称
     req_id: str                         # 请求 ID
     computer: str                       # 目标 Computer 名称
-    tags: NotRequired[list[str]]        # 可选：标签过滤；每个 tag 在文档 title/keywords/summary 中做 fuzzy 命中，任一命中即保留
-    file_type: NotRequired[str]         # 可选：文件类型过滤
-    offset: NotRequired[int]            # 可选：分页偏移（默认 0）
-    limit: NotRequired[int]             # 可选：分页限制（默认 20）
+    uri: str                            # dpe://host/doc-ref[/pages/N | /elements/ID]
+    timeout: NotRequired[int]           # 可选：秒，默认实现自定
 ```
 
-### DPEDocumentSummary
+### OpenDPERet
 
-DPE 文档摘要，用于文档目录展示。**这是 Agent-facing 结构**，由 Computer 从 MCP `resources/list` 返回的 `Resource` 对象合成：
+打开 DPE 文档响应——业务 Resolver 输出的访问 URI 与可选元数据。
 
 ```python
-class DPEDocumentSummary(TypedDict):
-    doc_ref: str                        # 从 URI 解析得出
-    uri: str                            # = Resource.uri
-    file_uri: NotRequired[str]          # = Resource._meta["file_uri"]
-    file_type: NotRequired[str]         # = Resource._meta["file_type"]
-    title: str                          # = Resource.name
-    page_count: int                     # = Resource._meta["page_count"]（必需）
-    keywords: NotRequired[list[str]]    # = Resource._meta["keywords"]
-    summary: NotRequired[str]           # = Resource.description
-    server: str                         # 由 Computer 注入：来源 MCP Server 名称
-    last_modified: NotRequired[str]     # = Resource.annotations.lastModified
+class OpenDPERet(TypedDict, total=False):
+    uri: str                            # Resolver 输出的访问 URI（任意 scheme：https / file / 业务自定义）
+    mime_type: NotRequired[str]         # 可选：MIME 类型
+    size: NotRequired[int]              # 可选：字节数；给 Agent 决策预算
+    req_id: str                         # 请求 ID
 ```
 
-!!! note "字段合成规则"
+!!! note "URI 生命周期与可用性"
 
-    Computer 在响应 `client:list_finder` 时，从每个 `dpe://` Resource 合成一份 `DPEDocumentSummary`。具体映射见 [Finder 规范 → DPE 文档资源元数据](finder.md#dpe-文档资源元数据)。Agent 看到的字段形态保持扁平、稳定，与 MCP Server 侧的分布式声明位置解耦。
+    `OpenDPERet.uri` 的过期、刷新、签名机制由**业务层 Resolver** 自决，A2C 协议**不**规定。Agent 拿到 URI 后用应用层协议（HTTP / file / ...）拉取实际内容；URI 失效时应重新调用 `client:open_dpe`。Agent **MUST NOT** 跨 session 缓存 URI。
 
-### DPEPageSummary
-
-DPE 页面摘要，用于文档内页面索引。
-
-```python
-class DPEPageSummary(TypedDict):
-    page_index: int                     # 页码（从 0 开始）
-    title: str                          # 页面标题
-    element_count: int                  # 元素数量
-    uri: str                            # 页面的 dpe:// URI
-    doc_ref: NotRequired[str]           # 所属文档引用键
-```
-
-### DPEElementDetail
-
-DPE 元素详情。
-
-```python
-class DPEElementDetail(TypedDict):
-    element_id: str                     # 元素唯一标识
-    category: str                       # 元素类型
-    summary: NotRequired[str]           # 元素摘要
-    content: dict                       # 元素内容（结构因类型而异）
-    doc_ref: NotRequired[str]           # 所属文档引用键
-    page_index: NotRequired[int]        # 所属页码
-    uri: NotRequired[str]              # 元素的 dpe:// URI
-    metadata: NotRequired[dict]         # 附加元数据
-```
-
-### ListFinderRet
-
-获取文档目录响应。
-
-```python
-class ListFinderRet(TypedDict, total=False):
-    documents: list[DPEDocumentSummary]  # 文档摘要列表
-    total_count: int                     # 总文档数（用于分页）
-    req_id: str                          # 请求 ID
-```
-
-!!! note "Finder 更新事件的数据结构"
-
-    `server:update_finder` 和 `notify:update_finder` 事件均复用 [`UpdateComputerConfigReq`](#updatecomputerconfigreq) 结构（仅包含 `computer: str` 字段），与 `server:update_config`、`server:update_desktop` 共享同一数据结构。
-
-详见 [Finder 文档系统](finder.md) 完整规范。
+详见 [DPE 文档协议](dpe.md) 完整规范。
 
 ---
 

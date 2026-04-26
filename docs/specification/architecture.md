@@ -307,39 +307,45 @@ MCP Server C ──┘
 
 详见 [Desktop 桌面系统](desktop.md) 完整规范。
 
-### Finder 文档系统
+### DPE 文档抽象
 
-Computer 将多个 MCP Server 暴露的 `dpe://` 资源聚合为统一的文档目录视图，为 Agent 提供结构化文档的渐进式导航能力。
+A2C 协议把各种文件格式（PDF / Excel / PPT / HTML / 代码仓库 / ...）统一为 **DPE（Document-Page-Element）** 三层抽象。MCP Server 通过 `dpe://` Resource 暴露文档；Computer 端业务层注册 **DPE Resolver Hook**，把 DPE Resource 转成 Agent 可访问的 URI（对象存储 / 本地文件 / 任意 scheme），避免大体量文档内容走 Socket.IO。
 
 ```
 MCP Server A ──┐
-  dpe://a/..   │    ┌─────────────────┐         ┌─────────┐
-               ├───→│    Computer     │────────→│  Agent  │
-MCP Server B ──┤    │ Finder Organizer│         │         │
-  dpe://b/..   │    └─────────────────┘         └─────────┘
-               │         过滤/排序/分页
-MCP Server C ──┘
-  (无文档资源)
+  dpe://a/..   │
+               │  resources/read   ┌─────────────────┐
+MCP Server B ──┤──────────────────→│    Computer     │
+  dpe://b/..   │                   │ DPE Resolver    │
+               │                   │ Hook (业务实现)  │
+MCP Server C ──┘                   └────────┬────────┘
+  (无 dpe 资源)                             │
+                                            │  返回访问 URI
+                                            ▼
+                          ┌─────────────────────────────┐
+                          │  Agent ←── 业务存储/本地缓存  │
+                          │  应用层（HTTP/file/...）拉取  │
+                          └─────────────────────────────┘
 ```
 
-**MCP 操作到 Finder 的映射**:
+**MCP 操作的角色**:
 
-| MCP 操作 | Finder 用途 |
-|----------|------------|
-| `resources/list` | 枚举并筛选 `dpe://` 资源 |
-| `resources/read` | 按 URI 级别读取文档/页面/元素内容 |
-| `resources/templates` | 声明 `pages/{N}` 和 `elements/{ID}` 子路径模板 |
-| `resources.subscribe` 能力 | 前提条件，Computer 据此决定是否枚举该 Server 的文档 |
-| `ResourceListChangedNotification` | 触发文档集合变化检测 |
-| `ResourceUpdatedNotification` | 触发文档内容变化刷新 |
-| `completion/complete` | 可选：`dpe://` 资源模板参数自动补全 |
+| MCP 操作 | 在 DPE 流程中的用途 |
+|----------|------------------|
+| `resources/list` | MCP Server 声明可用的 `dpe://` 文档（含元数据 `_meta` / `annotations`）|
+| `resources/read` | Computer 收到 `client:open_dpe` 时调此操作拿到 ResourceContents，喂给 Resolver |
+| `resources.subscribe` 能力 | 前提条件：MCP Server 声明后才进入 DPE 流程 |
 
-**核心组件**:
+**核心 A2C 事件**:
 
-- `finder/organize.py` — Finder 组织策略（过滤、排序、分页）
-- `utils/dpe_uri.py` — `dpe://` URI 解析与构建
+- `client:open_dpe` — Agent 请求把 DPE URI 转成访问 URI
 
-详见 [Finder 文档系统](finder.md) 完整规范。
+**协议范围之外（业务/应用层）**:
+
+- DPE 内容 JSON schema（Level 1/2/3 各级返回什么形态）—— 由文档应用层决定
+- 文档发现、检索、聚合视图、跨 MCP Server 文档管理 —— 未来作为内置 MCP Server（"Finder"）独立提供，**不在 v0.2 协议范围**
+
+详见 [DPE 文档协议](dpe.md) 完整规范。
 
 ---
 

@@ -126,11 +126,11 @@ MCP Server 参与 Desktop 需满足以下条件：
 
 ---
 
-## Finder 相关
+## DPE 文档相关
 
-### Q: Finder 和 Desktop 有什么区别？
+### Q: DPE 和 Desktop 有什么区别？
 
-**Desktop** 管理瞬态上下文（`window://`），适合小型、频繁变化的数据（如当前浏览器页面、编辑器状态）。**Finder** 管理持久文档（`dpe://`），适合大型、结构化的内容（如 Excel 表格、PDF 文档、PPT 演示文稿），支持渐进式导航（逐层钻入）。
+**Desktop** 管理瞬态上下文（`window://`），适合小型、频繁变化的数据（如当前浏览器页面、编辑器状态），内容随 Socket.IO 直接传输。**DPE** 是文档抽象（`dpe://`），适合大型结构化内容（如 Excel 表格、PDF 文档、PPT 演示文稿）；DPE 内容**不走 Socket.IO**，由 Computer 端业务 Resolver 转成访问 URI（对象存储 / 本地文件 / 任意 scheme），Agent 用应用层协议（HTTP / file / ...）自取。
 
 ### Q: 什么是 DPE 三层模型？
 
@@ -140,60 +140,44 @@ DPE 代表 Document-Page-Element 三层结构：
 - **Page**: 文档内的一个逻辑页面（如一个工作表）
 - **Element**: 页面内的一个内容单元（如一个表格、一段文本）
 
-这种模型通过 `dpe://` URI 三级寻址支持从文档到元素的渐进式导航；文档发现走 MCP 标准 `resources/list`（不再有 Level 0 URI）。
+DPE URI 子路径形态为 Agent 提供结构化定位语言（`dpe://host/doc-ref` / `pages/N` / `elements/ID`）；每一层映射到什么访问 URI 由业务 Resolver 决定。
 
 ### Q: dpe:// URI 的格式是什么？
 
-**格式**: `dpe://{host}/{doc-ref}[/sub-path][?content-control]`
+**格式**: `dpe://{host}/{doc-ref}[/sub-path]`
 
-三级寻址：
+DPE URI 是**纯标识符**，**不携带任何 query 参数**——所有元数据通过 MCP Resource 的 `_meta` / `annotations` 声明。三级寻址语言：
 
-- Level 1: `dpe://host/doc-ref` → 文档元数据 + 页面索引
-- Level 2: `dpe://host/doc-ref/pages/{N}` → 页面内容
-- Level 3: `dpe://host/doc-ref/elements/{ID}` → 元素详情
+- Level 1: `dpe://host/doc-ref` → 整个文档
+- Level 2: `dpe://host/doc-ref/pages/{N}` → 文档第 N 页
+- Level 3: `dpe://host/doc-ref/elements/{ID}` → 特定元素
 
-文档目录由 `client:list_finder` 事件返回（Computer 从 `resources/list` 合成），不通过 URI 暴露。文档元数据（keywords、file_type 等）在 MCP Resource 的 `_meta` / `annotations` 声明，不在 URI query 中。
+详见 [DPE 文档协议 - URI 规范](../specification/dpe.md#dpe-uri-规范)。
 
-详见 [Finder 文档系统 - dpe:// URI 协议](../specification/finder.md#dpe-uri-协议)。
+### Q: 如何让 MCP Server 暴露 DPE 文档？
 
-### Q: 如何让 MCP Server 的文档出现在 Finder 中？
+按 MCP 标准实现即可，**无需任何 SMCP 特定改动**：
 
-MCP Server 参与 Finder 需满足以下条件：
+1. 在 `resources/list` 中返回有效的 `dpe://` URI 的 Resource（含 `_meta` / `annotations` 元数据）
+2. 实现 `resources/read`，返回对应 ResourceContents（内容形态由 MCP Server 与文档应用层约定，A2C 协议不规定）
 
-1. 声明 `resources.subscribe` 能力
-2. 在 `resources/list` 中返回有效的 `dpe://` URI 的 Resource
-3. 实现 `resources/read`，按 URI 级别返回对应 JSON 内容
-4. 可选：声明 `resources/templates` 提供子路径模板
-5. 在文档增删/内容变化时发出对应的 MCP 通知
+详见 [DPE 文档协议 - MCP Server 实现指引](../specification/dpe.md#mcp-server-实现指引)。
 
-详见 [Finder 文档系统 - MCP Server 实现指南](../specification/finder.md#mcp-server-实现指南)。
+### Q: Agent 如何获取 DPE 文档内容？
 
-### Q: Agent 如何导航 DPE 文档内容？
+Agent 调用 `client:open_dpe(uri=dpe://...)` → Computer 调本地业务 Resolver 把 DPE 转成访问 URI → Agent 用应用层协议（HTTP / file / ...）自取实际内容。A2C 协议本身**不**承载 DPE 文档内容（避免大体量内容压垮 Socket.IO）。
 
-Agent 通过两种机制导航文档：
+详见 [DPE 文档协议 - client:open_dpe 事件](../specification/dpe.md#clientopen_dpe-事件)。
 
-1. **`client:list_finder` 事件**: 获取经 Organizer 过滤、排序、分页后的文档目录
-2. **MCP `resources/read`**: 按 `dpe://` URI 三级寻址逐层读取内容（文档 → 页面 → 元素）
+### Q: 为什么 client:open_dpe 返回 4011？
 
-具体的导航逻辑（分页遍历、关键词搜索、格式转换、缓存等）由 Agent 内部实现，不在协议范围内。详见 [Finder 文档系统 - Agent 端导航](../specification/finder.md#agent-端导航)。
+`4011 DPE Resolver Not Configured` 表示 Computer 未注册 DPE Resolver hook。Computer 业务方必须显式实现 Resolver（决定把 DPE 内容投递给 Agent 的方式：上传对象存储 / 落本地缓存 / 任意 URI scheme）。协议**不**降级到"inline 透传 ResourceContents"——这是设计意图。
 
-### Q: MCP Server 支持 dpe:// URI 自动补全吗？
+详见 [DPE 文档协议 - DPE Resolver Hook](../specification/dpe.md#dpe-resolver-hook业务层)。
 
-MCP 规范定义了 `completion/complete` 方法，MCP Server **可选择**为 `dpe://` 资源模板参数实现自动补全。补全链为 `doc_ref → page_index → element_id`，每一级依赖前一级已选定的值。
+### Q: A2C 为什么没有内置 Finder（文档目录浏览器）？
 
-这是可选能力（SHOULD），未实现的 Server 仍可正常参与 Finder。详见 [Finder 文档系统 - 自动补全](../specification/finder.md#自动补全可选)。
-
-### Q: 为什么 Finder 返回为空？
-
-**可能原因**:
-
-- 没有 MCP Server 暴露 `dpe://` 资源
-- MCP Server 未声明 `resources.subscribe` 能力
-- MCP Server 未启动
-- 关键词或文件类型过滤条件无匹配
-- `offset` 超出总数范围
-
-详见 [Finder 文档系统](../specification/finder.md) 完整规范。
+DPE 是底层抽象（类比 Linux POSIX 文件 API），Finder 是上层应用（类比文件管理器）。v0.2 协议保持纯粹——只定义 DPE 抽象（URI / 元数据 / 转换 hook），不内置文档发现、检索、聚合视图等"管理类"能力。这些未来作为内置 MCP Server（"Finder"）独立提供，与协议核心解耦。
 
 ---
 
