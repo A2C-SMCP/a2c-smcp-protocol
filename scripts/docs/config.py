@@ -29,6 +29,7 @@ class DocServerConfig:
     password: Optional[str] = None
     key_filename: Optional[str] = None
     deploy_path: str = "/var/www/doc.turingfocus.cn/a2c-smcp"
+    nginx_user: str = "nginx"  # 用于 chown，nginx worker user
 
 
 @dataclass
@@ -81,6 +82,7 @@ class DeployConfig:
             deploy_path=os.getenv(
                 "DOCS_DEPLOY_PATH", "/var/www/doc.turingfocus.cn/a2c-smcp"
             ),
+            nginx_user=os.getenv("DOCS_NGINX_USER", "nginx"),
         )
 
         wechat = None
