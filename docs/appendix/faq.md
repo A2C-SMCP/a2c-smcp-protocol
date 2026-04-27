@@ -140,17 +140,21 @@ DPE 代表 Document-Page-Element 三层结构：
 - **Page**: 文档内的一个逻辑页面（如一个工作表）
 - **Element**: 页面内的一个内容单元（如一个表格、一段文本）
 
-DPE URI 子路径形态为 Agent 提供结构化定位语言（`dpe://host/doc-ref` / `pages/N` / `elements/ID`）；每一层映射到什么访问 URI 由业务 Resolver 决定。
+DPE 三层是**内容结构层级**——通过 Resolver 输出的访问 URI 拉到的 JSON 必须符合 DPE 标准格式（Document JSON 含 pages 数组，每个 Page 含 elements 数组）。**URI 层只标识 Document**（`dpe://host/doc-ref`）；Page / Element 在 JSON 内部表达，不在 URI 层级。详见 [DPE 内容标准格式](../specification/dpe.md#dpe-内容标准格式)。
 
 ### Q: dpe:// URI 的格式是什么？
 
-**格式**: `dpe://{host}/{doc-ref}[/sub-path]`
+**格式**: `dpe://{host}/{doc-ref}`
 
-DPE URI 是**纯标识符**，**不携带任何 query 参数**——所有元数据通过 MCP Resource 的 `_meta` / `annotations` 声明。三级寻址语言：
+DPE URI 是**纯文档标识符**，**只到 Document 一层**——Page / Element 是文档内部结构（DPE 内容 JSON 的 pages / elements 数组），不在 URI 层级。URI **不携带 query / fragment**，所有元数据通过 MCP Resource 的 `_meta` / `annotations` 声明。
 
-- Level 1: `dpe://host/doc-ref` → 整个文档
-- Level 2: `dpe://host/doc-ref/pages/{N}` → 文档第 N 页
-- Level 3: `dpe://host/doc-ref/elements/{ID}` → 特定元素
+`doc-ref` 支持单段或分段路径，业务方按需选择风格：
+
+```
+dpe://com.example.docs/rpt-2026                      # 单段不透明键
+dpe://com.example.docs/reports/2026/annual           # 三段层级路径
+dpe://com.example.code/src/main/java/Foo.java        # 含扩展名的代码路径
+```
 
 详见 [DPE 文档协议 - URI 规范](../specification/dpe.md#dpe-uri-规范)。
 

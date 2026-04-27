@@ -38,7 +38,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 代码 | 名称 | 含义 |
 |------|------|------|
 | 4011 | DPE Resolver Not Configured | Computer 未注册 DPE Resolver hook，无法处理 `client:open_dpe`（见 [`dpe.md` Resolver 章节](dpe.md#dpe-resolver-hook业务层)）|
-| 4012 | Invalid DPE URI | URI 不符合 `dpe://` scheme 规范（缺 doc-ref、sub-path 形态非法、scheme 错等）|
+| 4012 | Invalid DPE URI | URI 不符合 `dpe://` scheme 规范（缺 host、缺 doc-ref、含 query/fragment、scheme 错等）|
 | 4013 | DPE Resolution Failed | Resolver 执行失败（业务上传/落盘异常、上游 MCP Server 不可用、`resources/read` 失败等）|
 
 ### 连接与房间管理错误码
@@ -375,9 +375,8 @@ CallToolResult(
 
 - scheme 不是 `dpe`
 - `host` 为空
-- 缺少 `doc-ref`（如 `dpe://host` 形式）
-- `sub-path` 形态非法（不是 `pages/{N}` 或 `elements/{ID}`）
-- 携带 query 参数（v0.2 起 DPE URI **不允许** query）
+- `doc-ref` 缺失或为空（如 `dpe://host` / `dpe://host/` 形式）
+- 携带 query 参数或 fragment（v0.2 起 DPE URI **不允许**——所有元数据走 Resource `_meta` / `annotations`）
 
 ### DPE 解析失败（4013）
 

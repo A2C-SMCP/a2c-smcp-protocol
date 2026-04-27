@@ -451,7 +451,7 @@ class OpenDPEReq(AgentCallData, total=True):
     agent: str                          # Agent 名称
     req_id: str                         # 请求 ID
     computer: str                       # 目标 Computer 名称
-    uri: str                            # dpe://host/doc-ref[/pages/N | /elements/ID]
+    uri: str                            # dpe://host/doc-ref（doc-ref 可单段或分段路径）
     timeout: NotRequired[int]           # 可选：秒，默认实现自定
 ```
 

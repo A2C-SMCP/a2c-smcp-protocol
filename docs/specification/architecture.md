@@ -342,7 +342,7 @@ MCP Server C ──┘                   └────────┬───
 
 **协议范围之外（业务/应用层）**:
 
-- DPE 内容 JSON schema（Level 1/2/3 各级返回什么形态）—— 由文档应用层决定
+- DPE 内容详细字段（19 种 Element 类型差异化字段、TFElementMetadata 40+ 字段、坐标系等）—— 见 [DPE 标准化提案](dpe-standardization-proposal.md)，作为业务/应用层 contract
 - 文档发现、检索、聚合视图、跨 MCP Server 文档管理 —— 未来作为内置 MCP Server（"Finder"）独立提供，**不在 v0.2 协议范围**
 
 详见 [DPE 文档协议](dpe.md) 完整规范。
