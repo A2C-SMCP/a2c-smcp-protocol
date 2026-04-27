@@ -442,12 +442,42 @@ class GetDeskTopRet(TypedDict, total=False):
 
 ## DPE 文档相关结构
 
-### OpenDPEReq
+### GetResourcesReq
 
-打开 DPE 文档请求——把一个 DPE URI 转成 Agent 可访问的 URI（业务 Resolver 实现）。
+枚举指定 MCP Server 的 Resource 列表请求——透明转发 MCP 标准 `resources/list`，**不做协议级过滤**。Agent 据此发现 dpe / window / 业务自定义 scheme 的资源。
 
 ```python
-class OpenDPEReq(AgentCallData, total=True):
+class GetResourcesReq(AgentCallData, total=True):
+    agent: str                          # Agent 名称
+    req_id: str                         # 请求 ID
+    computer: str                       # 目标 Computer 名称
+    mcp_server: str                     # 必填：目标 MCP Server 名称（来自 client:get_config 返回的 servers 字典 key）
+    cursor: NotRequired[str]            # 可选：MCP 标准 cursor 翻页；首次不传或传 null
+```
+
+### GetResourcesRet
+
+```python
+class GetResourcesRet(TypedDict, total=False):
+    resources: list[Resource]           # MCP 标准 Resource 列表（含任意 scheme，业务自决过滤）
+    next_cursor: NotRequired[str]       # 可选：有则继续翻页；无则结束
+    req_id: str                         # 请求 ID
+```
+
+!!! note "透明转发原则"
+
+    Computer 不做 scheme / 元数据层面的过滤、不做跨 Server 聚合——业务方按 Server 维度
+    遍历，自决过滤条件（`dpe://` / `window://` / `_meta` 字段 / 名称匹配等）。
+    **保留 MCP 标准 cursor 翻页能力**，业务方按需翻页，不强制全量加载。
+
+    `mcp_server` 不存在时返回 `404 Not Found`（错误信息含 server 名称）。
+
+### GetDPEReq
+
+把一个 DPE URI 转成 Agent 可访问的 URI（业务 Resolver 实现）。
+
+```python
+class GetDPEReq(AgentCallData, total=True):
     agent: str                          # Agent 名称
     req_id: str                         # 请求 ID
     computer: str                       # 目标 Computer 名称
@@ -455,12 +485,18 @@ class OpenDPEReq(AgentCallData, total=True):
     timeout: NotRequired[int]           # 可选：秒，默认实现自定
 ```
 
-### OpenDPERet
+!!! note "URI 自包含寻址"
 
-打开 DPE 文档响应——业务 Resolver 输出的访问 URI 与可选元数据。
+    DPE URI 是**自包含寻址凭据**——Agent 拿到任意 dpe URI（来自 `client:get_resources` / 业务工具返回 / 用户输入 / 历史持久化）都可直接调用 `get_dpe`，不需要持有外部元信息。Computer 通过 URI 中的 `host` 反查目标 MCP Server 进行路由。
+
+    跨 MCP Server host **SHOULD 唯一**（非 MUST）；冲突时 Computer 在注册阶段记 WARN、路由按"先注册优先"。详见 [DPE 文档协议 - host 路由策略](dpe.md#host-路由策略)。
+
+### GetDPERet
+
+业务 Resolver 输出的访问 URI 与可选元数据。
 
 ```python
-class OpenDPERet(TypedDict, total=False):
+class GetDPERet(TypedDict, total=False):
     uri: str                            # Resolver 输出的访问 URI（任意 scheme：https / file / 业务自定义）
     mime_type: NotRequired[str]         # 可选：MIME 类型
     size: NotRequired[int]              # 可选：字节数；给 Agent 决策预算
@@ -469,7 +505,7 @@ class OpenDPERet(TypedDict, total=False):
 
 !!! note "URI 生命周期与可用性"
 
-    `OpenDPERet.uri` 的过期、刷新、签名机制由**业务层 Resolver** 自决，A2C 协议**不**规定。Agent 拿到 URI 后用应用层协议（HTTP / file / ...）拉取实际内容；URI 失效时应重新调用 `client:open_dpe`。Agent **MUST NOT** 跨 session 缓存 URI。
+    `GetDPERet.uri` 的过期、刷新、签名机制由**业务层 Resolver** 自决，A2C 协议**不**规定。Agent 拿到 URI 后用应用层协议（HTTP / file / ...）拉取实际内容；URI 失效时应重新调用 `client:get_dpe`。Agent **MUST NOT** 跨 session 缓存 URI。
 
 详见 [DPE 文档协议](dpe.md) 完整规范。
 

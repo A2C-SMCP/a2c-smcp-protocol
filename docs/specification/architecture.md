@@ -333,12 +333,12 @@ MCP Server C ──┘                   └────────┬───
 | MCP 操作 | 在 DPE 流程中的用途 |
 |----------|------------------|
 | `resources/list` | MCP Server 声明可用的 `dpe://` 文档（含元数据 `_meta` / `annotations`）|
-| `resources/read` | Computer 收到 `client:open_dpe` 时调此操作拿到 ResourceContents，喂给 Resolver |
+| `resources/read` | Computer 收到 `client:get_dpe` 时调此操作拿到 ResourceContents，喂给 Resolver |
 | `resources.subscribe` 能力 | 前提条件：MCP Server 声明后才进入 DPE 流程 |
 
 **核心 A2C 事件**:
 
-- `client:open_dpe` — Agent 请求把 DPE URI 转成访问 URI
+- `client:get_dpe` — Agent 请求把 DPE URI 转成访问 URI
 
 **协议范围之外（业务/应用层）**:
 

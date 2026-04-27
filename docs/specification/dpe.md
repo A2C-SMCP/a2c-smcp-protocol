@@ -34,7 +34,7 @@ DPE 的核心理念：
 
 - **MCP Server 端**：按 MCP 标准暴露 `dpe://` Resource，无需任何 SMCP 特定改动
 - **Computer 端**：业务层注册 **DPE Resolver Hook**，决定把 DPE 内容投递给 Agent 的方式（对象存储 / 本地文件 / 任意 URI scheme）
-- **Agent 端**：调用 `client:open_dpe` 拿到访问 URI，用应用层协议（HTTP / file / ...）拉取实际内容；DPE 内容形态由文档应用层决定，A2C 协议不规定
+- **Agent 端**：调用 `client:get_dpe` 拿到访问 URI，用应用层协议（HTTP / file / ...）拉取实际内容；DPE 内容形态由文档应用层决定，A2C 协议不规定
 
 ---
 
@@ -98,7 +98,7 @@ DPE URI **不携带 query 参数也不含 fragment**——所有元数据通过 
 | 组件 | 必填 | 说明 | 约束 |
 |------|------|------|------|
 | `scheme` | 是 | 固定 `dpe` | 必须为 `dpe`，否则解析失败 |
-| `host` | 是 | MCP Server 唯一标识 | 不能为空；**在同一 Computer 进程范围内 MUST 全局唯一**（跨 Office/Room 也唯一）；推荐反向域名风格，如 `com.example.mcp` |
+| `host` | 是 | MCP Server 资源命名空间根 | 不能为空；**单个 MCP Server 内部的 URI 由 MCP `resources/list` 自身保证唯一**；跨 MCP Server **SHOULD** 唯一（详见 [host 路由策略](#host-路由策略)）；推荐反向域名风格，如 `com.example.mcp` |
 | `doc-ref` | 是 | 文档引用键 | 可以是单段或**分段路径**（多个 `/` 分隔），整体作为文档的唯一标识符；至少含一段 |
 
 ### doc-ref 的分段路径表达
@@ -117,7 +117,7 @@ DPE URI **不携带 query 参数也不含 fragment**——所有元数据通过 
 ### 校验规则
 
 1. `scheme` 必须为 `dpe`
-2. `host` 不能为空，且在同一 Computer 进程范围内 **MUST** 全局唯一（与 `window://` 共享 host 命名空间约束，详见 [Window URI 规范](desktop.md#window-uri-规范)）
+2. `host` 不能为空。**跨 MCP Server SHOULD 唯一**（非 MUST）——`client:get_dpe` 通过 URI 中的 host 反查目标 MCP Server。host 重复时 Computer 在 MCP Server 注册阶段记 WARN，运行时按"先注册优先"路由（详见 [host 路由策略](#host-路由策略)）。host 推荐使用反向域名风格（如 `com.example.mcp`）以提升可读性 + 避免冲突
 3. `doc-ref` 必须存在且至少含一段非空内容；`dpe://host` 或 `dpe://host/` 形式（doc-ref 为空）视为无效
 4. 每段 path 允许 URL 编码（`a%2Fb` 在单段内解码为 `a/b`，与"段间 `/`"语义区分）
 5. DPE URI **不允许**携带 query 参数或 fragment；解析时检测到 query/fragment 应记录 WARN 并丢弃
@@ -130,6 +130,30 @@ dpe://com.example.docs/reports/2026/annual           # 三段层级路径
 dpe://com.example.code/src/main/java/Foo.java        # 含扩展名的代码路径
 dpe://com.example.mail/inbox/2026-01-15/email-abc    # 时间分段
 ```
+
+### host 路由策略
+
+DPE URI 是**自包含寻址凭据**——Agent 只需调 `client:get_dpe(uri=...)`，由 Computer 通过 URI 中的 `host` 反查目标 MCP Server。这要求 host 在 Computer 范围内**SHOULD 唯一**。
+
+#### Computer 端实现要求
+
+| 阶段 | 行为 |
+|---|---|
+| **MCP Server 注册时** | Computer **MUST** 检测新注册 Server 的 host 是否与已有 Server 冲突；冲突时记 **WARN** 日志（含两个 Server 名称 + 共用 host），但**仍允许注册成功**（不阻塞业务） |
+| **`client:get_dpe` 路由时** | Computer 按 URI 中的 host 反查 MCP Server 索引：(a) 唯一匹配 → 路由到该 Server；(b) 多个匹配 → 按 **first-registered-wins**（先注册优先）路由，并再记 WARN；(c) 无匹配 → 返回 `4013 DPE Resolution Failed` |
+| **`client:get_resources` 路由时** | 不受影响——`get_resources` 通过 `mcp_server` 字段直接定位，无需 host 反查 |
+
+#### 设计取向
+
+- **URI 自包含**：保留"一段 dpe URI 字符串就能精确寻址"的语义——Agent 不需要持有外部元信息（mcp_server）才能调用
+- **软约束 + 显性 WARN**：host 重复是 MCP Server 实现的命名 bug，应被业务方修复；Computer 不阻塞注册（避免硬故障），但通过 WARN 让冲突可见
+- **first-registered-wins**：路由确定性——后注册的同 host 资源在 `get_dpe` 路径上无法被命中（其 URI 会被错误路由到先注册者），这是 visible 的运行时信号，促使业务方修复命名
+
+#### 业务方避免冲突的实践
+
+- 采用反向域名风格（`com.example.<service>`）——天然全局命名空间
+- host 中带业务标识（`com.example.docs` / `com.example.code` / `com.example.mail`）
+- 同一 Computer 部署多个 MCP Server 时，统一规划 host 命名空间
 
 ---
 
@@ -155,7 +179,7 @@ MCP Server 通过 `resources/list` 返回的 `Resource` 对象上的 `_meta` 与
 
 ### 校验规则
 
-1. `_meta.page_count` 若存在，**MUST** 为正整数（≥ 1）。单页文档约定 `page_count=1`；`0` 与 missing 视为无效（Agent 无法规划翻页，但仍可走 `open_dpe(dpe://host/doc-ref)` 拿整文档 URI）
+1. `_meta.page_count` 若存在，**MUST** 为正整数（≥ 1）。单页文档约定 `page_count=1`；`0` 与 missing 视为无效（Agent 无法规划翻页，但仍可走 `get_dpe(dpe://host/doc-ref)` 拿整文档 URI）
 2. `_meta.keywords` 若存在，必须为字符串数组
 3. `_meta.file_type` 若存在，推荐使用小写（如 `xlsx`、`pdf`）
 4. `annotations.lastModified` 若存在，必须为 ISO 8601 格式
@@ -326,11 +350,11 @@ class ResolvedResource(TypedDict, total=False):
 **协议不规定** Resolver 输出 URI 的过期、刷新、可用性、签名机制——这些**全由业务方自决**：
 
 - URI 是否过期、过期多久 → 业务方决定
-- Agent 拿到过期 URI 怎么办 → Agent **MUST** 重新调 `client:open_dpe` 拿新 URI
+- Agent 拿到过期 URI 怎么办 → Agent **MUST** 重新调 `client:get_dpe` 拿新 URI
 - URI 安全性、签名、防猜枚举 → 业务方实现责任
 - URI 校验、checksum → 业务方可选（在 `ResolvedResource` 里返回 hint，Agent 自行校验）
 
-Agent **MUST NOT** 跨 session 缓存 URI——即使看起来是公网持久 URL，下个 session 应重新调 `open_dpe`。
+Agent **MUST NOT** 跨 session 缓存 URI——即使看起来是公网持久 URL，下个 session 应重新调 `get_dpe`。
 
 ### 部署示例
 
@@ -345,27 +369,115 @@ Agent **MUST NOT** 跨 session 缓存 URI——即使看起来是公网持久 UR
 
 Computer **MUST NOT** 在未注册 DPE Resolver 时自行降级（如 inline 透传 ResourceContents）——这违背了"Socket.IO 不承载大体量 DPE"的设计意图。
 
-收到 `client:open_dpe` 时若无 Resolver：
+收到 `client:get_dpe` 时若无 Resolver：
 - Computer **MUST** 返回错误码 [`4011 DPE Resolver Not Configured`](error-handling.md#dpe-resolver-未配置4011)
 - 不进行任何 inline 兜底
 
+### Resolver 缓存与上游变更监听（业务自决）
+
+Resolver 在生产环境通常需要处理：
+
+- **缓存**：相同 dpe URI 的转换结果是否复用？过期多久？
+- **上游变更**：MCP Server 发出 `notifications/resources/list_changed` 或 `ResourceUpdatedNotification` 时，是否失效相关缓存、清理过期对象？
+- **预热**：Computer 启动时是否预先转换部分文档加速首次访问？
+
+A2C 协议**不规定**这些行为——全部交给 Computer SDK 在自身版本规划里**着情安排**。协议层只规定"行为约束"（resolve 的输入输出契约、未注册时返回 4011），具体实现是否做内存缓存、是否监听上游变化主动失效，全部 SDK 自由发挥。
+
 ---
 
-## client:open_dpe 事件
+## 文档发现
+
+A2C 协议通过组合 [`client:get_config`](events.md#clientget_config) 和 [`client:get_resources`](events.md#clientget_resources) 两个事件实现 DPE 文档发现，**无需业务方在 MCP Server 上写专门的发现工具**。
+
+### 发现流程
+
+```
+1. Agent → client:get_config(computer)
+   ← 拿到 MCPServerConfig 字典（key 为 server names）
+
+2. 对每个 server name：
+   Agent → client:get_resources(mcp_server=name, cursor=None)
+   ← {resources, next_cursor}
+   while next_cursor: 继续翻页
+
+3. Agent 自己过滤：
+   - 按 scheme（dpe:// / window:// / 业务自定义）
+   - 按 _meta / annotations 字段
+   - 按名称 / 描述模糊匹配
+   - 任意业务条件
+
+4. Agent → client:get_dpe(uri=dpe://...) → 拿到访问 URI → 应用层 fetch
+```
+
+### 设计原则
+
+- Computer 是 MCP `resources/list` 的**透明转发层**——不做 scheme / 元数据过滤、不做跨 Server 聚合
+- **MCP 标准 cursor 翻页**直接透传——Agent 按需翻页，不强制全量加载
+- 业务方拿到 Resource 后**自决过滤**逻辑——这是业务层关注点，不在协议层
+- `mcp_server` 必填——保持 Computer 的透明转发原则；想跨 Server 聚合是 Agent 的工作
+
+### Agent 端典型代码
+
+```python
+async def discover_dpe(agent, computer):
+    """跨所有 MCP Server 发现 dpe 文档。"""
+    cfg = await agent.get_config(computer)
+    docs = []
+    for server_name in cfg["servers"]:
+        cursor = None
+        while True:
+            ret = await agent.get_resources(computer, mcp_server=server_name, cursor=cursor)
+            for r in ret["resources"]:
+                if r["uri"].startswith("dpe://"):
+                    docs.append({
+                        "uri": r["uri"],          # 自包含寻址凭据，后续 get_dpe 直接用
+                        "title": r.get("name"),
+                        "summary": r.get("description"),
+                        "page_count": (r.get("_meta") or {}).get("page_count"),
+                    })
+            cursor = ret.get("next_cursor")
+            if not cursor:
+                break
+    return docs
+
+
+async def open_dpe(agent, computer, dpe_uri):
+    """对任意 dpe URI 调 get_dpe；URI 自包含足够的路由信息。"""
+    ret = await agent.get_dpe(computer, uri=dpe_uri)
+    return ret["uri"]   # 业务 Resolver 输出的访问 URI；Agent 用应用层协议自取
+```
+
+### 资源缓存与发现优化（SDK 自决）
+
+Computer / Agent 端的资源缓存策略、发现性能优化、`resources/list_changed` 监听响应等**由 SDK 在自身版本规划里着情安排**——协议层不强制。SDK 实现可以：
+
+- 缓存 `resources/list` 结果加速重复发现
+- 监听 MCP `notifications/resources/list_changed` 主动失效缓存
+- 预加载常用 server 的资源列表
+
+但这些都是 SDK 实现选择，不进协议规范。
+
+### 未来：Finder MCP Server
+
+当业务做了多个发现/检索/聚合需求后，常见模式（跨 Server 聚合、过滤、排序、搜索）会沉淀成事实标准。届时可独立开发 **Finder MCP Server**——可插拔的内置 MCP Server，与协议核心解耦。它对 Agent 通过标准 MCP 工具暴露能力，不需要新协议事件。
+
+---
+
+## client:get_dpe 事件
 
 ### 概述
 
-Agent 调用 `client:open_dpe` 把一个 DPE URI 转成可访问的 URI。这是 A2C 协议中**唯一的 DPE 内容访问入口**。
+Agent 调用 `client:get_dpe` 把一个 DPE URI 转成可访问的 URI。这是 A2C 协议中**唯一的 DPE 内容访问入口**。
 
 ```
-Agent ──[client:open_dpe]──→ Server ──[路由]──→ Computer
+Agent ──[client:get_dpe]──→ Server ──[路由]──→ Computer
                                               │
                                               ▼
                                          DPE Resolver
                                               │
                                               ▼
                                           访问 URI
-       ◄────────[OpenDPERet]─────────────┘
+       ◄────────[GetDPERet]─────────────┘
        │
        ▼
   Agent 用应用层协议（HTTP/file/...）自取访问 URI 内容
@@ -374,7 +486,7 @@ Agent ──[client:open_dpe]──→ Server ──[路由]──→ Computer
 ### 请求 / 响应
 
 ```python
-class OpenDPEReq(AgentCallData, total=True):
+class GetDPEReq(AgentCallData, total=True):
     agent: str            # Agent 名称
     req_id: str           # 请求 ID
     computer: str         # 目标 Computer
@@ -382,32 +494,34 @@ class OpenDPEReq(AgentCallData, total=True):
     timeout: NotRequired[int]  # 秒，默认实现自定
 
 
-class OpenDPERet(TypedDict, total=False):
+class GetDPERet(TypedDict, total=False):
     uri: str              # Resolver 输出的访问 URI
     mime_type: NotRequired[str]
     size: NotRequired[int]
     req_id: str
 ```
 
+DPE URI 是**自包含寻址凭据**——URI 字符串本身已足够精确定位一个 DPE 文档资源，Agent 拿到任意 dpe URI（无论来自 `client:get_resources` / 业务工具调用返回 / 用户输入 / 跨 session 引用）都可直接调 `get_dpe`。
+
 ### Computer 处理流程
 
-1. 接收 `client:open_dpe(uri=dpe://...)`
+1. 接收 `client:get_dpe(uri=dpe://...)`
 2. 校验 URI 合法性（参见 [URI 校验规则](#校验规则)）；非法返回 `4012 Invalid DPE URI`
 3. 检查是否注册了 DPE Resolver；未注册返回 `4011 DPE Resolver Not Configured`
-4. 解析 URI → 定位对应 MCP Server（按 `host` 找 Server）
-5. 调 MCP Server 的 `resources/read(uri)` 拿 `ResourceContents`
+4. 解析 URI → 通过 `host` 反查 MCP Server（详见 [host 路由策略](#host-路由策略)）；找不到匹配的 MCP Server 返回 `4013 DPE Resolution Failed`
+5. 调指定 MCP Server 的 `resources/read(uri)` 拿 `ResourceContents`
 6. 调 Resolver `resolve(uri, contents, hint)` 拿 `ResolvedResource`
-7. 返回 `OpenDPERet` 给 Agent
+7. 返回 `GetDPERet` 给 Agent
 
 ### Agent 处理流程
 
-1. 通过任意方式得到 dpe URI（MCP 工具返回、用户输入、未来的 Finder MCP Server 列出等等）
-2. 调 `client:open_dpe(uri)`
+1. 通过任意方式得到 dpe URI（`client:get_resources` 返回 / MCP 工具返回 / 用户输入 / 历史持久化等等）
+2. 调 `client:get_dpe(uri)`
 3. 拿到访问 URI 后，用对应 scheme 的应用层协议拉取内容：
     - `https://` / `http://` → HTTP GET（推荐 SDK 内置）
     - `file://` → 本地文件读取（推荐 SDK 内置）
     - 其他 scheme（`oss://` / `s3://` / 业务自定义）→ Agent 端需要对应解析器
-4. 拉取失败（含 URI 过期）→ 重新调 `client:open_dpe`
+4. 拉取失败（含 URI 过期）→ 重新调 `client:get_dpe(uri)`
 
 ### 错误处理
 
@@ -497,9 +611,3 @@ computer.register_dpe_resolver(MyOSSResolver())
 ```
 
 Computer **MUST NOT** 在未注册 Resolver 时自行降级。
-
-### 未来：Finder 作为内置 MCP Server
-
-文档发现、检索、聚合视图、跨 MCP Server 文档管理等"管理类"能力**不在 v0.2 协议范围**。这些能力适合作为**内置 MCP Server**实现（暂称"Finder"），通过标准 MCP 工具调用与 DPE URI 暴露给 Agent，与协议核心解耦。
-
-v0.2 不引入 Finder——等 DPE 在多 SDK 中标准化稳定后再独立设计。届时 Finder 作为可插拔模块，不影响协议核心。

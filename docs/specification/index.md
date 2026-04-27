@@ -111,7 +111,7 @@ Agent ──→ Computer ─┬─→ Excel MCP
 - [事件定义](events.md) - 完整事件列表与规范
 - [数据结构](data-structures.md) - 请求/响应数据结构定义
 - [Desktop 桌面系统](desktop.md) - Window URI 规范、桌面组织策略与更新机制
-- [DPE 文档协议](dpe.md) - DPE 数据模型、dpe:// URI 规范、Resolver Hook 与 `client:open_dpe` 事件
+- [DPE 文档协议](dpe.md) - DPE 数据模型、dpe:// URI 规范、Resolver Hook 与 `client:get_dpe` 事件
 - [房间模型](room-model.md) - 房间隔离机制详解
 - [错误处理](error-handling.md) - 错误码与响应格式
 - [安全考虑](security.md) - 安全性要求与建议
