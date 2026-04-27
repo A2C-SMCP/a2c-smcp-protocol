@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -866,10 +866,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#finder-文档系统" class="md-nav__link">
+  <a href="#dpe-文档抽象" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Finder 文档系统
+        DPE 文档抽象
       
     </span>
   </a>
@@ -1003,14 +1003,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../finder/" class="md-nav__link">
+      <a href="../dpe/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Finder 文档系统
+    DPE 文档协议
   
 
     
@@ -1212,34 +1212,6 @@
     
   
     Computer MCP 配置指南
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../guides/finder-sdk-guide/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Finder SDK 实现指南
   
 
     
@@ -1813,10 +1785,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#finder-文档系统" class="md-nav__link">
+  <a href="#dpe-文档抽象" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Finder 文档系统
+        DPE 文档抽象
       
     </span>
   </a>
@@ -2245,62 +2217,56 @@
 <li><code>utils/window_uri.py</code> — <code>window://</code> URI 解析与构建</li>
 </ul>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a> 完整规范。</p>
-<h3 id="finder-文档系统">Finder 文档系统<a class="headerlink" href="#finder-文档系统" title="Permanent link">&para;</a></h3>
-<p>Computer 将多个 MCP Server 暴露的 <code>dpe://</code> 资源聚合为统一的文档目录视图，为 Agent 提供结构化文档的渐进式导航能力。</p>
+<h3 id="dpe-文档抽象">DPE 文档抽象<a class="headerlink" href="#dpe-文档抽象" title="Permanent link">&para;</a></h3>
+<p>A2C 协议把各种文件格式（PDF / Excel / PPT / HTML / 代码仓库 / ...）统一为 <strong>DPE（Document-Page-Element）</strong> 三层抽象。MCP Server 通过 <code>dpe://</code> Resource 暴露文档；Computer 端业务层注册 <strong>DPE Resolver Hook</strong>，把 DPE Resource 转成 Agent 可访问的 URI（对象存储 / 本地文件 / 任意 scheme），避免大体量文档内容走 Socket.IO。</p>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>MCP Server A ──┐
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>  dpe://a/..   │    ┌─────────────────┐         ┌─────────┐
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>               ├───→│    Computer     │────────→│  Agent  │
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>MCP Server B ──┤    │ Finder Organizer│         │         │
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>  dpe://b/..   │    └─────────────────┘         └─────────┘
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>               │         过滤/排序/分页
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>MCP Server C ──┘
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>  (无文档资源)
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>  dpe://a/..   │
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>               │  resources/read   ┌─────────────────┐
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>MCP Server B ──┤──────────────────→│    Computer     │
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>  dpe://b/..   │                   │ DPE Resolver    │
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>               │                   │ Hook (业务实现)  │
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>MCP Server C ──┘                   └────────┬────────┘
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>  (无 dpe 资源)                             │
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>                                            │  返回访问 URI
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>                                            ▼
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>                          ┌─────────────────────────────┐
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>                          │  Agent ←── 业务存储/本地缓存  │
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>                          │  应用层（HTTP/file/...）拉取  │
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>                          └─────────────────────────────┘
 </code></pre></div>
-<p><strong>MCP 操作到 Finder 的映射</strong>:</p>
+<p><strong>MCP 操作的角色</strong>:</p>
 <table>
 <thead>
 <tr>
 <th>MCP 操作</th>
-<th>Finder 用途</th>
+<th>在 DPE 流程中的用途</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>resources/list</code></td>
-<td>枚举并筛选 <code>dpe://</code> 资源</td>
+<td>MCP Server 声明可用的 <code>dpe://</code> 文档（含元数据 <code>_meta</code> / <code>annotations</code>）</td>
 </tr>
 <tr>
 <td><code>resources/read</code></td>
-<td>按 URI 级别读取文档/页面/元素内容</td>
-</tr>
-<tr>
-<td><code>resources/templates</code></td>
-<td>声明 <code>pages/{N}</code> 和 <code>elements/{ID}</code> 子路径模板</td>
+<td>Computer 收到 <code>client:get_dpe</code> 时调此操作拿到 ResourceContents，喂给 Resolver</td>
 </tr>
 <tr>
 <td><code>resources.subscribe</code> 能力</td>
-<td>前提条件，Computer 据此决定是否枚举该 Server 的文档</td>
-</tr>
-<tr>
-<td><code>ResourceListChangedNotification</code></td>
-<td>触发文档集合变化检测</td>
-</tr>
-<tr>
-<td><code>ResourceUpdatedNotification</code></td>
-<td>触发文档内容变化刷新</td>
-</tr>
-<tr>
-<td><code>completion/complete</code></td>
-<td>可选：<code>dpe://</code> 资源模板参数自动补全</td>
+<td>前提条件：MCP Server 声明后才进入 DPE 流程</td>
 </tr>
 </tbody>
 </table>
-<p><strong>核心组件</strong>:</p>
+<p><strong>核心 A2C 事件</strong>:</p>
 <ul>
-<li><code>finder/organize.py</code> — Finder 组织策略（过滤、排序、分页）</li>
-<li><code>utils/dpe_uri.py</code> — <code>dpe://</code> URI 解析与构建</li>
+<li><code>client:get_dpe</code> — Agent 请求把 DPE URI 转成访问 URI</li>
 </ul>
-<p>详见 <a href="../finder/">Finder 文档系统</a> 完整规范。</p>
+<p><strong>协议范围之外（业务/应用层）</strong>:</p>
+<ul>
+<li>DPE 内容详细字段（19 种 Element 类型差异化字段、TFElementMetadata 40+ 字段、坐标系等）—— 见 <a href="../dpe-standardization-proposal/">DPE 标准化提案</a>，作为业务/应用层 contract</li>
+<li>文档发现、检索、聚合视图、跨 MCP Server 文档管理 —— 未来作为内置 MCP Server（"Finder"）独立提供，<strong>不在 v0.2 协议范围</strong></li>
+</ul>
+<p>详见 <a href="../dpe/">DPE 文档协议</a> 完整规范。</p>
 <hr />
 <h2 id="同步异步双栈">同步/异步双栈<a class="headerlink" href="#同步异步双栈" title="Permanent link">&para;</a></h2>
 <p>Server 和 Agent 模块均提供同步和异步两种实现：</p>

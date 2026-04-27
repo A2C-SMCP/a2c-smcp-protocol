@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -766,10 +766,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#clientlist_finder" class="md-nav__link">
+  <a href="#clientget_dpe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        client:list_finder
+        client:get_dpe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clientget_resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        client:get_resources
       
     </span>
   </a>
@@ -887,17 +898,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#serverupdate_finder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        server:update_finder
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -964,17 +964,6 @@
     <span class="md-ellipsis">
       
         notify:update_desktop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#notifyupdate_finder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        notify:update_finder
       
     </span>
   </a>
@@ -1059,10 +1048,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#文档目录更新流程" class="md-nav__link">
+  <a href="#dpe-文档访问流程" class="md-nav__link">
     <span class="md-ellipsis">
       
-        文档目录更新流程
+        DPE 文档访问流程
       
     </span>
   </a>
@@ -1207,14 +1196,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../finder/" class="md-nav__link">
+      <a href="../dpe/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Finder 文档系统
+    DPE 文档协议
   
 
     
@@ -1416,34 +1405,6 @@
     
   
     Computer MCP 配置指南
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../guides/finder-sdk-guide/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Finder SDK 实现指南
   
 
     
@@ -1889,10 +1850,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#clientlist_finder" class="md-nav__link">
+  <a href="#clientget_dpe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        client:list_finder
+        client:get_dpe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clientget_resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        client:get_resources
       
     </span>
   </a>
@@ -2010,17 +1982,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#serverupdate_finder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        server:update_finder
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2087,17 +2048,6 @@
     <span class="md-ellipsis">
       
         notify:update_desktop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#notifyupdate_finder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        notify:update_finder
       
     </span>
   </a>
@@ -2182,10 +2132,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#文档目录更新流程" class="md-nav__link">
+  <a href="#dpe-文档访问流程" class="md-nav__link">
     <span class="md-ellipsis">
       
-        文档目录更新流程
+        DPE 文档访问流程
       
     </span>
   </a>
@@ -2485,11 +2435,18 @@
 <td><code>GetDeskTopRet</code></td>
 </tr>
 <tr>
-<td><code>LIST_FINDER_EVENT</code></td>
-<td><code>client:list_finder</code></td>
-<td>获取文档目录</td>
-<td><code>ListFinderReq</code></td>
-<td><code>ListFinderRet</code></td>
+<td><code>GET_DPE_EVENT</code></td>
+<td><code>client:get_dpe</code></td>
+<td>把 DPE URI 解析为 Agent 可访问的 URI</td>
+<td><code>GetDPEReq</code></td>
+<td><code>GetDPERet</code></td>
+</tr>
+<tr>
+<td><code>GET_RESOURCES_EVENT</code></td>
+<td><code>client:get_resources</code></td>
+<td>透明转发指定 MCP Server 的 <code>resources/list</code>（含 cursor 翻页）</td>
+<td><code>GetResourcesReq</code></td>
+<td><code>GetResourcesRet</code></td>
 </tr>
 </tbody>
 </table>
@@ -2539,13 +2496,6 @@
 <td><code>server:update_desktop</code></td>
 <td>Computer</td>
 <td>桌面更新通知请求</td>
-<td><code>UpdateComputerConfigReq</code></td>
-</tr>
-<tr>
-<td><code>UPDATE_FINDER_EVENT</code></td>
-<td><code>server:update_finder</code></td>
-<td>Computer</td>
-<td>文档目录更新通知请求</td>
 <td><code>UpdateComputerConfigReq</code></td>
 </tr>
 <tr>
@@ -2604,12 +2554,6 @@
 <td><code>UPDATE_DESKTOP_NOTIFICATION</code></td>
 <td><code>notify:update_desktop</code></td>
 <td>桌面更新通知</td>
-<td><code>UpdateComputerConfigReq</code></td>
-</tr>
-<tr>
-<td><code>UPDATE_FINDER_NOTIFICATION</code></td>
-<td><code>notify:update_finder</code></td>
-<td>文档目录更新通知</td>
 <td><code>UpdateComputerConfigReq</code></td>
 </tr>
 <tr>
@@ -2678,52 +2622,98 @@
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 请求 ID</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">}</span>
 </code></pre></div></p>
-<h4 id="clientlist_finder"><code>client:list_finder</code><a class="headerlink" href="#clientlist_finder" title="Permanent link">&para;</a></h4>
-<p>获取指定 Computer 的文档目录（DPE 文档聚合视图）。Computer 从各 MCP Server 的 <code>resources/list</code>（仅 <code>dpe://</code> URI）合成 <code>DPEDocumentSummary</code> 列表，按 <code>tags</code> / <code>file_type</code> 过滤并按 <code>annotations.lastModified</code> 排序。<strong>不涉及 <code>resources/read</code></strong>。</p>
-<p><strong>请求数据 (ListFinderReq)</strong>:
+<h4 id="clientget_dpe"><code>client:get_dpe</code><a class="headerlink" href="#clientget_dpe" title="Permanent link">&para;</a></h4>
+<p>把一个 DPE URI 转成 Agent 可访问的 URI。Computer 调本地注册的 <a href="../dpe/#dpe-resolver-hook业务层">DPE Resolver hook</a> 完成转换；Resolver 业务自决（上传对象存储 / 落本地缓存 / 任意 URI scheme）。Agent 拿到访问 URI 后用应用层协议（HTTP / file / ...）自取实际内容——A2C 协议<strong>不</strong>承载 DPE 内容。</p>
+<p><strong>请求数据 (GetDPEReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>      <span class="c1"># 可选：标签过滤；每个 tag 在文档 title/keywords/summary 中 fuzzy 命中，任一命中即保留</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 可选：文件类型过滤</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>          <span class="c1"># 可选：分页偏移（默认 0）</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="nb">int</span>            <span class="c1"># 可选：分页限制（默认 20）</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                <span class="c1"># Agent 标识</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>               <span class="c1"># 请求 ID</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>             <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                  <span class="c1"># dpe://host/doc-ref（doc-ref 可单段或分段路径）</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="nb">int</span>               <span class="c1"># 可选：秒，默认实现自定</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span>
 </code></pre></div></p>
-<p><strong>响应数据 (ListFinderRet)</strong>:
+<p><strong>路由说明</strong>：DPE URI 是<strong>自包含寻址凭据</strong>——Computer 通过 URI 中的 <code>host</code> 反查目标 MCP Server。host 跨 Server SHOULD 唯一（非 MUST）；冲突时 Computer 在注册阶段记 WARN、路由按"先注册优先"。详见 <a href="../dpe/#host-路由策略">DPE 文档协议 - host 路由策略</a>。</p>
+<p><strong>响应数据 (GetDPERet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DPEDocumentSummary</span><span class="p">],</span>  <span class="c1"># 文档摘要列表</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="s2">&quot;total_count&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>                     <span class="c1"># 总文档数</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                           <span class="c1"># 请求 ID</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                  <span class="c1"># Resolver 输出的访问 URI（任意 scheme：https / file / 业务自定义）</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="s2">&quot;mime_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>            <span class="c1"># 可选</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>                 <span class="c1"># 可选：字节数</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
 </code></pre></div></p>
-<p>详见 <a href="../finder/">Finder 文档系统</a>。</p>
+<p><strong>错误码</strong>：未注册 Resolver → <code>4011 DPE Resolver Not Configured</code>；URI 非法 → <code>4012 Invalid DPE URI</code>；Resolver 执行失败（含 host 反查无结果、上游 MCP Server 不可用、上传异常等） → <code>4013 DPE Resolution Failed</code>。</p>
+<p>详见 <a href="../dpe/">DPE 文档协议</a>。</p>
+<h4 id="clientget_resources"><code>client:get_resources</code><a class="headerlink" href="#clientget_resources" title="Permanent link">&para;</a></h4>
+<p>枚举指定 MCP Server 暴露的 Resource 列表——透明转发 MCP 标准 <code>resources/list</code>，<strong>不做协议级过滤</strong>。Agent 据此发现 dpe / window / 业务自定义 scheme 的资源。</p>
+<p>支持 MCP 标准 cursor 翻页：Agent 首次调用不带 <code>cursor</code>，响应中含 <code>next_cursor</code> 时继续翻页；无 <code>next_cursor</code> 表示已到末尾。</p>
+<p><strong>请求数据 (GetResourcesReq)</strong>:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 必填：目标 MCP Server 名称（来自 client:get_config 返回的 servers 字典 key）</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 可选：MCP 标准 cursor 翻页；首次不传或传 null</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>响应数据 (GetResourcesRet)</strong>:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Resource</span><span class="p">],</span>  <span class="c1"># MCP 标准 Resource 列表（含任意 scheme，业务自决过滤）</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="s2">&quot;next_cursor&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># 可选：有则继续翻页；无则结束</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Computer 处理流程</strong>：</p>
+<ol>
+<li>校验 <code>mcp_server</code> 是否在已注册的 MCP Server 列表中——不存在返回 <code>404 Not Found</code>（错误信息含 mcp_server 名称）</li>
+<li>透明转发到对应 MCP Server 的 <code>resources/list(cursor=...)</code></li>
+<li>直接返回 <code>{resources, next_cursor}</code>，<strong>不做任何 scheme / 元数据层面的过滤</strong></li>
+</ol>
+<p><strong>典型 Agent 使用流程</strong>（DPE 文档发现）：</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>1. Agent → client:get_config(computer)
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>   ← 拿到所有 MCP Server 配置（servers 字典 key 即 server names）
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>2. 对每个 server name：
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>   Agent → client:get_resources(mcp_server=name, cursor=None)
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>   ← {resources, next_cursor}
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>   while next_cursor: 继续翻页
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>3. Agent 自己过滤（按 scheme / _meta / annotations / 名称等）
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>4. Agent → client:get_dpe(uri=dpe://...) → 拿到访问 URI → 应用层 fetch
+</code></pre></div>
+<p><strong>设计原则</strong>：</p>
+<ul>
+<li>Computer 是 MCP 标准 <code>resources/list</code> 的<strong>透明转发层</strong>——不做 scheme / 元数据过滤、不做跨 Server 聚合</li>
+<li><strong>保留 MCP 标准 cursor 翻页能力</strong>——Agent 按需翻页，不强制全量加载</li>
+<li>业务方拿到 Resource 后自决过滤逻辑（<code>dpe://</code> / <code>window://</code> / 业务自定义 scheme / <code>_meta</code> 字段 / 名称匹配）</li>
+</ul>
+<p>详见 <a href="../dpe/#文档发现">DPE 文档协议 - 文档发现</a>。</p>
 <h4 id="clientget_config"><code>client:get_config</code><a class="headerlink" href="#clientget_config" title="Permanent link">&para;</a></h4>
 <p>获取指定 Computer 的完整配置信息。</p>
 <p><strong>请求数据 (GetComputerConfigReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetComputerConfigRet)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServerInput</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 输入定义列表</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="s2">&quot;servers&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">]</span>   <span class="c1"># MCP Server 配置映射</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServerInput</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 输入定义列表</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s2">&quot;servers&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">]</span>   <span class="c1"># MCP Server 配置映射</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <hr />
 <h3 id="房间管理事件">房间管理事件<a class="headerlink" href="#房间管理事件" title="Permanent link">&para;</a></h3>
 <h4 id="serverjoin_office"><code>server:join_office</code><a class="headerlink" href="#serverjoin_office" title="Permanent link">&para;</a></h4>
 <p>Agent 或 Computer 请求加入房间。</p>
 <p><strong>请求数据 (EnterOfficeReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应</strong>: <code>(bool, str | None)</code> - 成功标志和错误信息。</p>
 <p><strong>Server 处理规则</strong>:
@@ -2732,33 +2722,33 @@
 <h4 id="serverleave_office"><code>server:leave_office</code><a class="headerlink" href="#serverleave_office" title="Permanent link">&para;</a></h4>
 <p>Agent 或 Computer 请求离开房间。</p>
 <p><strong>请求数据 (LeaveOfficeReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverlist_room"><code>server:list_room</code><a class="headerlink" href="#serverlist_room" title="Permanent link">&para;</a></h4>
 <p>Agent 查询指定房间内的所有会话信息。</p>
 <p><strong>请求数据 (ListRoomReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (ListRoomRet)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p>其中 <code>SessionInfo</code>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>   <span class="c1"># 角色</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="s2">&quot;a2c_version&quot;</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>   <span class="c1"># 角色</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="s2">&quot;a2c_version&quot;</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition info">
 <p class="admonition-title">peer 版本可见性</p>
@@ -2774,16 +2764,16 @@
 <h4 id="serverupdate_config"><code>server:update_config</code><a class="headerlink" href="#serverupdate_config" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其配置已更新，Server 随后广播 <code>notify:update_config</code>。</p>
 <p><strong>请求数据 (UpdateComputerConfigReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_tool_list"><code>server:update_tool_list</code><a class="headerlink" href="#serverupdate_tool_list" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其工具列表已更新，Server 随后广播 <code>notify:update_tool_list</code>。</p>
 <p><strong>请求数据 (UpdateToolListNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_desktop"><code>server:update_desktop</code><a class="headerlink" href="#serverupdate_desktop" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其桌面内容已更新，Server 随后广播 <code>notify:update_desktop</code>。</p>
@@ -2793,183 +2783,148 @@
 <li>MCP Server 发出 <code>ResourceUpdatedNotification</code> 且目标 URI 为 <code>window://</code></li>
 </ul>
 <p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_desktop</code>。</p>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a> 中的 <a href="../desktop/#desktop-更新机制">更新机制</a>。</p>
-<h4 id="serverupdate_finder"><code>server:update_finder</code><a class="headerlink" href="#serverupdate_finder" title="Permanent link">&para;</a></h4>
-<p>Computer 通知 Server 其文档目录已更新，Server 随后广播 <code>notify:update_finder</code>。</p>
-<p><strong>触发条件</strong>（由 Computer 端检测）:</p>
-<ul>
-<li>MCP Server 发出 <code>ResourceListChangedNotification</code> 且 <code>dpe://</code> URI 集合发生变化</li>
-<li>MCP Server 发出 <code>ResourceUpdatedNotification</code> 且目标 URI 为 <code>dpe://</code></li>
-</ul>
-<p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_finder</code>。</p>
-<p><strong>触发粒度补充</strong>：仅 <code>dpe://</code> URI 集合（文档增删）或具体 <code>dpe://</code> 文档资源元数据更新触发该通知；DPE Level 2/3 的页面/元素 body 内容变化<strong>不</strong>触发——后者属于 Agent 主动 <code>resources/read</code> 范畴。</p>
-<p><strong>Computer 端去重 / 防抖（SHOULD）</strong>：</p>
-<ul>
-<li>Computer <strong>SHOULD</strong> 在 50–100ms 时间窗内合并多个起因相同的 MCP <code>notifications/resources/list_changed</code> 与 <code>ResourceUpdatedNotification</code>，对外只广播一次 <code>server:update_finder</code>，避免高频变更场景下淹没 Agent</li>
-<li>Computer <strong>MAY</strong> 在窗内做 URI 集合 diff——若 dpe:// URI 集合与上次广播时一致且无元数据变化则跳过广播</li>
-<li>协议<strong>不强制</strong>实现去重/防抖；不实现也合规（Agent 侧应假设可能收到冗余通知，幂等处理）</li>
-</ul>
-<p><strong>Agent 后续行为</strong>：</p>
-<ul>
-<li>Agent 收到 <code>notify:update_finder</code> 后 <strong>SHOULD</strong> 调用 <code>client:list_finder</code> 重新拉取最新文档目录</li>
-<li>通知本身<strong>不携带</strong>分页游标或差异；Agent 维护自己的 <code>offset</code> / <code>limit</code> / <code>tags</code> / <code>file_type</code> 过滤参数，重拉取时可按需复用或重置</li>
-<li>Computer 与 Server <strong>不维护</strong> Agent 侧的分页状态——重拉取语义由 Agent 决策，不是协议状态机</li>
-<li>Agent <strong>SHOULD</strong> 容忍冗余通知（同一变更可能触发多次广播），以最终一致为准——不应在 notification 中携带或推断 diff</li>
-</ul>
-<p>详见 <a href="../finder/">Finder 文档系统</a> 中的 <a href="../finder/#更新机制">更新机制</a>。</p>
 <hr />
 <h3 id="通知事件">通知事件<a class="headerlink" href="#通知事件" title="Permanent link">&para;</a></h3>
 <h4 id="notifyenter_office"><code>notify:enter_office</code><a class="headerlink" href="#notifyenter_office" title="Permanent link">&para;</a></h4>
 <p>Server 广播：有成员加入房间。</p>
 <p><strong>数据结构 (EnterOfficeNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应自动调用 <code>client:get_tools</code> 获取新 Computer 的工具列表。</p>
 <h4 id="notifyleave_office"><code>notify:leave_office</code><a class="headerlink" href="#notifyleave_office" title="Permanent link">&para;</a></h4>
 <p>Server 广播：有成员离开房间。</p>
 <p><strong>数据结构 (LeaveOfficeNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="notifyupdate_config"><code>notify:update_config</code><a class="headerlink" href="#notifyupdate_config" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的配置已更新。</p>
 <p><strong>数据结构 (UpdateMCPConfigNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，可调用 <code>client:get_config</code> 获取最新配置。</p>
 <h4 id="notifyupdate_tool_list"><code>notify:update_tool_list</code><a class="headerlink" href="#notifyupdate_tool_list" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的工具列表已更新。</p>
 <p><strong>数据结构 (UpdateToolListNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应调用 <code>client:get_tools</code> 刷新本地工具列表。</p>
 <h4 id="notifyupdate_desktop"><code>notify:update_desktop</code><a class="headerlink" href="#notifyupdate_desktop" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的桌面内容已更新。</p>
 <p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:get_desktop</code> 获取最新桌面。</p>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a> 中的 <a href="../desktop/#完整生命周期时序图">完整生命周期时序图</a>。</p>
-<h4 id="notifyupdate_finder"><code>notify:update_finder</code><a class="headerlink" href="#notifyupdate_finder" title="Permanent link">&para;</a></h4>
-<p>Server 广播：某 Computer 的文档目录已更新。</p>
-<p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 文档目录发生变化的 Computer 名称</span>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
-</code></pre></div></p>
-<p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:list_finder</code> 获取最新文档目录。</p>
-<p>详见 <a href="../finder/">Finder 文档系统</a> 中的 <a href="../finder/#完整通知链时序图">完整通知链时序图</a>。</p>
 <h4 id="notifytool_call_cancel"><code>notify:tool_call_cancel</code><a class="headerlink" href="#notifytool_call_cancel" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某工具调用已被取消。</p>
 <p><strong>数据结构 (AgentCallData)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID</span>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <hr />
 <h2 id="事件流程图">事件流程图<a class="headerlink" href="#事件流程图" title="Permanent link">&para;</a></h2>
 <h3 id="工具调用流程">工具调用流程<a class="headerlink" href="#工具调用流程" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sequenceDiagram
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    participant A as Agent
-<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    participant S as Server
-<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    participant C as Computer
-<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>
-<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>    A-&gt;&gt;S: client:tool_call (ToolCallReq)
-<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>    S-&gt;&gt;C: client:tool_call (转发)
-<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>    C-&gt;&gt;S: 工具执行结果
-<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>    S-&gt;&gt;A: 返回结果
-</code></pre></div>
-<h3 id="动态工具发现流程">动态工具发现流程<a class="headerlink" href="#动态工具发现流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sequenceDiagram
 <a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    participant A as Agent
 <a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>    participant S as Server
 <a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>    participant C as Computer
 <a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>
-<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>    Note over C: Computer 加入房间
-<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>    C-&gt;&gt;S: server:join_office
-<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>    S-&gt;&gt;A: notify:enter_office
-<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>    A-&gt;&gt;S: client:get_tools
-<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>    S-&gt;&gt;C: client:get_tools (转发)
-<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>    C-&gt;&gt;S: 工具列表
-<a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a>    S-&gt;&gt;A: GetToolsRet
-<a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a>    Note over A: 注册新工具
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>    A-&gt;&gt;S: client:tool_call (ToolCallReq)
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>    S-&gt;&gt;C: client:tool_call (转发)
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>    C-&gt;&gt;S: 工具执行结果
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>    S-&gt;&gt;A: 返回结果
 </code></pre></div>
-<h3 id="配置更新流程">配置更新流程<a class="headerlink" href="#配置更新流程" title="Permanent link">&para;</a></h3>
+<h3 id="动态工具发现流程">动态工具发现流程<a class="headerlink" href="#动态工具发现流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sequenceDiagram
 <a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    participant A as Agent
 <a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>    participant S as Server
 <a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>    participant C as Computer
 <a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>
-<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>    Note over C: 配置变更
-<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>    C-&gt;&gt;S: server:update_config
-<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>    S-&gt;&gt;A: notify:update_config
-<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>    A-&gt;&gt;S: client:get_tools (可选)
-<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a>    S-&gt;&gt;C: 转发
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>    Note over C: Computer 加入房间
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>    C-&gt;&gt;S: server:join_office
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>    S-&gt;&gt;A: notify:enter_office
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>    A-&gt;&gt;S: client:get_tools
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a>    S-&gt;&gt;C: client:get_tools (转发)
 <a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a>    C-&gt;&gt;S: 工具列表
 <a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a>    S-&gt;&gt;A: GetToolsRet
+<a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>    Note over A: 注册新工具
+</code></pre></div>
+<h3 id="配置更新流程">配置更新流程<a class="headerlink" href="#配置更新流程" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sequenceDiagram
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    participant A as Agent
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>    participant S as Server
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>    participant C as Computer
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>    Note over C: 配置变更
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>    C-&gt;&gt;S: server:update_config
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>    S-&gt;&gt;A: notify:update_config
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a>    A-&gt;&gt;S: client:get_tools (可选)
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a>    S-&gt;&gt;C: 转发
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a>    C-&gt;&gt;S: 工具列表
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a>    S-&gt;&gt;A: GetToolsRet
 </code></pre></div>
 <h3 id="桌面更新流程">桌面更新流程<a class="headerlink" href="#桌面更新流程" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sequenceDiagram
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    participant M as MCP Server
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>    participant C as Computer
-<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>    participant S as Server
-<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>    participant A as Agent
-<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>
-<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>    Note over M: 窗口资源变化
-<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
-<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a>    C-&gt;&gt;C: 比较 window:// URI 集合
-<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a>    C-&gt;&gt;S: server:update_desktop
-<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a>    S-&gt;&gt;A: notify:update_desktop
-<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a>    A-&gt;&gt;S: client:get_desktop
-<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
-<a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a>    C-&gt;&gt;C: organize_desktop()
-<a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a>    C-&gt;&gt;S: GetDeskTopRet
-<a id="__codelineno-33-16" name="__codelineno-33-16" href="#__codelineno-33-16"></a>    S-&gt;&gt;A: GetDeskTopRet
-</code></pre></div>
-<p>详见 <a href="../desktop/">Desktop 桌面系统</a>。</p>
-<h3 id="文档目录更新流程">文档目录更新流程<a class="headerlink" href="#文档目录更新流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>sequenceDiagram
 <a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    participant M as MCP Server
 <a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>    participant C as Computer
 <a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>    participant S as Server
 <a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>    participant A as Agent
 <a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>
-<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>    Note over M: 文档资源变化
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>    Note over M: 窗口资源变化
 <a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
-<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>    C-&gt;&gt;C: 比较 dpe:// URI 集合
-<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a>    C-&gt;&gt;S: server:update_finder
-<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a>    S-&gt;&gt;A: notify:update_finder
-<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a>    A-&gt;&gt;S: client:list_finder
-<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a>    S-&gt;&gt;C: client:list_finder (转发)
-<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a>    C-&gt;&gt;C: organize_finder()
-<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a>    C-&gt;&gt;S: ListFinderRet
-<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a>    S-&gt;&gt;A: ListFinderRet
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>    C-&gt;&gt;C: 比较 window:// URI 集合
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a>    C-&gt;&gt;S: server:update_desktop
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a>    S-&gt;&gt;A: notify:update_desktop
+<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a>    A-&gt;&gt;S: client:get_desktop
+<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a>    S-&gt;&gt;A: GetDeskTopRet
 </code></pre></div>
-<p>详见 <a href="../finder/">Finder 文档系统</a>。</p>
+<p>详见 <a href="../desktop/">Desktop 桌面系统</a>。</p>
+<h3 id="dpe-文档访问流程">DPE 文档访问流程<a class="headerlink" href="#dpe-文档访问流程" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sequenceDiagram
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    participant M as MCP Server
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>    participant C as Computer
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>    participant S as Server
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>    participant A as Agent
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>    participant Store as 业务存储&lt;br/&gt;(OSS / 本地 / etc)
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a>    Note over A: Agent 通过任意方式得到 dpe URI
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a>    A-&gt;&gt;S: client:get_dpe(dpe://host/doc-1)
+<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a>    S-&gt;&gt;C: 路由到目标 Computer
+<a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a>    C-&gt;&gt;M: resources/read(dpe://host/doc-1)
+<a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a>    M-&gt;&gt;C: ResourceContents
+<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a>    C-&gt;&gt;C: 调 DPE Resolver Hook（业务实现）
+<a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a>    C-&gt;&gt;Store: 上传 / 持久化（业务自决）
+<a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a>    Store-&gt;&gt;C: 访问 URI
+<a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a>    C-&gt;&gt;S: GetDPERet(uri=https://...)
+<a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a>    S-&gt;&gt;A: GetDPERet
+<a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a>    A-&gt;&gt;Store: 用应用层（HTTP/file/...）拉取实际内容
+</code></pre></div>
+<p>详见 <a href="../dpe/">DPE 文档协议</a>。</p>
 <hr />
 <h2 id="实现要求">实现要求<a class="headerlink" href="#实现要求" title="Permanent link">&para;</a></h2>
 <h3 id="server-必须实现">Server 必须实现<a class="headerlink" href="#server-必须实现" title="Permanent link">&para;</a></h3>
@@ -2988,7 +2943,6 @@
 <li><code>notify:enter_office</code> - 自动获取新 Computer 的工具</li>
 <li><code>notify:leave_office</code> - 清理离开 Computer 的工具</li>
 <li><code>notify:update_config</code> / <code>notify:update_tool_list</code> - 刷新工具列表</li>
-<li><code>notify:update_finder</code> - 刷新文档目录</li>
 </ul>
 <hr />
 <h2 id="参考">参考<a class="headerlink" href="#参考" title="Permanent link">&para;</a></h2>
