@@ -100,7 +100,7 @@
 
 **格式**: `window://host/path1/path2`（纯标识符，不含 query 参数）
 
-- `host`（必需）: MCP Server 资源命名空间根，**SHOULD** 跨 MCP Server 唯一（非 MUST；冲突时 Computer 记 WARN，运行时按"先注册优先"路由）；推荐反向域名风格如 `com.example.mcp` 天然回避冲突
+- `host`（必需）: MCP Server 资源命名空间根，**MUST** 跨 MCP Server 唯一（v0.2 起为注册期硬约束，冲突时 Computer 注册失败）；**SHOULD** 反向域名风格如 `com.example.mcp`（lint-style 引导，不符合时 WARN 但不阻塞注册）
 - `path`（可选）: 0..N 个路径段，URL 编码
 
 布局元数据自 v0.2 起改为通过 MCP Resource 的 `annotations`（MCP 标准字段）与 `_meta`（A2C 扩展字段）声明，**不再写入 URI query**：

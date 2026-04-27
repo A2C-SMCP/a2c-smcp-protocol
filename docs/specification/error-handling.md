@@ -25,7 +25,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 
 | 代码 | 名称 | 含义 |
 |------|------|------|
-| 4001 | Tool Not Found | 工具不存在 |
+| 4001 | Tool Not Found | `tool_name` 在指定 MCP Server 中不存在；**不**含 `mcp_server` 本身缺失场景（用 [4014](#mcp-server-not-found4014)）|
 | 4002 | Tool Disabled | 工具被禁用 |
 | 4003 | Tool Execution Failed | 工具执行失败 |
 | 4004 | Tool Timeout | 工具执行超时 |
@@ -38,8 +38,15 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 代码 | 名称 | 含义 |
 |------|------|------|
 | 4011 | DPE Resolver Not Configured | Computer 未注册 DPE Resolver hook，无法处理 `client:get_dpe`（见 [`dpe.md` Resolver 章节](dpe.md#dpe-resolver-hook业务层)）|
-| 4012 | Invalid DPE URI | URI 不符合 `dpe://` scheme 规范（缺 host、缺 doc-ref、含 query/fragment、scheme 错等）|
-| 4013 | DPE Resolution Failed | Resolver 执行失败（业务上传/落盘异常、上游 MCP Server 不可用、`resources/read` 失败等）|
+| 4012 | Invalid DPE URI | Agent SDK 构造层硬错误——URI 不符合 `dpe://` scheme 规范（缺 host、缺 doc-ref、scheme 错等）。**含 query/fragment 在 Computer 解析层容错丢弃 + WARN，不报此码**（详见 [F4 分层处理](dpe.md#uri-query--fragment-处理分层)）|
+| 4013 | DPE Resolution Failed | Resolver / 上游 / mimetype 失败——payload 内 `category` 字段细分（见 [§DPE 解析失败](#dpe-解析失败4013)）|
+
+### MCP Server 路由错误码
+
+| 代码 | 名称 | 含义 |
+|------|------|------|
+| 4014 | MCP Server Not Found | 引用的 `mcp_server` 名字未注册（见 [§MCP Server Not Found](#mcp-server-not-found4014)）|
+| 4015 | MCP Capability Not Supported | MCP Server 已注册但未声明所需 capability（见 [§MCP Capability Not Supported](#mcp-capability-not-supported4015)）|
 
 ### 连接与房间管理错误码
 
@@ -227,16 +234,32 @@ logger.error(
 
 **触发时机**：客户端（Agent / Computer）通过 Socket.IO 连接 Server，**HTTP 中间件层**校验 URL query 中的 `a2c_version` 发现与 Server 不兼容。校验发生在 Socket.IO 处理之前，业务代码无法影响。
 
-**传递方式**：Server 返回 HTTP 400，body 为结构化 JSON。Socket.IO 客户端在 `connect_error` 事件收到该 body：
+### 4008 是 HTTP body code，不是 WS close code
 
-```json
+!!! warning "明确语义边界"
+
+    **4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中**。
+    4008 **不是** WebSocket close code（RFC 6455 自定义码段 4xxx）——协议版本校验在 HTTP 层完成，发生在 WS 帧建立之前，不存在 WS close 形态。
+    SDK 实现 **MUST NOT** 把 4008 与 WS close code 4xxx 混淆。
+
+### HTTP 响应规范
+
+```
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+X-A2C-Error-Code: 4008
+
 {
   "code": 4008,
   "message": "Protocol version mismatch",
   "server_version": "0.2.0",
-  "client_version": "0.1.5"
+  "client_version": "0.1.5",
+  "min_supported": "0.2.0",
+  "max_supported": "0.2.999"
 }
 ```
+
+`X-A2C-Error-Code` 响应 header 是冗余诊断辅助：当客户端无法访问 body 时（罕见 transport 边角情况），可从 header 中识别错误类型。**不替代** body，body 是 single source of truth。
 
 ### 字段说明
 
@@ -246,12 +269,48 @@ logger.error(
 | `message` | 是 | 人类可读的错误信息 |
 | `server_version` | 是 | Server 当前支持的协议版本（Client 据此决定是否升级） |
 | `client_version` | 是 | Server 从 URL query 读取的客户端版本（回显供诊断） |
+| `min_supported` | 是 | Server 支持的最低协议版本 |
+| `max_supported` | 是 | Server 支持的最高协议版本 |
 
 ### SDK 实现要求
 
 - Client SDK **必须**解析 HTTP 400 的响应 body，识别 `code: 4008`，转化为专属异常（如 `ProtocolVersionError`），**禁止**静默重试
 - 异常信息应明确告知用户两边版本，便于快速判断应升级哪端
+- 客户端 transport 顺序 **SHOULD** 配置为 `polling → websocket`（绝大多数 socketio 客户端默认即如此），保证首个握手请求是 HTTP polling，body 可访问
 - 可选：SDK 在本地日志中打印诊断信息（当前 SDK 声称的 PROTOCOL_VERSION 常量、接收到的 server_version）
+
+### Python 解析示例（reference impl）
+
+```python
+import json
+import socketio
+from a2c_smcp import PROTOCOL_VERSION
+from a2c_smcp.exceptions import ProtocolVersionError
+
+sio = socketio.AsyncClient()
+try:
+    await sio.connect(
+        f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
+        auth={"role": "agent", "agent_id": "..."},
+    )
+except socketio.exceptions.ConnectionError as e:
+    # python-socketio 在 HTTP 非 2xx 时把 body 放进异常 message
+    raw = str(e)
+    try:
+        body = json.loads(raw)
+    except json.JSONDecodeError:
+        raise  # 非协议级错误，保持原异常
+    if body.get("code") == 4008:
+        raise ProtocolVersionError(
+            client_version=body.get("client_version"),
+            server_version=body.get("server_version"),
+            min_supported=body.get("min_supported"),
+            max_supported=body.get("max_supported"),
+        )
+    raise
+```
+
+> **注**：协议规范仅提供 Python reference impl。其他 SDK（Rust / TypeScript / Go 等）的具体解析模式由各 SDK 自行决定——A2C-SMCP 协议文档不堆砌多语言示例。
 
 详细的版本语义、兼容性规则与握手流程见 [协议版本与握手](versioning.md)。
 
@@ -358,7 +417,7 @@ CallToolResult(
 
 ### 无效 DPE URI（4012）
 
-**触发时机**：Agent 提供的 `uri` 不符合 [`dpe://` URI 规范](dpe.md#dpe-uri-规范)。
+**触发时机**：Agent SDK **构造层** URI 校验失败（硬错误）。Computer **解析层**对 query / fragment 容错丢弃 + WARN，**不报此码**——分层规则详见 [URI query / fragment 处理分层](dpe.md#uri-query--fragment-处理分层)。
 
 **响应结构**（Socket.IO ack 数据）:
 
@@ -371,16 +430,17 @@ CallToolResult(
 }
 ```
 
-**常见违规**：
+**常见违规**（Agent SDK 构造层 / Computer 严重格式错误）：
 
 - scheme 不是 `dpe`
-- `host` 为空
+- `host` 为空 / 不符合 [反向域名命名规范](dpe.md#host-命名规范)
 - `doc-ref` 缺失或为空（如 `dpe://host` / `dpe://host/` 形式）
-- 携带 query 参数或 fragment（v0.2 起 DPE URI **不允许**——所有元数据走 Resource `_meta` / `annotations`）
+
+**注意**：携带 query 参数或 fragment 的 URI 在 Agent SDK 构造层报 4012；但 Computer 解析层遇到这类 URI 会**容错丢弃 + WARN**，不报 4012（健壮性优先）。
 
 ### DPE 解析失败（4013）
 
-**触发时机**：DPE Resolver hook 已注册并被调用，但执行过程中失败。
+**触发时机**：Computer 在处理 `client:get_dpe` 流程中遇到非构造类失败（Resolver / 上游 / mimetype）。
 
 **响应结构**（Socket.IO ack 数据）:
 
@@ -388,18 +448,95 @@ CallToolResult(
 {
   "code": 4013,
   "message": "DPE Resolution Failed",
+  "category": "upstream_unavailable",
   "uri": "dpe://com.example.docs/rpt-2026",
-  "reason": "upstream MCP Server unreachable"
+  "details": {
+    "mcp_server_name": "com.example.docs",
+    "mcp_error": "connection timeout"
+  }
 }
 ```
 
-**常见原因**：
+#### `category` 字段（SHOULD 携带）
 
-- 上游 MCP Server 的 `resources/read` 调用失败（Server 离线、URI 不存在等）
-- Resolver 业务逻辑抛异常（对象存储上传失败、本地落盘 IO 错误等）
-- Resolver 返回非法 URI（空 / 格式错误）
+`category` 是 4013 的细分维度（v0.2 锁定 4 个枚举值）。SDK 收到无 `category` 的 4013 时按 generic 处理（向前兼容）。
 
-Agent 行为建议：把错误暴露给上层（不要静默重试——这是业务层故障），由用户/运维介入排查。
+| `category` | 触发场景 | Agent UX 建议 |
+|------------|----------|---------------|
+| `upstream_unavailable` | MCP Server 不可用 / `resources/read` 超时 / 上游 5xx | 提示"DPE 来源暂时不可用"，**可重试** |
+| `invalid_dpe_mime` | MCP Server 返回非 `application/vnd.a2c.dpe-inline+json` / `application/vnd.a2c.dpe-uri+json` 的 mimetype | 提示"DPE 来源实现不规范"，**不要重试** |
+| `resolver_error` | Resolver Hook 抛异常（业务上传失败、IO 错误、外部存储签名失败）| 提示业务层故障，**不要重试** |
+| `resolver_returned_invalid` | Resolver 返回的 `A2CResource` 缺 `uri` / 字段非法 | 提示业务层 bug，**不要重试** |
+
+#### `details` 字段（可选）
+
+`details` 承载 category-specific 上下文（仅供日志 / 调试）：
+
+| 字段 | 适用 category | 说明 |
+|------|---------------|------|
+| `mcp_server_name` | 全部 | 定位上游 server |
+| `mcp_error` | `upstream_unavailable` / `invalid_dpe_mime` | 透传上游错误描述 |
+| `resolver_exception` | `resolver_error` / `resolver_returned_invalid` | Resolver 异常类名 / 消息 |
+
+Agent **MUST NOT** 把 `details` 透传给最终用户——避免泄露内部信息。
+
+#### 演进规则
+
+- 新增 `category` 值 → **不算 breaking**（minor 升级即可）；SDK **MUST** 把未知 category 当作 generic 处理
+- 删除 / 重命名 `category` 值 → 算 breaking（需 MAJOR）
+- **不允许**业务自定义 `category`——保持枚举为协议级封闭集合（业务自定义错误请用 4013 + `details` 或专用业务码段）
+
+Agent 行为建议：根据 `category` 决定是否重试 / 提示用户 / 报告运维。
+
+### MCP Server Not Found（4014）
+
+**触发时机**：客户端事件（`client:get_resources` / `client:tool_call` / `client:get_dpe` 等）引用的 `mcp_server` 名字在 Computer 上未注册。对 `client:get_dpe`，特指 dpe URI 中的 `host` 反查不到对应 MCP Server。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4014,
+  "message": "MCP Server not registered",
+  "mcp_server_name": "com.example.docs"
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4014` |
+| `message` | 是 | 人类可读 |
+| `mcp_server_name` | 是 | 客户端引用的 server 名（或 dpe URI 的 host）|
+
+**Agent 行为建议**：刷新 server list（调用 `client:get_config`）后重试；持续不存在则提示用户 server 已下线。
+
+### MCP Capability Not Supported（4015）
+
+**触发时机**：MCP Server 已注册，但未声明所请求事件依赖的 capability。例如 `client:get_resources` 调用时该 server 未声明 `resources` capability。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4015,
+  "message": "MCP Server does not support 'resources' capability",
+  "mcp_server_name": "com.example.docs",
+  "capability": "resources"
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4015` |
+| `message` | 是 | 人类可读 |
+| `mcp_server_name` | 是 | 目标 server |
+| `capability` | 是 | 缺失的 capability 名（`resources` / `tools` / `prompts` 等 MCP 标准 capability）|
+
+**Agent 行为建议**：跳过此 server，不再向其发送同类事件；可在 server list UI 中标注能力缺失。
 
 ## TODO
 

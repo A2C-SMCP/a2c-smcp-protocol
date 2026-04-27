@@ -333,7 +333,7 @@ MCP Server C ──┘                   └────────┬───
 | MCP 操作 | 在 DPE 流程中的用途 |
 |----------|------------------|
 | `resources/list` | MCP Server 声明可用的 `dpe://` 文档（含元数据 `_meta` / `annotations`）|
-| `resources/read` | Computer 收到 `client:get_dpe` 时调此操作拿到 ResourceContents，喂给 Resolver |
+| `resources/read` | Computer 收到 `client:get_dpe` 时调此操作；返回的 `mimeType` 必须是 `application/vnd.a2c.dpe-inline+json`（小文档 inline）或 `application/vnd.a2c.dpe-uri+json`（大文档 URI 引用）之一；Computer 解析为 `ResolverContents` 喂给 Resolver |
 | `resources.subscribe` 能力 | 前提条件：MCP Server 声明后才进入 DPE 流程 |
 
 **核心 A2C 事件**:
