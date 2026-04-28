@@ -69,38 +69,69 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 
 ## 错误响应格式
 
-### 标准错误响应
+A2C-SMCP 协议级错误（HTTP 握手层 + Socket.IO ack 层）统一采用**扁平 ErrorPayload** shape：标准字段 `code` / `message` 顶层平铺，code-specific 字段（如 `category` / `mcp_server_name` / `uri`）顶层并列，诊断信息封装在 `details` 子对象内。
 
-```json
-{
-  "error": {
-    "code": 404,
-    "message": "请求的工具不存在",
-    "details": {
-      "tool_name": "invalid-tool-name",
-      "computer": "my-computer"
-    }
-  }
-}
+!!! warning "无嵌套 envelope"
+
+    协议**不使用** `{"error": {"code": ..., "message": ...}}` 形式的嵌套包装。SDK 反序列化时直接读取顶层字段，**禁止**二次 unwrap。
+
+> **作用域**：本节定义 `4008` / `4011-4015` 这类协议事件级错误的响应 shape。**不**适用：(a) `server:join_office` 等返回 `(success, error_msg)` 元组的事件，见 [§事件级错误处理](#事件级错误处理)；(b) `client:tool_call` 工具失败，使用 MCP `CallToolResult.isError=true`，见 [§错误传播](#错误传播)。
+
+### Flat ErrorPayload schema
+
+```python
+class ErrorPayload(TypedDict, total=False):
+    code: int                       # 必选：错误码
+    message: str                    # 必选：人类可读描述
+    details: NotRequired[dict]      # 可选：诊断容器，仅供日志 / 调试
+    # 各错误码可附加 code-specific 顶层字段，详见下方总表
 ```
 
-### 字段说明
+### 传输分层
 
-| 字段 | 类型 | 必需 | 说明 |
-|------|------|------|------|
-| `error.code` | int | 是 | 错误码 |
-| `error.message` | str | 是 | 人类可读的错误描述 |
-| `error.details` | object | 否 | 结构化调试信息 |
+| 层 | 错误码 | 承载方式 |
+|----|--------|----------|
+| HTTP 握手层 | `4008` | HTTP 400 响应 body（JSON）+ `X-A2C-Error-Code` header（冗余诊断）|
+| Socket.IO ack 层 | `4011` / `4012` / `4013` / `4014` / `4015` | ack callback 第一参（dict）|
 
-### 安全注意事项
+两层使用**同一种** flat shape，差别仅在传输通道。
 
-`details` 字段**禁止**包含以下敏感信息：
+### 各错误码标准字段总表
+
+除 `code` / `message` 外的顶层 code-specific 字段，以及 `details` 内推荐 key：
+
+| code | 顶层 code-specific 字段 | `details` 内推荐 key |
+|------|------------------------|---------------------|
+| `4008` | `server_version` / `client_version` / `min_supported` / `max_supported` | — |
+| `4011` | `uri` | — |
+| `4012` | `uri` / `reason` | — |
+| `4013` | `category` / `uri` | `mcp_server_name` / `mcp_error` / `resolver_exception`（按 [`category` 分流](#dpe-解析失败4013)）|
+| `4014` | `mcp_server_name` | — |
+| `4015` | `mcp_server_name` / `capability` | — |
+
+各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§DPE 资源访问错误](#dpe-资源访问错误) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015)）。
+
+### `details` 字段约束（协议级）
+
+`details` 是**诊断信息容器**，承载日志 / 调试上下文。协议级约束：
+
+- Agent **MUST NOT** 把 `details` 内容透传给最终用户——避免泄露内部实现细节
+- 协议级标准 key 见上表；新增 standard key 算 minor 升级
+- 业务自定义 key 可附加，**不进入**协议演进语义（不算 breaking）
+
+#### `details` 内禁止包含的敏感信息
 
 - API 密钥或 Token
 - 内部 IP 地址或端口
 - 数据库连接信息
 - 用户密码或凭证
 - 堆栈跟踪（生产环境）
+
+### SDK 反序列化建议
+
+按 `code` 分发到 code-specific TypedDict 解析，**不要**写 over-generic `details: dict` 把所有顶层字段折叠收集——会丢失类型信息与 IDE 推导能力。
+
+> **注**：协议规范仅提供 Python reference impl。其他 SDK 由各自实现决定具体解析模式——A2C-SMCP 协议文档不堆砌多语言示例。
 
 ## 事件级错误处理
 
@@ -464,7 +495,7 @@ CallToolResult(
 | `category` | 触发场景 | Agent UX 建议 |
 |------------|----------|---------------|
 | `upstream_unavailable` | MCP Server 不可用 / `resources/read` 超时 / 上游 5xx | 提示"DPE 来源暂时不可用"，**可重试** |
-| `invalid_dpe_mime` | MCP Server 返回非 `application/vnd.a2c.dpe-inline+json` / `application/vnd.a2c.dpe-uri+json` 的 mimetype | 提示"DPE 来源实现不规范"，**不要重试** |
+| `invalid_dpe_mime` | DPE 内容形态不规范：mimetype 非 `application/vnd.a2c.dpe-inline+json` / `application/vnd.a2c.dpe-uri+json`，**或** mimetype 合法但 body 解析失败 / schema 不合法 | 提示"DPE 来源实现不规范"，**不要重试** |
 | `resolver_error` | Resolver Hook 抛异常（业务上传失败、IO 错误、外部存储签名失败）| 提示业务层故障，**不要重试** |
 | `resolver_returned_invalid` | Resolver 返回的 `A2CResource` 缺 `uri` / 字段非法 | 提示业务层 bug，**不要重试** |
 
