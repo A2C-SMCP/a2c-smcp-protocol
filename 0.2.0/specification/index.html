@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -802,34 +802,6 @@
   
   
     <li class="md-nav__item">
-      <a href="dpe/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 文档协议
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="room-model/" class="md-nav__link">
         
   
@@ -1099,7 +1071,7 @@
   <span class="md-ellipsis">
     
   
-    v0.2 URI 元数据重构
+    v0.2 升级指南
   
 
     
@@ -1189,34 +1161,6 @@
     
   
     常见问题
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="dpe-standardization-proposal/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 标准化提案
   
 
     
@@ -1642,7 +1586,6 @@
 <li><a href="events/">事件定义</a> - 完整事件列表与规范</li>
 <li><a href="data-structures/">数据结构</a> - 请求/响应数据结构定义</li>
 <li><a href="desktop/">Desktop 桌面系统</a> - Window URI 规范、桌面组织策略与更新机制</li>
-<li><a href="dpe/">DPE 文档协议</a> - DPE 数据模型、dpe:// URI 规范、Resolver Hook 与 <code>client:get_dpe</code> 事件</li>
 <li><a href="room-model/">房间模型</a> - 房间隔离机制详解</li>
 <li><a href="error-handling/">错误处理</a> - 错误码与响应格式</li>
 <li><a href="security/">安全考虑</a> - 安全性要求与建议</li>
@@ -1650,7 +1593,7 @@
 <h2 id="与-mcp-的关系">与 MCP 的关系<a class="headerlink" href="#与-mcp-的关系" title="Permanent link">&para;</a></h2>
 <p>A2C-SMCP 构建于 MCP 协议之上：</p>
 <ul>
-<li><strong>MCP Server 开发者</strong>: 无需任何改动，现有 MCP Server 可直接被 Computer 管理；MCP Server 还可通过暴露 <code>window://</code> 资源参与 <a href="desktop/">Desktop 桌面系统</a>，或通过暴露 <code>dpe://</code> 资源参与 <a href="dpe/">DPE 文档协议</a>，同样无需任何 SMCP 特定改动</li>
+<li><strong>MCP Server 开发者</strong>: 无需任何改动，现有 MCP Server 可直接被 Computer 管理；MCP Server 还可通过暴露 <code>window://</code> 资源参与 <a href="desktop/">Desktop 桌面系统</a>，无需任何 SMCP 特定改动。结构化文档分发（PDF / Excel / PPT 等）见独立的 <a href="https://github.com/A2C-SMCP/dpe-protocol">DPE 协议</a></li>
 <li><strong>Agent 开发者</strong>: 仅需实现 SMCP 协议接口，无需关心底层 MCP 细节</li>
 <li><strong>工具调用</strong>: Agent → SMCP → Computer → MCP → 工具</li>
 </ul>

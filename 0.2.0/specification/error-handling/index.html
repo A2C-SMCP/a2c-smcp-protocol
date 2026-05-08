@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -598,34 +598,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../dpe/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 文档协议
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../room-model/" class="md-nav__link">
         
   
@@ -789,10 +761,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dpe-错误码" class="md-nav__link">
+  <a href="#mcp-server-路由错误码" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE 错误码
+        MCP Server 路由错误码
       
     </span>
   </a>
@@ -804,17 +776,6 @@
     <span class="md-ellipsis">
       
         连接与房间管理错误码
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#finder-文档系统错误码" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Finder 文档系统错误码
       
     </span>
   </a>
@@ -839,10 +800,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#标准错误响应" class="md-nav__link">
+  <a href="#flat-errorpayload-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        标准错误响应
+        Flat ErrorPayload schema
       
     </span>
   </a>
@@ -850,10 +811,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#字段说明" class="md-nav__link">
+  <a href="#传输分层" class="md-nav__link">
     <span class="md-ellipsis">
       
-        字段说明
+        传输分层
       
     </span>
   </a>
@@ -861,10 +822,49 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#安全注意事项" class="md-nav__link">
+  <a href="#各错误码标准字段总表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安全注意事项
+        各错误码标准字段总表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-字段约束协议级" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 字段约束（协议级）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="details 字段约束（协议级）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#details-内禁止包含的敏感信息" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 内禁止包含的敏感信息
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-反序列化建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 反序列化建议
       
     </span>
   </a>
@@ -1056,7 +1056,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#字段说明_1" class="md-nav__link">
+  <a href="#4008-是-http-body-code不是-ws-close-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4008 是 HTTP body code，不是 WS close code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-响应规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP 响应规范
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明" class="md-nav__link">
     <span class="md-ellipsis">
       
         字段说明
@@ -1071,6 +1093,17 @@
     <span class="md-ellipsis">
       
         SDK 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-解析示例reference-impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 解析示例（reference impl）
       
     </span>
   </a>
@@ -1117,7 +1150,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#字段说明_2" class="md-nav__link">
+  <a href="#字段说明_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         字段说明
@@ -1144,28 +1177,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dpe-资源访问错误" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DPE 资源访问错误
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DPE 资源访问错误">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#dpe-resolver-未配置4011" class="md-nav__link">
+  <a href="#mcp-server-not-found4014" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE Resolver 未配置（4011）
+        MCP Server Not Found（4014）
       
     </span>
   </a>
@@ -1173,21 +1189,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#无效-dpe-uri4012" class="md-nav__link">
+  <a href="#mcp-capability-not-supported4015" class="md-nav__link">
     <span class="md-ellipsis">
       
-        无效 DPE URI（4012）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dpe-解析失败4013" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DPE 解析失败（4013）
+        MCP Capability Not Supported（4015）
       
     </span>
   </a>
@@ -1422,7 +1427,7 @@
   <span class="md-ellipsis">
     
   
-    v0.2 URI 元数据重构
+    v0.2 升级指南
   
 
     
@@ -1525,34 +1530,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dpe-standardization-proposal/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 标准化提案
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1634,10 +1611,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dpe-错误码" class="md-nav__link">
+  <a href="#mcp-server-路由错误码" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE 错误码
+        MCP Server 路由错误码
       
     </span>
   </a>
@@ -1649,17 +1626,6 @@
     <span class="md-ellipsis">
       
         连接与房间管理错误码
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#finder-文档系统错误码" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Finder 文档系统错误码
       
     </span>
   </a>
@@ -1684,10 +1650,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#标准错误响应" class="md-nav__link">
+  <a href="#flat-errorpayload-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        标准错误响应
+        Flat ErrorPayload schema
       
     </span>
   </a>
@@ -1695,10 +1661,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#字段说明" class="md-nav__link">
+  <a href="#传输分层" class="md-nav__link">
     <span class="md-ellipsis">
       
-        字段说明
+        传输分层
       
     </span>
   </a>
@@ -1706,10 +1672,49 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#安全注意事项" class="md-nav__link">
+  <a href="#各错误码标准字段总表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安全注意事项
+        各错误码标准字段总表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-字段约束协议级" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 字段约束（协议级）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="details 字段约束（协议级）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#details-内禁止包含的敏感信息" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 内禁止包含的敏感信息
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-反序列化建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 反序列化建议
       
     </span>
   </a>
@@ -1901,7 +1906,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#字段说明_1" class="md-nav__link">
+  <a href="#4008-是-http-body-code不是-ws-close-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4008 是 HTTP body code，不是 WS close code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-响应规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP 响应规范
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明" class="md-nav__link">
     <span class="md-ellipsis">
       
         字段说明
@@ -1916,6 +1943,17 @@
     <span class="md-ellipsis">
       
         SDK 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-解析示例reference-impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 解析示例（reference impl）
       
     </span>
   </a>
@@ -1962,7 +2000,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#字段说明_2" class="md-nav__link">
+  <a href="#字段说明_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         字段说明
@@ -1989,28 +2027,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dpe-资源访问错误" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DPE 资源访问错误
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DPE 资源访问错误">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#dpe-resolver-未配置4011" class="md-nav__link">
+  <a href="#mcp-server-not-found4014" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE Resolver 未配置（4011）
+        MCP Server Not Found（4014）
       
     </span>
   </a>
@@ -2018,21 +2039,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#无效-dpe-uri4012" class="md-nav__link">
+  <a href="#mcp-capability-not-supported4015" class="md-nav__link">
     <span class="md-ellipsis">
       
-        无效 DPE URI（4012）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dpe-解析失败4013" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DPE 解析失败（4013）
+        MCP Capability Not Supported（4015）
       
     </span>
   </a>
@@ -2204,7 +2214,7 @@
 <tr>
 <td>4001</td>
 <td>Tool Not Found</td>
-<td>工具不存在</td>
+<td><code>tool_name</code> 在指定 MCP Server 中不存在；<strong>不</strong>含 <code>mcp_server</code> 本身缺失场景（用 <a href="#mcp-server-not-found4014">4014</a>）</td>
 </tr>
 <tr>
 <td>4002</td>
@@ -2238,7 +2248,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="dpe-错误码">DPE 错误码<a class="headerlink" href="#dpe-错误码" title="Permanent link">&para;</a></h3>
+<h3 id="mcp-server-路由错误码">MCP Server 路由错误码<a class="headerlink" href="#mcp-server-路由错误码" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2249,19 +2259,14 @@
 </thead>
 <tbody>
 <tr>
-<td>4011</td>
-<td>DPE Resolver Not Configured</td>
-<td>Computer 未注册 DPE Resolver hook，无法处理 <code>client:get_dpe</code>（见 <a href="../dpe/#dpe-resolver-hook业务层"><code>dpe.md</code> Resolver 章节</a>）</td>
+<td>4014</td>
+<td>MCP Server Not Found</td>
+<td>引用的 <code>mcp_server</code> 名字未注册（见 <a href="#mcp-server-not-found4014">§MCP Server Not Found</a>）</td>
 </tr>
 <tr>
-<td>4012</td>
-<td>Invalid DPE URI</td>
-<td>URI 不符合 <code>dpe://</code> scheme 规范（缺 host、缺 doc-ref、含 query/fragment、scheme 错等）</td>
-</tr>
-<tr>
-<td>4013</td>
-<td>DPE Resolution Failed</td>
-<td>Resolver 执行失败（业务上传/落盘异常、上游 MCP Server 不可用、<code>resources/read</code> 失败等）</td>
+<td>4015</td>
+<td>MCP Capability Not Supported</td>
+<td>MCP Server 已注册但未声明所需 capability（见 <a href="#mcp-capability-not-supported4015">§MCP Capability Not Supported</a>）</td>
 </tr>
 </tbody>
 </table>
@@ -2302,84 +2307,82 @@
 </tr>
 </tbody>
 </table>
-<h3 id="finder-文档系统错误码">Finder 文档系统错误码<a class="headerlink" href="#finder-文档系统错误码" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>代码</th>
-<th>名称</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>4201</td>
-<td>Document Not Found</td>
-<td>文档引用（<code>doc_ref</code>）不存在</td>
-</tr>
-<tr>
-<td>4202</td>
-<td>Page Out of Range</td>
-<td>页码超出文档的 <code>page_count</code> 范围</td>
-</tr>
-<tr>
-<td>4203</td>
-<td>Element Not Found</td>
-<td>元素 ID 不存在</td>
-</tr>
-<tr>
-<td>4204</td>
-<td>Invalid DPE URI</td>
-<td><code>dpe://</code> URI 格式错误或校验失败</td>
-</tr>
-</tbody>
-</table>
 <h2 id="错误响应格式">错误响应格式<a class="headerlink" href="#错误响应格式" title="Permanent link">&para;</a></h2>
-<h3 id="标准错误响应">标准错误响应<a class="headerlink" href="#标准错误响应" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;请求的工具不存在&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;invalid-tool-name&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">&quot;computer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my-computer&quot;</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
+<p>A2C-SMCP 协议级错误（HTTP 握手层 + Socket.IO ack 层）统一采用<strong>扁平 ErrorPayload</strong> shape：标准字段 <code>code</code> / <code>message</code> 顶层平铺，code-specific 字段（如 <code>mcp_server_name</code> / <code>capability</code>）顶层并列，诊断信息封装在 <code>details</code> 子对象内。</p>
+<div class="admonition warning">
+<p class="admonition-title">无嵌套 envelope</p>
+<p>协议<strong>不使用</strong> <code>{"error": {"code": ..., "message": ...}}</code> 形式的嵌套包装。SDK 反序列化时直接读取顶层字段，<strong>禁止</strong>二次 unwrap。</p>
+</div>
+<blockquote>
+<p><strong>作用域</strong>：本节定义 <code>4008</code> / <code>4014</code> / <code>4015</code> 这类协议事件级错误的响应 shape。<strong>不</strong>适用：(a) <code>server:join_office</code> 等返回 <code>(success, error_msg)</code> 元组的事件，见 <a href="#事件级错误处理">§事件级错误处理</a>；(b) <code>client:tool_call</code> 工具失败，使用 MCP <code>CallToolResult.isError=true</code>，见 <a href="#错误传播">§错误传播</a>。</p>
+</blockquote>
+<h3 id="flat-errorpayload-schema">Flat ErrorPayload schema<a class="headerlink" href="#flat-errorpayload-schema" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ErrorPayload</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">int</span>                       <span class="c1"># 必选：错误码</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>                    <span class="c1"># 必选：人类可读描述</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">details</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>      <span class="c1"># 可选：诊断容器，仅供日志 / 调试</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="c1"># 各错误码可附加 code-specific 顶层字段，详见下方总表</span>
 </code></pre></div>
-<h3 id="字段说明">字段说明<a class="headerlink" href="#字段说明" title="Permanent link">&para;</a></h3>
+<h3 id="传输分层">传输分层<a class="headerlink" href="#传输分层" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>字段</th>
-<th>类型</th>
-<th>必需</th>
-<th>说明</th>
+<th>层</th>
+<th>错误码</th>
+<th>承载方式</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>error.code</code></td>
-<td>int</td>
-<td>是</td>
-<td>错误码</td>
+<td>HTTP 握手层</td>
+<td><code>4008</code></td>
+<td>HTTP 400 响应 body（JSON）+ <code>X-A2C-Error-Code</code> header（冗余诊断）</td>
 </tr>
 <tr>
-<td><code>error.message</code></td>
-<td>str</td>
-<td>是</td>
-<td>人类可读的错误描述</td>
-</tr>
-<tr>
-<td><code>error.details</code></td>
-<td>object</td>
-<td>否</td>
-<td>结构化调试信息</td>
+<td>Socket.IO ack 层</td>
+<td><code>4014</code> / <code>4015</code></td>
+<td>ack callback 第一参（dict）</td>
 </tr>
 </tbody>
 </table>
-<h3 id="安全注意事项">安全注意事项<a class="headerlink" href="#安全注意事项" title="Permanent link">&para;</a></h3>
-<p><code>details</code> 字段<strong>禁止</strong>包含以下敏感信息：</p>
+<p>两层使用<strong>同一种</strong> flat shape，差别仅在传输通道。</p>
+<h3 id="各错误码标准字段总表">各错误码标准字段总表<a class="headerlink" href="#各错误码标准字段总表" title="Permanent link">&para;</a></h3>
+<p>除 <code>code</code> / <code>message</code> 外的顶层 code-specific 字段，以及 <code>details</code> 内推荐 key：</p>
+<table>
+<thead>
+<tr>
+<th>code</th>
+<th>顶层 code-specific 字段</th>
+<th><code>details</code> 内推荐 key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>4008</code></td>
+<td><code>server_version</code> / <code>client_version</code> / <code>min_supported</code> / <code>max_supported</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>4014</code></td>
+<td><code>mcp_server_name</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>4015</code></td>
+<td><code>mcp_server_name</code> / <code>capability</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>各错误码完整 payload 示例与触发时机详见对应章节（<a href="#协议版本不匹配4008">§4008</a> / <a href="#mcp-server-not-found4014">§4014</a> / <a href="#mcp-capability-not-supported4015">§4015</a>）。</p>
+<h3 id="details-字段约束协议级"><code>details</code> 字段约束（协议级）<a class="headerlink" href="#details-字段约束协议级" title="Permanent link">&para;</a></h3>
+<p><code>details</code> 是<strong>诊断信息容器</strong>，承载日志 / 调试上下文。协议级约束：</p>
+<ul>
+<li>Agent <strong>MUST NOT</strong> 把 <code>details</code> 内容透传给最终用户——避免泄露内部实现细节</li>
+<li>协议级标准 key 见上表；新增 standard key 算 minor 升级</li>
+<li>业务自定义 key 可附加，<strong>不进入</strong>协议演进语义（不算 breaking）</li>
+</ul>
+<h4 id="details-内禁止包含的敏感信息"><code>details</code> 内禁止包含的敏感信息<a class="headerlink" href="#details-内禁止包含的敏感信息" title="Permanent link">&para;</a></h4>
 <ul>
 <li>API 密钥或 Token</li>
 <li>内部 IP 地址或端口</li>
@@ -2387,6 +2390,11 @@
 <li>用户密码或凭证</li>
 <li>堆栈跟踪（生产环境）</li>
 </ul>
+<h3 id="sdk-反序列化建议">SDK 反序列化建议<a class="headerlink" href="#sdk-反序列化建议" title="Permanent link">&para;</a></h3>
+<p>按 <code>code</code> 分发到 code-specific TypedDict 解析，<strong>不要</strong>写 over-generic <code>details: dict</code> 把所有顶层字段折叠收集——会丢失类型信息与 IDE 推导能力。</p>
+<blockquote>
+<p><strong>注</strong>：协议规范仅提供 Python reference impl。其他 SDK 由各自实现决定具体解析模式——A2C-SMCP 协议文档不堆砌多语言示例。</p>
+</blockquote>
 <h2 id="事件级错误处理">事件级错误处理<a class="headerlink" href="#事件级错误处理" title="Permanent link">&para;</a></h2>
 <h3 id="serverjoin_office-响应">server:join_office 响应<a class="headerlink" href="#serverjoin_office-响应" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 成功</span>
@@ -2519,15 +2527,29 @@
 </code></pre></div>
 <h2 id="协议版本不匹配4008">协议版本不匹配（4008）<a class="headerlink" href="#协议版本不匹配4008" title="Permanent link">&para;</a></h2>
 <p><strong>触发时机</strong>：客户端（Agent / Computer）通过 Socket.IO 连接 Server，<strong>HTTP 中间件层</strong>校验 URL query 中的 <code>a2c_version</code> 发现与 Server 不兼容。校验发生在 Socket.IO 处理之前，业务代码无法影响。</p>
-<p><strong>传递方式</strong>：Server 返回 HTTP 400，body 为结构化 JSON。Socket.IO 客户端在 <code>connect_error</code> 事件收到该 body：</p>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4008</span><span class="p">,</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Protocol version mismatch&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;server_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;client_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.1.5&quot;</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
+<h3 id="4008-是-http-body-code不是-ws-close-code">4008 是 HTTP body code，不是 WS close code<a class="headerlink" href="#4008-是-http-body-code不是-ws-close-code" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">明确语义边界</p>
+<p><strong>4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中</strong>。
+4008 <strong>不是</strong> WebSocket close code（RFC 6455 自定义码段 4xxx）——协议版本校验在 HTTP 层完成，发生在 WS 帧建立之前，不存在 WS close 形态。
+SDK 实现 <strong>MUST NOT</strong> 把 4008 与 WS close code 4xxx 混淆。</p>
+</div>
+<h3 id="http-响应规范">HTTP 响应规范<a class="headerlink" href="#http-响应规范" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>HTTP/1.1 400 Bad Request
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Content-Type: application/json
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>X-A2C-Error-Code: 4008
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>{
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  &quot;code&quot;: 4008,
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>  &quot;message&quot;: &quot;Protocol version mismatch&quot;,
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  &quot;server_version&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>  &quot;client_version&quot;: &quot;0.1.5&quot;,
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  &quot;min_supported&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  &quot;max_supported&quot;: &quot;0.2.999&quot;
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>}
 </code></pre></div>
-<h3 id="字段说明_1">字段说明<a class="headerlink" href="#字段说明_1" title="Permanent link">&para;</a></h3>
+<p><code>X-A2C-Error-Code</code> 响应 header 是冗余诊断辅助：当客户端无法访问 body 时（罕见 transport 边角情况），可从 header 中识别错误类型。<strong>不替代</strong> body，body 是 single source of truth。</p>
+<h3 id="字段说明">字段说明<a class="headerlink" href="#字段说明" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2557,14 +2579,56 @@
 <td>是</td>
 <td>Server 从 URL query 读取的客户端版本（回显供诊断）</td>
 </tr>
+<tr>
+<td><code>min_supported</code></td>
+<td>是</td>
+<td>Server 支持的最低协议版本</td>
+</tr>
+<tr>
+<td><code>max_supported</code></td>
+<td>是</td>
+<td>Server 支持的最高协议版本</td>
+</tr>
 </tbody>
 </table>
 <h3 id="sdk-实现要求">SDK 实现要求<a class="headerlink" href="#sdk-实现要求" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Client SDK <strong>必须</strong>解析 HTTP 400 的响应 body，识别 <code>code: 4008</code>，转化为专属异常（如 <code>ProtocolVersionError</code>），<strong>禁止</strong>静默重试</li>
 <li>异常信息应明确告知用户两边版本，便于快速判断应升级哪端</li>
+<li>客户端 transport 顺序 <strong>SHOULD</strong> 配置为 <code>polling → websocket</code>（绝大多数 socketio 客户端默认即如此），保证首个握手请求是 HTTP polling，body 可访问</li>
 <li>可选：SDK 在本地日志中打印诊断信息（当前 SDK 声称的 PROTOCOL_VERSION 常量、接收到的 server_version）</li>
 </ul>
+<h3 id="python-解析示例reference-impl">Python 解析示例（reference impl）<a class="headerlink" href="#python-解析示例reference-impl" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">socketio</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2c_smcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">PROTOCOL_VERSION</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2c_smcp.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProtocolVersionError</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;agent&quot;</span><span class="p">,</span> <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="p">)</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="k">except</span> <span class="n">socketio</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="c1"># python-socketio 在 HTTP 非 2xx 时把 body 放进异常 message</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="n">raw</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="k">raise</span>  <span class="c1"># 非协议级错误，保持原异常</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="k">raise</span> <span class="n">ProtocolVersionError</span><span class="p">(</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>        <span class="p">)</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    <span class="k">raise</span>
+</code></pre></div>
+<blockquote>
+<p><strong>注</strong>：协议规范仅提供 Python reference impl。其他 SDK（Rust / TypeScript / Go 等）的具体解析模式由各 SDK 自行决定——A2C-SMCP 协议文档不堆砌多语言示例。</p>
+</blockquote>
 <p>详细的版本语义、兼容性规则与握手流程见 <a href="../versioning/">协议版本与握手</a>。</p>
 <hr />
 <h2 id="mcp-上游授权错误响应">MCP 上游授权错误响应<a class="headerlink" href="#mcp-上游授权错误响应" title="Permanent link">&para;</a></h2>
@@ -2574,19 +2638,19 @@
 </blockquote>
 <h3 id="授权失败的响应结构">授权失败的响应结构<a class="headerlink" href="#授权失败的响应结构" title="Permanent link">&para;</a></h3>
 <p>当 Computer 调用 MCP 工具因上游授权问题失败时，使用 <code>CallToolResult</code> 返回错误，并在 <code>meta</code> 中携带结构化提示：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">CallToolResult</span><span class="p">(</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;此工具需要授权 GitHub 账号后方可使用&quot;</span><span class="p">)],</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="mi">4006</span><span class="p">,</span>  <span class="c1"># 或 4007</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="s2">&quot;github-mcp&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>        <span class="s2">&quot;auth_hint&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>            <span class="c1"># 可选：引导用户完成授权的提示信息</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;user_authorization_required&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;请在 Computer 宿主环境完成 GitHub OAuth 登录后重试&quot;</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="p">}</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="p">}</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">CallToolResult</span><span class="p">(</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;此工具需要授权 GitHub 账号后方可使用&quot;</span><span class="p">)],</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="mi">4006</span><span class="p">,</span>  <span class="c1"># 或 4007</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="s2">&quot;github-mcp&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">&quot;auth_hint&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>            <span class="c1"># 可选：引导用户完成授权的提示信息</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;user_authorization_required&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;请在 Computer 宿主环境完成 GitHub OAuth 登录后重试&quot;</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>        <span class="p">}</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="p">}</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="40064007-判定决策表">4006/4007 判定决策表<a class="headerlink" href="#40064007-判定决策表" title="Permanent link">&para;</a></h3>
 <p>为消除"未授权 vs 授权失败"的边界歧义，Computer <strong>MUST</strong> 按下表把上游 MCP Server / OAuth Provider 的具体表现映射到协议错误码：</p>
@@ -2642,7 +2706,7 @@
 <li>当 Computer 无法可靠判别时，倾向于报 <code>4006</code>（提示用户重新走授权流程是稳妥兜底）</li>
 </ul>
 <p><strong>Agent 行为差异</strong>：Agent 收到 <code>4006</code> 应引导用户<strong>首次/重新</strong>完成授权；收到 <code>4007</code> 应引导用户<strong>检查权限设置或重新授权</strong>——区别仅在 UX 文案，机器路由可统一。</p>
-<h3 id="字段说明_2">字段说明<a class="headerlink" href="#字段说明_2" title="Permanent link">&para;</a></h3>
+<h3 id="字段说明_1">字段说明<a class="headerlink" href="#字段说明_1" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2720,56 +2784,86 @@
 <blockquote>
 <p>完整凭证传播禁令见 <a href="../security/#零凭证传播原则"><code>security.md</code> → 零凭证传播原则</a>。<code>auth_hint</code> 是该原则下的<strong>唯一豁免</strong>——豁免范围严格限于上表"允许包含"部分。</p>
 </blockquote>
-<h2 id="dpe-资源访问错误">DPE 资源访问错误<a class="headerlink" href="#dpe-资源访问错误" title="Permanent link">&para;</a></h2>
-<h3 id="dpe-resolver-未配置4011">DPE Resolver 未配置（4011）<a class="headerlink" href="#dpe-resolver-未配置4011" title="Permanent link">&para;</a></h3>
-<p><strong>触发时机</strong>：Agent 调用 <code>client:get_dpe</code>，Computer 检查发现未注册 DPE Resolver hook。</p>
-<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
-<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4011</span><span class="p">,</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DPE Resolver Not Configured&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
-</code></pre></div>
-<p><strong>说明</strong>：</p>
-<ul>
-<li>A2C 协议<strong>不允许</strong>在未注册 Resolver 时降级到 inline 透传 ResourceContents——这是设计意图（避免 Socket.IO 承载大体量 DPE 内容）</li>
-<li>Computer 业务方<strong>MUST</strong>在启动时显式注册 Resolver（见 <a href="../dpe/#dpe-resolver-hook业务层">DPE Resolver Hook</a>）</li>
-<li>业务实现自由度高：上传对象存储 / 落本地缓存 / 任意 URI scheme 都可</li>
-</ul>
-<h3 id="无效-dpe-uri4012">无效 DPE URI（4012）<a class="headerlink" href="#无效-dpe-uri4012" title="Permanent link">&para;</a></h3>
-<p><strong>触发时机</strong>：Agent 提供的 <code>uri</code> 不符合 <a href="../dpe/#dpe-uri-规范"><code>dpe://</code> URI 规范</a>。</p>
+<h3 id="mcp-server-not-found4014">MCP Server Not Found（4014）<a class="headerlink" href="#mcp-server-not-found4014" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：客户端事件（<code>client:get_resources</code> / <code>client:tool_call</code> 等）引用的 <code>mcp_server</code> 名字在 Computer 上未注册。</p>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4012</span><span class="p">,</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Invalid DPE URI&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://host&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;missing doc-ref&quot;</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4014</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server not registered&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.example.docs&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
 </code></pre></div>
-<p><strong>常见违规</strong>：</p>
-<ul>
-<li>scheme 不是 <code>dpe</code></li>
-<li><code>host</code> 为空</li>
-<li><code>doc-ref</code> 缺失或为空（如 <code>dpe://host</code> / <code>dpe://host/</code> 形式）</li>
-<li>携带 query 参数或 fragment（v0.2 起 DPE URI <strong>不允许</strong>——所有元数据走 Resource <code>_meta</code> / <code>annotations</code>）</li>
-</ul>
-<h3 id="dpe-解析失败4013">DPE 解析失败（4013）<a class="headerlink" href="#dpe-解析失败4013" title="Permanent link">&para;</a></h3>
-<p><strong>触发时机</strong>：DPE Resolver hook 已注册并被调用，但执行过程中失败。</p>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4014</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>mcp_server_name</code></td>
+<td>是</td>
+<td>客户端引用的 server 名</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Agent 行为建议</strong>：刷新 server list（调用 <code>client:get_config</code>）后重试；持续不存在则提示用户 server 已下线。</p>
+<h3 id="mcp-capability-not-supported4015">MCP Capability Not Supported（4015）<a class="headerlink" href="#mcp-capability-not-supported4015" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：MCP Server 已注册，但未声明所请求事件依赖的 capability。例如 <code>client:get_resources</code> 调用时该 server 未声明 <code>resources</code> capability。</p>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4013</span><span class="p">,</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DPE Resolution Failed&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;upstream MCP Server unreachable&quot;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4015</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server does not support &#39;resources&#39; capability&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.example.docs&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;capability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;resources&quot;</span>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
 </code></pre></div>
-<p><strong>常见原因</strong>：</p>
-<ul>
-<li>上游 MCP Server 的 <code>resources/read</code> 调用失败（Server 离线、URI 不存在等）</li>
-<li>Resolver 业务逻辑抛异常（对象存储上传失败、本地落盘 IO 错误等）</li>
-<li>Resolver 返回非法 URI（空 / 格式错误）</li>
-</ul>
-<p>Agent 行为建议：把错误暴露给上层（不要静默重试——这是业务层故障），由用户/运维介入排查。</p>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4015</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>mcp_server_name</code></td>
+<td>是</td>
+<td>目标 server</td>
+</tr>
+<tr>
+<td><code>capability</code></td>
+<td>是</td>
+<td>缺失的 capability 名（<code>resources</code> / <code>tools</code> / <code>prompts</code> 等 MCP 标准 capability）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Agent 行为建议</strong>：跳过此 server，不再向其发送同类事件；可在 server list UI 中标注能力缺失。</p>
 <h2 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p>以下功能尚未实现，计划在后续版本中完善：</p>

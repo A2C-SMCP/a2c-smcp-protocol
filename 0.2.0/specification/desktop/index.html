@@ -16,14 +16,14 @@
         <link rel="prev" href="../data-structures/">
       
       
-        <link rel="next" href="../dpe/">
+        <link rel="next" href="../room-model/">
       
       
         
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1124,34 +1124,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../dpe/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 文档协议
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../room-model/" class="md-nav__link">
         
   
@@ -1421,7 +1393,7 @@
   <span class="md-ellipsis">
     
   
-    v0.2 URI 元数据重构
+    v0.2 升级指南
   
 
     
@@ -1511,34 +1483,6 @@
     
   
     常见问题
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dpe-standardization-proposal/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 标准化提案
   
 
     
@@ -2186,7 +2130,7 @@
 <td><code>host</code></td>
 <td>是</td>
 <td>MCP Server 资源命名空间根</td>
-<td>不能为空；<strong>单个 MCP Server 内部的 URI 由 MCP <code>resources/list</code> 自身保证唯一</strong>；跨 MCP Server <strong>SHOULD</strong> 唯一（与 <code>dpe://</code> 共享 host 命名空间约束，详见 <a href="../dpe/#host-路由策略">DPE host 路由策略</a>）；推荐反向域名风格，如 <code>com.example.mcp</code></td>
+<td>不能为空；<strong>单个 MCP Server 内部的 URI 由 MCP <code>resources/list</code> 自身保证唯一</strong>；跨 MCP Server <strong>SHOULD</strong> 唯一；推荐反向域名风格，如 <code>com.example.mcp</code></td>
 </tr>
 <tr>
 <td><code>path</code></td>
@@ -2200,7 +2144,7 @@
 <ol>
 <li><code>scheme</code> 必须为 <code>window</code></li>
 <li><code>host</code> 不能为空</li>
-<li><code>host</code> 跨 MCP Server <strong>SHOULD</strong> 唯一（与 <code>dpe://</code> 共享 host 命名空间约束）。<code>organize_desktop</code> 本身按 MCP Server 名称分组、不依赖 host 唯一；但 <code>client:get_dpe</code> 通过 host 反查 MCP Server，host 重复会导致 dpe 资源被错误路由。Computer 在 MCP Server 注册时检测 host 冲突 + 记 WARN（不阻塞注册）；详见 <a href="../dpe/#host-路由策略">DPE host 路由策略</a>。<strong>实践建议</strong>：采用反向域名风格（如 <code>com.example.editor</code>）天然回避冲突</li>
+<li><code>host</code> 跨 MCP Server <strong>SHOULD</strong> 唯一。Window URI 内部的 desktop 组织算法按 MCP Server 名称分组、不强依赖 host 唯一；冲突时 Computer 在 MCP Server 注册阶段记 WARN（lint-style 引导，不阻塞注册）。host <strong>SHOULD</strong> 使用反向域名风格（如 <code>com.example.editor</code>）</li>
 <li>路径段使用 URL 编码，<code>c%2Fd</code> 保持为单段，解码为 <code>c/d</code></li>
 <li>Window URI <strong>不允许</strong>携带 query 参数；若 Computer 检测到 query，应记录警告并丢弃 query 部分，仅用 host+path 作为标识</li>
 </ol>
@@ -2343,7 +2287,10 @@
 <hr />
 <h2 id="desktop-组织策略">Desktop 组织策略<a class="headerlink" href="#desktop-组织策略" title="Permanent link">&para;</a></h2>
 <h3 id="概述_1">概述<a class="headerlink" href="#概述_1" title="Permanent link">&para;</a></h3>
-<p>Computer 通过 <code>organize_desktop(windows, size, history)</code> 函数对原始窗口资源进行组织，输出经过过滤、排序和截断的 Desktop 列表。</p>
+<p>Computer 在响应 <code>client:get_desktop</code> 时执行 <strong>desktop 组织职能</strong>——对原始窗口资源进行过滤、按 audience / priority 排序、按 size 截断，输出经过组织的 Desktop 列表。</p>
+<blockquote>
+<p><strong>协议视角</strong>：A2C-SMCP 协议规定 desktop 组织的<strong>行为契约</strong>（过滤规则、排序规则、size 语义、错误情形），但<strong>不规定</strong> Computer SDK 内部用什么函数签名 / 参数形式实现。SDK 可以选择 <code>organize_desktop(windows, size, history)</code> 或 <code>(server_name, resource_list, size, history)</code> 或任何其他形式——只要<strong>外部行为符合本节规定的契约</strong>。具体 SDK 实现细节见各 SDK 文档。</p>
+</blockquote>
 <h3 id="步骤-1过滤与分组">步骤 1：过滤与分组<a class="headerlink" href="#步骤-1过滤与分组" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>过滤</strong>: 跳过以下窗口：<ul>
@@ -2560,7 +2507,7 @@
 </code></pre></div>
 <h3 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.myapp</code>）以提升可读性 + 天然回避跨 Server 冲突；跨 MCP Server <strong>SHOULD</strong> 唯一（与 <code>dpe://</code> 共享 host 命名空间），冲突时 Computer 注册阶段记 WARN——详见 <a href="../dpe/#host-路由策略">DPE host 路由策略</a></li>
+<li><strong>host 使用反向域名风格</strong>（如 <code>com.example.myapp</code>）以提升可读性 + 天然回避跨 Server 冲突；跨 MCP Server <strong>SHOULD</strong> 唯一，冲突时 Computer 注册阶段记 WARN</li>
 <li><strong>通过 <code>Resource.annotations.priority</code> 合理分配优先级</strong>（[0.0, 1.0]，越大越靠前），避免所有窗口使用默认 <code>0.0</code></li>
 <li><strong><code>Resource._meta.fullscreen</code> 仅用于需要完整展示的主窗口</strong>，如当前浏览器页面或全屏编辑器</li>
 <li><strong><code>Resource.annotations.audience</code> SHOULD 显式声明 <code>["assistant"]</code></strong>：Window 面向 Agent 渲染；声明 <code>["user"]</code> 在 v0.2 仅触发 WARN 但不过滤</li>

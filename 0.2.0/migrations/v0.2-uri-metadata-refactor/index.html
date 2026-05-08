@@ -23,11 +23,11 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>v0.2 URI 元数据重构 - A2C-SMCP Protocol</title>
+        <title>v0.2 升级指南 - A2C-SMCP Protocol</title>
       
     
     
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              v0.2 URI 元数据重构
+              v0.2 升级指南
             
           </span>
         </div>
@@ -595,34 +595,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specification/dpe/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 文档协议
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../specification/room-model/" class="md-nav__link">
         
   
@@ -904,7 +876,7 @@
   <span class="md-ellipsis">
     
   
-    v0.2 URI 元数据重构
+    v0.2 升级指南
   
 
     
@@ -922,7 +894,7 @@
   <span class="md-ellipsis">
     
   
-    v0.2 URI 元数据重构
+    v0.2 升级指南
   
 
     
@@ -1012,10 +984,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#23-不变的部分明确告知避免过度改动" class="md-nav__link">
+  <a href="#23-不变的部分" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.3 不变的部分（明确告知，避免过度改动）
+        2.3 不变的部分
       
     </span>
   </a>
@@ -1085,10 +1057,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#元数据声明由-mcp-server-在-resourceslist-响应中设置" class="md-nav__link">
+  <a href="#元数据声明mcp-server-在-resourceslist-响应中设置" class="md-nav__link">
     <span class="md-ellipsis">
       
-        元数据声明（由 MCP Server 在 resources/list 响应中设置）
+        元数据声明（MCP Server 在 resources/list 响应中设置）
       
     </span>
   </a>
@@ -1096,10 +1068,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#organize_desktop-行为变更" class="md-nav__link">
+  <a href="#desktop-组织职能行为变更" class="md-nav__link">
     <span class="md-ellipsis">
       
-        organize_desktop 行为变更
+        Desktop 组织职能行为变更
       
     </span>
   </a>
@@ -1112,160 +1084,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-dpe-uri-重构" class="md-nav__link">
+  <a href="#42-mcp-server-host-唯一性" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 DPE URI 重构
+        4.2 MCP Server host 唯一性
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.2 DPE URI 重构">
+    <nav class="md-nav" aria-label="4.2 MCP Server host 唯一性">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#uri-语法_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        URI 语法
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#解析器行为" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        解析器行为
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#文档元数据声明替代旧的-uri-query--level-0-body" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        文档元数据声明（替代旧的 URI query / Level 0 body）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#不再有-v01-的-level-0聚合端点" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        不再有 v0.1 的 Level 0/聚合端点
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#43-clientget_dpe-与-dpe-resolver-hook新增" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.3 client:get_dpe 与 DPE Resolver Hook（新增）
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4.3 client:get_dpe 与 DPE Resolver Hook（新增）">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#设计动机" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        设计动机
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#新增事件" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        新增事件
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-必须实现-dpe-resolver-注册-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 必须实现 DPE Resolver 注册 API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-处理流程" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 处理流程
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#44-mcp-server-host-唯一性从-must-放宽为-should--computer-warn" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.4 MCP Server host 唯一性（从 MUST 放宽为 SHOULD + Computer WARN）
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4.4 MCP Server host 唯一性（从 MUST 放宽为 SHOULD + Computer WARN）">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#路径与路由依据" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        路径与路由依据
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-端实现要求v02-新规约" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 端实现要求（v0.2 新规约）
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#设计取向" class="md-nav__link">
@@ -1278,32 +1106,21 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#实践建议" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        实践建议
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#45-错误码新增" class="md-nav__link">
+  <a href="#43-错误码扩展" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.5 错误码新增
+        4.3 错误码扩展
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.5 错误码新增">
+    <nav class="md-nav" aria-label="4.3 错误码扩展">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1318,10 +1135,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dpe-资源访问4011--4012--4013" class="md-nav__link">
+  <a href="#mcp-server-路由4014--4015" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE 资源访问（4011 / 4012 / 4013）
+        MCP Server 路由（4014 / 4015）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4001-描述收紧" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4001 描述收紧
       
     </span>
   </a>
@@ -1334,16 +1162,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#46-协议版本握手新增" class="md-nav__link">
+  <a href="#44-协议版本握手" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.6 协议版本握手（新增）
+        4.4 协议版本握手
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.6 协议版本握手（新增）">
+    <nav class="md-nav" aria-label="4.4 协议版本握手">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#为什么选-url-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么选 URL query
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#客户端" class="md-nav__link">
@@ -1368,10 +1207,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#client-sdk-收到-4008-后必须主动-disconnect" class="md-nav__link">
+  <a href="#4008-显式定义为-http-body-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client SDK 收到 4008 后必须主动 disconnect
+        4008 显式定义为 HTTP body code
       
     </span>
   </a>
@@ -1380,6 +1219,17 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-clientget_resources新增" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 client:get_resources（新增）
+      
+    </span>
+  </a>
   
 </li>
         
@@ -1401,10 +1251,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-mcp-server-实现者最小改动" class="md-nav__link">
+  <a href="#51-mcp-server-实现者" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 MCP Server 实现者（最小改动）
+        5.1 MCP Server 实现者
       
     </span>
   </a>
@@ -1451,10 +1301,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#61-uri-解析器" class="md-nav__link">
+  <a href="#61-uri-解析器computer-解析层--容错丢弃" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.1 URI 解析器
+        6.1 URI 解析器（Computer 解析层 — 容错丢弃）
       
     </span>
   </a>
@@ -1462,10 +1312,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#62-organize_desktop与-v01-保持算法一致仅元数据来源变化" class="md-nav__link">
+  <a href="#62-organize_desktop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.2 organize_desktop（与 v0.1 保持算法一致，仅元数据来源变化）
+        6.2 organize_desktop
       
     </span>
   </a>
@@ -1473,10 +1323,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#63-clientget_dpe--resolver" class="md-nav__link">
+  <a href="#63-clientget_resources资源发现" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.3 client:get_dpe + Resolver
+        6.3 client:get_resources（资源发现）
       
     </span>
   </a>
@@ -1484,54 +1334,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#631-clientget_resources资源发现" class="md-nav__link">
+  <a href="#64-协议版本握手" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.3.1 client:get_resources（资源发现）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#64-host-路由--唯一性" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.4 host 路由 / 唯一性
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#65-协议版本握手" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.5 协议版本握手
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#66-集成测试" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.6 集成测试
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#67-回归测试重点" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.7 回归测试重点
+        6.4 协议版本握手
       
     </span>
   </a>
@@ -1544,72 +1350,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-兼容性策略" class="md-nav__link">
+  <a href="#7-priority-int-0100--float-01-迁移" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. 兼容性策略
+        7. priority int [0,100] → float [0,1] 迁移
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="7. 兼容性策略">
+    <nav class="md-nav" aria-label="7. priority int [0,100] → float [0,1] 迁移">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#71-协议层硬切换" class="md-nav__link">
+  <a href="#换算对照表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.1 协议层：硬切换
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="7.1 协议层：硬切换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#不内建-v01-mcp-server-fallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        不内建 v0.1 MCP Server fallback
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#72-数据层agent-视角" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.2 数据层：Agent 视角
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#73-mcp-server-生态" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.3 MCP Server 生态
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#74-建议的升级顺序" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.4 建议的升级顺序
+        换算对照表
       
     </span>
   </a>
@@ -1622,22 +1378,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-版本号与发布" class="md-nav__link">
+  <a href="#8-兼容性策略" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. 版本号与发布
+        8. 兼容性策略
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="8. 版本号与发布">
+    <nav class="md-nav" aria-label="8. 兼容性策略">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#81-语义化版本" class="md-nav__link">
+  <a href="#81-协议层硬切换" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.1 语义化版本
+        8.1 协议层：硬切换
       
     </span>
   </a>
@@ -1645,10 +1401,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#82-发布清单" class="md-nav__link">
+  <a href="#82-不内建-v01-mcp-server-fallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.2 发布清单
+        8.2 不内建 v0.1 MCP Server fallback
       
     </span>
   </a>
@@ -1656,10 +1412,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#83-文档变更" class="md-nav__link">
+  <a href="#83-升级顺序建议" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.3 文档变更
+        8.3 升级顺序建议
       
     </span>
   </a>
@@ -1780,34 +1536,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specification/dpe-standardization-proposal/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DPE 标准化提案
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1906,10 +1634,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#23-不变的部分明确告知避免过度改动" class="md-nav__link">
+  <a href="#23-不变的部分" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.3 不变的部分（明确告知，避免过度改动）
+        2.3 不变的部分
       
     </span>
   </a>
@@ -1979,10 +1707,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#元数据声明由-mcp-server-在-resourceslist-响应中设置" class="md-nav__link">
+  <a href="#元数据声明mcp-server-在-resourceslist-响应中设置" class="md-nav__link">
     <span class="md-ellipsis">
       
-        元数据声明（由 MCP Server 在 resources/list 响应中设置）
+        元数据声明（MCP Server 在 resources/list 响应中设置）
       
     </span>
   </a>
@@ -1990,10 +1718,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#organize_desktop-行为变更" class="md-nav__link">
+  <a href="#desktop-组织职能行为变更" class="md-nav__link">
     <span class="md-ellipsis">
       
-        organize_desktop 行为变更
+        Desktop 组织职能行为变更
       
     </span>
   </a>
@@ -2006,160 +1734,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#42-dpe-uri-重构" class="md-nav__link">
+  <a href="#42-mcp-server-host-唯一性" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.2 DPE URI 重构
+        4.2 MCP Server host 唯一性
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.2 DPE URI 重构">
+    <nav class="md-nav" aria-label="4.2 MCP Server host 唯一性">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#uri-语法_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        URI 语法
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#解析器行为" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        解析器行为
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#文档元数据声明替代旧的-uri-query--level-0-body" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        文档元数据声明（替代旧的 URI query / Level 0 body）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#不再有-v01-的-level-0聚合端点" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        不再有 v0.1 的 Level 0/聚合端点
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#43-clientget_dpe-与-dpe-resolver-hook新增" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.3 client:get_dpe 与 DPE Resolver Hook（新增）
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4.3 client:get_dpe 与 DPE Resolver Hook（新增）">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#设计动机" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        设计动机
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#新增事件" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        新增事件
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-必须实现-dpe-resolver-注册-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 必须实现 DPE Resolver 注册 API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-处理流程" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 处理流程
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#44-mcp-server-host-唯一性从-must-放宽为-should--computer-warn" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.4 MCP Server host 唯一性（从 MUST 放宽为 SHOULD + Computer WARN）
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4.4 MCP Server host 唯一性（从 MUST 放宽为 SHOULD + Computer WARN）">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#路径与路由依据" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        路径与路由依据
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#computer-端实现要求v02-新规约" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Computer 端实现要求（v0.2 新规约）
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#设计取向" class="md-nav__link">
@@ -2172,32 +1756,21 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#实践建议" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        实践建议
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#45-错误码新增" class="md-nav__link">
+  <a href="#43-错误码扩展" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.5 错误码新增
+        4.3 错误码扩展
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.5 错误码新增">
+    <nav class="md-nav" aria-label="4.3 错误码扩展">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2212,10 +1785,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dpe-资源访问4011--4012--4013" class="md-nav__link">
+  <a href="#mcp-server-路由4014--4015" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DPE 资源访问（4011 / 4012 / 4013）
+        MCP Server 路由（4014 / 4015）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4001-描述收紧" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4001 描述收紧
       
     </span>
   </a>
@@ -2228,16 +1812,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#46-协议版本握手新增" class="md-nav__link">
+  <a href="#44-协议版本握手" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4.6 协议版本握手（新增）
+        4.4 协议版本握手
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4.6 协议版本握手（新增）">
+    <nav class="md-nav" aria-label="4.4 协议版本握手">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#为什么选-url-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么选 URL query
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#客户端" class="md-nav__link">
@@ -2262,10 +1857,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#client-sdk-收到-4008-后必须主动-disconnect" class="md-nav__link">
+  <a href="#4008-显式定义为-http-body-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client SDK 收到 4008 后必须主动 disconnect
+        4008 显式定义为 HTTP body code
       
     </span>
   </a>
@@ -2274,6 +1869,17 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-clientget_resources新增" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 client:get_resources（新增）
+      
+    </span>
+  </a>
   
 </li>
         
@@ -2295,10 +1901,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51-mcp-server-实现者最小改动" class="md-nav__link">
+  <a href="#51-mcp-server-实现者" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 MCP Server 实现者（最小改动）
+        5.1 MCP Server 实现者
       
     </span>
   </a>
@@ -2345,10 +1951,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#61-uri-解析器" class="md-nav__link">
+  <a href="#61-uri-解析器computer-解析层--容错丢弃" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.1 URI 解析器
+        6.1 URI 解析器（Computer 解析层 — 容错丢弃）
       
     </span>
   </a>
@@ -2356,10 +1962,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#62-organize_desktop与-v01-保持算法一致仅元数据来源变化" class="md-nav__link">
+  <a href="#62-organize_desktop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.2 organize_desktop（与 v0.1 保持算法一致，仅元数据来源变化）
+        6.2 organize_desktop
       
     </span>
   </a>
@@ -2367,10 +1973,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#63-clientget_dpe--resolver" class="md-nav__link">
+  <a href="#63-clientget_resources资源发现" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.3 client:get_dpe + Resolver
+        6.3 client:get_resources（资源发现）
       
     </span>
   </a>
@@ -2378,54 +1984,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#631-clientget_resources资源发现" class="md-nav__link">
+  <a href="#64-协议版本握手" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.3.1 client:get_resources（资源发现）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#64-host-路由--唯一性" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.4 host 路由 / 唯一性
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#65-协议版本握手" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.5 协议版本握手
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#66-集成测试" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.6 集成测试
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#67-回归测试重点" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6.7 回归测试重点
+        6.4 协议版本握手
       
     </span>
   </a>
@@ -2438,72 +2000,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-兼容性策略" class="md-nav__link">
+  <a href="#7-priority-int-0100--float-01-迁移" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. 兼容性策略
+        7. priority int [0,100] → float [0,1] 迁移
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="7. 兼容性策略">
+    <nav class="md-nav" aria-label="7. priority int [0,100] → float [0,1] 迁移">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#71-协议层硬切换" class="md-nav__link">
+  <a href="#换算对照表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.1 协议层：硬切换
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="7.1 协议层：硬切换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#不内建-v01-mcp-server-fallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        不内建 v0.1 MCP Server fallback
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#72-数据层agent-视角" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.2 数据层：Agent 视角
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#73-mcp-server-生态" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.3 MCP Server 生态
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#74-建议的升级顺序" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7.4 建议的升级顺序
+        换算对照表
       
     </span>
   </a>
@@ -2516,22 +2028,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-版本号与发布" class="md-nav__link">
+  <a href="#8-兼容性策略" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. 版本号与发布
+        8. 兼容性策略
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="8. 版本号与发布">
+    <nav class="md-nav" aria-label="8. 兼容性策略">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#81-语义化版本" class="md-nav__link">
+  <a href="#81-协议层硬切换" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.1 语义化版本
+        8.1 协议层：硬切换
       
     </span>
   </a>
@@ -2539,10 +2051,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#82-发布清单" class="md-nav__link">
+  <a href="#82-不内建-v01-mcp-server-fallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.2 发布清单
+        8.2 不内建 v0.1 MCP Server fallback
       
     </span>
   </a>
@@ -2550,10 +2062,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#83-文档变更" class="md-nav__link">
+  <a href="#83-升级顺序建议" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8.3 文档变更
+        8.3 升级顺序建议
       
     </span>
   </a>
@@ -2648,240 +2160,151 @@
 <p><strong>协议版本</strong>：0.1.x → <strong>0.2.0</strong>
 <strong>目标读者</strong>：python-sdk / rust-sdk 实现工程师
 <strong>发布节奏</strong>：破坏性升级，需同步发布三方（Agent / Computer / MCP Server helper）</p>
+<div class="admonition note">
+<p class="admonition-title">DPE 已独立为单独协议（2026-05-08）</p>
+<p>v0.2 早期草案曾把 DPE（Document-Page-Element）内嵌进 A2C-SMCP（<code>dpe://</code> URI、<code>client:get_dpe</code> 事件、4011/4012/4013 错误码、Resolver Hook、双 mimetype 等），后判断该模块<strong>与 A2C-SMCP 控制面属性不匹配</strong>，已从本协议<strong>全量移除</strong>。客户端实现请直接对接独立的 <a href="https://github.com/A2C-SMCP/dpe-protocol">DPE 协议</a>，不再走 A2C-SMCP 通道。</p>
+<p>本指南只覆盖 v0.2 中<strong>保留</strong>的非 DPE 改动：Window URI 纯标识符化、协议版本握手、错误码扩展（4006/4007/4008/4014/4015）、priority 类型变更等。</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Greenfield 阅读提示</p>
-<p>本指南默认 SDK 已实现 v0.1 完整功能并据此描述"迁移路径"。如果你所维护的 SDK <strong>从未</strong>实现某个子系统（典型如 DPE / Window URI 解析器），那么相关章节应按 <strong>Greenfield 实现规范</strong>阅读：</p>
-<ul>
-<li>关于"旧形式"的描述可作为反面参考（避免按 v0.1 模式实现）</li>
-<li>关于"新形式"和"行为约束"是 SDK 必须实现的目标</li>
-<li>"迁移步骤"中提到的"修改 X 文件"对未实现的 SDK 来说是"新建 X 文件"</li>
-</ul>
+<p>本指南默认 SDK 已实现 v0.1 完整功能并据此描述"迁移路径"。如果你所维护的 SDK <strong>从未</strong>实现某个子系统（典型如 Window URI 解析器），那么相关章节应按 <strong>Greenfield 实现规范</strong>阅读：旧形式作反面参考，新形式 + 行为约束作目标。</p>
 </div>
 <hr />
 <h2 id="1-摘要">1. 摘要<a class="headerlink" href="#1-摘要" title="Permanent link">&para;</a></h2>
-<p>v0.2 是一次<strong>破坏性</strong>协议升级，包含四组变更：</p>
+<p>v0.2 是一次<strong>破坏性</strong>协议升级，包含五组保留改动：</p>
 <ol>
-<li><strong>URI 纯标识符化</strong>：<code>window://</code> 与 <code>dpe://</code> 都变成纯标识符，不再携带元数据 query；元数据下沉到 MCP <code>Resource.annotations</code> + <code>Resource._meta</code></li>
-<li><strong>DPE 协议从 Finder 中独立</strong>：v0.1 把"DPE 抽象"和"文档目录浏览器（Finder）"耦合在一起；v0.2 把 Finder 从协议范围<strong>整体移除</strong>，只保留 DPE 文档抽象作为底层原语</li>
-<li><strong>DPE 内容投递重构</strong>：DPE 内容<strong>不再走 Socket.IO</strong>——Computer 端业务层注册 DPE Resolver hook，把 DPE Resource 转成 Agent 可访问的 URI（对象存储 / 本地文件 / 任意 scheme），Agent 用应用层协议（HTTP / file / ...）自取</li>
-<li><strong>协议版本握手</strong>：引入 Socket.IO connect 阶段的版本校验机制（详见 <a href="../../specification/versioning/">versioning.md</a>）</li>
-<li><strong>MCP 上游授权错误码</strong>：新增 <code>4006</code> / <code>4007</code> / <code>4008</code> / <code>4011</code> / <code>4012</code> / <code>4013</code></li>
+<li><strong>Window URI 纯标识符化</strong>：<code>window://</code> 不再携带元数据 query；元数据下沉到 MCP <code>Resource.annotations</code> + <code>Resource._meta</code></li>
+<li><strong>协议版本握手</strong>：引入 Socket.IO connect 阶段的版本校验机制（详见 <a href="../../specification/versioning/">versioning.md</a>）；4008 显式定义为 HTTP body code，<strong>不是 WS close code</strong></li>
+<li><strong>MCP Server host 跨 Server SHOULD 唯一</strong>（注册期记 WARN，不阻塞）</li>
+<li><strong>client:get_resources 新增</strong>：透明转发 MCP 标准 <code>resources/list</code> 给 Agent（含 cursor 翻页），用于 Window 等资源发现</li>
+<li><strong>错误码扩展</strong>：新增 <code>4006</code> / <code>4007</code> / <code>4008</code> / <code>4014</code> / <code>4015</code>；4001 描述收紧</li>
 </ol>
 <h3 id="核心改动一句话版">核心改动一句话版<a class="headerlink" href="#核心改动一句话版" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Window/DPE URI 变成<strong>纯标识符</strong>（不再携带元数据 query）</li>
-<li>元数据下沉到 MCP <code>Resource.annotations</code>（标准字段：<code>priority</code> / <code>audience</code> / <code>lastModified</code>）+ <code>Resource._meta</code>（A2C 扩展：<code>fullscreen</code> / <code>keywords</code> / <code>file_type</code> / <code>page_count</code> / <code>file_uri</code>）</li>
-<li><strong>Finder 整体从协议移除</strong>——<code>client:list_finder</code> / <code>server:update_finder</code> / <code>notify:update_finder</code> / <code>ListFinderReq</code> / <code>DPEDocumentSummary</code> / <code>organize_finder</code> 全部删除；文档发现/检索/聚合视图未来作为内置 MCP Server 重做，与协议核心解耦</li>
-<li><strong>新增 <code>client:get_dpe</code></strong>：Agent 把 DPE URI 提交给 Computer，Computer 调本地业务 Resolver hook 转成访问 URI 返回；Resolver 实现完全交给业务方（上传 OSS / 落本地缓存 / 任意 scheme），协议不规定生命周期/可用性
-4'. <strong>新增 <code>client:get_resources</code></strong>：透明转发 MCP 标准 <code>resources/list</code> 给 Agent（含 cursor 翻页）；<code>mcp_server</code> 必填，Computer 不做协议级过滤；与 <code>client:get_config</code> 组合实现 Agent 端的 dpe / window / 业务自定义资源发现，替代 v0.1 Finder 聚合视图</li>
-<li><strong>新增 Socket.IO 连接必带 URL query <code>?a2c_version=0.2.0</code></strong>；Server 在 HTTP 中间件层校验，不兼容时返回 HTTP 400 + <code>4008</code></li>
-<li>元数据字段分工原则：MCP 标准 <code>annotations</code>（<code>priority</code> / <code>audience</code> / <code>lastModified</code>）<strong>MUST</strong> 放入 <code>annotations</code>；A2C 自定义字段（<code>fullscreen</code> / DPE 业务字段）放入 <code>_meta</code>。Window <code>audience=["assistant"]</code>、DPE <code>audience=["user"]</code></li>
+<li><strong>Window URI 变成纯标识符</strong>——元数据通过 MCP <code>Resource.annotations</code> / <code>_meta</code> 声明</li>
+<li><strong>新增 <code>client:get_resources</code></strong>——Agent 通过它发现 Computer 上各 MCP Server 的资源</li>
+<li><strong>Socket.IO 连接必带 URL query <code>?a2c_version=0.2.0</code></strong>；Server HTTP 中间件校验，不兼容时返回 HTTP 400 + <code>X-A2C-Error-Code: 4008</code> header + body</li>
+<li><strong>MCP Server host 跨 Server SHOULD 唯一</strong>（lint-style 引导，不阻塞注册）</li>
+<li>元数据字段分工：MCP 标准 <code>annotations</code>（<code>priority</code> / <code>audience</code> / <code>lastModified</code>）<strong>MUST</strong> 放入 <code>annotations</code>；A2C 自定义字段（<code>fullscreen</code> / <code>keywords</code> 等）放入 <code>_meta</code></li>
 </ol>
 <hr />
 <h2 id="2-受影响范围">2. 受影响范围<a class="headerlink" href="#2-受影响范围" title="Permanent link">&para;</a></h2>
 <h3 id="21-代码影响矩阵">2.1 代码影响矩阵<a class="headerlink" href="#21-代码影响矩阵" title="Permanent link">&para;</a></h3>
 <blockquote>
-<p>Python SDK 路径基于 <code>python-sdk</code> 仓库实际现状；Rust SDK 列<strong>仅作示意</strong>——<code>rust-sdk</code> 实际目录结构由 rust-sdk 实现方维护，本文档不锚定具体路径，仅描述需要修改/新建的<strong>职能模块</strong>。</p>
+<p>本表只描述"职能模块"——具体文件路径由各 SDK 自决。</p>
 </blockquote>
 <table>
 <thead>
 <tr>
 <th>职能模块</th>
-<th>Python SDK 路径</th>
-<th>Rust SDK</th>
+<th>职责契约</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>WindowURI 解析器</strong></td>
-<td><code>a2c_smcp/computer/utils/window_uri.py</code></td>
-<td>rust-sdk 决定</td>
-<td>移除 <code>priority</code> / <code>fullscreen</code> query 解析</td>
+<td><code>window://</code> URI 解析 + 校验</td>
+<td>移除 <code>priority</code> / <code>fullscreen</code> query 解析；含 query 时按分层处理（Agent 构造层失败 / Computer 解析层 WARN 丢弃）</td>
 </tr>
 <tr>
-<td><strong>DPE URI 解析器</strong></td>
-<td><code>a2c_smcp/computer/utils/dpe_uri.py</code></td>
-<td>rust-sdk 决定（v0.2 待新建）</td>
-<td>URI 纯标识符化（不解析 query）；拒绝 <code>dpe://host</code> 形式（无 doc-ref）</td>
+<td><strong>Desktop 组织职能</strong></td>
+<td>按 audience / priority 整理 windows，按 size 截断</td>
+<td>从 <code>Resource.annotations.priority</code> 读优先级（<strong>float [0,1]</strong>，不再是 int [0,100]）；<code>Resource._meta.fullscreen</code> 读全屏标记</td>
 </tr>
 <tr>
-<td><strong>organize_desktop</strong></td>
-<td><code>a2c_smcp/computer/desktop/organize.py</code></td>
-<td>rust-sdk 决定</td>
-<td>从 <code>Resource.annotations.priority</code> 读优先级（float [0,1]）；<code>Resource._meta.fullscreen</code> 读全屏标记</td>
+<td><strong>client:get_resources 处理</strong></td>
+<td>透明转发 MCP <code>resources/list</code></td>
+<td>必填 <code>mcp_server</code>，Computer 不做协议级过滤；不返回 resourceTemplates</td>
 </tr>
 <tr>
-<td><strong>DPE Resolver Hook（新增）</strong></td>
-<td><code>a2c_smcp/computer/dpe/resolver.py</code></td>
-<td>rust-sdk 决定（v0.2 待新建）</td>
-<td>Computer 业务层注册接口；把 DPE URI + ResourceContents 转成访问 URI</td>
+<td><strong>协议版本中间件</strong></td>
+<td>Socket.IO connect 阶段校验 <code>a2c_version</code></td>
+<td>不兼容时返回 HTTP 400 + <code>X-A2C-Error-Code: 4008</code></td>
 </tr>
 <tr>
-<td><strong>MCP Manager</strong></td>
-<td><code>a2c_smcp/computer/mcp_clients/manager.py</code></td>
-<td>rust-sdk 决定</td>
-<td>维护 MCP Server 名称索引（<code>client:get_resources</code> 路由）+ host → MCP Server 反查索引（<code>client:get_dpe</code> 路由）；host 注册时检测冲突 + 记 WARN；运行时按 first-registered-wins</td>
-</tr>
-<tr>
-<td><strong>Socket.IO Client（Agent 侧）</strong></td>
-<td><code>a2c_smcp/agent/socketio/client.py</code></td>
-<td>rust-sdk 决定</td>
-<td>新增 <code>get_dpe</code> / <code>get_resources</code> 方法；移除 <code>list_finder</code></td>
-</tr>
-<tr>
-<td><strong>Socket.IO Client（Computer 侧）</strong></td>
-<td><code>a2c_smcp/computer/socketio/client.py</code></td>
-<td>rust-sdk 决定</td>
-<td>新增 <code>on_get_dpe</code> / <code>on_get_resources</code> 处理器；移除 <code>on_list_finder</code> / <code>update_finder</code></td>
-</tr>
-<tr>
-<td><strong>数据类型</strong></td>
-<td><code>a2c_smcp/smcp.py</code></td>
-<td>rust-sdk 决定</td>
-<td>新增 <code>GetDPEReq</code> / <code>GetDPERet</code> / <code>GetResourcesReq</code> / <code>GetResourcesRet</code>；删除 <code>ListFinderReq</code> / <code>ListFinderRet</code> / <code>DPEDocumentSummary</code> / <code>DPEPageSummary</code> / <code>DPEElementDetail</code></td>
-</tr>
-<tr>
-<td><strong>错误码枚举</strong></td>
-<td><code>a2c_smcp/smcp.py::ErrorCode</code></td>
-<td>rust-sdk 决定</td>
-<td>新增 <code>4006</code> / <code>4007</code> / <code>4008</code> / <code>4011</code> / <code>4012</code> / <code>4013</code></td>
-</tr>
-<tr>
-<td><strong>协议版本常量</strong></td>
-<td><code>a2c_smcp/__init__.py::PROTOCOL_VERSION</code></td>
-<td>rust-sdk 决定</td>
-<td>新增导出；SDK 包版本 MAJOR.MINOR MUST 锁定协议 MAJOR.MINOR（见 <a href="../../specification/versioning/#sdk-仓库">versioning.md SDK 仓库</a>）</td>
-</tr>
-<tr>
-<td><strong>Agent/Computer 连接逻辑</strong></td>
-<td><code>a2c_smcp/agent/socketio/client.py</code>、<code>a2c_smcp/computer/socketio/client.py</code></td>
-<td>rust-sdk 决定</td>
-<td>连接时 URL 拼 <code>?a2c_version=...</code>，<code>auth</code> 默认仅传 <code>role</code>（业务字段由用户回调注入，详见 <a href="../../specification/data-structures/#auth-对象业务层connectauth">data-structures.md ConnectAuth</a>）；解析 HTTP 400 body 识别 <code>4008</code> → 主动 <code>disconnect()</code> → 抛 <code>ProtocolVersionError</code></td>
-</tr>
-<tr>
-<td><strong>Server 连接处理</strong></td>
-<td><code>a2c_smcp/server/</code> 的 HTTP 中间件 + <code>connect</code> handler</td>
-<td>rust-sdk 决定（socketioxide 默认 HTTP 路径 <code>/socket.io/</code>）</td>
-<td>在 Socket.IO handler 之前于 HTTP 层校验 <code>a2c_version</code>；<code>connect</code> handler 处理 <code>auth.role</code>；<code>server:list_room</code> 返回含版本</td>
-</tr>
-<tr>
-<td><strong>测试</strong></td>
-<td><code>tests/unit_tests/computer/</code>、<code>tests/integration_tests/</code></td>
-<td>rust-sdk 决定</td>
-<td>所有涉及 URI query 解析、Finder 事件、<code>keywords</code> 参数的测试要重写或删除；新增 <code>get_dpe</code> / Resolver / 版本握手矩阵测试</td>
+<td><strong>错误处理器</strong></td>
+<td>新增 <code>4006/4007/4008/4014/4015</code> 处理</td>
+<td>见 <a href="../../specification/error-handling/">error-handling.md</a></td>
 </tr>
 </tbody>
 </table>
 <h3 id="22-非代码影响">2.2 非代码影响<a class="headerlink" href="#22-非代码影响" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>MCP Server 示例仓库</strong>（若存在）需要更新</li>
-<li><strong>文档站点</strong>：<code>docs/specification/</code>、<code>docs/guides/</code>、<code>docs/appendix/faq.md</code> 已更新</li>
-<li><strong>示例 / quickstart</strong>：需要按新模式改写</li>
+<li>现有 v0.1 部署的 MCP Server 必须升级以适配元数据下沉与 host 风格建议</li>
+<li>Agent / Computer SDK 必须同步升版（HTTP 握手层 a2c_version 不兼容直接断连）</li>
 </ul>
-<h3 id="23-不变的部分明确告知避免过度改动">2.3 不变的部分（明确告知，避免过度改动）<a class="headerlink" href="#23-不变的部分明确告知避免过度改动" title="Permanent link">&para;</a></h3>
+<h3 id="23-不变的部分">2.3 不变的部分<a class="headerlink" href="#23-不变的部分" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>事件名（Desktop）</strong>：<code>client:get_desktop</code> / <code>server:update_desktop</code> / <code>notify:update_desktop</code> 保持不变</li>
-<li><strong>Window URI 与 Desktop 行为</strong>：URI 形态、组织算法不变；仅元数据声明位置从 URI query 迁移到 <code>Resource.annotations</code> / <code>_meta</code></li>
-<li><strong>Room 模型 / Server 路由</strong>：完全不变</li>
-<li><strong>安全模型（零凭证传播、房间隔离）</strong>：完全不变</li>
+<li>Socket.IO 三角色架构、房间模型、<code>server:*</code> / <code>notify:*</code> 事件</li>
+<li>工具调用（<code>client:tool_call</code> + MCP <code>CallToolResult</code>）</li>
+<li>Desktop 桌面系统的整体行为（仅元数据来源变化）</li>
 </ul>
 <hr />
 <h2 id="3-破坏性变更详表">3. 破坏性变更详表<a class="headerlink" href="#3-破坏性变更详表" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>变更点</th>
+<th>变更 ID</th>
+<th>范围</th>
 <th>旧形式</th>
 <th>新形式</th>
-<th>兼容策略</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>B1</td>
-<td>Window URI query 移除</td>
-<td><code>window://host/path?priority=80&amp;fullscreen=true</code></td>
+<td>W1</td>
+<td>Window URI</td>
+<td><code>window://host/path?priority=5&amp;fullscreen=1</code></td>
 <td><code>window://host/path</code></td>
-<td><strong>硬切换</strong>；旧 URI 解析时丢弃 query 并记录 WARN</td>
 </tr>
 <tr>
-<td>B2</td>
-<td>Window 元数据位置</td>
+<td>W2</td>
+<td>priority 类型</td>
+<td><code>int [0, 100]</code></td>
+<td><code>float [0, 1]</code></td>
+</tr>
+<tr>
+<td>W3</td>
+<td>fullscreen 来源</td>
 <td>URI query</td>
-<td><code>Resource.annotations.priority</code>（float [0,1]）+ <code>Resource._meta.fullscreen</code> + <code>Resource.annotations.audience=["assistant"]</code></td>
-<td><strong>硬切换</strong>；priority 语义由 int [0,100] 迁移到 MCP 标准 float [0,1]，audience 固定 <code>["assistant"]</code></td>
+<td><code>Resource._meta.fullscreen</code></td>
 </tr>
 <tr>
-<td>B3</td>
-<td>DPE URI 收缩到 Document 层</td>
-<td><code>dpe://host/doc?format=md</code>、<code>dpe://host/doc/pages/N</code>、<code>dpe://host/doc/elements/ID</code></td>
-<td><code>dpe://host/doc-ref</code>（doc-ref 可单段或分段路径）</td>
-<td><strong>硬切换</strong>；DPE URI 纯文档标识符化——sub-path（pages/N、elements/ID）与所有 content-control query（<code>format</code> / <code>depth</code> / <code>offset</code> / <code>limit</code> / <code>categories</code>）全部移除；Page / Element 由 DPE 内容 JSON 在 Document 内部表达</td>
+<td>W4</td>
+<td>priority 来源</td>
+<td>URI query</td>
+<td><code>Resource.annotations.priority</code></td>
 </tr>
 <tr>
-<td>B4</td>
-<td>DPE 文档元数据位置</td>
-<td>Level 0/1 response body 中的扁平字段</td>
-<td><code>Resource._meta.{keywords, file_type, page_count, file_uri}</code> + <code>Resource.annotations.lastModified</code> + <code>Resource.annotations.audience=["user"]</code></td>
-<td><strong>硬切换</strong>；audience 固定 <code>["user"]</code>（DPE 文档是用户数据资产）</td>
-</tr>
-<tr>
-<td><strong>B5</strong></td>
-<td><strong>Finder 整体从协议移除</strong></td>
-<td><code>client:list_finder</code> / <code>server:update_finder</code> / <code>notify:update_finder</code> / <code>ListFinderReq</code> / <code>ListFinderRet</code> / <code>DPEDocumentSummary</code> / <code>DPEPageSummary</code> / <code>DPEElementDetail</code> / <code>organize_finder</code></td>
-<td><strong>不再存在</strong></td>
-<td><strong>硬删除</strong>；文档发现/检索未来作为内置 MCP Server 重做，与协议核心解耦</td>
-</tr>
-<tr>
-<td><strong>B6</strong></td>
-<td><strong>新增 <code>client:get_dpe</code></strong></td>
-<td>无（v0.1 通过 list_finder + MCP <code>resources/read</code> 直接返回内容）</td>
-<td><code>client:get_dpe(uri) → GetDPERet(uri=访问URI)</code>；DPE 内容<strong>不走 Socket.IO</strong>，由业务 Resolver hook 转成访问 URI（HTTP/file/任意 scheme），Agent 应用层自取</td>
-<td><strong>新增</strong>；SDK 必须实现该事件；Computer 必须暴露 Resolver 注册 API</td>
-</tr>
-<tr>
-<td><strong>B6'</strong></td>
-<td><strong>新增 <code>client:get_resources</code></strong></td>
-<td>无</td>
-<td><code>client:get_resources(mcp_server, cursor?) → {resources, next_cursor}</code>；透明转发 MCP 标准 <code>resources/list</code>，含 cursor 翻页；不做协议级过滤；为 Agent 提供资源发现入口（替代 v0.1 Finder 聚合视图）</td>
-<td><strong>新增</strong>；Computer 必须实现透明转发；<code>mcp_server</code> 必填，不存在返回 404</td>
-</tr>
-<tr>
-<td>B7</td>
+<td>H1</td>
 <td>host 唯一性</td>
-<td>MUST（v0.1 后期加，跨 Server 强制唯一）</td>
-<td><strong>SHOULD</strong> 跨 MCP Server 唯一（非 MUST）；Computer 注册时检测重复 + 记 WARN（不阻塞注册）；运行时 <code>client:get_dpe</code> 路由按 first-registered-wins</td>
-<td>从硬约束放宽为软约束；旧实现不受影响</td>
+<td>未约束</td>
+<td>跨 Server <strong>SHOULD</strong> 唯一（不符合时 WARN）</td>
 </tr>
 <tr>
-<td><strong>B8</strong></td>
-<td><strong>Socket.IO 连接握手</strong></td>
-<td>无版本校验，任意客户端可连接</td>
-<td><strong>必须</strong>在 URL query 携带 <code>?a2c_version=...</code>；Server HTTP 中间件层校验，不兼容返回 HTTP 400 + <code>4008</code></td>
-<td><strong>硬切换</strong>；旧客户端未带 <code>a2c_version</code> 被拒（HTTP 400）</td>
+<td>V1</td>
+<td>协议版本</td>
+<td>无显式协商</td>
+<td>URL query <code>a2c_version</code> 必带；HTTP 握手校验</td>
 </tr>
 <tr>
-<td>N1</td>
-<td>MCP 上游授权错误码</td>
-<td>泛化为 <code>4003</code></td>
-<td><code>4006</code> / <code>4007</code>（独立码）</td>
-<td>新增；旧 Computer 返回 <code>4003</code> 在 Agent 侧仍可工作但体验降级</td>
+<td>E1</td>
+<td>错误码 4001</td>
+<td>通用 "Tool Not Found"</td>
+<td>描述收紧为"工具调用前的查找失败"——执行失败用 4003</td>
 </tr>
 <tr>
-<td>N2</td>
-<td>DPE 资源访问错误码</td>
-<td>无</td>
-<td><code>4011 DPE Resolver Not Configured</code> / <code>4012 Invalid DPE URI</code> / <code>4013 DPE Resolution Failed</code></td>
-<td>新增；为 <code>client:get_dpe</code> 路径提供专属错误语义</td>
+<td>E2</td>
+<td>错误码新增</td>
+<td>—</td>
+<td>4006 / 4007（MCP 上游授权）+ 4008（HTTP 握手 body code）+ 4014 / 4015（MCP 路由）</td>
 </tr>
 <tr>
-<td>N3</td>
-<td>SessionInfo 字段扩展</td>
-<td><code>{sid, name, role, office_id}</code></td>
-<td>新增 <code>a2c_version</code></td>
-<td>新增字段，对老客户端向后兼容（可忽略不识别字段）</td>
+<td>R1</td>
+<td>client:get_resources</td>
+<td>不存在</td>
+<td>新增；透明转发 <code>resources/list</code></td>
 </tr>
 </tbody>
 </table>
@@ -2889,653 +2312,239 @@
 <h2 id="4-详细变更规范">4. 详细变更规范<a class="headerlink" href="#4-详细变更规范" title="Permanent link">&para;</a></h2>
 <h3 id="41-window-uri-重构">4.1 Window URI 重构<a class="headerlink" href="#41-window-uri-重构" title="Permanent link">&para;</a></h3>
 <h4 id="uri-语法">URI 语法<a class="headerlink" href="#uri-语法" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>// 旧
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>window://host/path1/path2?priority=P&amp;fullscreen=F
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>// 新
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>window://host/path1/path2
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>旧：window://com.example.app/main?priority=8&amp;fullscreen=1
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>新：window://com.example.app/main
 </code></pre></div>
 <h4 id="校验规则">校验规则<a class="headerlink" href="#校验规则" title="Permanent link">&para;</a></h4>
 <ul>
-<li>解析时若 URI 含 query 部分，<strong>MUST</strong> 丢弃并记录 <code>WARNING</code> 级日志</li>
-<li><code>path</code> 段继续支持 URL 编码（<code>c%2Fd</code> 保持为单段）</li>
-<li><code>host</code> 跨 MCP Server <strong>SHOULD</strong> 唯一（非 MUST）；Computer 注册重复时记 WARN，不阻塞注册</li>
+<li><code>scheme</code> 固定 <code>window</code></li>
+<li><code>host</code> 不能为空（推荐反向域名风格）</li>
+<li><code>path</code> 0..N 段，URL 编码</li>
+<li><strong>不允许</strong> query / fragment：Agent SDK 构造层硬错误；Computer 解析层容错丢弃 + WARN</li>
 </ul>
-<h4 id="元数据声明由-mcp-server-在-resourceslist-响应中设置">元数据声明（由 MCP Server 在 <code>resources/list</code> 响应中设置）<a class="headerlink" href="#元数据声明由-mcp-server-在-resourceslist-响应中设置" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>类型</th>
-<th>必需</th>
-<th>默认</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Resource.annotations.priority</code></td>
-<td><code>float [0, 1]</code></td>
-<td>否</td>
-<td><code>0.0</code></td>
-<td><strong>MCP 标准</strong>；布局排序依据，值越大越优先，仅同一 Server 内比较</td>
-</tr>
-<tr>
-<td><code>Resource.annotations.audience</code></td>
-<td><code>["assistant"]</code></td>
-<td>推荐</td>
-<td>—</td>
-<td><strong>MCP 标准</strong>；Window 面向 Agent 渲染，MCP Server 应显式声明 <code>["assistant"]</code></td>
-</tr>
-<tr>
-<td><code>Resource.annotations.lastModified</code></td>
-<td>ISO 8601</td>
-<td>否</td>
-<td>—</td>
-<td>MCP 标准；v0.2 Computer 透传不排序</td>
-</tr>
-<tr>
-<td><code>Resource._meta.fullscreen</code></td>
-<td><code>bool</code></td>
-<td>否</td>
-<td><code>false</code></td>
-<td><strong>A2C 扩展</strong>；全屏渲染标记</td>
-</tr>
-</tbody>
-</table>
-<h4 id="organize_desktop-行为变更">organize_desktop 行为变更<a class="headerlink" href="#organize_desktop-行为变更" title="Permanent link">&para;</a></h4>
-<ul>
-<li>输入：<code>windows: list[tuple[SERVER_NAME, Resource, ReadResourceResult]]</code>（Resource 对象必须完整携带 <code>annotations</code> 与 <code>_meta</code>）</li>
-<li>排序键改为 <code>Resource.annotations.priority</code>（float），fullscreen 标记改读 <code>Resource._meta.fullscreen</code></li>
-<li><strong>不再解析 URI query</strong></li>
-</ul>
-<hr />
-<h3 id="42-dpe-uri-重构">4.2 DPE URI 重构<a class="headerlink" href="#42-dpe-uri-重构" title="Permanent link">&para;</a></h3>
-<h4 id="uri-语法_1">URI 语法<a class="headerlink" href="#uri-语法_1" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>// 旧（多层 URI + content-control query）
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>dpe://host/doc-ref?format=markdown&amp;offset=0&amp;limit=20
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>dpe://host/doc-ref/pages/N?categories=table
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>dpe://host/doc-ref/elements/ID
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>// 新（纯文档标识符，只到 Document 一层；doc-ref 可分段路径）
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>dpe://host/doc-ref
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>dpe://host/reports/2026/annual                # 分段路径示例
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>dpe://host/src/main/java/Foo.java             # 含扩展名示例
+<h4 id="元数据声明mcp-server-在-resourceslist-响应中设置">元数据声明（MCP Server 在 <code>resources/list</code> 响应中设置）<a class="headerlink" href="#元数据声明mcp-server-在-resourceslist-响应中设置" title="Permanent link">&para;</a></h4>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 旧（v0.1）</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;window://com.example.app/main?priority=8&amp;fullscreen=1&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Main Window&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># 新（v0.2）</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">{</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;window://com.example.app/main&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Main Window&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>  <span class="s2">&quot;annotations&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>                  <span class="c1"># float [0, 1]</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="s2">&quot;audience&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>        <span class="c1"># MUST 标识 assistant</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="s2">&quot;lastModified&quot;</span><span class="p">:</span> <span class="s2">&quot;2026-04-12T08:30:00Z&quot;</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  <span class="p">},</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>  <span class="s2">&quot;_meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="n">true</span>                <span class="c1"># A2C 扩展</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>  <span class="p">}</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
 </code></pre></div>
-<h4 id="解析器行为">解析器行为<a class="headerlink" href="#解析器行为" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>拒绝 <code>dpe://host</code> 形式</strong>（无 doc-ref）；返回解析失败 / <code>4012</code></li>
-<li><strong>doc-ref 可分段</strong>：从 host 之后第一个 <code>/</code> 起到 URI 结尾的整段 path，整体作为文档唯一标识；<strong>不再有 sub-path（pages/N、elements/ID）概念</strong>——Page / Element 在 DPE 内容 JSON 内部表达</li>
-<li><strong>拒绝 query / fragment</strong>：解析时检测到则记录 WARN 并丢弃；Agent SDK 构造 URI 时<strong>不应</strong>附加 query 或 fragment</li>
-<li><code>host</code> 跨 MCP Server <strong>SHOULD</strong> 唯一（非 MUST）——<code>client:get_dpe</code> 通过 URI 中 host 反查 Server，重复时记 WARN + 先注册优先</li>
-</ul>
-<h4 id="文档元数据声明替代旧的-uri-query--level-0-body">文档元数据声明（替代旧的 URI query / Level 0 body）<a class="headerlink" href="#文档元数据声明替代旧的-uri-query--level-0-body" title="Permanent link">&para;</a></h4>
-<p>每个文档作为一个 <code>Resource</code> 出现在 <code>resources/list</code> 响应中：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://com.example.docs/rpt-2026&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;2026 年度报告&quot;</span><span class="p">,</span>                              <span class="c1"># = title</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;2026 年度财务与运营报告&quot;</span><span class="p">,</span>              <span class="c1"># = summary</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">],</span>                            <span class="c1"># DPE 文档是用户数据资产，固定 [&quot;user&quot;]</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;2026-01-15T08:30:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">),</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;财务&quot;</span><span class="p">,</span> <span class="s2">&quot;年报&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="s2">&quot;page_count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>                             <span class="c1"># 推荐：Agent 据此规划翻页</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="s2">&quot;file_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;file:///data/reports/2026-annual.xlsx&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="p">},</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">)</span>
-</code></pre></div>
-<h4 id="不再有-v01-的-level-0聚合端点">不再有 v0.1 的 Level 0/聚合端点<a class="headerlink" href="#不再有-v01-的-level-0聚合端点" title="Permanent link">&para;</a></h4>
-<p><code>dpe://host</code> 形式（v0.1 用作 catalog 端点）整体移除。文档发现走 MCP 标准 <code>resources/list</code> 或未来的 Finder MCP Server。</p>
-<p>详见 <a href="../../specification/dpe/">DPE 文档协议</a>。</p>
-<hr />
-<h3 id="43-clientget_dpe-与-dpe-resolver-hook新增">4.3 client:get_dpe 与 DPE Resolver Hook（新增）<a class="headerlink" href="#43-clientget_dpe-与-dpe-resolver-hook新增" title="Permanent link">&para;</a></h3>
-<h4 id="设计动机">设计动机<a class="headerlink" href="#设计动机" title="Permanent link">&para;</a></h4>
-<p>v0.1 的 DPE 内容通过 MCP <code>resources/read</code> 直接经 Socket.IO 返回给 Agent。<strong>对大体量文档（Excel / PDF / PPT 数十 MB）这是不可行的</strong>——Socket.IO 默认 <code>maxHttpBufferSize</code> 1MB；即便调大，单消息阻塞通道、Server 全量缓冲等问题都会暴露。</p>
-<p>v0.2 把 DPE 内容投递与 A2C 传输层解耦：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Agent → client:get_dpe(uri) → Computer → DPE Resolver Hook → 访问 URI
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                                              │
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                                              ▼
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>                                     业务存储（OSS / 本地 / etc）
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>                                              │
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        Agent ← 应用层协议（HTTP / file / ...）拉取 ←
-</code></pre></div>
-<p>A2C 协议本身<strong>不</strong>承载 DPE 内容；URI 的生命周期、可用性、签名机制全部交给业务方。</p>
-<h4 id="新增事件">新增事件<a class="headerlink" href="#新增事件" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>事件常量</th>
-<th>事件名称</th>
-<th>数据结构</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>GET_DPE_EVENT</code></td>
-<td><code>client:get_dpe</code></td>
-<td><code>GetDPEReq</code> → <code>GetDPERet</code></td>
-</tr>
-</tbody>
-</table>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GetDPEReq</span><span class="p">(</span><span class="n">AgentCallData</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">agent</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">computer</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># dpe://host/doc-ref（doc-ref 可单段或分段路径）</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">GetDPERet</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># 业务 Resolver 输出的访问 URI</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">mime_type</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">size</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>
-</code></pre></div>
-<h4 id="computer-必须实现-dpe-resolver-注册-api">Computer 必须实现 DPE Resolver 注册 API<a class="headerlink" href="#computer-必须实现-dpe-resolver-注册-api" title="Permanent link">&para;</a></h4>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">DPEResolver</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">dpe_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="n">contents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ResourceContents</span><span class="p">],</span>   <span class="c1"># Computer 已从 MCP Server 读到的内容</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        <span class="n">hint</span><span class="p">:</span> <span class="n">ResolverHint</span><span class="p">,</span>                  <span class="c1"># mcp_server_name / mime_type 等上下文</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedResource</span><span class="p">:</span> <span class="o">...</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># Computer SDK 启动时业务方注册</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">computer</span><span class="o">.</span><span class="n">register_dpe_resolver</span><span class="p">(</span><span class="n">MyOSSResolver</span><span class="p">())</span>
-</code></pre></div>
-<p>未注册时收到 <code>client:get_dpe</code> 必须返回 <code>4011 DPE Resolver Not Configured</code>——<strong>禁止</strong>降级到 inline 透传 ResourceContents。</p>
-<h4 id="computer-处理流程">Computer 处理流程<a class="headerlink" href="#computer-处理流程" title="Permanent link">&para;</a></h4>
-<ol>
-<li>接收 <code>client:get_dpe(uri=dpe://...)</code></li>
-<li>校验 URI（dpe scheme + 非空 host + 非空 doc-ref + 无 query/fragment）；非法返回 <code>4012</code></li>
-<li>检查 Resolver 是否注册；未注册返回 <code>4011</code></li>
-<li>解析 host → 定位对应 MCP Server</li>
-<li>调 MCP Server 的 <code>resources/read(uri)</code> 拿 ResourceContents</li>
-<li>调 Resolver <code>resolve(uri, contents, hint)</code> 拿访问 URI</li>
-<li>返回 <code>GetDPERet(uri=访问URI, ...)</code></li>
-<li>任一步失败 → 返回 <code>4013 DPE Resolution Failed</code>（含 reason）</li>
-</ol>
-<p>详见 <a href="../../specification/dpe/">DPE 文档协议</a>。</p>
-<hr />
-<h3 id="44-mcp-server-host-唯一性从-must-放宽为-should--computer-warn">4.4 MCP Server host 唯一性（从 MUST 放宽为 SHOULD + Computer WARN）<a class="headerlink" href="#44-mcp-server-host-唯一性从-must-放宽为-should--computer-warn" title="Permanent link">&para;</a></h3>
-<p>v0.2 起 host 跨 MCP Server <strong>SHOULD</strong> 唯一（非 MUST）——保留 host 作为路由依据的同时引入软约束 + 显性警告。</p>
-<h4 id="路径与路由依据">路径与路由依据<a class="headerlink" href="#路径与路由依据" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>协议路径</th>
-<th>路由依据</th>
-<th>host 角色</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>client:get_dpe(uri=dpe://host/...)</code></td>
-<td>URI 中的 host 反查 MCP Server 索引</td>
-<td><strong>路由关键字</strong>——保持 URI 自包含寻址能力</td>
-</tr>
-<tr>
-<td><code>client:get_resources(mcp_server=name)</code></td>
-<td><code>mcp_server</code> 字段直接定位</td>
-<td>不参与路由</td>
-</tr>
-<tr>
-<td><code>client:get_desktop</code></td>
-<td><code>organize_desktop</code> 按 MCP Server 名称分组</td>
-<td>仅参与单 Server 内的窗口排序</td>
-</tr>
-</tbody>
-</table>
-<h4 id="computer-端实现要求v02-新规约">Computer 端实现要求（v0.2 新规约）<a class="headerlink" href="#computer-端实现要求v02-新规约" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>阶段</th>
-<th>行为</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>MCP Server 注册时</strong></td>
-<td>Computer <strong>MUST</strong> 检测新 Server 的 host 是否与已有 Server 冲突；冲突时记 <strong>WARN</strong> 日志（含两个 Server 名称 + 共用 host）；<strong>仍允许注册成功</strong>（不阻塞业务）</td>
-</tr>
-<tr>
-<td><strong><code>client:get_dpe</code> 路由时</strong></td>
-<td>(a) host 唯一匹配 → 路由到该 Server；(b) host 多个匹配 → <strong>first-registered-wins</strong> + WARN；(c) host 无匹配 → 返回 <code>4013 DPE Resolution Failed</code></td>
-</tr>
-</tbody>
-</table>
+<h4 id="desktop-组织职能行为变更">Desktop 组织职能行为变更<a class="headerlink" href="#desktop-组织职能行为变更" title="Permanent link">&para;</a></h4>
+<p><code>organize_desktop</code> 函数读取数据源从 URI query 改为 Resource annotations / _meta。算法本身<strong>不变</strong>——按 audience 过滤、按 priority 排序、按 size 截断。</p>
+<h3 id="42-mcp-server-host-唯一性">4.2 MCP Server host 唯一性<a class="headerlink" href="#42-mcp-server-host-唯一性" title="Permanent link">&para;</a></h3>
+<p><strong>v0.2 软约束</strong>：跨 MCP Server host <strong>SHOULD</strong> 唯一；冲突时 Computer 在注册阶段记 WARN，<strong>不阻塞注册</strong>。</p>
 <h4 id="设计取向">设计取向<a class="headerlink" href="#设计取向" title="Permanent link">&para;</a></h4>
 <ul>
-<li><strong>保留 URI 自包含寻址</strong>：Agent 持有任意 dpe URI 即可调 <code>get_dpe</code>，不需要外部元信息</li>
-<li><strong>软约束 + 显性 WARN</strong>：host 重复是 MCP Server 命名 bug；Computer 不阻塞注册（避免硬故障），但通过 WARN 让冲突可见</li>
-<li><strong>first-registered-wins</strong>：路由确定性——后注册的同 host 资源在 <code>get_dpe</code> 路径上被错误路由到先注册者，这是 visible 信号，促使业务方修复</li>
+<li>v0.2 不强制硬约束，避免阻断既有部署的 MCP Server 上线</li>
+<li>host 推荐使用反向域名风格（如 <code>com.example.editor</code>）以天然回避冲突</li>
+<li>客户端 desktop 组织算法按 MCP Server 名称分组、不强依赖 host 唯一</li>
 </ul>
-<h4 id="实践建议">实践建议<a class="headerlink" href="#实践建议" title="Permanent link">&para;</a></h4>
-<ul>
-<li>MCP Server 采用反向域名风格（<code>com.example.&lt;service&gt;</code>）天然回避冲突</li>
-<li>同一 Computer 部署多个 MCP Server 时统一规划 host 命名空间</li>
-<li>监控 Computer WARN 日志中的 host 冲突告警</li>
-</ul>
-<p>详见 <a href="../../specification/dpe/#host-路由策略">DPE host 路由策略</a> / <a href="../../specification/desktop/#window-uri-规范">Window URI 校验规则</a>。</p>
-<hr />
-<h3 id="45-错误码新增">4.5 错误码新增<a class="headerlink" href="#45-错误码新增" title="Permanent link">&para;</a></h3>
+<h3 id="43-错误码扩展">4.3 错误码扩展<a class="headerlink" href="#43-错误码扩展" title="Permanent link">&para;</a></h3>
 <h4 id="mcp-上游授权4006--4007">MCP 上游授权（4006 / 4007）<a class="headerlink" href="#mcp-上游授权4006--4007" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
-<th>代码</th>
+<th>码</th>
 <th>名称</th>
-<th>含义</th>
+<th>触发</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>4006</code></td>
+<td>4006</td>
 <td>Tool Authorization Required</td>
-<td>工具需要 MCP 上游授权（如 OAuth），Computer 当前无有效凭证</td>
+<td>工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证</td>
 </tr>
 <tr>
-<td><code>4007</code></td>
+<td>4007</td>
 <td>Tool Authorization Failed</td>
-<td>上游授权流程失败、Token 失效、刷新失败、权限不足</td>
+<td>MCP 上游授权流程失败、Token 已失效、刷新失败、或权限不足</td>
 </tr>
 </tbody>
 </table>
-<p>详见 <a href="../../specification/error-handling/#40064007-判定决策表">error-handling.md 4006/4007 判定决策表</a>。</p>
-<h4 id="dpe-资源访问4011--4012--4013">DPE 资源访问（4011 / 4012 / 4013）<a class="headerlink" href="#dpe-资源访问4011--4012--4013" title="Permanent link">&para;</a></h4>
+<p>详见 <a href="../../specification/error-handling/">error-handling.md</a> 的判定决策表。</p>
+<h4 id="mcp-server-路由4014--4015">MCP Server 路由（4014 / 4015）<a class="headerlink" href="#mcp-server-路由4014--4015" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
-<th>代码</th>
+<th>码</th>
 <th>名称</th>
-<th>含义</th>
+<th>触发</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>4011</code></td>
-<td>DPE Resolver Not Configured</td>
-<td>Computer 未注册 DPE Resolver hook</td>
+<td>4014</td>
+<td>MCP Server Not Found</td>
+<td>客户端事件引用的 <code>mcp_server</code> 名字未注册</td>
 </tr>
 <tr>
-<td><code>4012</code></td>
-<td>Invalid DPE URI</td>
-<td>URI 不符合 <code>dpe://</code> scheme 规范</td>
-</tr>
-<tr>
-<td><code>4013</code></td>
-<td>DPE Resolution Failed</td>
-<td>Resolver 执行失败（业务异常 / 上游 MCP Server 不可用 / 等）</td>
+<td>4015</td>
+<td>MCP Capability Not Supported</td>
+<td>MCP Server 已注册但未声明所需 capability</td>
 </tr>
 </tbody>
 </table>
-<p>详见 <a href="../../specification/error-handling/#dpe-资源访问错误">error-handling.md DPE 资源访问错误</a>。</p>
-<hr />
-<h3 id="46-协议版本握手新增">4.6 协议版本握手（新增）<a class="headerlink" href="#46-协议版本握手新增" title="Permanent link">&para;</a></h3>
+<h4 id="4001-描述收紧">4001 描述收紧<a class="headerlink" href="#4001-描述收紧" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>旧</th>
+<th>新</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tool Not Found</code>：工具调用相关失败的兜底码</td>
+<td><code>Tool Not Found</code>：<strong>工具调用前</strong>的查找失败（不存在 / 已下线）；<strong>执行</strong>失败用 <code>4003 Tool Execution Failed</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-协议版本握手">4.4 协议版本握手<a class="headerlink" href="#44-协议版本握手" title="Permanent link">&para;</a></h3>
+<h4 id="为什么选-url-query">为什么选 URL query<a class="headerlink" href="#为什么选-url-query" title="Permanent link">&para;</a></h4>
+<ul>
+<li>WebSocket 握手阶段无 body 可读</li>
+<li>HTTP middleware 可在升级到 WebSocket 前完成校验，节省连接建立成本</li>
+<li>URL query 与 cookie / header 同样在 connect 阶段可读，且不与业务字段冲突</li>
+</ul>
 <h4 id="客户端">客户端<a class="headerlink" href="#客户端" title="Permanent link">&para;</a></h4>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># python-sdk 内部实现</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2c_smcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">PROTOCOL_VERSION</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;/smcp&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;agent&quot;</span><span class="p">},</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Python reference impl</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">socketio</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncClient</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">AsyncClient</span><span class="p">()</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;https://server.example.com/?a2c_version=0.2.0&quot;</span><span class="p">,</span> <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;websocket&quot;</span><span class="p">])</span>
 </code></pre></div>
 <h4 id="server">Server<a class="headerlink" href="#server" title="Permanent link">&para;</a></h4>
-<p>HTTP 中间件层校验 <code>a2c_version</code>，不兼容返回 HTTP 400 + <code>4008</code>。详细规范、Python/Rust 实现示例、跨语言通用约束见 <a href="../../specification/versioning/">versioning.md</a>。</p>
-<h4 id="client-sdk-收到-4008-后必须主动-disconnect">Client SDK 收到 4008 后必须主动 disconnect<a class="headerlink" href="#client-sdk-收到-4008-后必须主动-disconnect" title="Permanent link">&para;</a></h4>
-<p>防止底层库自动重连导致死循环。详见 <a href="../../specification/versioning/#4-client-sdk-must-主动断开连接">versioning.md § 4. Client SDK MUST 主动断开连接</a>。</p>
+<p>Socket.IO HTTP 中间件层校验 <code>a2c_version</code>：
+- 缺失 → HTTP 400 + <code>X-A2C-Error-Code: 4008</code> + body <code>{"code": 4008, "message": "missing a2c_version"}</code>
+- 不兼容 → HTTP 400 + 同上 header + body 内附 <code>server_version</code> / <code>min_supported</code> / <code>max_supported</code></p>
+<h4 id="4008-显式定义为-http-body-code">4008 显式定义为 HTTP body code<a class="headerlink" href="#4008-显式定义为-http-body-code" title="Permanent link">&para;</a></h4>
+<p><strong>不是</strong> WebSocket close code（WS close code 范围有限且语义混淆）。SDK 收到 HTTP 400 + 4008 后<strong>必须主动 disconnect</strong>，不再尝试 WS upgrade。</p>
+<h3 id="45-clientget_resources新增">4.5 client:get_resources（新增）<a class="headerlink" href="#45-clientget_resources新增" title="Permanent link">&para;</a></h3>
+<p>透明转发 MCP <code>resources/list</code> 给 Agent，用于 Window 等资源发现。详见 <a href="../../specification/events/#clientget_resources">events.md - client:get_resources</a>。</p>
 <hr />
 <h2 id="5-迁移步骤">5. 迁移步骤<a class="headerlink" href="#5-迁移步骤" title="Permanent link">&para;</a></h2>
-<h3 id="51-mcp-server-实现者最小改动">5.1 MCP Server 实现者（最小改动）<a class="headerlink" href="#51-mcp-server-实现者最小改动" title="Permanent link">&para;</a></h3>
+<h3 id="51-mcp-server-实现者">5.1 MCP Server 实现者<a class="headerlink" href="#51-mcp-server-实现者" title="Permanent link">&para;</a></h3>
 <ol>
-<li>
-<p><strong>Window</strong>：把 URI query 中的 <code>priority</code> / <code>fullscreen</code> 改成 Resource 元数据
-   <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 旧</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Resource</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://host/path?priority=80&amp;fullscreen=true&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># 新</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://host/path&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">priority</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">]),</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">)</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>DPE</strong>：把所有 query 参数移除；把文档元数据迁到 Resource 上
-   <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;dpe://host/doc-ref&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">],</span> <span class="n">lastModified</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">),</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">_meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;keywords&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span> <span class="s2">&quot;page_count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;file_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">)</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>DPE 内容形态自决</strong>：A2C 协议<strong>不规定</strong> <code>resources/read</code> 响应 JSON schema；与 Agent / Resolver 之间约定即可</p>
-</li>
+<li>移除 URI 中的 query 参数（<code>window://</code> 不再携带 priority / fullscreen）</li>
+<li>在 <code>resources/list</code> 响应中通过 <code>annotations</code> / <code>_meta</code> 声明元数据</li>
+<li>priority 改为 float [0, 1]（按语义重新映射，如 v0.1 的 <code>8/100</code>-style 映射到 <code>0.08</code> 通常是错的；按真实优先级语义映射到 <code>0.8</code>）</li>
+<li>检查 host 是否符合反向域名风格</li>
 </ol>
 <h3 id="52-computer-sdk-工程师">5.2 Computer SDK 工程师<a class="headerlink" href="#52-computer-sdk-工程师" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>WindowURI 解析器</strong>：移除 query 解析；解析时若有 query，丢弃并记录 WARN</li>
-<li><strong>DPE URI 解析器</strong>：拒绝 <code>dpe://host</code> 形式（无 doc-ref）；拒绝 query 参数</li>
-<li><strong>organize_desktop</strong>：从 <code>Resource.annotations.priority</code> 读优先级；从 <code>Resource._meta.fullscreen</code> 读全屏标记</li>
-<li><strong>删除 organize_finder / Finder 事件处理</strong>：v0.2 协议无 Finder</li>
-<li><strong>新增 DPE Resolver 注册 API</strong>：暴露 <code>register_dpe_resolver(resolver)</code> 接口</li>
-<li><strong>新增 <code>client:get_dpe</code> 处理器</strong>：按 <a href="#computer-处理流程">§4.3 处理流程</a> 实现</li>
-<li><strong>MCP Manager</strong>：维护两套索引——(a) MCP Server 名称索引（用于 <code>client:get_resources</code> 直接定位）；(b) host → MCP Server 反查索引（用于 <code>client:get_dpe</code> 按 URI 中 host 路由）；注册时检测 host 重复 + 记 WARN（不阻塞）；多匹配时 first-registered-wins</li>
-<li><strong>错误码枚举</strong>：新增 4006 / 4007 / 4008 / 4011 / 4012 / 4013</li>
+<li>WindowURI 解析器移除 query 解析路径</li>
+<li>organize_desktop 数据源从 URI 改为 <code>Resource.annotations</code> / <code>_meta</code></li>
+<li>实现 <code>client:get_resources</code> 透明转发（含 cursor 翻页）</li>
+<li>注册 host 冲突检测，记 WARN（不阻塞）</li>
+<li>实现 <code>?a2c_version</code> 中间件校验</li>
 </ol>
 <h3 id="53-agent-sdk-工程师">5.3 Agent SDK 工程师<a class="headerlink" href="#53-agent-sdk-工程师" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>删除 <code>list_finder</code> 方法</strong></li>
-<li><strong>新增 <code>get_dpe(uri)</code> 方法</strong>：返回 <code>GetDPERet</code>；Agent 业务代码拿到访问 URI 后用应用层协议自取实际内容</li>
-<li><strong>新增 <code>get_resources(mcp_server, cursor=None)</code> 方法</strong>：透明转发 MCP <code>resources/list</code>；返回 <code>{resources, next_cursor}</code>；<code>mcp_server</code> 必填</li>
-<li><strong>HTTP / file URI 内置拉取</strong>：建议 SDK 内置 http(s):// 与 file:// 的拉取能力；其他 scheme 由用户业务代码处理</li>
-<li><strong>不缓存 URI 跨 session</strong>：拿到 URI 仅在本次会话使用；过期时重新调用 <code>get_dpe</code></li>
-<li><strong>协议版本握手</strong>：连接 URL query 拼 <code>?a2c_version=...</code>；解析 HTTP 400 body 识别 4008 → 主动 <code>disconnect()</code> → 抛 <code>ProtocolVersionError</code></li>
-<li><strong>DPE 发现链路</strong>：典型路径是 <code>get_config(computer) → 对每个 server name 翻页 get_resources → 按 scheme/元数据自决过滤 → get_dpe</code></li>
+<li>WindowURI 构造时不再附加 query</li>
+<li>priority 字段读取从 URI query 改为 <code>Resource.annotations.priority</code></li>
+<li>处理 <code>client:get_resources</code> 响应（含 cursor 翻页）</li>
+<li>处理新错误码（4006 / 4007 / 4008 / 4014 / 4015）</li>
+<li>Socket.IO 连接 URL 必带 <code>?a2c_version=0.2.0</code></li>
 </ol>
 <hr />
 <h2 id="6-测试矩阵">6. 测试矩阵<a class="headerlink" href="#6-测试矩阵" title="Permanent link">&para;</a></h2>
-<h3 id="61-uri-解析器">6.1 URI 解析器<a class="headerlink" href="#61-uri-解析器" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>用例</th>
-<th>Window</th>
-<th>DPE</th>
-<th>预期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>纯标识符 URI</td>
-<td><code>window://host/path</code></td>
-<td><code>dpe://host/doc-ref</code></td>
-<td>✅ 解析成功</td>
-</tr>
-<tr>
-<td>带 query</td>
-<td><code>window://host/path?priority=0.8</code></td>
-<td><code>dpe://host/doc-ref?format=md</code></td>
-<td>✅ 丢弃 query + WARN</td>
-</tr>
-<tr>
-<td>多段路径</td>
-<td><code>window://host/a/b/c</code></td>
-<td><code>dpe://host/reports/2026/annual</code></td>
-<td>✅ 解析成功（doc-ref="reports/2026/annual"）</td>
-</tr>
-<tr>
-<td>URL 编码</td>
-<td><code>window://host/a%2Fb</code></td>
-<td>—</td>
-<td>✅ 单段，解码 <code>a/b</code></td>
-</tr>
-<tr>
-<td>缺 host</td>
-<td><code>window:///path</code></td>
-<td><code>dpe:///doc-ref</code></td>
-<td>❌ 解析失败</td>
-</tr>
-<tr>
-<td>DPE 缺 doc-ref</td>
-<td>—</td>
-<td><code>dpe://host</code></td>
-<td>❌ 解析失败 / <code>4012</code></td>
-</tr>
-<tr>
-<td>DPE 含 query</td>
-<td>—</td>
-<td><code>dpe://host/doc?format=md</code></td>
-<td>❌ WARN + 丢弃 query；解析后 doc-ref="doc"</td>
-</tr>
-</tbody>
-</table>
-<h3 id="62-organize_desktop与-v01-保持算法一致仅元数据来源变化">6.2 organize_desktop（与 v0.1 保持算法一致，仅元数据来源变化）<a class="headerlink" href="#62-organize_desktop与-v01-保持算法一致仅元数据来源变化" title="Permanent link">&para;</a></h3>
+<h3 id="61-uri-解析器computer-解析层--容错丢弃">6.1 URI 解析器（Computer 解析层 — 容错丢弃）<a class="headerlink" href="#61-uri-解析器computer-解析层--容错丢弃" title="Permanent link">&para;</a></h3>
 <ul>
-<li>优先级排序：从 <code>annotations.priority</code>（float）降序</li>
-<li>全屏处理：从 <code>_meta.fullscreen</code>，per-Server 处理</li>
-<li>缺失值同义：<code>annotations is None</code> 与 <code>annotations.priority is None</code> 等价处理为 0.0</li>
+<li>✅ <code>window://host/path</code> 解析成功</li>
+<li>✅ <code>window://host/path?priority=5</code> Computer 端容错丢弃 query + WARN，不返回 4012/4001 类硬错</li>
+<li>❌ Agent SDK 构造时附 query → 构造层硬错误</li>
 </ul>
-<h3 id="63-clientget_dpe--resolver">6.3 client:get_dpe + Resolver<a class="headerlink" href="#63-clientget_dpe--resolver" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>用例</th>
-<th>预期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>注册 Resolver + 合法 dpe URI</td>
-<td>✅ 返回 <code>GetDPERet(uri=...)</code></td>
-</tr>
-<tr>
-<td>未注册 Resolver</td>
-<td>❌ <code>4011 DPE Resolver Not Configured</code></td>
-</tr>
-<tr>
-<td>非法 URI（缺 doc-ref / 非 dpe scheme / 含 fragment 等）</td>
-<td>❌ <code>4012 Invalid DPE URI</code></td>
-</tr>
-<tr>
-<td>Resolver 抛异常</td>
-<td>❌ <code>4013 DPE Resolution Failed</code>（含 reason）</td>
-</tr>
-<tr>
-<td>上游 MCP Server <code>resources/read</code> 失败</td>
-<td>❌ <code>4013 DPE Resolution Failed</code></td>
-</tr>
-<tr>
-<td>Resolver 返回 https URL</td>
-<td>✅ Agent 应用层 GET 拿到内容</td>
-</tr>
-<tr>
-<td>Resolver 返回 file URL（同机部署）</td>
-<td>✅ Agent 应用层读本地文件</td>
-</tr>
-</tbody>
-</table>
-<h3 id="631-clientget_resources资源发现">6.3.1 client:get_resources（资源发现）<a class="headerlink" href="#631-clientget_resources资源发现" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>用例</th>
-<th>预期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>已注册的 mcp_server + cursor=None</td>
-<td>✅ 返回 <code>{resources, next_cursor?}</code>（透明转发 MCP <code>resources/list</code>）</td>
-</tr>
-<tr>
-<td>已注册的 mcp_server + 翻页 cursor</td>
-<td>✅ 拿下一页；末页 <code>next_cursor</code> 缺省</td>
-</tr>
-<tr>
-<td>未注册的 mcp_server</td>
-<td>❌ <code>404 Not Found</code>（错误信息含 server 名称）</td>
-</tr>
-<tr>
-<td>Computer 不做协议级过滤</td>
-<td>✅ 响应中含任意 scheme 的 Resource（dpe / window / 业务自定义），由 Agent 自决过滤</td>
-</tr>
-<tr>
-<td>完整发现流程</td>
-<td>✅ Agent 用 <code>get_config</code> + 多次 <code>get_resources</code> 翻页 + 自决过滤 → 拿到 dpe URI 列表 → <code>get_dpe</code> 拿访问 URI</td>
-</tr>
-</tbody>
-</table>
-<h3 id="64-host-路由--唯一性">6.4 host 路由 / 唯一性<a class="headerlink" href="#64-host-路由--唯一性" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>用例</th>
-<th>预期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>两个 MCP Server 声明不同 host</td>
-<td>✅ 注册成功；<code>get_dpe</code> 按 host 反查正确路由</td>
-</tr>
-<tr>
-<td>两个 MCP Server 声明相同 host（同一 Computer）</td>
-<td>⚠️ 注册成功但记 WARN（含两个 Server 名 + 共用 host）</td>
-</tr>
-<tr>
-<td>host 重复时 <code>get_dpe(uri=dpe://repeated-host/...)</code></td>
-<td>⚠️ 路由到<strong>先注册的</strong> Server + 记 WARN；后注册者的同 URI 资源无法被命中</td>
-</tr>
-<tr>
-<td><code>get_dpe(uri=dpe://unknown-host/...)</code>（host 不在任何 Server 索引中）</td>
-<td>❌ <code>4013 DPE Resolution Failed</code></td>
-</tr>
-<tr>
-<td>单 MCP Server 内 URI 重复（MCP 标准已禁）</td>
-<td>❌ 由 MCP <code>resources/list</code> 自身校验拒绝</td>
-</tr>
-</tbody>
-</table>
-<h3 id="65-协议版本握手">6.5 协议版本握手<a class="headerlink" href="#65-协议版本握手" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>场景</th>
-<th>Client</th>
-<th>Server</th>
-<th>预期</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>完全匹配</td>
-<td>0.2.0</td>
-<td>0.2.0</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>PATCH 差异</td>
-<td>0.2.1</td>
-<td>0.2.0</td>
-<td>✅</td>
-</tr>
-<tr>
-<td>MINOR 差异（v0.x）</td>
-<td>0.2.0</td>
-<td>0.3.0</td>
-<td>❌ HTTP 400 + <code>4008</code></td>
-</tr>
-<tr>
-<td>MAJOR 差异</td>
-<td>1.0.0</td>
-<td>0.2.0</td>
-<td>❌ HTTP 400 + <code>4008</code></td>
-</tr>
-<tr>
-<td>缺失 a2c_version</td>
-<td>—</td>
-<td>0.2.0</td>
-<td>❌ HTTP 400</td>
-</tr>
-<tr>
-<td>非法版本号</td>
-<td>"abc"</td>
-<td>0.2.0</td>
-<td>❌ HTTP 400</td>
-</tr>
-<tr>
-<td>中间件前置性</td>
-<td>connect handler 抛异常</td>
-<td>0.2.0</td>
-<td>校验仍正常工作</td>
-</tr>
-</tbody>
-</table>
-<h3 id="66-集成测试">6.6 集成测试<a class="headerlink" href="#66-集成测试" title="Permanent link">&para;</a></h3>
+<h3 id="62-organize_desktop">6.2 organize_desktop<a class="headerlink" href="#62-organize_desktop" title="Permanent link">&para;</a></h3>
+<p>与 v0.1 保持算法一致，仅元数据来源变化。测试用例：从 v0.1 的 URI query 切换到 Resource annotations / _meta 后<strong>输出顺序应一致</strong>。</p>
+<h3 id="63-clientget_resources资源发现">6.3 client:get_resources（资源发现）<a class="headerlink" href="#63-clientget_resources资源发现" title="Permanent link">&para;</a></h3>
 <ul>
-<li>完整 <code>get_dpe</code> 流程：Mock MCP Server 返回 <code>dpe://</code> Resource → Agent <code>client:get_resources</code> 发现 → Agent <code>client:get_dpe</code> 解析 → Computer 调 Resolver → Agent 用应用层拉取</li>
-<li>4008 死循环防御：底层 socketio 自动重连开启时，收到 4008 SDK 必须主动 disconnect</li>
+<li>✅ 调用合法 MCP Server 返回 <code>{resources, next_cursor}</code></li>
+<li>✅ cursor 翻页正确处理</li>
+<li>❌ 引用未注册 server → <code>4014 MCP Server Not Found</code></li>
+<li>❌ MCP Server 不支持 <code>resources</code> capability → <code>4015 MCP Capability Not Supported</code></li>
 </ul>
-<h3 id="67-回归测试重点">6.7 回归测试重点<a class="headerlink" href="#67-回归测试重点" title="Permanent link">&para;</a></h3>
+<h3 id="64-协议版本握手">6.4 协议版本握手<a class="headerlink" href="#64-协议版本握手" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Desktop 全链路</strong>：list → notify:update_desktop → 重新 list（Window 行为完全不变，仅元数据来源变化）</li>
-<li><strong>工具调用全链路</strong>：未受 v0.2 影响，确保不破坏</li>
+<li>✅ 兼容版本 → connect 成功</li>
+<li>❌ 缺 <code>a2c_version</code> → HTTP 400 + 4008</li>
+<li>❌ 不兼容版本 → HTTP 400 + 4008 + 服务器版本范围</li>
+<li>✅ Client 收到 4008 后主动 disconnect，不再尝试 WS upgrade</li>
 </ul>
 <hr />
-<h2 id="7-兼容性策略">7. 兼容性策略<a class="headerlink" href="#7-兼容性策略" title="Permanent link">&para;</a></h2>
-<h3 id="71-协议层硬切换">7.1 协议层：硬切换<a class="headerlink" href="#71-协议层硬切换" title="Permanent link">&para;</a></h3>
-<p>v0.1.x 与 v0.2.0 在 URI 形态、Finder 移除、<code>get_dpe</code> 新增等多处<strong>无法互通</strong>。Server 端通过 HTTP 中间件 <code>a2c_version</code> 校验，不兼容直接拒绝（HTTP 400 + <code>4008</code>）。</p>
-<h4 id="不内建-v01-mcp-server-fallback">不内建 v0.1 MCP Server fallback<a class="headerlink" href="#不内建-v01-mcp-server-fallback" title="Permanent link">&para;</a></h4>
-<p>v0.2 SDK <strong>MUST NOT</strong> 内建针对 v0.1 MCP Server 的 URI query fallback 解析。当 v0.2 Computer 遇到只在 URI query 中携带 <code>?priority=</code> / <code>?fullscreen=</code> 的 v0.1 MCP Server 时：</p>
-<ul>
-<li>按 v0.2 校验规则丢弃 URI query 部分（仅 WARN）</li>
-<li>不读取 <code>_meta</code> / <code>annotations</code> 之外的元数据来源</li>
-<li>Desktop 中该窗口降级显示为 <code>priority=0.0, fullscreen=false</code></li>
-</ul>
-<p>理由：保持协议纯粹；用户感知到降级会主动升级 MCP Server，比静默兼容更早暴露问题。</p>
-<h3 id="72-数据层agent-视角">7.2 数据层：Agent 视角<a class="headerlink" href="#72-数据层agent-视角" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Window 端 Agent 看到的 <code>Desktop</code> 字符串列表形态<strong>不变</strong></li>
-<li>DPE 端 Agent 拿到的是访问 URI（v0.1 没有这个语义，是新增）；具体内容由应用层拉取</li>
-</ul>
-<h3 id="73-mcp-server-生态">7.3 MCP Server 生态<a class="headerlink" href="#73-mcp-server-生态" title="Permanent link">&para;</a></h3>
-<ul>
-<li>旧 MCP Server（只输出 URI query 形态）在 v0.2 Computer 下 Desktop <strong>MUST 降级</strong>为 <code>priority=0.0, fullscreen=false</code> 并 WARN</li>
-<li>旧 MCP Server（实现 v0.1 DPE Level 0）在 v0.2 Computer 下，Level 0 响应被忽略（Computer 不再调用）</li>
-</ul>
-<p><strong>结论</strong>：v0.2 Computer 对旧 MCP Server 宽容（降级运行），但 v0.1 Computer <strong>无法</strong>消费 v0.2 MCP Server。<strong>升级顺序</strong>：Computer 先于 MCP Server。</p>
-<h3 id="74-建议的升级顺序">7.4 建议的升级顺序<a class="headerlink" href="#74-建议的升级顺序" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>阶段 1：发布 v0.2 Computer SDK（含 DPE Resolver API + get_dpe + get_resources）
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>阶段 2：用户升级 Computer 到 v0.2，业务方注册 Resolver
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>阶段 3：发布 v0.2 MCP Server Helper（Window 用 annotations，DPE 用 _meta）
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>阶段 4：MCP Server 增量升级（Window/DPE 元数据迁移）
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>阶段 5：发布 v0.2 Agent SDK（含 get_dpe / get_resources 客户端 + 应用层拉取）
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>阶段 6：Agent 升级；旧 v0.1 客户端无法连接 v0.2 Server，由 4008 提示用户升级
-</code></pre></div>
+<h2 id="7-priority-int-0100--float-01-迁移">7. priority int [0,100] → float [0,1] 迁移<a class="headerlink" href="#7-priority-int-0100--float-01-迁移" title="Permanent link">&para;</a></h2>
+<h3 id="换算对照表">换算对照表<a class="headerlink" href="#换算对照表" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>v0.1（int [0, 100]）</th>
+<th>v0.2（float [0, 1]）</th>
+<th>语义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>1.0</td>
+<td>最高优先级</td>
+</tr>
+<tr>
+<td>80</td>
+<td>0.8</td>
+<td>高</td>
+</tr>
+<tr>
+<td>50</td>
+<td>0.5</td>
+<td>中</td>
+</tr>
+<tr>
+<td>30</td>
+<td>0.3</td>
+<td>低</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0.0</td>
+<td>最低</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>不存在</strong>自动迁移工具——SDK 必须在加载 v0.1 数据时显式转换。</p>
+</blockquote>
 <hr />
-<h2 id="8-版本号与发布">8. 版本号与发布<a class="headerlink" href="#8-版本号与发布" title="Permanent link">&para;</a></h2>
-<h3 id="81-语义化版本">8.1 语义化版本<a class="headerlink" href="#81-语义化版本" title="Permanent link">&para;</a></h3>
-<p>按 <a href="../../specification/versioning/">versioning.md</a> PATCH 自由 / MINOR 严格 / v0.x 规则：v0.1 → v0.2 是 MINOR bump（v0.x 阶段 MINOR 也是破坏性）。</p>
-<h3 id="82-发布清单">8.2 发布清单<a class="headerlink" href="#82-发布清单" title="Permanent link">&para;</a></h3>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 协议规范文档（<code>docs/specification/</code>、<code>docs/migrations/</code>）已更新</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> python-sdk 实现完成 + 测试通过</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> rust-sdk 实现完成 + 测试通过</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> python-sdk 包版本 <code>0.2.0</code> 发布</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> rust-sdk crate 版本 <code>0.2.0</code> 发布</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> CHANGELOG / 升级公告已发出</li>
-</ul>
-<h3 id="83-文档变更">8.3 文档变更<a class="headerlink" href="#83-文档变更" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>docs/specification/dpe.md</code>：<strong>新建</strong>（替代旧 finder.md）</li>
-<li><code>docs/specification/finder.md</code>：<strong>已删除</strong>（Finder 移出协议范围）</li>
-<li><code>docs/guides/finder-sdk-guide.md</code>：<strong>已删除</strong></li>
-<li><code>docs/specification/desktop.md</code>：已更新（priority float / audience / <code>_meta.fullscreen</code>）</li>
-<li><code>docs/specification/data-structures.md</code>：删除 <code>ListFinderReq</code> / <code>ListFinderRet</code> / <code>DPEDocumentSummary</code> / <code>DPEPageSummary</code> / <code>DPEElementDetail</code>；新增 <code>GetDPEReq</code> / <code>GetDPERet</code></li>
-<li><code>docs/specification/events.md</code>：删除 <code>client:list_finder</code> / <code>server:update_finder</code> / <code>notify:update_finder</code>；新增 <code>client:get_dpe</code></li>
-<li><code>docs/specification/error-handling.md</code>：新增 4006/4007/4008/4011/4012/4013</li>
-<li><code>docs/specification/architecture.md</code>：DPE 章节重写（去掉 Finder Organizer，加入 Resolver Hook）</li>
-<li><code>docs/specification/versioning.md</code>：协议依赖 / SDK 版本锁定 / 4008 disconnect / 等</li>
-<li><code>docs/appendix/faq.md</code>：DPE Q&amp;A 重写</li>
-</ul>
+<h2 id="8-兼容性策略">8. 兼容性策略<a class="headerlink" href="#8-兼容性策略" title="Permanent link">&para;</a></h2>
+<h3 id="81-协议层硬切换">8.1 协议层：硬切换<a class="headerlink" href="#81-协议层硬切换" title="Permanent link">&para;</a></h3>
+<p>v0.2 不向后兼容 v0.1。Socket.IO connect 阶段 <code>a2c_version</code> 不匹配直接断连。</p>
+<h3 id="82-不内建-v01-mcp-server-fallback">8.2 不内建 v0.1 MCP Server fallback<a class="headerlink" href="#82-不内建-v01-mcp-server-fallback" title="Permanent link">&para;</a></h3>
+<p>部署侧需先升级 MCP Server 再升级 Computer / Agent。</p>
+<h3 id="83-升级顺序建议">8.3 升级顺序建议<a class="headerlink" href="#83-升级顺序建议" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>先升 MCP Server</strong>——更新 URI 与元数据声明形态（最先发布也最容易回滚）</li>
+<li><strong>再升 Computer</strong>——支持新 URI 解析、新事件、版本握手</li>
+<li><strong>最后升 Agent</strong>——发布新 SDK 版本</li>
+</ol>
 <hr />
 <h2 id="9-联系与反馈">9. 联系与反馈<a class="headerlink" href="#9-联系与反馈" title="Permanent link">&para;</a></h2>
 <ul>
 <li>协议仓库：<a href="https://github.com/A2C-SMCP/a2c-smcp-protocol">github.com/A2C-SMCP/a2c-smcp-protocol</a></li>
 <li>python-sdk：<a href="https://github.com/A2C-SMCP/python-sdk">github.com/A2C-SMCP/python-sdk</a></li>
 <li>rust-sdk：<a href="https://github.com/A2C-SMCP/rust-sdk">github.com/A2C-SMCP/rust-sdk</a></li>
+<li>DPE 协议（独立仓库）：<a href="https://github.com/A2C-SMCP/dpe-protocol">github.com/A2C-SMCP/dpe-protocol</a></li>
 <li>实现疑问 / 跨 SDK 不一致 / 协议歧义 → 在协议仓库开 issue</li>
 </ul>
 
