@@ -95,7 +95,7 @@ A2C-SMCP 协议版本号采用**语义化版本（Semantic Versioning）**，格
 - 改变已有字段的**类型**（如 `list[str]` 改为 `dict`）
 - 移除或改变已有错误码
 - 改变事件的**路由语义**（如 `client:*` 前缀的含义）
-- 删除或重命名 URI scheme（`window://` / `dpe://`）、或改变 URI 语法
+- 删除或重命名 URI scheme（如 `window://`）、或改变 URI 语法
 
 **兼容性**：
 

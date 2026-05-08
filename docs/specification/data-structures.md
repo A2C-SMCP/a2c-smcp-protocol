@@ -440,11 +440,11 @@ class GetDeskTopRet(TypedDict, total=False):
 
 ---
 
-## DPE 文档相关结构
+## Resource 发现相关结构
 
 ### GetResourcesReq
 
-枚举指定 MCP Server 的 Resource 列表请求——透明转发 MCP 标准 `resources/list`，**不做协议级过滤**。Agent 据此发现 dpe / window / 业务自定义 scheme 的资源。
+枚举指定 MCP Server 的 Resource 列表请求——透明转发 MCP 标准 `resources/list`，**不做协议级过滤**。Agent 据此发现 window / 业务自定义 scheme 的资源。
 
 ```python
 class GetResourcesReq(AgentCallData, total=True):
@@ -467,7 +467,7 @@ class GetResourcesRet(TypedDict, total=False):
 !!! note "透明转发原则"
 
     Computer 不做 scheme / 元数据层面的过滤、不做跨 Server 聚合——业务方按 Server 维度
-    遍历，自决过滤条件（`dpe://` / `window://` / `_meta` 字段 / 名称匹配等）。
+    遍历，自决过滤条件（`window://` / `_meta` 字段 / 名称匹配等）。
     **保留 MCP 标准 cursor 翻页能力**，业务方按需翻页，不强制全量加载。
 
     - `mcp_server` 不存在 → `4014 MCP Server Not Found`
@@ -475,11 +475,11 @@ class GetResourcesRet(TypedDict, total=False):
 
 !!! note "v0.2 不返回 resourceTemplates"
 
-    `client:get_resources` 仅对应 MCP `resources/list`，**不返回** resourceTemplates。MCP 上游有独立端点 `resources/templates/list`——v0.2 用户场景（DPE / window 静态资源发现）不需要 URI 模板能力，未来 v0.3+ 如有需要将增加 `client:get_resource_templates` 独立事件。
+    `client:get_resources` 仅对应 MCP `resources/list`，**不返回** resourceTemplates。MCP 上游有独立端点 `resources/templates/list`——v0.2 用户场景（window 静态资源发现等）不需要 URI 模板能力，未来 v0.3+ 如有需要将增加 `client:get_resource_templates` 独立事件。
 
 ### A2CResource
 
-A2C 协议定义的 Resource 类型——结构镜像 MCP `Resource`，但字段命名沿用 A2C snake_case 风格。`A2CResource` 是 DPE Resolver 的**输入与输出同形载体**：原始 DPE Resource → Resolver 二次加工 → Agent 可访问的 Resource。
+A2C 协议定义的 Resource 类型——结构镜像 MCP `Resource`，但字段命名沿用 A2C snake_case 风格。
 
 ```python
 class A2CResource(TypedDict, total=False):
@@ -489,82 +489,8 @@ class A2CResource(TypedDict, total=False):
     mime_type: NotRequired[str]
     size: NotRequired[int]              # 可选：字节数
     annotations: NotRequired[dict]      # 透传 MCP annotations（含 audience 等）
-    _meta: NotRequired[dict]            # 协议扩展点（_meta.expires_at / _meta.etag 等承载于此）
+    _meta: NotRequired[dict]            # 协议扩展点
 ```
-
-#### `_meta` 协议扩展字段
-
-`_meta` 内的字段沿用扁平命名（与 [DPE Resource 元数据](dpe.md#dpe-resource-元数据) 一致）。Resolver 输出的 `A2CResource._meta` 可携带访问层 hint：
-
-| 字段 | 类型 | 含义 |
-|------|------|------|
-| `_meta.expires_at` | ISO 8601 字符串 | URI 过期时间；缺省视为不过期 |
-| `_meta.etag` | 字符串 | 内容指纹；Agent 多次拉取时校验一致性 |
-
-不再使用 `cacheable` 字段——`expires_at` 缺省即"session 内可缓存"。
-
-### ResolverContents
-
-DPE Resolver 输入的内容形态判别联合，对应 [双 mimetype](dpe.md#dpe-文档读取的两种形态-mimetype) 解析后的形态：
-
-```python
-class InlineContents(TypedDict):
-    kind: Literal["inline"]             # 鉴别器
-    document: dict                      # DPE 标准 JSON（来自 application/vnd.a2c.dpe-inline+json 解析）
-
-class ExternalContents(TypedDict, total=False):
-    kind: Literal["external"]           # 鉴别器
-    uri: str                            # 必选：物理存储 URI（来自 application/vnd.a2c.dpe-uri+json 解析）
-    mime_type: NotRequired[str]
-    size: NotRequired[int]
-
-ResolverContents = Union[InlineContents, ExternalContents]
-```
-
-### ResolverHint
-
-DPE Resolver 输入的运行时上下文（业务侧审计需要）：
-
-```python
-class ResolverHint(TypedDict, total=True):
-    mcp_server_name: str                # 必选：Computer 已经路由过的 server 名
-    agent: str                          # 必选：发起请求的 Agent name
-    req_id: str                         # 必选：协议级 req_id
-```
-
-### GetDPEReq
-
-把一个 DPE URI 转成 Agent 可访问的 URI（业务 Resolver 实现）。
-
-```python
-class GetDPEReq(AgentCallData, total=True):
-    agent: str                          # Agent 名称
-    req_id: str                         # 请求 ID
-    computer: str                       # 目标 Computer 名称
-    uri: str                            # dpe://host/doc-ref（doc-ref 可单段或分段路径）
-    timeout: NotRequired[int]           # 可选：秒，默认实现自定
-```
-
-!!! note "URI 自包含寻址"
-
-    DPE URI 是**自包含寻址凭据**——Agent 拿到任意 dpe URI（来自 `client:get_resources` / 业务工具返回 / 用户输入 / 历史持久化）都可直接调用 `get_dpe`，不需要持有外部元信息。Computer 通过 URI 中的 `host` 反查目标 MCP Server 进行路由。
-
-    跨 MCP Server host **MUST** 唯一——Computer 在 MCP Server 注册阶段强制检测，冲突时**注册失败**（硬约束）。运行时不存在路由歧义。详见 [DPE 文档协议 - host 路由策略](dpe.md#host-路由策略)。
-
-### GetDPERet
-
-`GetDPERet` 内容字段完全等同 `A2CResource`——Resolver 是 MCP Resource 的二次加工器，输入输出同形（uri 从逻辑标识转为物理访问地址）。
-
-```python
-class GetDPERet(A2CResource, total=False):
-    req_id: str                         # A2C 协议级关联字段（其他字段继承自 A2CResource）
-```
-
-!!! note "URI 生命周期与可用性"
-
-    `GetDPERet.uri` 的过期、刷新、签名机制由**业务层 Resolver** 自决，A2C 协议**不**规定。访问层 hint（过期时间、内容指纹）通过 `_meta.expires_at` / `_meta.etag` 承载。Agent 拿到 URI 后用应用层协议（HTTP / file / ...）拉取实际内容；URI 失效时应重新调用 `client:get_dpe`。Agent **MUST NOT** 跨 session 缓存 URI。
-
-详见 [DPE 文档协议](dpe.md) 完整规范。
 
 ---
 

@@ -126,62 +126,13 @@ MCP Server 参与 Desktop 需满足以下条件：
 
 ---
 
-## DPE 文档相关
+## 文档分发相关
 
-### Q: DPE 和 Desktop 有什么区别？
+### Q: A2C-SMCP 协议如何处理大文档（PDF / Excel / PPT 等）的传输？
 
-**Desktop** 管理瞬态上下文（`window://`），适合小型、频繁变化的数据（如当前浏览器页面、编辑器状态），内容随 Socket.IO 直接传输。**DPE** 是文档抽象（`dpe://`），适合大型结构化内容（如 Excel 表格、PDF 文档、PPT 演示文稿）；DPE 内容**不走 Socket.IO**，由 Computer 端业务 Resolver 转成访问 URI（对象存储 / 本地文件 / 任意 scheme），Agent 用应用层协议（HTTP / file / ...）自取。
+**不在协议范围**。A2C-SMCP 是**控制面**协议（事件路由、工具调用、桌面）。结构化文档分发由独立的 [DPE 协议](https://github.com/A2C-SMCP/dpe-protocol) 承担——基于 OCI Distribution 的内容寻址 + 增量分发。Agent 通过 DPE 协议拉取文档内容，A2C-SMCP 不直接承载文档字节。
 
-### Q: 什么是 DPE 三层模型？
-
-DPE 代表 Document-Page-Element 三层结构：
-
-- **Document**: 一个完整文档实例（如一个 Excel 工作簿）
-- **Page**: 文档内的一个逻辑页面（如一个工作表）
-- **Element**: 页面内的一个内容单元（如一个表格、一段文本）
-
-DPE 三层是**内容结构层级**——通过 Resolver 输出的访问 URI 拉到的 JSON 必须符合 DPE 标准格式（Document JSON 含 pages 数组，每个 Page 含 elements 数组）。**URI 层只标识 Document**（`dpe://host/doc-ref`）；Page / Element 在 JSON 内部表达，不在 URI 层级。详见 [DPE 内容标准格式](../specification/dpe.md#dpe-内容标准格式)。
-
-### Q: dpe:// URI 的格式是什么？
-
-**格式**: `dpe://{host}/{doc-ref}`
-
-DPE URI 是**纯文档标识符**，**只到 Document 一层**——Page / Element 是文档内部结构（DPE 内容 JSON 的 pages / elements 数组），不在 URI 层级。URI **不携带 query / fragment**，所有元数据通过 MCP Resource 的 `_meta` / `annotations` 声明。
-
-`doc-ref` 支持单段或分段路径，业务方按需选择风格：
-
-```
-dpe://com.example.docs/rpt-2026                      # 单段不透明键
-dpe://com.example.docs/reports/2026/annual           # 三段层级路径
-dpe://com.example.code/src/main/java/Foo.java        # 含扩展名的代码路径
-```
-
-详见 [DPE 文档协议 - URI 规范](../specification/dpe.md#dpe-uri-规范)。
-
-### Q: 如何让 MCP Server 暴露 DPE 文档？
-
-按 MCP 标准实现即可，**无需任何 SMCP 特定改动**：
-
-1. 在 `resources/list` 中返回有效的 `dpe://` URI 的 Resource（含 `_meta` / `annotations` 元数据）
-2. 实现 `resources/read`，返回对应 ResourceContents（内容形态由 MCP Server 与文档应用层约定，A2C 协议不规定）
-
-详见 [DPE 文档协议 - MCP Server 实现指引](../specification/dpe.md#mcp-server-实现指引)。
-
-### Q: Agent 如何获取 DPE 文档内容？
-
-Agent 调用 `client:get_dpe(uri=dpe://...)` → Computer 调本地业务 Resolver 把 DPE 转成访问 URI → Agent 用应用层协议（HTTP / file / ...）自取实际内容。A2C 协议本身**不**承载 DPE 文档内容（避免大体量内容压垮 Socket.IO）。
-
-详见 [DPE 文档协议 - client:get_dpe 事件](../specification/dpe.md#clientget_dpe-事件)。
-
-### Q: 为什么 client:get_dpe 返回 4011？
-
-`4011 DPE Resolver Not Configured` 表示 Computer 未注册 DPE Resolver hook。Computer 业务方必须显式实现 Resolver（决定把 DPE 内容投递给 Agent 的方式：上传对象存储 / 落本地缓存 / 任意 URI scheme）。协议**不**降级到"inline 透传 ResourceContents"——这是设计意图。
-
-详见 [DPE 文档协议 - DPE Resolver Hook](../specification/dpe.md#dpe-resolver-hook业务层)。
-
-### Q: A2C 为什么没有内置 Finder（文档目录浏览器）？
-
-DPE 是底层抽象（类比 Linux POSIX 文件 API），Finder 是上层应用（类比文件管理器）。v0.2 协议保持纯粹——只定义 DPE 抽象（URI / 元数据 / 转换 hook），不内置文档发现、检索、聚合视图等"管理类"能力。这些未来作为内置 MCP Server（"Finder"）独立提供，与协议核心解耦。
+> 历史背景：v0.2 早期草案曾把 DPE 内嵌为 A2C-SMCP 的 Resource 类型（`dpe://` URI + Resolver Hook + `client:get_dpe` 事件），由于数据流方向、传输形态、业界先例等多个层面不匹配，已**整体抽离为独立协议仓库**。客户端实现请直接对接 [dpe-protocol](https://github.com/A2C-SMCP/dpe-protocol)，不再走 A2C-SMCP 通道。
 
 ---
 
