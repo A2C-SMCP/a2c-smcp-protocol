@@ -116,5 +116,7 @@ nav:
       - 安全考虑: specification/security.md
   - 开发指南:
       - Computer MCP 配置指南: guides/computer-mcp-config-guide.md
+  - 迁移指南:
+      - v0.2 升级指南: migrations/v0.2-uri-metadata-refactor.md
   - 附录:
       - 常见问题: appendix/faq.md
