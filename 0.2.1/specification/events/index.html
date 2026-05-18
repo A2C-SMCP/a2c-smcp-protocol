@@ -2530,7 +2530,7 @@
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;/smcp&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;agent&quot;</span><span class="p">},</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;polling&quot;</span><span class="p">,</span> <span class="s2">&quot;websocket&quot;</span><span class="p">],</span>   <span class="c1"># SHOULD：保证首个握手是 HTTP polling，4008 body 可访问</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;polling&quot;</span><span class="p">,</span> <span class="s2">&quot;websocket&quot;</span><span class="p">],</span>   <span class="c1"># MUST：首个握手必须走 HTTP polling，4008 body 可读（versioning.md §5）</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">)</span>
 </code></pre></div>
 <blockquote>

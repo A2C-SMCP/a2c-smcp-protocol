@@ -1022,6 +1022,67 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#5-websocket-only-握手的版本拒绝形态" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. WebSocket-only 握手的版本拒绝形态
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. WebSocket-only 握手的版本拒绝形态">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#r1-客户端-polling-firstmust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R1 客户端 polling-first（MUST）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r2-服务端-must-校验-websocket-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R2 服务端 MUST 校验 websocket scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r3-拒绝形态二选一按运行栈能力" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R3 拒绝形态（二选一，按运行栈能力）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r4-客户端收到-close-code-4900" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R4 客户端收到 close code 4900
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1044,6 +1105,17 @@
     <span class="md-ellipsis">
       
         4008 Protocol Version Mismatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4900-ws-version-handshake-rejectedwebsocket-close-code非-errorpayloadcode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4900 WS Version-Handshake Rejected（WebSocket close code，非 ErrorPayload.code）
       
     </span>
   </a>
@@ -1862,6 +1934,67 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#5-websocket-only-握手的版本拒绝形态" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. WebSocket-only 握手的版本拒绝形态
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. WebSocket-only 握手的版本拒绝形态">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#r1-客户端-polling-firstmust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R1 客户端 polling-first（MUST）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r2-服务端-must-校验-websocket-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R2 服务端 MUST 校验 websocket scope
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r3-拒绝形态二选一按运行栈能力" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R3 拒绝形态（二选一，按运行栈能力）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r4-客户端收到-close-code-4900" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R4 客户端收到 close code 4900
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1884,6 +2017,17 @@
     <span class="md-ellipsis">
       
         4008 Protocol Version Mismatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4900-ws-version-handshake-rejectedwebsocket-close-code非-errorpayloadcode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4900 WS Version-Handshake Rejected（WebSocket close code，非 ErrorPayload.code）
       
     </span>
   </a>
@@ -2097,7 +2241,7 @@
 
 
 <h1 id="协议版本与握手">协议版本与握手<a class="headerlink" href="#协议版本与握手" title="Permanent link">&para;</a></h1>
-<p><strong>当前协议版本</strong>: <code>0.2.0</code></p>
+<p><strong>当前协议版本</strong>: <code>0.2.1</code></p>
 <p>A2C-SMCP 作为三方参与（Agent / Server / Computer）的协议，必须保证同一房间内的成员以兼容的协议版本通信。本规范定义协议版本号语义、兼容性判定规则，以及在 <strong>Socket.IO 连接的 HTTP 层</strong>完成的版本校验流程。</p>
 <hr />
 <h2 id="设计取向">设计取向<a class="headerlink" href="#设计取向" title="Permanent link">&para;</a></h2>
@@ -2356,12 +2500,16 @@
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;/smcp&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;agent&quot;</span><span class="p">},</span>                    <span class="c1"># 业务层身份数据</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;polling&quot;</span><span class="p">,</span> <span class="s2">&quot;websocket&quot;</span><span class="p">],</span>       <span class="c1"># SHOULD：保证首个握手是 HTTP polling，4008 body 可访问</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;polling&quot;</span><span class="p">,</span> <span class="s2">&quot;websocket&quot;</span><span class="p">],</span>       <span class="c1"># MUST：首个握手必须走 HTTP polling，4008 body 可读（见 §5）</span>
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span>
 </code></pre></div>
 <blockquote>
 <p><strong>注</strong>：协议规范仅提供 Python reference impl。其他 SDK（Rust / TypeScript / Go 等）的连接示例由各 SDK 自行决定——A2C-SMCP 协议文档不堆砌多语言示例。</p>
 </blockquote>
+<div class="admonition warning">
+<p class="admonition-title">polling-first 是 MUST（v0.2.1 由 SHOULD 收紧）</p>
+<p>客户端 <strong>MUST</strong> 令<strong>首个</strong>握手走 HTTP polling（<code>transports</code> 以 <code>polling</code> 起始或等效配置）。理由：版本校验依赖一个可承载 HTTP 400 + 4008 body 的响应阶段；直连 WebSocket 在 ASGI 下是 <code>websocket</code> scope、无常规 HTTP 响应阶段。SDK <strong>MUST NOT</strong> 默认 WebSocket-only。若调用方<strong>显式</strong>强制 WS-only，握手不被豁免——版本拒绝退化为 <a href="#5-websocket-only-握手的版本拒绝形态">§5</a> 定义的 WS 形态（服务端仍强制校验，保证传递性对<strong>任意</strong>客户端无条件成立）。</p>
+</div>
 <h3 id="2-server-在-http-中间件层校验实现无关的语义约束">2. Server 在 HTTP 中间件层校验（实现无关的语义约束）<a class="headerlink" href="#2-server-在-http-中间件层校验实现无关的语义约束" title="Permanent link">&para;</a></h3>
 <p>Server <strong>MUST</strong> 在任何 Socket.IO handler 执行<strong>之前</strong>，于 HTTP 层校验 URL query 中的 <code>a2c_version</code>。校验时机的强约束：</p>
 <table>
@@ -2373,12 +2521,12 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>MUST</strong> 在 Engine.IO HTTP 握手到达 Socket.IO 业务代码之前完成</td>
+<td><strong>MUST</strong> 在 Engine.IO 握手到达 Socket.IO 业务代码之前完成</td>
 <td>确保 <code>connect</code> handler 即使有 bug 也无法绕过版本校验</td>
 </tr>
 <tr>
-<td><strong>MUST</strong> 拦截所有 Engine.IO 握手 HTTP 请求（含 polling 与 WebSocket upgrade）</td>
-<td>任何路径的 Socket.IO 流量都要校验</td>
+<td><strong>MUST</strong> 同时校验 polling 握手与直连 WebSocket 握手两条建连路径</td>
+<td>二者 <code>a2c_version</code> 均在 query string 中；ASGI 下分别是 <code>http</code> 与 <code>websocket</code> scope。<strong>只校验 <code>http</code> scope 会让 <code>transports=["websocket"]</code> 客户端绕过版本闸门、击穿传递性保证</strong>。WS-only 握手的校验与拒绝形态见 <a href="#5-websocket-only-握手的版本拒绝形态">§5</a></td>
 </tr>
 <tr>
 <td><strong>不强制</strong> HTTP 拦截路径</td>
@@ -2525,7 +2673,7 @@
 <h3 id="3-client-处理-http-400-错误">3. Client 处理 HTTP 400 错误<a class="headerlink" href="#3-client-处理-http-400-错误" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">4008 是 HTTP body code，不是 WS close code</p>
-<p>协议版本校验在 HTTP 层完成，发生在 WS 帧建立之前。<strong>4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中</strong>——SDK 实现 <strong>MUST NOT</strong> 把 4008 与 WebSocket close code 4xxx 混淆。完整的 4008 解析模式见 <a href="../error-handling/#协议版本不匹配4008">error-handling.md §协议版本不匹配（4008）</a>。</p>
+<p>polling 握手路径上版本校验在 HTTP 层完成、发生在 WS 帧建立之前。<strong>4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中</strong>——SDK 实现 <strong>MUST NOT</strong> 把 4008 与 WebSocket close code 混淆。WS-only 直连握手另有拒绝形态（首选 denial-response 仍回<strong>字节一致</strong>的 4008 body；栈不支持时回退到协议指定的、与 <code>4008</code> <strong>取不同值</strong>的 WS close code），见 <a href="#5-websocket-only-握手的版本拒绝形态">§5</a>。完整的 4008 解析模式见 <a href="../error-handling/#协议版本不匹配4008">error-handling.md §协议版本不匹配（4008）</a>。</p>
 </div>
 <p>Socket.IO 客户端遇到 HTTP 400 响应会触发 <code>connect_error</code> 事件，或在 <code>connect()</code> 调用时抛 <code>ConnectionError</code>。SDK <strong>必须</strong>解析响应 body，识别 <code>code: 4008</code> 并抛出专属异常。响应 body 不可访问的罕见 transport 边角情况下，可从 <code>X-A2C-Error-Code</code> 响应 header 中识别错误类型作为冗余诊断辅助。</p>
 <p>Python reference impl：</p>
@@ -2596,6 +2744,47 @@
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    → 抛 ProtocolVersionError(server_version, client_version) 到用户业务代码
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    → 用户决定如何应对（升级 SDK / 切换 Server 实例 / 报告给运维）
 </code></pre></div>
+<h3 id="5-websocket-only-握手的版本拒绝形态">5. WebSocket-only 握手的版本拒绝形态<a class="headerlink" href="#5-websocket-only-握手的版本拒绝形态" title="Permanent link">&para;</a></h3>
+<p>ASGI 把<strong>直连 WebSocket</strong>（客户端 <code>transports=["websocket"]</code>，跳过 polling）呈现为 <code>websocket</code> scope（<strong>不是</strong> <code>http</code>）。若服务端中间件只处理 <code>http</code> scope，这类客户端将<strong>绕过版本闸门</strong>——而 <a href="#设计取向">§设计取向</a> 的传递性保证（"同房间成员必然兼容，无需 peer 二次校验"）依赖闸门对<strong>任意</strong>客户端无条件成立。本节定义该路径的强制行为，消除该缺口。</p>
+<h4 id="r1-客户端-polling-firstmust">R1 客户端 polling-first（MUST）<a class="headerlink" href="#r1-客户端-polling-firstmust" title="Permanent link">&para;</a></h4>
+<p>见 <a href="#1-client-在-url-中声明版本">§1</a>：conforming 客户端首个握手 MUST 走 HTTP polling，故正常路径<strong>根本不会</strong>进入本节。本节仅约束<strong>非 conforming / 显式 WS-only</strong> 客户端，使闸门对它们仍然有效。</p>
+<h4 id="r2-服务端-must-校验-websocket-scope">R2 服务端 MUST 校验 websocket scope<a class="headerlink" href="#r2-服务端-must-校验-websocket-scope" title="Permanent link">&para;</a></h4>
+<p>服务端版本中间件 <strong>MUST</strong> 在 ASGI <code>websocket</code> scope（直连 WS 握手）上执行与 <code>http</code> scope <strong>相同</strong>的校验：<code>a2c_version</code> 同样位于 <code>scope["query_string"]</code>，判定逻辑复用 <code>is_compatible</code>，<strong>不得</strong>因 scope 类型不同而跳过。</p>
+<h4 id="r3-拒绝形态二选一按运行栈能力">R3 拒绝形态（二选一，按运行栈能力）<a class="headerlink" href="#r3-拒绝形态二选一按运行栈能力" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>运行栈</th>
+<th>服务端 MUST 行为</th>
+<th>客户端可见</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>支持 ASGI <strong>WebSocket Denial Response</strong>（uvicorn ≥0.21 / hypercorn / daphne 等）</td>
+<td>在 WS 打开<strong>之前</strong>返回 <strong>HTTP 400 + 与 polling 路径字节一致的 4008 flat ErrorPayload + <code>X-A2C-Error-Code: 4008</code></strong></td>
+<td>与 polling 路径<strong>完全一致</strong>，4008 仍是单一事实源，SDK 复用同一解析路径</td>
+</tr>
+<tr>
+<td>不支持 denial-response</td>
+<td>以协议指定的 WebSocket close code <strong><code>4900</code></strong> 关闭握手</td>
+<td>收到 close code <code>4900</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">为什么 close code 取 <code>4900</code> 而非 <code>4008</code></p>
+<p><code>4900</code> 是 RFC 6455 私有段（4000–4999）的 <strong>WebSocket close code</strong>，<strong>不是</strong> <code>ErrorPayload.code</code>，且<strong>有意取与 <code>4008</code> 不同的值</strong>——遵守"4008 是 HTTP body code，MUST NOT 与 WS close code 混淆"的既有铁律：不是禁止在 WS 路径拒绝，而是要求该路径用一个<strong>独立、可区分</strong>的标识。<code>4900</code> 选自当前 <code>ErrorPayload.code</code> 未占用区间（避免与 4006–4018 / 4101–4104 数值视觉混淆），仅表意"A2C 版本握手被拒"，<strong>不</strong>携带结构化 body（WS close reason ≤123 字节，仅放简短文案）。</p>
+</div>
+<h4 id="r4-客户端收到-close-code-4900">R4 客户端收到 close code <code>4900</code><a class="headerlink" href="#r4-客户端收到-close-code-4900" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>MUST NOT</strong> 自动重连（同 <a href="#4-client-sdk-must-主动断开连接">§4</a> 死循环防御）</li>
+<li><strong>SHOULD</strong> 用 <strong>polling-only</strong> transport 重连一次，取回权威 HTTP 400 + 4008 body，再抛 <code>ProtocolVersionError</code>（拿到完整 <code>server_version</code>/<code>client_version</code>/<code>min_supported</code>/<code>max_supported</code>）</li>
+<li>若重连仍拿不到 body：直接以 <code>4900</code> 抛 <code>ProtocolVersionError</code>，<code>message</code> 注明"WS-only 握手被服务端按版本不匹配拒绝；请改用 polling 重连以获取版本详情"，版本字段可为空</li>
+</ul>
+<blockquote>
+<p><strong>净效果</strong>：传递性保证对<strong>任意</strong>客户端无条件成立——conforming 客户端走 polling 得标准 4008；非 conforming WS-only 客户端在支持 denial-response 的栈上同样得字节一致的 4008，否则得可判定的 <code>4900</code>。服务端在任何情形下都<strong>不会</strong>放行版本不兼容的连接。</p>
+</blockquote>
 <hr />
 <h2 id="错误码">错误码<a class="headerlink" href="#错误码" title="Permanent link">&para;</a></h2>
 <h3 id="4008-protocol-version-mismatch">4008 Protocol Version Mismatch<a class="headerlink" href="#4008-protocol-version-mismatch" title="Permanent link">&para;</a></h3>
@@ -2614,6 +2803,16 @@
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">}</span>
 </code></pre></div>
 <p>完整字段语义、SDK 解析示例（Python reference impl）见 <a href="../error-handling/#协议版本不匹配4008">error-handling.md §协议版本不匹配（4008）</a>。Client SDK <strong>必须</strong>将此错误转换为明确异常，而不是静默重试。</p>
+<ul>
+<li><strong>承载层</strong>：4008 始终是 <strong>HTTP 400 body</strong> 的 <code>ErrorPayload.code</code>。WS-only 直连握手在支持 denial-response 的运行栈上<strong>仍回字节一致的 4008 HTTP body</strong>；不支持时改用下面的 <code>4900</code>。</li>
+</ul>
+<h3 id="4900-ws-version-handshake-rejectedwebsocket-close-code非-errorpayloadcode">4900 WS Version-Handshake Rejected（WebSocket close code，非 ErrorPayload.code）<a class="headerlink" href="#4900-ws-version-handshake-rejectedwebsocket-close-code非-errorpayloadcode" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>触发</strong>：客户端违反 <a href="#1-client-在-url-中声明版本">§1 polling-first MUST</a> 强制直连 WebSocket，且服务端运行栈不支持 ASGI WebSocket Denial Response</li>
+<li><strong>作用</strong>：服务端按版本不匹配拒绝 WS 握手时关闭连接所用的 <strong>WebSocket close code</strong>（RFC 6455 私有段）</li>
+<li><strong>与 4008 的关系</strong>：<code>4900</code> 与 <code>4008</code> <strong>是不同命名空间的不同值</strong>，<strong>MUST NOT</strong> 互相混淆或互换；<code>4900</code> 不携带 body，客户端按 <a href="#5-websocket-only-握手的版本拒绝形态">§5 R4</a> 处理（SHOULD 改 polling 重连取回权威 4008）</li>
+<li>完整语义见 <a href="#5-websocket-only-握手的版本拒绝形态">§5</a></li>
+</ul>
 <hr />
 <h2 id="版本号来源与发布流程">版本号来源与发布流程<a class="headerlink" href="#版本号来源与发布流程" title="Permanent link">&para;</a></h2>
 <h3 id="协议仓库本仓库">协议仓库（本仓库）<a class="headerlink" href="#协议仓库本仓库" title="Permanent link">&para;</a></h3>
@@ -2783,6 +2982,30 @@
 <td>"abc"</td>
 <td>0.2.0</td>
 <td>❌ HTTP 400</td>
+</tr>
+<tr>
+<td>WS-only 兼容（直连 websocket）</td>
+<td>0.2.0</td>
+<td>0.2.0</td>
+<td>✅ 连接（<code>websocket</code> scope 同样被校验后放行）</td>
+</tr>
+<tr>
+<td>WS-only 不兼容（栈支持 denial-response）</td>
+<td>0.3.0</td>
+<td>0.2.0</td>
+<td>❌ HTTP 400 / 4008（与 polling 路径字节一致）</td>
+</tr>
+<tr>
+<td>WS-only 不兼容（栈无 denial-response）</td>
+<td>0.3.0</td>
+<td>0.2.0</td>
+<td>❌ WS close <code>4900</code>；client SHOULD 改 polling 重连取 4008</td>
+</tr>
+<tr>
+<td>中间件仅校验 http、漏 websocket scope</td>
+<td>0.3.0</td>
+<td>0.2.0（WS-only client）</td>
+<td>❌ 实现缺陷：连接被错误放行（回归测试 MUST 覆盖此反例）</td>
 </tr>
 <tr>
 <td>中间件前置性</td>

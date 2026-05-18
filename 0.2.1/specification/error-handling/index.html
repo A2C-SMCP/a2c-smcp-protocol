@@ -2785,8 +2785,9 @@
 <div class="admonition warning">
 <p class="admonition-title">明确语义边界</p>
 <p><strong>4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中</strong>。
-4008 <strong>不是</strong> WebSocket close code（RFC 6455 自定义码段 4xxx）——协议版本校验在 HTTP 层完成，发生在 WS 帧建立之前，不存在 WS close 形态。
-SDK 实现 <strong>MUST NOT</strong> 把 4008 与 WS close code 4xxx 混淆。</p>
+4008 <strong>不是</strong> WebSocket close code。polling 握手路径上版本校验在 HTTP 层完成、发生在 WS 帧建立之前。
+WS-only 直连握手另有拒绝形态：支持 ASGI denial-response 的栈仍回<strong>字节一致</strong>的 4008 HTTP body；不支持时回退到协议指定的、与 <code>4008</code> <strong>取不同值</strong>的 WebSocket close code <code>4900</code>（详见 <a href="../versioning/#5-websocket-only-握手的版本拒绝形态">versioning.md §5</a>）。
+SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code）与 <code>4900</code>（WS close code）混淆或互换。</p>
 </div>
 <h3 id="http-响应规范">HTTP 响应规范<a class="headerlink" href="#http-响应规范" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>HTTP/1.1 400 Bad Request
