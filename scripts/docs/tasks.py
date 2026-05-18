@@ -363,8 +363,11 @@ def upload_server(c):
             f"  | xargs -0 -r chmod 755 && "
             f"find {deploy_path} -path '{deploy_path}/.git' -prune -o -type f -print0 "
             f"  | xargs -0 -r chmod 644 && "
-            # 持久关闭 fileMode 检查，下次走 mode=git 不会再因 mode 误判 dirty
-            f"git -C {deploy_path} config core.fileMode false && "
+            # 持久关闭 fileMode 检查，下次走 mode=git 不会再因 mode 误判 dirty。
+            # upload 模式本就绕开服务器 git，deploy_path 未必是 git checkout；
+            # 仅当确为 git 仓库时执行，否则跳过——不得阻断后续 tar 清理与部署成功判定。
+            f"( git -C {deploy_path} rev-parse --git-dir >/dev/null 2>&1 "
+            f"&& git -C {deploy_path} config core.fileMode false || true ) && "
             # 清理远端 tar
             f"rm -f {remote_tar}"
         )
