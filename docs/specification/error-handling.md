@@ -270,8 +270,9 @@ logger.error(
 !!! warning "明确语义边界"
 
     **4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中**。
-    4008 **不是** WebSocket close code（RFC 6455 自定义码段 4xxx）——协议版本校验在 HTTP 层完成，发生在 WS 帧建立之前，不存在 WS close 形态。
-    SDK 实现 **MUST NOT** 把 4008 与 WS close code 4xxx 混淆。
+    4008 **不是** WebSocket close code。polling 握手路径上版本校验在 HTTP 层完成、发生在 WS 帧建立之前。
+    WS-only 直连握手另有拒绝形态：支持 ASGI denial-response 的栈仍回**字节一致**的 4008 HTTP body；不支持时回退到协议指定的、与 `4008` **取不同值**的 WebSocket close code `4900`（详见 [versioning.md §5](versioning.md#5-websocket-only-握手的版本拒绝形态)）。
+    SDK 实现 **MUST NOT** 把 `4008`（ErrorPayload.code）与 `4900`（WS close code）混淆或互换。
 
 ### HTTP 响应规范
 

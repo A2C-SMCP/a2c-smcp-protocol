@@ -83,3 +83,8 @@ replace = "当前协议版本：**{new_version}**"
 filename = "CLAUDE.md"
 search = "**Current Version**: {current_version}"
 replace = "**Current Version**: {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "docs/specification/versioning.md"
+search = "**当前协议版本**: `{current_version}`"
+replace = "**当前协议版本**: `{new_version}`"

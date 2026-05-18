@@ -61,7 +61,7 @@ await sio.connect(
     f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
     socketio_path="/smcp",
     auth={"role": "agent"},
-    transports=["polling", "websocket"],   # SHOULD：保证首个握手是 HTTP polling，4008 body 可访问
+    transports=["polling", "websocket"],   # MUST：首个握手必须走 HTTP polling，4008 body 可读（versioning.md §5）
 )
 ```
 
