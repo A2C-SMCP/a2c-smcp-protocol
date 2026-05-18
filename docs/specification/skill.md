@@ -1,0 +1,715 @@
+# SKILL 通道
+
+## 概述
+
+SKILL 通道是 A2C-SMCP 协议中工具调用之外的**可执行能力包通道**。Agent 通过它发现 Computer 已纳管的 SKILL，并按需读取 SKILL.md 内容驱动 LLM 推理与脚本调用。
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              Computer Host                                    │
+│                                                                              │
+│   ┌──────────────────┐         ┌─────────────────────────────────────────┐  │
+│   │ MCP Server 集合   │ install │  SKILL Home (SDK 选定位置)               │  │
+│   │ (skill:// 资源)   │────────▶│  ├── mcp/<server>/<skill>/              │  │
+│   └──────────────────┘         │  │   ├── SKILL.md                       │  │
+│                                │  │   ├── .skillenv                      │  │
+│   ┌──────────────────┐         │  │   ├── scripts/                       │  │
+│   │ Marketplace       │ install │  │   ├── references/                    │  │
+│   │ (用户配置 git 源) │────────▶│  │   └── ...                            │  │
+│   └──────────────────┘         │  │                                       │  │
+│                                │  └── marketplace/<repo>/<plugin>/<skill>/│  │
+│   ┌──────────────────┐         │                                          │  │
+│   │ 用户手动 drop     │────────▶│  (...更多 source namespace)              │  │
+│   └──────────────────┘         └─────────────────┬───────────────────────┘  │
+│                                                  │                            │
+│                                                  ▼                            │
+│                                     ┌──────────────────────┐                  │
+│                                     │  Skill Registry      │                  │
+│                                     │  name → A2CSkillRef  │                  │
+│                                     └───────────┬──────────┘                  │
+└─────────────────────────────────────────────────┼─────────────────────────────┘
+                                                  │
+                                                  ▼ client:get_skills / get_skill
+                                             ┌─────────┐
+                                             │  Agent   │
+                                             └─────────┘
+```
+
+### 核心理念
+
+A2C-SMCP SKILL 通道遵循以下原则：
+
+1. **SKILL = 文件夹**——SKILL 本质上是符合 [marketplace SKILL v1](https://github.com/A2C-SMCP/tfrobot-marketplace) 规范的目录包（`SKILL.md` + 可选 `scripts/` / `references/` / `assets/` / `.skillenv`），A2C 不重新定义 SKILL 内容格式
+2. **Computer 是 SKILL 管理者**——Computer 通过 staging 把多种 source（MCP / marketplace / 用户）的 SKILL 物化到统一的本地安装目录，对 Agent 暴露的协议表面与 source 无关
+3. **Agent 自决聚合**——Computer 不做 priority 排序 / fullscreen 排他 / size 截断等编排（与 Desktop 不同）；Agent 拿到 SKILL 清单后自行决定使用策略
+4. **name 是统一身份**——所有 SKILL 跨 source 共享一个全局唯一的合成 name（参考 Claude Code 单一命名空间设计），Agent 与 LLM 始终用 name 引用 SKILL
+
+### 与相关通道的对照
+
+| 维度 | Desktop（`window://`） | get_resources（通用） | **SKILL（`skill://`）** |
+|---|---|---|---|
+| 是否仅 MCP 来源 | 是 | 是 | **否——MCP / marketplace / 用户手动皆可** |
+| Computer 编排 | priority 排序 + fullscreen + size 截断 | 透明转发 | **物化 staging，不编排** |
+| Agent 视角 | 已编排好的 desktop 字符串列表 | 原始 MCP Resource 列表 | **统一 A2CSkillRef 清单（含本地路径）** |
+| 元数据来源 | MCP `Resource.annotations` / `_meta` | MCP `Resource` 原样 | **本地 staged SKILL.md frontmatter（marketplace §3）** |
+| 主键 | URI | URI | **合成 name** |
+| 子文件访问 | 不支持 | 不支持 | **支持**——`rel_path` 渐进式披露：文本内联，二进制/过大文本经 `blob_handle` 转[通用二进制传输](blob-transfer.md)；严格 sandbox 在包根内 |
+
+---
+
+## 1. SKILL 命名
+
+A2C-SMCP SKILL 用**全局唯一的合成 name** 作为协议主键，参考 Claude Code 的单一命名空间设计：所有 SKILL（无论来源）拼成 `<source-prefix>:<inner-name>` 形式，Agent 与 LLM 始终用 name 引用 SKILL，调用接口跨 source 一致。
+
+### 1.1 整体格式
+
+```
+<source-prefix>:<inner-name>
+```
+
+- `:` 是 A2C 协议层 reserved separator
+- 整个 name 在单个 Computer 范围内**全局唯一**
+- Computer 负责合成；Agent 把 name 当**不透明可比较字符串**（不应试图拆解 inner 结构）
+
+### 1.2 各 source 的命名规则
+
+| Source | `source` 字段 | `name` 合成规则 | 示例 |
+|---|---|---|---|
+| MCP Server | `mcp:<normalized-server>` | `mcp:<normalized-server>:<frontmatter.name>` | `mcp:tfrobot-tools:code-review` |
+| Marketplace | `marketplace:<repo>` | `marketplace:<repo>:<inner-namespaced-path>` | `marketplace:acme-skills:audit`<br>`marketplace:acme-skills:python:lint` |
+| 用户手动 | `user` | `user:<frontmatter.name>` | `user:my-helper` |
+| Bundled / 其他 SDK 扩展 | `<custom-prefix>` 或 `<custom-prefix>:<sub>` | SDK 决定，**MUST** 文档化 | — |
+
+!!! important "强制前缀化"
+
+    A2C-SMCP 是多 source 共享场所，与 Claude Code 中 `bundled` / `skills` 路径的"无前缀"模式不同——A2C 协议层**强制**所有 SKILL name 带 source prefix，避免跨 source 命名碰撞。这与 Claude Code 的 `plugin` / `mcp` 路径同哲学。
+
+### 1.3 MCP Server 名规范化算法
+
+MCP source 下，原始 server 名经规范化后填入 `<normalized-server>` 段。算法**与 Claude Code 通用规则等价**，但**不**实现其 `claude.ai ` 前缀特例：
+
+```python
+def normalize_mcp_server_segment(name: str) -> str:
+    """
+    A2C-SMCP MCP <server> 段规范化。
+    与 Claude Code normalizeNameForMCP() 通用规则等价。
+    不实现 Claude Code 的 "claude.ai " 前缀折叠 + trim 特例
+    （Anthropic 平台特化，违反 A2C 协议中立性）。
+    """
+    import re
+    return re.sub(r'[^a-zA-Z0-9_-]', '_', name)
+```
+
+**规则要点**：
+
+| 行为 | A2C-SMCP | Claude Code | 备注 |
+|---|---|---|---|
+| 非 `[a-zA-Z0-9_-]` → `_` | ✅ | ✅ | 完全一致 |
+| `claude.ai ` 前缀的 `_` 折叠 + trim | ❌ | ✅（特例） | A2C 不实现，保持协议中立 |
+| 大小写保留 | ✅ | ✅ | `MyServer ≠ myserver` |
+| 长度截断 | ❌ | ❌ | 不做；超长由上层校验 |
+
+**规范化示例**：
+
+| 原始 server 名 | 规范化后 `<server>` 段 |
+|---|---|
+| `tfrobot-tools` | `tfrobot-tools` |
+| `my.api server` | `my_api_server` |
+| `My_Server` | `My_Server` |
+| `服务器` | `___` |
+| `claude.ai my.server` | `claude_ai_my_server` |
+
+!!! note "Claude Code 兼容性差异"
+
+    绝大多数 server 名规范化结果与 Claude Code 一致。仅当 server 名以 `claude.ai ` 开头时，A2C 不做 `_` 折叠 / trim——这是设计选择，不是缺陷。SDK 文档应明示此差异以避免使用者误判。
+
+### 1.4 命名 lexer 总表
+
+A2C SKILL name 按 `:` 分隔后每段独立 lexer：
+
+| 段位置 | 字符集 | 长度 | 校验责任 |
+|---|---|---|---|
+| **source prefix 固定段**<br>(`mcp` / `marketplace` / `user` / 等) | `[a-z]+` | 协议保留枚举 | A2C 协议层（SDK 可扩展自定义 prefix，**MUST** 文档化） |
+| **source 子标识段**<br>(MCP `<server>` / marketplace `<repo>`) | source-specific | 1–64 | source-specific 算法 |
+| **inner 中间段**<br>(marketplace 子目录命名空间等) | source-specific | source-specific | source-specific |
+| **leaf SKILL 名段**（最后一段） | `[a-z0-9-]`<br>不以 `-` 开头/结尾<br>无连续 `--` | 1–64 | marketplace SKILL v1 §3.1 |
+
+### 1.5 校验失败处理
+
+Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入** Registry，对 Agent 不可见：
+
+| 情形 | Computer 行为 |
+|---|---|
+| `<server>` 规范化后长度 = 0（原始 server 名全是非法字符） | 拒绝该 server 全部 SKILL 注册；记 ERROR |
+| `<server>` 规范化后长度 > 64 | 同上 |
+| `<skill>` leaf 段不符合 marketplace §3.1 格式 | 拒绝该 SKILL 注册；记 ERROR |
+| 两个不同原始 server 规范化后撞名（如 `my.server` 与 `my_server` 都得到 `my_server`） | 拒绝第二注册者；记 ERROR；保留先到者 |
+| 同 source 内 frontmatter `name` 重复（违反 marketplace §2.1） | 拒绝第二注册者；记 ERROR |
+
+校验失败不向 Agent 返回硬错误——SKILL 通道的 batch 接口必须对部分失败健壮。
+
+### 1.6 合成示例
+
+| 原始信息 | `A2CSkillRef.name` | `A2CSkillRef.source` |
+|---|---|---|
+| MCP server=`tfrobot-tools` + frontmatter.name=`code-review` | `mcp:tfrobot-tools:code-review` | `mcp:tfrobot-tools` |
+| MCP server=`my.api` + frontmatter.name=`csv-aggregator` | `mcp:my_api:csv-aggregator` | `mcp:my_api` |
+| Marketplace repo=`acme-skills` + leaf `audit` | `marketplace:acme-skills:audit` | `marketplace:acme-skills` |
+| Marketplace repo=`acme-skills` + 子目录 `python` + leaf `lint` | `marketplace:acme-skills:python:lint` | `marketplace:acme-skills` |
+| 用户手动 drop + leaf `my-helper` | `user:my-helper` | `user` |
+
+---
+
+## 2. URI 规范（次要身份）
+
+A2C-SMCP MCP Server 通道沿用 Claude Code 的 `skill://` URI 约定。**URI 不是协议主键**——name 才是——但 URI 在 MCP 通道内用于：
+
+- MCP Server 在 `resources/list` 中暴露 SKILL 资源
+- Computer 用 URI 追溯 MCP Server 的 SKILL 来源、做更新对账
+- 跨 client（如 Claude Code）的 SKILL 标识互通
+
+```
+skill://host/skill-name
+```
+
+### URI 组成
+
+| 组件 | 必需 | 说明 | 约束 |
+|------|------|------|------|
+| `scheme` | 是 | 固定为 `skill` | 必须为 `skill`，否则 Computer 忽略 |
+| `host` | 是 | MCP Server SKILL 命名空间根 | 推荐反向域名风格（如 `com.example.skills`）；单个 MCP Server 内 URI 唯一；跨 MCP Server **SHOULD** 唯一 |
+| `path` | 是 | SKILL 标识 | URL 编码；通常即 SKILL frontmatter `name` |
+
+### URI 仅对 MCP source 存在
+
+| Source | `A2CSkillRef.uri` |
+|---|---|
+| `mcp:<server>` | 必有；MCP Server 在 `resources/list` 声明 |
+| `marketplace:<repo>` | 无 |
+| `user` | 无 |
+
+Agent 不应基于 `uri` 字段做协议逻辑判断；它仅是来源追溯用的元数据。
+
+---
+
+## 3. MCP Server 端 source 模式声明
+
+当 SKILL 来源是 MCP Server 时，**MCP Server 必须声明 staging 模式**让 Computer 能把 SKILL 物化到本地。声明位于 `Resource._meta`，**三选一**：
+
+| 模式 | `_meta` 必备字段 | Computer 物化行为 | 典型场景 |
+|---|---|---|---|
+| **A. mounted** | `source = "mounted"`<br>`mount_dir: str`（绝对路径） | symlink 或直接挂载到 staging | MCP Server 与 Computer 同机，SKILL 已在本地 FS |
+| **B. archive** | `source = "archive"`<br>`archive_uri: str`<br>`archive_format: "tar.gz" \| "zip"`<br>`archive_sha256: str`（可选） | HTTP GET 拉取 → 校验 sha256 → 解包到 staging | 远程 MCP Server，整包分发 |
+| **C. resources** | `source = "resources"` | Computer 枚举 `skill://<this>/**` 子资源，逐个 `resources/read`，按相对路径写入 staging | 远程 MCP Server，无打包能力；子文件作为独立 MCP Resource 暴露 |
+
+### 推荐附加字段
+
+| `_meta` 字段 | 类型 | 用途 |
+|---|---|---|
+| `version` | string | 语义化版本；Computer 用于更新检测 |
+| `etag` | string | 缓存校验；Computer 用于跳过未变更的 staging |
+
+### frontmatter 是否需要镜像到 `_meta`？
+
+**不需要**。Computer 在 staging 完成后**直接读取本地 SKILL.md 的 YAML frontmatter** 作为元数据权威源。MCP Server 不必把 marketplace §3 的 6 个字段（`name` / `description` / `license` / `compatibility` / `metadata` / `allowed-tools`）镜像进 `_meta`——多写无害，但协议层不强求。
+
+这条设计带来的红利：
+
+- MCP Server 实现门槛降低
+- frontmatter 字段升级 / 迁移由 marketplace 单方主导，不需联动改 `_meta` 命名
+- A2C 不重复定义 SKILL 元数据 schema，与 marketplace 完全脱钩
+
+### MCP Server `resources/list` 示例
+
+```python
+# MCP Server 端代码示意
+Resource(
+    uri="skill://com.example.skills/csv-aggregator",
+    name="csv-aggregator",                # 与 SKILL.md frontmatter.name 一致
+    description="把多个 CSV 文件按规则聚合并生成报告。",
+    mimeType="text/markdown",
+    annotations=Annotations(
+        audience=["assistant"],           # 推荐声明
+    ),
+    _meta={
+        "source": "archive",
+        "archive_uri": "https://cdn.example.com/skills/csv-aggregator-1.2.0.tar.gz",
+        "archive_format": "tar.gz",
+        "archive_sha256": "a3f8...",
+        "version": "1.2.0",
+    },
+)
+```
+
+---
+
+## 4. Computer 实施期望
+
+A2C 协议**只规定行为契约**，不规定 Computer 实施细节。Computer 实现 SKILL 通道时**期望具备**以下能力（informational）：
+
+1. **维护用户可见、可管理的本地 SKILL 安装位置**——具体路径由 SDK 决定（如 `~/.a2c/skills/` / `$XDG_DATA_HOME/a2c/skills/` / 平台特化路径）
+2. **该位置下每个 SKILL 包 MUST 符合 marketplace SKILL v1 §2 包结构**——`SKILL.md` 必存在；包根目录名 = frontmatter `name`。这是 SKILL 跨工具互操作的基础契约，非 A2C 私有约束
+3. **支持多 source 共存**——A2C-SMCP MCP / marketplace / 用户手动等，具体如何隔离 / 命名空间化由 SDK 决定（推荐按 `<source>/<...>/<skill>/` 三级目录分组）
+4. **提供管理 UX**——CLI、配置文件、UI 任选；让用户能列出 / 更新 / 移除已安装 SKILL（类似 Claude Code 的 plugin 管理 UX）
+
+A2C 协议关心的只是：`A2CSkillRef.path` 指向一个 Computer 本地真实可读、符合 SKILL 包结构的目录（staging 物化产物，**恒存在**）——其余皆 SDK 自由。
+
+---
+
+## 5. 安装生命周期
+
+A2C-SMCP MCP Server 来源的 SKILL 安装生命周期：
+
+| 阶段 | 触发 | Computer 行为 |
+|---|---|---|
+| **首装** | MCP Server 首次连接 / 首次 `client:get_skills` | 遍历 `resources/list` → 过滤 `skill://` → 按 §3 三种 source 模式物化每个 SKILL 到本地 staging；读取 SKILL.md frontmatter；合成 name；注册到 Skill Registry |
+| **变更同步** | 收到 `ResourceListChangedNotification` 或 `ResourceUpdatedNotification(skill://...)` | 增量重装受影响 SKILL；发出 `server:update_skills` |
+| **孤儿标记** | MCP Server 断开 | 该 server 下所有 SKILL 标记孤儿（**不删**）；`get_skills` 响应中**排除**孤儿（Agent 视野消失） |
+| **孤儿恢复** | MCP Server 重连 + 仍声明该 SKILL | 取消孤儿标记，重新出现在 `get_skills` 中 |
+| **孤儿清理** | 用户主动操作 / Computer SDK 策略 | 物理删除；**协议不规定**何时清 |
+| **用户主动更新** | 用户通过 SDK 管理 UX 触发 | Computer 重新跑该 SKILL 的物化流程 |
+
+!!! note "自动安装而非用户显式 opt-in"
+
+    MCP Server 是用户主动配置的可信源；既然信任 server 提供 tools，自然也信任其 SKILLs。MCP Server 的连接动作本身即视为对其 SKILL 的安装授权。这与 Claude Code plugin "用户显式 add" 不同——MCP Server 的连接已是显式动作。
+
+### 物化失败处理
+
+物化失败的 SKILL **不进入** Registry，对 Agent 不可见；Computer 记 ERROR 日志，但**不**向 Agent 返回硬错误（batch 接口必须对部分失败健壮）。
+
+---
+
+## 6. 数据结构
+
+> 本节示意结构定义；完整 TypedDict 在 [数据结构](data-structures.md) 文档中。
+
+### A2CSkillRef
+
+Skill 引用对象——`client:get_skills` 返回列表的元素。
+
+```python
+class A2CSkillRef(TypedDict, total=False):
+    # ── 主键 ─────────────────────────────────────────
+    name: str                       # 必选：合成的全局唯一名（含 source prefix）
+                                    # 例：mcp:tfrobot-tools:code-review
+
+    # ── 来源元数据 ────────────────────────────────────
+    source: str                     # 必选：source prefix
+                                    # 例：mcp:tfrobot-tools / marketplace:acme-skills / user
+    uri: NotRequired[str]           # 仅 MCP 来源时存在：skill://host/skill-name
+                                    # 来源追溯用次要身份，Agent 非权威（见 §2）
+
+    # ── 物化输出 ──────────────────────────────────────
+    path: str                       # 必选：Computer 本地绝对目录路径
+                                    # staging 落盘是所有 source 的统一第一步，故恒存在
+                                    # 面向 Agent SDK（脚本执行/文件访问）；LLM 永不可见（§9.1）
+
+    # ── SKILL.md frontmatter 派生 ────────────────────
+    description: str                # 必选：marketplace §3.1
+    license: NotRequired[str]
+    compatibility: NotRequired[str]
+    allowed_tools: NotRequired[list[str]]   # frontmatter "allowed-tools" 规范化为 list
+    version: NotRequired[str]
+    skill_metadata: NotRequired[dict]       # frontmatter.metadata map 透传
+                                            # A2C 不解释，仅作跨工具互操作 passthrough
+```
+
+!!! note "`path` 恒存在（不存在"无 baseDir"形态）"
+
+    Computer 是 SKILL 管理者（理念 #2），所有 source（MCP / marketplace / 用户）落地的统一第一步都是 staging 物化到本地安装目录（§4 / §5）。因此**任何进入 Skill Registry 的 SKILL 必有可读本地目录**——`path` 是必选字段。该字段面向 Agent SDK 的脚本执行与文件访问；LLM-facing 流程仍只用 `name` + body（§9.1）。
+
+!!! note "为什么没有 raw `mcp_server` 字段"
+
+    理念 #2：对 Agent 暴露的协议表面**与 source 无关**。原始（未规范化）MCP server 名是 source 实现细节，与 SKILL 不同层级——它属于 MCP 工具/资源通道的寻址键（`client:get_config` 返回的 `servers` key），不应反规范化进每条 SKILL ref。来源追溯由 `source`（规范化、通道内合法）与 MCP 来源的 `uri`（§2 次要身份）承担。若未来确有 raw-name 关联需求，须像 §2 那样补独立 justification，而非加裸字段。
+
+### GetSkillsReq / GetSkillsRet
+
+批量列表——元数据轻量响应，**不含** SKILL.md body。
+
+```python
+class GetSkillsReq(AgentCallData, total=True):
+    agent: str
+    req_id: str
+    computer: str
+
+class GetSkillsRet(TypedDict, total=False):
+    skills: list[A2CSkillRef]       # 当前已安装且可用的 SKILL
+                                    # 不包含孤儿（来源已断开）
+                                    # 不排序、不去重
+    req_id: str
+```
+
+### GetSkillReq / GetSkillRet
+
+SKILL 包内单资源读取——SKILL 本质是文件夹，`rel_path` 缺省取包根 `SKILL.md`（入口），携带 `rel_path` 取包内其它资源。文本且可内联 → `body` 直接给出；二进制 / 过大文本 → `blob_handle` 转 [`client:get_blob`](blob-transfer.md)。`body` 与 `blob_handle` **恰一存在**。
+
+```python
+class GetSkillReq(AgentCallData, total=True):
+    agent: str
+    req_id: str
+    computer: str
+    name: str                       # 必选：来自某 A2CSkillRef.name
+    rel_path: NotRequired[str]      # 可选：SKILL 包根 POSIX 相对路径
+                                    # 缺省 = "SKILL.md"；MUST 相对、无 ..、无绝对路径
+
+class GetSkillRet(TypedDict, total=False):
+    name: str                       # 回显
+    rel_path: str                   # 回显（缺省请求时为 "SKILL.md"）
+    mime_type: str                  # 资源 MIME，如 text/markdown / image/png
+    total_size: int                 # 资源总字节数
+    sha256: str                     # 全量资源 sha256 十六进制（完整性 + 变更检测）
+    body: NotRequired[str]          # 文本且 ≤ 内联预算：直接内容（与 blob_handle 恰一）
+    blob_handle: NotRequired[str]   # 否则：转 client:get_blob 的不透明句柄（与 body 恰一）
+    req_id: str
+```
+
+!!! note "「资源字节」基准 / 内联判定 / 完整性"
+
+    `total_size` / `sha256` 基于 **Agent 最终消费的资源字节**：SKILL.md → frontmatter 剥离后 body；其它 → 原始文件字节（占位符均不展开）。空资源 = `total_size=0`，文本走空 `body`。
+    Computer 解析 `rel_path` 后：**文本 MIME 且 `total_size` ≤ 内联预算** → `body`；**二进制 MIME 或文本超内联预算** → 仅 `blob_handle`。Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。分块 / 背压 / 演进缝隙等传输语义见 [通用二进制传输](blob-transfer.md)。
+
+---
+
+## 7. 事件
+
+### `client:get_skills`
+
+获取 Computer 当前已安装且可用的 SKILL 列表。
+
+**请求数据 (GetSkillsReq)**:
+```python
+{
+    "agent": str,       # Agent 标识
+    "req_id": str,      # 请求 ID
+    "computer": str     # 目标 Computer 名称
+}
+```
+
+**响应数据 (GetSkillsRet)**:
+```python
+{
+    "skills": list[A2CSkillRef],
+    "req_id": str
+}
+```
+
+**Computer 处理流程**：
+
+1. 从 Skill Registry 读取所有已安装且当前可用 SKILL
+2. 排除孤儿 SKILL（其来源当前不在线）
+3. 对每条 SKILL：从已 staged 的 SKILL.md frontmatter 读取元数据，填入 `A2CSkillRef`
+4. 按发现顺序返回（不排序、不去重）
+5. **不**读取 SKILL.md body——保持响应轻量
+
+### `client:get_skill`
+
+获取 SKILL 包内单个资源。SKILL 本质是文件夹：`rel_path` 缺省取包根 `SKILL.md`（入口），Agent 读 SKILL.md 后按其披露的引用，用**同一事件**携带 `rel_path` 渐进式拉取包内其它资源（文本或二进制）。无目录列举操作——资源路径由 SKILL.md 正文披露（marketplace 惯例）。
+
+**请求数据 (GetSkillReq)**:
+```python
+{
+    "agent": str,
+    "req_id": str,
+    "computer": str,
+    "name": str,        # 来自 A2CSkillRef.name
+    "rel_path": str     # 可选：SKILL 包根 POSIX 相对路径；缺省 = "SKILL.md"
+}
+```
+
+**响应数据 (GetSkillRet)**:
+```python
+{
+    "name": str,         # 回显
+    "rel_path": str,     # 回显（缺省请求时为 "SKILL.md"）
+    "mime_type": str,    # 资源 MIME
+    "total_size": int,   # 资源总字节数
+    "sha256": str,       # 全量资源 sha256 十六进制（完整性 + 变更检测）
+    "body": str,         # 可选：文本且 ≤ 内联预算（与 blob_handle 恰一）
+    "blob_handle": str,  # 可选：转 client:get_blob 的不透明句柄（与 body 恰一）
+    "req_id": str
+}
+```
+
+**Computer 处理流程**：
+
+1. 校验 `name` 格式（含至少一个 `:`、各段符合 §1 lexer 规则）；不合法 → `4016`
+2. Skill Registry 按 name 精确匹配解析出**包根目录**；未找到（含已卸载 / 孤儿 / 从未存在）→ [`4014`](error-handling.md#mcp-server-not-found4014) 语义复用
+3. 解析 `rel_path`（缺省 `SKILL.md`）：`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内；绝对路径 / `..` / 符号链接逃逸 / 命中 `.skillenv` 等敏感文件 / 文件不存在 → [`4017`](error-handling.md#skill-resource-not-accessible4017)（`details.reason` ∈ `traversal` / `forbidden` / `not_found`，详见 §9）
+4. 确定**资源字节**：`SKILL.md` 剥离 YAML frontmatter（首行 `---` 到第二个 `---` 含两端整块）后的 body，其它资源原样文件字节（占位符均**不展开**）；计算 `total_size` 与全量 `sha256`
+5. 绝对上限校验：`total_size` 超 SDK 可配上限 → [`4017`](error-handling.md#skill-resource-not-accessible4017) `details.reason="too_large"`（带 `details.total_size`），**不铸造句柄、零字节传输**
+6. 文本 MIME 且 `total_size` ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 `body`；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 `blob_handle`（Agent 转 [`client:get_blob`](blob-transfer.md) 拉取）。`body` / `blob_handle` 恰一
+
+!!! note "占位符展开是 Agent SDK 职责"
+
+    marketplace v1 §6.2 第一条："平台在拼到 LLM prompt 之前完成替换"——这是 Agent SDK 在 prompt 渲染层的职责，不是 Computer 的协议层职责。A2C 协议层只负责把原始内容安全送达 Agent。
+
+### `server:update_skills`
+
+Computer 向 Server 通报 SKILL 集合或内容已变化。
+
+**数据结构**：复用 `UpdateComputerConfigReq`
+```python
+{
+    "computer": str     # Computer 名称
+}
+```
+
+### `notify:update_skills`
+
+Server 向房间内 Agent 广播 SKILL 变化。
+
+**数据结构**：同上。
+
+Agent 收到后建议自动调用 `client:get_skills` 获取最新清单。
+
+---
+
+## 8. 变更检测
+
+Computer 检测**所有 source** 的 SKILL 变更——MCP 经协议通知，Marketplace plugin skills 与 User DropIn 经 Computer 本地检测——任一变更都汇聚到「增量物化 → `server:update_skills`」，对 Agent 暴露的表面与 source 无关（理念 #2，机制细节见 §5）：
+
+### 8.1 SKILL 列表变化（ResourceListChangedNotification）
+
+```
+MCP Server 发出 ResourceListChangedNotification
+    → Computer 重新枚举该 server 的 skill:// 资源
+    → 与缓存的 SKILL 集合比较
+    → 集合不同 → 增量物化变化部分 → 触发 server:update_skills
+    → 集合相同 → 跳过（仅 DEBUG 日志）
+```
+
+### 8.2 SKILL 内容变化（ResourceUpdatedNotification）
+
+```
+MCP Server 发出 ResourceUpdatedNotification (uri=skill://...)
+    → Computer 重新物化该 SKILL
+    → 触发 server:update_skills
+```
+
+### 8.3 Marketplace plugin skills / User DropIn 变更
+
+```
+Marketplace（用户配置 git 源）：定时 / 用户触发重拉 → 与缓存 SKILL 集合对账
+User DropIn（用户手动放置/删除 或 SDK 管理 UX）：本地安装目录变更被 Computer 感知
+    → 任一：集合不同 → 增量物化变化部分 → 触发 server:update_skills
+    → 集合相同 → 跳过
+```
+
+这两类非 MCP source **不依赖 MCP 通知**，由 Computer 本地检测；具体探测机制（轮询 / inotify / 显式 UX 动作）SDK 自决，见 §5「用户主动更新」。
+
+### 8.4 Agent 主动拉取
+
+Agent 可在任何时候通过 `client:get_skills` 主动获取最新清单，无需等待通知。
+
+### 8.5 事件流时序图
+
+#### 初始拉取
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant S as Server
+    participant C as Computer
+
+    A->>S: client:get_skills
+    S->>C: client:get_skills (转发)
+    C->>C: 读取 Skill Registry
+    C->>S: GetSkillsRet
+    S->>A: GetSkillsRet
+
+    A->>S: client:get_skill(name)
+    S->>C: client:get_skill (转发)
+    C->>C: 查 Registry → 读本地 SKILL.md → 剥离 frontmatter
+    C->>S: GetSkillRet
+    S->>A: GetSkillRet
+```
+
+#### SKILL 集合变化触发流程
+
+```mermaid
+sequenceDiagram
+    participant SRC as SKILL 源
+    participant C as Computer
+    participant S as Server
+    participant A as Agent
+
+    Note over SRC,C: 触发任一：①MCP ResourceListChanged/Updated(skill://) ②Marketplace git 源重拉对账 ③User DropIn 手动增删 / SDK UX
+    SRC->>C: 源变更
+    C->>C: 重新枚举 / 对比缓存
+    C->>C: 增量物化变化部分
+    C->>S: server:update_skills {"computer": "..."}
+    S->>A: notify:update_skills {"computer": "..."}
+    A->>S: client:get_skills
+    S->>C: client:get_skills (转发)
+    C->>S: GetSkillsRet
+    S->>A: GetSkillsRet
+```
+
+---
+
+## 9. 安全模型
+
+A2C-SMCP SKILL 通道继承 [marketplace SKILL v1 §1.2 三条强制安全原则](https://github.com/A2C-SMCP/tfrobot-marketplace)，并在 A2C 层补充约束。
+
+### 9.1 继承的三条强制原则
+
+| 原则 | A2C v0.2 通道落位 |
+|---|---|
+| **SKILL 资源访问受控** | LLM 只见 URI 与 SKILL.md body；`path` 仅给 Agent SDK；脚本执行 env 注入由 Computer 完成 |
+| **加载方不持久化 SKILL** | A2C-SMCP Computer **是**已授权加载方，物化到 SKILL 安装目录是协议设计，不违反原则；Agent 端 SDK 仍然只把 SKILL 当 data |
+| **敏感凭证 LLM 不可见** | `.skillenv` 在 staging 目录落盘是协议允许的，但 A2C 协议 **MUST** 保证：(a) **无论 `rel_path` 为何**，`client:get_skill` 都不返回 `.skillenv`（命中即 [`4017`](error-handling.md#skill-resource-not-accessible4017) `forbidden`，且不泄漏存在性）；(b) Computer 注入 `.skillenv` 到子进程 env 时不写日志、不进 prompt；(c) 任何场景下 `client:get_skills` / `client:get_skill` 都不暴露 `.skillenv` 解析结果 |
+
+### 9.2 A2C 层补充约束
+
+| 约束 | 说明 |
+|---|---|
+| **Source 信任继承** | MCP Server 上报的 SKILL 信任级别 = MCP Server 自身信任级别。SKILL 物化不创建新的信任边界——脚本执行权限同其 MCP Server 的工具调用权限 |
+| **Staging 隔离** | 单一 Computer 进程的 SKILL 安装目录 **MUST NOT** 跨用户共享（即不能放系统目录如 `/var/lib/a2c-skills`）；多用户场景每用户独立 home |
+| **name 校验** | `client:get_skill` 入参 name **MUST** 经 §1 lexer 校验；非法 name 立即拒绝（`4016`），不进入 Registry 查询路径 |
+| **name 寻址防越权** | Computer 用 name 在 Registry 内做 O(1) 精确匹配；**禁止**从 name 推导 FS 路径再读文件。Registry 是唯一的 name→path 映射来源 |
+| **rel_path 沙箱** | 包根绝对路径**仅**由 Registry 经 name 解析得到；`rel_path` MUST 相对，`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内。绝对路径 / `..` / 符号链接逃逸 → [`4017`](error-handling.md#skill-resource-not-accessible4017) `traversal`；命中 `.skillenv` 等敏感文件 → `forbidden`（不泄漏存在性）；包内不存在 → `not_found` |
+| **铸造期边界** | 资源总字节超 SDK 可配绝对上限 → `4017` `too_large`（不铸造句柄、零字节传输，防 DoS）；`.skillenv` 等敏感文件在铸造期已被 `forbidden` 拦截，**永不**会有指向它的 `blob_handle` |
+| **句柄解析重施鉴权** | `blob_handle` 不透明、Computer 铸造、无状态。[`client:get_blob`](blob-transfer.md) 每次解析**MUST 重跑本节沙箱**（防御纵深，不信任句柄内容）；源已 orphan/删除 → [`4018`](error-handling.md#blob-not-accessible4018)。`get_blob` **不是**任意文件读原语 |
+
+### 9.3 与 Claude Code 安全模型的差异
+
+Claude Code 的 MCP Skill 设计是"远程不可信"——不执行 `scripts/`、不暴露 baseDir、不展开 `${CLAUDE_SKILL_DIR}`。A2C-SMCP **有意分叉**：marketplace §0.2 明确 Computer-side SKILL **可执行**，所以 A2C-SMCP 通道保留 `scripts/` 执行能力。这是协议层的设计选择。
+
+为补偿这一信任放宽，A2C-SMCP 通过 **source 信任继承**（脚本执行权限 = MCP Server 调用权限）和 **加载流程隔离**（Computer 是受控物化层，Agent 不直接接触原始 source）来约束风险。
+
+---
+
+## 10. 错误码
+
+| 码 | 触发 | 场景 |
+|---|---|---|
+| [`4014`](error-handling.md#mcp-server-not-found4014) | `client:get_skill` 入参 name 未在 Skill Registry 中 | SKILL 不存在 / 已卸载 / 已孤儿 |
+| `4016` | `client:get_skill` 入参 name 格式非法（违反 §1 lexer） | 参数校验类硬错 |
+| [`4017`](error-handling.md#skill-resource-not-accessible4017) | `client:get_skill` 铸造期：`rel_path` 穿越 / 命中 `.skillenv` 等禁止文件 / 包内不存在 / 资源超绝对上限 | `details.reason` ∈ `traversal` / `forbidden` / `not_found` / `too_large` |
+| [`4018`](error-handling.md#blob-not-accessible4018) | `client:get_blob` 拉取期：`blob_handle` 无效 / 重施鉴权失败 / 源消失 / 范围越界 | 详见 [通用二进制传输](blob-transfer.md) |
+
+### 不使用的错误码
+
+- `4015 MCP Capability Not Supported`——SKILL 通道**不使用**。MCP Server 未声明 `resources` capability 时，物化阶段就排除该 server，不上送 Agent
+- 物化失败、孤儿、跨 source 冲突等内部事故——不进协议错误码，Computer 日志即可
+
+---
+
+## 11. MCP Server 实现指南
+
+MCP Server 若要参与 A2C-SMCP SKILL 通道，需满足以下契约。
+
+### 11.1 capability 声明
+
+```python
+{
+    "capabilities": {
+        "resources": {
+            "subscribe": True,           # 必需
+            "listChanged": True,         # 强烈推荐
+        }
+    }
+}
+```
+
+- 必须有 `resources`，否则 Computer 不会枚举该 server 的 SKILL
+- `listChanged: true` 保证 SKILL 集合变更能被 Computer 及时感知
+
+### 11.2 URI 约定
+
+- SKILL URI：`skill://<host>/<skill-name>`
+- `<host>` 推荐反向域名（如 `com.example.skills`）
+- `<skill-name>` 通常即 SKILL.md frontmatter `name`（marketplace §3.1 格式：`[a-z0-9-]`，1–64 字符）
+
+### 11.3 在 `resources/list` 暴露 SKILL
+
+```python
+@server.list_resources()
+async def list_resources():
+    return [
+        Resource(
+            uri="skill://com.example.skills/csv-aggregator",
+            name="csv-aggregator",
+            description="把多个 CSV 文件按规则聚合并生成报告。当用户上传 CSV 并要求聚合时触发。",
+            mimeType="text/markdown",
+            annotations=Annotations(
+                audience=["assistant"],
+            ),
+            _meta={
+                "source": "archive",
+                "archive_uri": "https://cdn.example.com/skills/csv-aggregator-1.2.0.tar.gz",
+                "archive_format": "tar.gz",
+                "archive_sha256": "a3f8...",
+                "version": "1.2.0",
+            },
+        ),
+    ]
+```
+
+Computer 据此完成 staging。SKILL.md frontmatter 的其他字段（`license` / `compatibility` / `metadata` / `allowed-tools`）由 Computer 在 staging 后读取，**不需要**镜像到 `_meta`。
+
+### 11.4 三种 source 模式选择
+
+| 模式 | 何时选用 |
+|---|---|
+| `mounted` | MCP Server 与 Computer 同机；SKILL 已在本地 FS 可达。最简单，零拷贝 |
+| `archive` | 远程 MCP Server 但有打包能力。一次下载，整体校验，缓存高效 |
+| `resources` | 远程 MCP Server 且无打包能力。每个子文件作为独立 MCP Resource 暴露在 `resources/list` 中，Computer 按 URI prefix 枚举 |
+
+### 11.5 变更通知
+
+- **SKILL 增删时**：发出 `ResourceListChangedNotification`
+- **SKILL 内容变更时**：发出 `ResourceUpdatedNotification`（携带具体 `skill://` URI）
+
+```python
+# SKILL 集合变化
+await server.request_context.session.send_resource_list_changed()
+
+# 某 SKILL 内容更新
+await server.request_context.session.send_resource_updated(
+    uri="skill://com.example.skills/csv-aggregator"
+)
+```
+
+### 11.6 最佳实践
+
+1. **host 使用反向域名** 提升可读性，跨 server 命名空间天然隔离
+2. **`<skill-name>` 与 SKILL.md frontmatter `name` 一致**——避免 Computer 端验证混乱
+3. **`annotations.audience` 显式声明 `["assistant"]`**：SKILL 默认面向 Agent 消费
+4. **声明 `_meta.version`** 便于 Computer 做更新检测
+5. **`archive` 模式声明 `archive_sha256`** 让 Computer 能校验完整性
+6. **不要在 `_meta` 重复 SKILL.md frontmatter 字段**——Computer 以本地 SKILL.md 为权威源
+
+---
+
+## 12. 与 Claude Code 的兼容性
+
+A2C-SMCP SKILL 通道在 URI 与命名上**直接对齐** Claude Code 的 MCP Skill 设计，已知差异如下：
+
+| 维度 | Claude Code MCP Skill | **A2C-SMCP SKILL 通道** |
+|---|---|---|
+| URI scheme | `skill://<namespace>/<skill-name>` | 一致 |
+| 命名格式 | `<server>:<skill>`（强制前缀） | `mcp:<server>:<skill>`（强制三段；多源共享场景需要 `mcp:` 第一段） |
+| Server 名规范化 | `normalizeNameForMCP()`，含 `claude.ai ` 前缀特例 | 同算法，**不实现** `claude.ai ` 特例 |
+| `scripts/` 执行 | ❌ 禁止（MCP Skill 远程不可信） | ✅ 由 Computer 执行（source 信任继承） |
+| `${SKILL_DIR}` 占位符 | `${CLAUDE_SKILL_DIR}` 对 MCP Skill **无意义** | `${TFROBOT_SKILL_DIR}` 展开为不透明 URI（LLM-facing）/ 真 FS 路径（脚本执行 env，由 Computer 注入） |
+| `resources/list` cursor 翻页 | 不消费 | Computer 完整消费翻页直至末尾 |
+| Resource Templates | 不消费 | 不消费（与 Claude Code 一致） |
+
+MCP Server 实现者若同时面向 Claude Code 与 A2C-SMCP：声明 `_meta.source` 等 A2C 扩展字段对 Claude Code **透明无害**（Claude Code 忽略未知 `_meta` 字段）；唯一需要注意的是 `claude.ai ` 前缀的 server 名在两边规范化结果会不同。
+
+---
+
+## 13. 与 Desktop 通道的关系
+
+SKILL 通道与 Desktop 通道**功能正交**：
+
+| | Desktop | SKILL |
+|---|---|---|
+| URI scheme | `window://` | `skill://` |
+| 提供给 Agent 的内容 | 已组织过的桌面字符串列表 | SKILL 元数据 + 按需包内资源（SKILL.md / 引用文件） |
+| Computer 编排 | priority/fullscreen/size | 不编排 |
+| Agent 自决聚合 | 否 | 是 |
+| 跨 source 支持 | 否（仅 MCP） | 是（MCP / marketplace / 用户） |
+
+二者都基于 MCP `resources/list` 通道但分别按 URI scheme 路由，互不干扰；MCP Server 可以同时暴露 `window://` 与 `skill://` 资源。

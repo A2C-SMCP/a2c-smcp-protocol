@@ -40,6 +40,23 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4014 | MCP Server Not Found | 引用的 `mcp_server` 名字未注册（见 [§MCP Server Not Found](#mcp-server-not-found4014)）|
 | 4015 | MCP Capability Not Supported | MCP Server 已注册但未声明所需 capability（见 [§MCP Capability Not Supported](#mcp-capability-not-supported4015)）|
 
+### SKILL 通道错误码
+
+| 代码 | 名称 | 含义 |
+|------|------|------|
+| 4016 | Invalid Skill Name | `client:get_skill` 入参 `name` 格式非法（违反 SKILL name lexer 规则；见 [§Invalid Skill Name](#invalid-skill-name4016)）|
+| 4017 | Skill Resource Not Accessible | `client:get_skill` 的 `rel_path` 路径穿越 / 命中禁止文件 / 包内不存在（见 [§Skill Resource Not Accessible](#skill-resource-not-accessible4017)）|
+
+> **复用与不使用**：SKILL `name` **格式合法但不存在**（不存在 / 已卸载 / 已孤儿）复用 [`4014 MCP Server Not Found`](#mcp-server-not-found4014) 语义；`name` 格式非法 → `4016`；`name` 有效但 `rel_path` 不可达 → `4017`。SKILL 通道**不使用** [`4015`](#mcp-capability-not-supported4015)——未声明 `resources` capability 的 server 在物化阶段即被排除，不会上送 Agent。物化失败 / 孤儿 / 跨 source 冲突等内部事故不进协议错误码（Computer 日志即可，batch 接口对部分失败健壮）。二进制 / 过大文本经 `blob_handle` 转 [`client:get_blob`](blob-transfer.md)：**铸造期**的沙箱与上限属 `4017`，**拉取期**的句柄/源/范围属 [`4018`](#blob-not-accessible4018)，二者不重叠。
+
+### 通用二进制传输错误码
+
+| 代码 | 名称 | 含义 |
+|------|------|------|
+| 4018 | Blob Not Accessible | `client:get_blob` 句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（见 [§Blob Not Accessible](#blob-not-accessible4018)）|
+
+> **边界**：`4018` 属传输**拉取期**。资源的鉴权与绝对上限由**铸造句柄的生产者通道**在铸造期决断（SKILL → `4017`，不通过则不铸造句柄）。详见 [通用二进制传输](blob-transfer.md)。
+
 ### 连接与房间管理错误码
 
 | 代码 | 名称 | 含义 |
@@ -88,6 +105,9 @@ class ErrorPayload(TypedDict, total=False):
 | `4008` | `server_version` / `client_version` / `min_supported` / `max_supported` | — |
 | `4014` | `mcp_server_name` | — |
 | `4015` | `mcp_server_name` / `capability` | — |
+| `4016` | — | `name` |
+| `4017` | — | `reason` / `rel_path` / `total_size` |
+| `4018` | — | `reason` |
 
 各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015)）。
 
@@ -453,6 +473,106 @@ CallToolResult(
 | `capability` | 是 | 缺失的 capability 名（`resources` / `tools` / `prompts` 等 MCP 标准 capability）|
 
 **Agent 行为建议**：跳过此 server，不再向其发送同类事件；可在 server list UI 中标注能力缺失。
+
+### Invalid Skill Name（4016）
+
+**触发时机**：`client:get_skill` 入参 `name` 不符合 SKILL name lexer 规则——缺少 source prefix 分隔符 `:`、某段字符集非法、或 leaf 段不符合 marketplace SKILL v1 §3.1 格式。属**参数校验类硬错**：Computer 在进入 Skill Registry 查询路径**之前**即拒绝（防止从 name 推导 FS 路径越权）。
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4016,
+  "message": "Invalid skill name format",
+  "details": { "name": "bad name!!" }
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4016` |
+| `message` | 是 | 人类可读 |
+| `details.name` | 否 | 被拒的原始 name，仅供诊断（Agent **MUST NOT** 透传给最终用户）|
+
+**与 4014 的边界**：`name` **格式合法但不存在**（未注册 / 已卸载 / 孤儿）→ 复用 [`4014`](#mcp-server-not-found4014)；`name` **格式非法** → `4016`。两者互斥：Computer 先做 lexer 校验（不过则 `4016`），通过后再查 Registry（未命中则 `4014`）。
+
+**Agent 行为建议**：`4016` 属客户端构造错误，**不应**重试同一 name；应回溯 `client:get_skills` 返回的 `A2CSkillRef.name` 原样使用，不要自行拼接 / 改写。
+
+### Skill Resource Not Accessible（4017）
+
+**触发时机**：`client:get_skill` 的 `name` 合法且命中 Registry，但 `rel_path` 无法安全服务。Computer 在 Registry 解析出包根后、读取文件前完成校验（包根绝对路径来源**唯一**是 Registry，**禁止**从 `name` / `rel_path` 推导）。
+
+**判定**：`rel_path` 缺省 `SKILL.md`；`safe_join(包根, rel_path)` 后 `realpath` 必须仍落在包根内。下列任一 → `4017`：
+
+| `details.reason` | 触发 |
+|---|---|
+| `traversal` | `rel_path` 为绝对路径、含 `..`、或符号链接逃逸出包根 |
+| `forbidden` | 命中敏感文件（`.skillenv` 及 Computer 判定的凭证类文件）——**无论是否存在一律按 forbidden**，MUST NOT 泄漏存在性 |
+| `not_found` | 路径合法且在包根内，但目标文件不存在 |
+| `too_large` | 资源总字节数超过 SDK 可配的绝对上限——**首块前即拒，零字节传输**，带 `details.total_size` |
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4017,
+  "message": "Skill resource not accessible",
+  "details": { "reason": "traversal", "rel_path": "../../etc/passwd" }
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4017` |
+| `message` | 是 | 人类可读 |
+| `details.reason` | 是 | `traversal` / `forbidden` / `not_found` / `too_large`（开放枚举，未来可非破坏新增）|
+| `details.rel_path` | 否 | 被拒的原始 `rel_path`，仅供诊断（Agent **MUST NOT** 透传给最终用户）|
+| `details.total_size` | 否 | 仅 `too_large`：资源总字节数，供 Agent 告知用户/降级决策 |
+
+**安全不变量**：`forbidden` 对"文件不存在"与"文件存在但敏感"返回**同一** reason，不暴露敏感文件存在性。`.skillenv` 在任何 `rel_path` 下都不可经此通道读出——这是 [SKILL 通道 §9 安全模型](skill.md#9-安全模型) 的硬约束，不是可选项。
+
+**Agent 行为建议**：`traversal` / `forbidden` 属客户端构造错误，**不重试**；`not_found` 说明 SKILL.md 披露的路径与实际包内容不一致，可回退到仅用 SKILL.md body；`too_large` 不重试，依 `details.total_size` 向用户说明或改用其它策略（该资源不经此通道传输）。`rel_path` 应严格取自 SKILL.md 正文披露的引用，不自行拼接。
+
+> **成功路径**：解析通过且未超上限时，文本可内联走 `body`；二进制 / 过大文本则 `get_skill` 铸造 `blob_handle`，字节经 [`client:get_blob`](blob-transfer.md) 拉取（拉取期错误见 [`4018`](#blob-not-accessible4018)）。
+
+### Blob Not Accessible（4018）
+
+**触发时机**：`client:get_blob` 拉取阶段——`blob_handle` 无法解析回一个**当前仍被铸造通道授权**的可读源。资源的鉴权与绝对上限已在**铸造期**由生产者通道决断（不通过则根本没有句柄），故 `4018` 只承载拉取期失败。
+
+**判定**：
+
+| `details.reason` | 触发 |
+|---|---|
+| `invalid_handle` | `blob_handle` 格式非法 / 非本 Computer 铸造 / 无法识别 |
+| `forbidden` | 句柄可解析，但**重施铸造通道鉴权失败**（如 SKILL 现已 orphan、`.skillenv` 等仍禁止）——防御纵深，句柄内容**绝不**被直接信任 |
+| `gone` | 源已不可达：SKILL 卸载 / 文件删除 / 内容已无法服务 |
+| `range` | `chunk_offset < 0` 或 `> total_size` |
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4018,
+  "message": "Blob not accessible",
+  "details": { "reason": "gone" }
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4018` |
+| `message` | 是 | 人类可读 |
+| `details.reason` | 是 | `invalid_handle` / `forbidden` / `gone` / `range`（开放枚举，未来可非破坏新增）|
+
+**安全不变量**：`client:get_blob` **不是**任意文件读原语。Computer 每次解析句柄 **MUST** 重跑铸造通道的边界校验（SKILL → [§9 沙箱](skill.md#9-安全模型)）；句柄即便编码了路径也**绝不**被直接信任。`.skillenv` 等敏感文件因在铸造期已被 `4017 forbidden` 拦截，**永不**会有指向它的句柄。
+
+**Agent 行为建议**：`invalid_handle` / `forbidden` 不重试；`gone` 回到生产者通道重新获取（如重新 `client:get_skill` 取新 `blob_handle`）；`range` 修正 `chunk_offset` 后重试。跨块若 `sha256` / `total_size` 变化，从 offset 0 重读。
 
 ## TODO
 

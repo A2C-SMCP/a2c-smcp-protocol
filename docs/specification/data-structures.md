@@ -330,7 +330,7 @@ class ListRoomRet(TypedDict):
 
 ### UpdateComputerConfigReq
 
-配置更新请求。同时被 Desktop 更新事件（`server:update_desktop` / `notify:update_desktop`）复用。
+配置更新请求。同时被 Desktop 更新事件（`server:update_desktop` / `notify:update_desktop`）与 SKILL 更新事件（`server:update_skills` / `notify:update_skills`）复用。
 
 ```python
 class UpdateComputerConfigReq(TypedDict):
@@ -344,6 +344,8 @@ class UpdateComputerConfigReq(TypedDict):
 | `server:update_config` | Computer 配置更新请求 |
 | `server:update_desktop` | 桌面更新通知请求 |
 | `notify:update_desktop` | 桌面更新广播通知 |
+| `server:update_skills` | SKILL 更新通知请求 |
+| `notify:update_skills` | SKILL 更新广播通知 |
 
 ### UpdateMCPConfigNotification
 
@@ -491,6 +493,166 @@ class A2CResource(TypedDict, total=False):
     annotations: NotRequired[dict]      # 透传 MCP annotations（含 audience 等）
     _meta: NotRequired[dict]            # 协议扩展点
 ```
+
+---
+
+## SKILL 相关结构
+
+SKILL 通道的请求 / 响应结构。完整通道语义（命名规则、URI、source 模式、安装生命周期、安全模型）见 [SKILL 通道](skill.md)。
+
+### A2CSkillRef
+
+Skill 引用对象——`client:get_skills` 返回列表的元素。`name` 是协议主键（合成的全局唯一名，含 source prefix）；Agent 把 `name` 当**不透明可比较字符串**。
+
+```python
+class A2CSkillRef(TypedDict, total=False):
+    # ── 主键 ────────────────────────────────────────────
+    name: str                       # 必选：合成全局唯一名（含 source prefix）
+                                    # 例：mcp:tfrobot-tools:code-review
+    # ── 来源元数据 ───────────────────────────────────────
+    source: str                     # 必选：source prefix
+                                    # 例：mcp:tfrobot-tools / marketplace:acme-skills / user
+    uri: NotRequired[str]           # 仅 MCP 来源：skill://host/skill-name
+                                    # 来源追溯用次要身份，Agent 非权威（见 skill.md §2）
+    # ── 物化输出 ─────────────────────────────────────────
+    path: str                       # 必选：Computer 本地绝对目录路径
+                                    # staging 落盘是所有 source 的统一第一步，故恒存在
+                                    # 面向 Agent SDK（脚本执行/文件访问）；LLM 永不可见
+    # ── SKILL.md frontmatter 派生 ────────────────────────
+    description: str                # 必选：marketplace SKILL v1 §3.1
+    license: NotRequired[str]
+    compatibility: NotRequired[str]
+    allowed_tools: NotRequired[list[str]]   # frontmatter "allowed-tools" 规范化为 list
+    version: NotRequired[str]
+    skill_metadata: NotRequired[dict]       # frontmatter.metadata 透传；A2C 不解释
+```
+
+!!! note "`path` 恒存在；为何无 raw `mcp_server` 字段"
+
+    **`path` 必选**：Computer 是 SKILL 管理者，所有 source 落地的统一第一步都是 staging 物化到本地（skill.md §4/§5），故进入 Registry 的 SKILL 必有可读本地目录，不存在"无 baseDir"形态。
+
+    **不暴露原始 MCP server 名**：理念 #2 要求 Agent 侧协议表面与 source 无关。raw（未规范化）server 名是 MCP 工具/资源通道的寻址键（`client:get_config` 的 `servers` key），与 SKILL 不同层级，不反规范化进 SKILL ref。来源追溯由 `source` 与 MCP 来源的 `uri`（skill.md §2）承担。
+
+### GetSkillsReq
+
+获取 SKILL 清单请求。
+
+```python
+class GetSkillsReq(AgentCallData, total=True):
+    agent: str          # Agent 名称
+    req_id: str         # 请求 ID
+    computer: str       # 目标 Computer 名称
+```
+
+### GetSkillsRet
+
+获取 SKILL 清单响应——轻量元数据，**不含** SKILL.md body。
+
+```python
+class GetSkillsRet(TypedDict, total=False):
+    skills: list[A2CSkillRef]   # 当前已安装且可用 SKILL（排除孤儿；不排序、不去重）
+    req_id: str                 # 请求 ID
+```
+
+### GetSkillReq
+
+获取 SKILL 包内单个资源请求。SKILL 本质是文件夹：`rel_path` 缺省取包根 `SKILL.md`（入口），携带 `rel_path` 取包内其它资源，实现渐进式披露。传输机制不在此处——二进制 / 过大文本由 `GetSkillRet.blob_handle` 转 [通用二进制传输](blob-transfer.md)。
+
+```python
+class GetSkillReq(AgentCallData, total=True):
+    agent: str                  # Agent 名称
+    req_id: str                 # 请求 ID
+    computer: str               # 目标 Computer 名称
+    name: str                   # 必选：来自某 A2CSkillRef.name
+    rel_path: NotRequired[str]  # 可选：SKILL 包根 POSIX 相对路径
+                                # 缺省 = "SKILL.md"；MUST 相对、无 ..、无绝对路径
+```
+
+### GetSkillRet
+
+获取 SKILL 包内单个资源响应。文本且可内联 → `body` 直接给出；二进制或过大文本 → `blob_handle` 转 [`client:get_blob`](blob-transfer.md) 拉取——`body` 与 `blob_handle` **恰一存在**。
+
+```python
+class GetSkillRet(TypedDict, total=False):
+    name: str                       # 回显
+    rel_path: str                   # 回显（缺省请求时为 "SKILL.md"）
+    mime_type: str                  # 资源 MIME，如 text/markdown / image/png
+    total_size: int                 # 资源总字节数
+    sha256: str                     # 全量资源 sha256 十六进制（完整性 + 变更检测）
+    body: NotRequired[str]          # 文本且 ≤ 内联预算：直接内容（与 blob_handle 恰一）
+    blob_handle: NotRequired[str]   # 否则：转 client:get_blob 的不透明句柄（与 body 恰一）
+    req_id: str                     # 请求 ID
+```
+
+!!! note "「资源字节」的定义（total_size / sha256 / 传输的基准）"
+
+    `total_size` / `sha256` 及（走 handle 时的）分块一律基于 **Agent 最终消费的资源字节**：SKILL.md → **frontmatter 剥离后的 body**；其它文件 → 原始文件字节。frontmatter 剥离、占位符**不展开**在确定资源字节时已完成。空资源 = `total_size=0`，文本走空 `body`。
+
+!!! note "内联 vs handle 的判定"
+
+    Computer 解析 `rel_path` 后：**文本 MIME 且 `total_size` ≤ 内联预算**（保证单条 ack 不超 Server buffer）→ `body`；**二进制 MIME，或文本超内联预算** → 仅给 `blob_handle`（不内联任何字节）。`body` / `blob_handle` 恰一；Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。
+
+!!! note "安全边界与 too_large"
+
+    `rel_path` 沙箱（穿越 / `.skillenv` / 不存在）与绝对上限（`too_large`）在 **get_skill 解析时** 决断 → [`4017`](error-handling.md#skill-resource-not-accessible4017)，**不**铸造 handle、零字节传输。占位符不展开（Agent SDK 职责，见 [SKILL §7](skill.md#7-事件)）。详见 [SKILL §9](skill.md#9-安全模型)。
+
+---
+
+## 通用二进制传输结构
+
+通用 Agent←Computer 字节拉取通道的结构。完整语义（句柄契约、生产者-消费者模型、安全模型）见 [通用二进制传输](blob-transfer.md)。
+
+### BlobHandle
+
+```python
+BlobHandle: TypeAlias = str   # 不透明、Computer 铸造、无状态可重解析
+```
+
+由某生产者通道在其响应中铸造。Agent 视为**不透明**：MUST NOT 解析 / 拼接 / 伪造。Computer 每次调用即时解析，**无 session / 无 TTL**；解析时**重新施加铸造通道的鉴权**（SKILL → §9 沙箱）。
+
+载体随响应结构而异，**语义与拉取契约完全一致**（详见 [通用二进制传输 §5](blob-transfer.md#5-生产者通道接入契约)）：
+
+| 生产者 | 句柄载体 | 对等元数据 |
+|---|---|---|
+| `GetSkillRet`（A2C 可变） | 顶层 [`blob_handle`](#getskillret) | 顶层 `total_size` / `sha256` / `mime_type` |
+| MCP `CallToolResult`（标准不可变） | content item `_meta.a2c_blob_handle` | item `_meta.a2c_total_size` / `_meta.a2c_sha256` + 既有 `mimeType` |
+
+`_meta` 旁路与 [`SMCPTool.meta` 命名空间约定](#smcptoolmeta-序列化规范)（`a2c_tool_meta` 等）同构——A2C 在不可变 MCP 结构上扩展的既定手法。
+
+### GetBlobReq
+
+```python
+class GetBlobReq(AgentCallData, total=True):
+    agent: str                          # Agent 名称
+    req_id: str                         # 请求 ID
+    computer: str                       # 目标 Computer 名称
+    blob_handle: str                    # 必选：来自某通道响应的不透明句柄
+    chunk_offset: NotRequired[int]      # 可选：资源字节绝对偏移；缺省 0
+                                        # 无状态幂等 → 可续传 / 重试 / 并行
+    max_chunk_bytes: NotRequired[int]   # 可选：客户建议单块上限
+                                        # Computer clamp（不超 Server buffer）
+```
+
+### GetBlobRet
+
+```python
+class GetBlobRet(TypedDict, total=False):
+    blob_handle: str            # 回显
+    mime_type: str              # 资源 MIME
+    total_size: int             # 资源总字节数（首块即知；一次读取内恒定）
+    sha256: str                 # 全量资源 sha256 十六进制（跨块恒定）
+    chunk_offset: int           # 本块起始字节偏移
+    eof: bool                   # ⟺ chunk_offset + 本块字节数 == total_size
+    blob: str                   # base64，本块字节
+    req_id: str                 # 请求 ID
+```
+
+!!! note "完整性 / 一致性 / 演进缝隙"
+
+    - `eof` 后 Agent **SHOULD** 校验重组 sha256 == 响应 `sha256`，不符即损坏、重读。
+    - `sha256` / `total_size` 一次逻辑读取内 **MUST** 稳定；跨块变化 ⇒ 源被改写，Agent **MUST** 从 offset 0 重读。Computer **SHOULD** 尽力一致快照。
+    - `GetBlobReq` / `GetBlobRet` 为开放 TypedDict，未来可**非破坏**追加 `content_encoding`（gzip 等，缺省 identity）/ `etag`；offset / total_size / sha256 基于**解码后**资源字节，加压缩不致歧义。
+    - 句柄失效 / 源消失 / 范围越界 → [`4018`](error-handling.md#blob-not-accessible4018)。
 
 ---
 

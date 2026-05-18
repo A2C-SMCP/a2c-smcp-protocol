@@ -110,6 +110,8 @@ nav:
       - 事件定义: specification/events.md
       - 数据结构: specification/data-structures.md
       - Desktop 桌面系统: specification/desktop.md
+      - SKILL 通道: specification/skill.md
+      - 通用二进制传输: specification/blob-transfer.md
       - 房间模型: specification/room-model.md
       - 协议版本: specification/versioning.md
       - 错误处理: specification/error-handling.md

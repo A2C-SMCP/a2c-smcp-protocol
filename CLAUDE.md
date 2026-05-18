@@ -114,6 +114,16 @@ When modifying specification documents:
 - Error codes in `docs/specification/error-handling.md` should cover new failure modes
 - Security implications should be documented in `docs/specification/security.md`
 
+#### Channel Doc Propagation Rule (通道文档落地规则)
+
+A standalone channel doc (e.g. `skill.md`, `desktop.md`) is a **narrative spec, not the source of truth**. A channel is only *landed* once its definitions are propagated into the canonical trio — until then it is an isolated draft, even if it reads complete and is wired into `mkdocs.yml` nav:
+
+1. **`data-structures.md`** — every TypedDict the channel introduces, in this file's snake_case + `NotRequired` convention (this file is the single source of truth for schemas)
+2. **`events.md`** — every `client:*` / `server:*` / `notify:*` event added to **both** the summary tables **and** the detailed section, plus a flow diagram and an entry in "Agent 应该实现" if the channel has a non-trivial sequence; reused payloads (e.g. `UpdateComputerConfigReq`) must be cross-referenced
+3. **`error-handling.md`** — every new error code in the code-table, the 各错误码标准字段总表, and a dedicated trigger section mirroring §4014/§4015; **explicitly state** which existing codes are reused and which are deliberately unused
+
+The standalone doc keeps the full rationale; the canonical trio MUST stay mutually consistent (events ↔ structures ↔ error codes) and is what SDK implementers read. A change that adds/edits a channel doc without syncing the trio is **incomplete** — do not treat it as done.
+
 ### Documentation Build & Deploy
 
 This project uses [uv](https://github.com/astral-sh/uv) for dependency management.
