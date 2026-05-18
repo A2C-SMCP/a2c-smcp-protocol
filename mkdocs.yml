@@ -120,5 +120,6 @@ nav:
       - Computer MCP 配置指南: guides/computer-mcp-config-guide.md
   - 迁移指南:
       - v0.2 升级指南: migrations/v0.2-uri-metadata-refactor.md
+      - v0.2.1 SKILL/二进制传输适配: migrations/v0.2.1-skill-and-blob-transfer.md
   - 附录:
       - 常见问题: appendix/faq.md
