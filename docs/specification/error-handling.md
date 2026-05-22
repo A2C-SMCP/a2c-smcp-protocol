@@ -500,7 +500,7 @@ CallToolResult(
 
 ### Invalid Skill Name（4016）
 
-**触发时机**：`client:get_skill` 入参 `name` 不符合 SKILL name lexer 规则——缺少 source prefix 分隔符 `:`、某段字符集非法、或 leaf 段不符合 marketplace SKILL v1 §3.1 格式。属**参数校验类硬错**：Computer 在进入 Skill Registry 查询路径**之前**即拒绝（防止从 name 推导 FS 路径越权）。
+**触发时机**：`client:get_skill` 入参 `name` 不符合 SKILL name lexer 规则（[skill.md §1.4](skill.md#14-命名-lexer-总表)）——段数 ∉ {1, 2, 3}、3 段但首段 ≠ `mcp`、或某段字符集非法（leaf 段须符合 marketplace SKILL v1 §3.1）。**注意 user 源裸名为合法 1 段、无 `:`**，不因「缺 `:`」判错。属**参数校验类硬错**：Computer 在进入 Skill Registry 查询路径**之前**即拒绝（防止从 name 推导 FS 路径越权）。
 
 **响应结构**（Socket.IO ack 数据）:
 

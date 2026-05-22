@@ -59,30 +59,43 @@ A2C-SMCP SKILL 通道遵循以下原则：
 
 ## 1. SKILL 命名
 
-A2C-SMCP SKILL 用**全局唯一的合成 name** 作为协议主键，参考 Claude Code 的单一命名空间设计：所有 SKILL（无论来源）拼成 `<source-prefix>:<inner-name>` 形式，Agent 与 LLM 始终用 name 引用 SKILL，调用接口跨 source 一致。
+A2C-SMCP SKILL 用**全局唯一的合成 name** 作为协议主键，参考 Claude Code / [tfrobot-marketplace](https://github.com/A2C-SMCP/tfrobot-marketplace) 的单一命名空间设计：name **跨工具直接对齐开放标准**——marketplace 源 `<plugin>:<skill>`、user 源裸 `<skill>`、mcp 源 `mcp:<server>:<skill>`。Agent 与 LLM 始终用 name 引用 SKILL，调用接口跨 source 一致。
 
 ### 1.1 整体格式
 
-```
-<source-prefix>:<inner-name>
-```
+name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code 的可见 ID：
 
-- `:` 是 A2C 协议层 reserved separator
+| Source | name 形态 | 段数 |
+|---|---|---|
+| marketplace | `<plugin>:<skill>` | 2 |
+| user | `<skill>`（裸名） | 1 |
+| mcp | `mcp:<server>:<skill>` | 3 |
+
+- `:` 是 A2C 协议层 reserved separator（正式承认，非「待追认」）
 - 整个 name 在单个 Computer 范围内**全局唯一**
-- Computer 负责合成；Agent 把 name 当**不透明可比较字符串**（不应试图拆解 inner 结构）
+- Computer 负责合成；Agent 把 name 当**不透明可比较字符串**——要判定来源用 `source` 字段，不应解析 name 结构
+
+!!! note "三形态靠段数 + `mcp:` 字面消歧，互不碰撞"
+
+    1 段（user）/ 2 段（marketplace）/ 3 段（mcp）按**段数**互斥；mcp 必带字面首段 `mcp`，故不与 2 段 marketplace 混淆。**唯一**保留前缀的是 mcp 源——若它也退化成 `<server>:<skill>`（2 段）就会与 marketplace `<plugin>:<skill>` 碰撞。一个名为 `mcp` 的 marketplace plugin 产出 `mcp:<skill>`（2 段），仍按**段数**判为 marketplace；SDK / marketplace **SHOULD** 避免把 plugin 命名为 `mcp` 以免人眼混淆。
 
 ### 1.2 各 source 的命名规则
 
 | Source | `source` 字段 | `name` 合成规则 | 示例 |
 |---|---|---|---|
+| Marketplace | `marketplace:<repo>` | `<plugin>:<skill>`（**裸 2 段**，不含 marketplace 名） | `acme-audit:audit` |
+| 用户手动 | `user` | `<skill>`（**裸 1 段**） | `my-helper` |
 | MCP Server | `mcp:<normalized-server>` | `mcp:<normalized-server>:<frontmatter.name>` | `mcp:tfrobot-tools:code-review` |
-| Marketplace | `marketplace:<repo>` | `marketplace:<repo>:<inner-namespaced-path>` | `marketplace:acme-skills:audit`<br>`marketplace:acme-skills:python:lint` |
-| 用户手动 | `user` | `user:<frontmatter.name>` | `user:my-helper` |
-| Bundled / 其他 SDK 扩展 | `<custom-prefix>` 或 `<custom-prefix>:<sub>` | SDK 决定，**MUST** 文档化 | — |
 
-!!! important "强制前缀化"
+!!! important "为何对齐裸名（放弃旧版「强制前缀化」）"
 
-    A2C-SMCP 是多 source 共享场所，与 Claude Code 中 `bundled` / `skills` 路径的"无前缀"模式不同——A2C 协议层**强制**所有 SKILL name 带 source prefix，避免跨 source 命名碰撞。这与 Claude Code 的 `plugin` / `mcp` 路径同哲学。
+    判断基准是**最终用户（SKILL 作者）跨工具互操作体验最优**：同一 SKILL 在 Claude Code / Cursor / A2C 看到的可见 ID 一致，作者文档/提示里引用的名字不因工具而漂移。故 marketplace / user 形态**直接采用 tfrobot-marketplace §6.1 的裸名**。
+
+    - **marketplace 名不进可见 ID**：跨 marketplace 的 `<plugin>` 重名在**安装层**用 `<plugin>@<marketplace>` 拦截（tfrobot §2.3），已装集合内 `<plugin>` 唯一 ⇒ `<plugin>:<skill>` 唯一。完整 marketplace 溯源仍由 `source = marketplace:<repo>` 承载
+    - **mcp 源保留 `mcp:` 前缀**：多 source 共享场所中，这是把 mcp 与 2 段 marketplace 区分开的**最小**结构标记（见 §1.1 note）；CC 的 mcp skill 是 `<server>:<skill>`，A2C 多加 `mcp:` 是有意的、**唯一**保留的前缀
+    - **碰撞防护模型**：由旧版「结构化前缀」转为「段数 + `mcp:` 字面 + Computer 安装层唯一性」三者协同（校验见 §1.5）
+
+    > SDK 若扩展自定义 source，其 name 形态 **MUST** 与上述 1/2/3 段 canonical 形态**不相交**（如采用 ≥4 段并带文档化首段标记）且 **MUST** 文档化——否则击穿段数消歧。
 
 ### 1.3 MCP Server 名规范化算法
 
@@ -125,14 +138,19 @@ def normalize_mcp_server_segment(name: str) -> str:
 
 ### 1.4 命名 lexer 总表
 
-A2C SKILL name 按 `:` 分隔后每段独立 lexer：
+A2C SKILL name 先按**段数**判形态，再逐段 lexer：
 
-| 段位置 | 字符集 | 长度 | 校验责任 |
+| name 形态 | 段构成 | 各段字符集 | 校验责任 |
 |---|---|---|---|
-| **source prefix 固定段**<br>(`mcp` / `marketplace` / `user` / 等) | `[a-z]+` | 协议保留枚举 | A2C 协议层（SDK 可扩展自定义 prefix，**MUST** 文档化） |
-| **source 子标识段**<br>(MCP `<server>` / marketplace `<repo>`) | source-specific | 1–64 | source-specific 算法 |
-| **inner 中间段**<br>(marketplace 子目录命名空间等) | source-specific | source-specific | source-specific |
-| **leaf SKILL 名段**（最后一段） | `[a-z0-9-]`<br>不以 `-` 开头/结尾<br>无连续 `--` | 1–64 | marketplace SKILL v1 §3.1 |
+| **user**（1 段） | `<skill>` | `[a-z0-9-]`，不以 `-` 始末，无连续 `--`，1–64 | marketplace SKILL v1 §3.1 |
+| **marketplace**（2 段） | `<plugin>` `:` `<skill>` | 两段均同上严格 kebab | marketplace SKILL v1 §2.2 / §3.1 |
+| **mcp**（3 段，首段字面 `mcp`） | `mcp` `:` `<server>` `:` `<skill>` | `<server>`：§1.3 算法（`[A-Za-z0-9_-]`，1–64）；`<skill>`：严格 kebab | A2C §1.3 + marketplace §3.1 |
+
+**消歧规则（lexer 第一步）**：
+
+- 段数 ∉ {1, 2, 3} → 非法（`4016`）
+- 3 段但首段 ≠ `mcp` → 非法（3 段形态为 mcp 源专属）
+- 任一段不符上表字符集 → 非法
 
 ### 1.5 校验失败处理
 
@@ -144,7 +162,12 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 | `<server>` 规范化后长度 > 64 | 同上 |
 | `<skill>` leaf 段不符合 marketplace §3.1 格式 | 拒绝该 SKILL 注册；记 ERROR |
 | 两个不同原始 server 规范化后撞名（如 `my.server` 与 `my_server` 都得到 `my_server`） | 拒绝第二注册者；记 ERROR；保留先到者 |
+| 两个不同 marketplace 提供同名 `<plugin>`（合成 `<plugin>:<skill>` 碰撞） | **安装层**按 `<plugin>@<marketplace>` 唯一性拒绝第二个（tfrobot §2.3）；已装集合内 `<plugin>` 唯一 |
 | 同 source 内 frontmatter `name` 重复（违反 marketplace §2.1） | 拒绝第二注册者；记 ERROR |
+
+!!! note "跨 source 类别天然不碰撞"
+
+    user（1 段）/ marketplace（2 段）/ mcp（3 段）按段数互斥，**不可能**跨类别碰撞。碰撞只可能发生在**同类别内**（上表 mcp `<server>` 规范化、marketplace `<plugin>`、同 source frontmatter 重名），均有对应拒绝策略。
 
 校验失败不向 Agent 返回硬错误——SKILL 通道的 batch 接口必须对部分失败健壮。
 
@@ -152,11 +175,15 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 
 | 原始信息 | `A2CSkillRef.name` | `A2CSkillRef.source` |
 |---|---|---|
+| Marketplace repo=`acme-skills` + plugin=`acme-audit` + skill `audit` | `acme-audit:audit` | `marketplace:acme-skills` |
+| Marketplace repo=`acme-skills` + plugin=`pylint-tools` + skill `lint` | `pylint-tools:lint` | `marketplace:acme-skills` |
+| 用户手动 drop + skill `my-helper` | `my-helper` | `user` |
 | MCP server=`tfrobot-tools` + frontmatter.name=`code-review` | `mcp:tfrobot-tools:code-review` | `mcp:tfrobot-tools` |
 | MCP server=`my.api` + frontmatter.name=`csv-aggregator` | `mcp:my_api:csv-aggregator` | `mcp:my_api` |
-| Marketplace repo=`acme-skills` + leaf `audit` | `marketplace:acme-skills:audit` | `marketplace:acme-skills` |
-| Marketplace repo=`acme-skills` + 子目录 `python` + leaf `lint` | `marketplace:acme-skills:python:lint` | `marketplace:acme-skills` |
-| 用户手动 drop + leaf `my-helper` | `user:my-helper` | `user` |
+
+!!! note "name 不再恒以 source 开头"
+
+    旧版 name 总以 source prefix 起始；现在仅 **mcp** 形态 name（`mcp:<server>:...`）与 `source`（`mcp:<server>`）同头。marketplace / user 的 `name` 是裸名，**不**含 `source` 里的 marketplace 名——`source` 独立承载完整 provenance。
 
 ---
 
@@ -290,11 +317,12 @@ Skill 引用对象——`client:get_skills` 返回列表的元素。
 ```python
 class A2CSkillRef(TypedDict, total=False):
     # ── 主键 ─────────────────────────────────────────
-    name: str                       # 必选：合成的全局唯一名（含 source prefix）
-                                    # 例：mcp:tfrobot-tools:code-review
+    name: str                       # 必选：合成的全局唯一名（跨工具对齐裸名）
+                                    # marketplace: acme-audit:audit / user: my-helper
+                                    # mcp: mcp:tfrobot-tools:code-review
 
     # ── 来源元数据 ────────────────────────────────────
-    source: str                     # 必选：source prefix
+    source: str                     # 必选：完整来源 provenance（含 marketplace 名等）
                                     # 例：mcp:tfrobot-tools / marketplace:acme-skills / user
     uri: NotRequired[str]           # 仅 MCP 来源时存在：skill://host/skill-name
                                     # 来源追溯用次要身份，Agent 非权威（见 §2）
@@ -304,15 +332,28 @@ class A2CSkillRef(TypedDict, total=False):
                                     # staging 落盘是所有 source 的统一第一步，故恒存在
                                     # 面向 Agent SDK（脚本执行/文件访问）；LLM 永不可见（§9.1）
 
-    # ── SKILL.md frontmatter 派生 ────────────────────
+    # ── SKILL.md frontmatter 派生（marketplace §3.1 的 6 字段，无 version）──
     description: str                # 必选：marketplace §3.1
     license: NotRequired[str]
     compatibility: NotRequired[str]
     allowed_tools: NotRequired[list[str]]   # frontmatter "allowed-tools" 规范化为 list
-    version: NotRequired[str]
     skill_metadata: NotRequired[dict]       # frontmatter.metadata map 透传
                                             # A2C 不解释，仅作跨工具互操作 passthrough
+    # ── 包元数据派生（非 frontmatter）────────────────
+    version: NotRequired[str]               # 来源各异（见下方 note）；user 源缺省/null
 ```
+
+!!! note "`version` 来源（非 frontmatter）"
+
+    marketplace SKILL v1 frontmatter 恰好 6 字段（`name` / `description` / `license` / `compatibility` / `metadata` / `allowed-tools`），**无 version**。`A2CSkillRef.version` 的 source-of-truth 按来源区分：
+
+    | Source | `version` 来源 |
+    |---|---|
+    | marketplace | `plugin.json` / marketplace entry 的 version |
+    | mcp | `skill://` 资源的 `_meta.version`（§3 推荐附加字段） |
+    | user | 无可靠来源 → **缺省 / null** |
+
+    故 `version` 是 `NotRequired`：无来源即省略。Agent **MUST NOT** 假定 version 一定存在。
 
 !!! note "`path` 恒存在（不存在"无 baseDir"形态）"
 
@@ -432,7 +473,7 @@ class GetSkillRet(TypedDict, total=False):
 
 **Computer 处理流程**：
 
-1. 校验 `name` 格式（含至少一个 `:`、各段符合 §1 lexer 规则）；不合法 → `4016`
+1. 校验 `name` 格式（按 §1.4 段数消歧 + 各段字符集——user 为合法 **1 段无 `:`**、marketplace 2 段、mcp 3 段首段 `mcp`）；不合法 → `4016`
 2. Skill Registry 按 name 精确匹配解析出**包根目录**；未找到（含已卸载 / 孤儿 / 从未存在）→ [`4014`](error-handling.md#mcp-server-not-found4014) 语义复用
 3. 解析 `rel_path`（缺省 `SKILL.md`）：`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内；绝对路径 / `..` / 符号链接逃逸 / 命中 `.skillenv` 等敏感文件 / 文件不存在 → [`4017`](error-handling.md#skill-resource-not-accessible4017)（`details.reason` ∈ `traversal` / `forbidden` / `not_found`，详见 §9）
 4. 确定**资源字节**：`SKILL.md` 剥离 YAML frontmatter（首行 `---` 到第二个 `---` 含两端整块）后的 body，其它资源原样文件字节（占位符均**不展开**）；计算 `total_size` 与全量 `sha256`
@@ -689,7 +730,9 @@ A2C-SMCP SKILL 通道在 URI 与命名上**直接对齐** Claude Code 的 MCP Sk
 | 维度 | Claude Code MCP Skill | **A2C-SMCP SKILL 通道** |
 |---|---|---|
 | URI scheme | `skill://<namespace>/<skill-name>` | 一致 |
-| 命名格式 | `<server>:<skill>`（强制前缀） | `mcp:<server>:<skill>`（强制三段；多源共享场景需要 `mcp:` 第一段） |
+| 命名格式（marketplace plugin） | `<plugin>:<skill>` | **一致**（裸 2 段，对齐开放标准） |
+| 命名格式（user / bundled） | 裸 `<skill>` | **一致**（裸 1 段） |
+| 命名格式（mcp） | `<server>:<skill>` | `mcp:<server>:<skill>`（A2C 多源共享，**唯一**保留 `mcp:` 段消歧） |
 | Server 名规范化 | `normalizeNameForMCP()`，含 `claude.ai ` 前缀特例 | 同算法，**不实现** `claude.ai ` 特例 |
 | `scripts/` 执行 | ❌ 禁止（MCP Skill 远程不可信） | ✅ 由 Computer 执行（source 信任继承） |
 | `${SKILL_DIR}` 占位符 | `${CLAUDE_SKILL_DIR}` 对 MCP Skill **无意义** | `${TFROBOT_SKILL_DIR}` 展开为不透明 URI（LLM-facing）/ 真 FS 路径（脚本执行 env，由 Computer 注入） |
