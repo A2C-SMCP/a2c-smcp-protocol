@@ -1,0 +1,1909 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Agent To Computer Socket.IO-based MCP Protocol Specification">
+      
+      
+      
+        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/blob-transfer/">
+      
+      
+        <link rel="prev" href="../skill/">
+      
+      
+        <link rel="next" href="../room-model/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>通用二进制传输 - A2C-SMCP Protocol</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#通用二进制传输" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            A2C-SMCP Protocol
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              通用二进制传输
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  协议规范
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/computer-mcp-config-guide/" class="md-tabs__link">
+          
+  
+  
+  开发指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
+          
+  
+  
+  迁移指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../appendix/faq/" class="md-tabs__link">
+          
+  
+  
+  附录
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    A2C-SMCP Protocol
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议规范
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    协议规范
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件定义
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-structures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据结构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skill/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SKILL 通道
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    通用二进制传输
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    通用二进制传输
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="概述">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#为什么独立成通道" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么独立成通道
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#设计原则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        设计原则
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-blobhandle-契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. BlobHandle 契约
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-事件-clientget_blob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 事件 client:get_blob
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-分块--背压--完整性--上限" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 分块 / 背压 / 完整性 / 上限
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 分块 / 背压 / 完整性 / 上限">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#时序以-skill-二进制资源为例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        时序（以 SKILL 二进制资源为例）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-错误模型" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 错误模型
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-生产者通道接入契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 生产者通道接入契约
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 生产者通道接入契约">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#一致性铁律所有生产者拉取契约相同仅载体位置随结构而异" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一致性铁律：所有生产者拉取契约相同，仅载体位置随结构而异
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#生产者一skill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生产者一：SKILL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#生产者二tool_call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生产者二：tool_call
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-实现要求" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-参考" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 参考
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../room-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    房间模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议版本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    错误处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安全考虑
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    开发指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/computer-mcp-config-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer MCP 配置指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    迁移指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    迁移指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2 升级指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.2.1-skill-and-blob-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.1 SKILL/二进制传输适配
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    附录
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    附录
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendix/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    常见问题
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="概述">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#为什么独立成通道" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么独立成通道
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#设计原则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        设计原则
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-blobhandle-契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. BlobHandle 契约
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-事件-clientget_blob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 事件 client:get_blob
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-分块--背压--完整性--上限" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 分块 / 背压 / 完整性 / 上限
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 分块 / 背压 / 完整性 / 上限">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#时序以-skill-二进制资源为例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        时序（以 SKILL 二进制资源为例）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-错误模型" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 错误模型
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-生产者通道接入契约" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 生产者通道接入契约
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 生产者通道接入契约">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#一致性铁律所有生产者拉取契约相同仅载体位置随结构而异" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一致性铁律：所有生产者拉取契约相同，仅载体位置随结构而异
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#生产者一skill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生产者一：SKILL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#生产者二tool_call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生产者二：tool_call
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-实现要求" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-参考" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 参考
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    协议规范
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="通用二进制传输">通用二进制传输<a class="headerlink" href="#通用二进制传输" title="Permanent link">&para;</a></h1>
+<h2 id="概述">概述<a class="headerlink" href="#概述" title="Permanent link">&para;</a></h2>
+<p>通用二进制传输是 A2C-SMCP 的<strong>跨通道字节搬运层</strong>：任何需要把较大 / 二进制内容从 Computer 送达 Agent 的通道，都不把字节塞进自己的响应，而是在响应里铸造一个 <strong><code>blob_handle</code></strong>，由 Agent SDK 经统一的 <code>client:get_blob</code> 事件分块拉取。</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌── 生产者通道（如 SKILL）────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ client:get_skill                    │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   文本且可内联 → body               │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   二进制 / 过大 → blob_handle ──────┼──┐
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└─────────────────────────────────────┘  │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                          ▼
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                            ┌── 通用传输 ───────────────┐
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                            │ client:get_blob           │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                            │   (blob_handle, offset)   │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                            │   → 分块 base64 + sha256  │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                            └───────────────────────────┘
+</code></pre></div>
+<h3 id="为什么独立成通道">为什么独立成通道<a class="headerlink" href="#为什么独立成通道" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>生产者通道保持精简</strong></td>
+<td>SKILL 等通道只表达自身语义；字节泵机制（分块 / 背压 / 完整性 / 上限）定义一次</td>
+</tr>
+<tr>
+<td><strong>复用</strong></td>
+<td>任何 Agent←Computer 字节场景（SKILL 资源、未来大 tool_call 结果 / desktop 截图 / artifact 通道）共用同一契约</td>
+</tr>
+<tr>
+<td><strong>演进解耦</strong></td>
+<td>传输层加压缩 / etag 等优化，生产者通道零改动</td>
+</tr>
+</tbody>
+</table>
+<h3 id="设计原则">设计原则<a class="headerlink" href="#设计原则" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>句柄即不透明能力引用</strong>——<code>blob_handle</code> 由 Computer 铸造，Agent 视为不透明 token</li>
+<li><strong>无状态</strong>——Computer 每次调用即时解析句柄，<strong>无 session、无 TTL</strong>；幂等、可续传、可并行</li>
+<li><strong>传输 ≠ 鉴权</strong>——<code>client:get_blob</code> 是搬运层；鉴权属于<strong>铸造句柄的生产者通道</strong>，解析时重新施加</li>
+<li><strong>pull 即背压</strong>——Agent 决定何时取下一块，Computer 永不超速</li>
+</ol>
+<hr />
+<h2 id="1-blobhandle-契约">1. BlobHandle 契约<a class="headerlink" href="#1-blobhandle-契约" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>BlobHandle: TypeAlias = str
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>约束</th>
+<th>强度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不透明</td>
+<td><strong>MUST</strong></td>
+<td>Agent <strong>MUST NOT</strong> 解析 / 拼接 / 伪造 / 跨 Computer 复用句柄</td>
+</tr>
+<tr>
+<td>Computer 铸造</td>
+<td><strong>MUST</strong></td>
+<td>仅由生产者通道在其成功且已授权的响应中产生</td>
+</tr>
+<tr>
+<td>无状态可重解析</td>
+<td><strong>MUST</strong></td>
+<td>Computer 每次调用从句柄确定性解析回源；<strong>禁止</strong>服务端会话 / 游标 / TTL</td>
+</tr>
+<tr>
+<td>鉴权随源</td>
+<td><strong>MUST</strong></td>
+<td>解析时<strong>重新施加铸造通道的授权与边界</strong>（SKILL → <a href="../skill/#9-安全模型">§9 沙箱</a>）；句柄解码出的路径<strong>绝不</strong>被直接信任</td>
+</tr>
+<tr>
+<td>非任意文件读</td>
+<td><strong>MUST</strong></td>
+<td><code>client:get_blob</code> <strong>不是</strong>"读 Computer 任意文件"的原语；只服务生产者通道已授权的源</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">句柄不是绕过鉴权的后门</p>
+<p>若生产者通道（如 SKILL）在铸造句柄前已拒绝（<code>.skillenv</code> / 越权 / 超上限 → 不铸造），则该资源<strong>根本没有句柄</strong>。<code>client:get_blob</code> 解析任何句柄时仍 <strong>MUST</strong> 重跑源通道的边界校验（防御纵深）：源已变为 orphan / 被删 / 现在越权 → <a href="../error-handling/#blob-not-accessible4018"><code>4018</code></a>。</p>
+</div>
+<hr />
+<h2 id="2-事件-clientget_blob">2. 事件 <code>client:get_blob</code><a class="headerlink" href="#2-事件-clientget_blob" title="Permanent link">&para;</a></h2>
+<p>通用：Agent → Server → Computer，Server 按 <code>computer</code> 路由（与其它 <code>client:*</code> 同）。</p>
+<p><strong>请求数据 (GetBlobReq)</strong>:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 来自某通道响应的不透明句柄</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 可选：资源字节绝对偏移；缺省 0（无状态幂等）</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">&quot;max_chunk_bytes&quot;</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># 可选：客户建议单块上限；Computer clamp</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>响应数据 (GetBlobRet)</strong>:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 回显</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;mime_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数（首块即知；一次读取内恒定）</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（跨块恒定）</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 本块起始字节偏移</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">&quot;eof&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>         <span class="c1"># ⟺ chunk_offset + 本块字节数 == total_size</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">&quot;blob&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># base64，本块字节</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Computer 处理流程</strong>：</p>
+<ol>
+<li>解析 <code>blob_handle</code> 回源（不透明 → 源描述符）；无法识别 / 格式非法 → <a href="../error-handling/#blob-not-accessible4018"><code>4018</code></a> <code>invalid_handle</code></li>
+<li><strong>重施铸造通道鉴权</strong>：SKILL 源 → 重跑 <a href="../skill/#9-安全模型">§9 沙箱</a>（Registry 仍含、未孤儿、<code>.skillenv</code> 等仍 forbidden）。失败 → <code>4018</code> <code>forbidden</code></li>
+<li>源已不可达（SKILL 卸载 / 文件删除 / 内容已变得无法服务）→ <code>4018</code> <code>gone</code></li>
+<li><code>chunk_offset &lt; 0</code> 或 <code>&gt; total_size</code> → <code>4018</code> <code>range</code></li>
+<li>从 <code>chunk_offset</code> 起取 <code>min(max_chunk_bytes, Computer cap)</code> 字节；<code>max_chunk_bytes</code> 缺省时 Computer 自定，<strong>恒保证序列化后 ≤ Server <code>maxHttpBufferSize</code></strong>（计入 base64 +33% 与 envelope）</li>
+<li>回填 <code>total_size</code> / <code>sha256</code>（全量资源）/ <code>chunk_offset</code> / <code>eof</code>；本块字节 base64 → <code>blob</code></li>
+</ol>
+<hr />
+<h2 id="3-分块--背压--完整性--上限">3. 分块 / 背压 / 完整性 / 上限<a class="headerlink" href="#3-分块--背压--完整性--上限" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>关注点</th>
+<th>协议落位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>背压</strong></td>
+<td>pull 模型内生——Agent 控制取下一块的节奏，Computer 不推送，无需字段</td>
+</tr>
+<tr>
+<td><strong>续传 / 重试 / 并行</strong></td>
+<td><code>chunk_offset</code> 是<strong>资源解码后字节的绝对偏移</strong>，无服务端状态 → 天然幂等、可并行不同 offset</td>
+</tr>
+<tr>
+<td><strong>完整性</strong></td>
+<td><code>sha256</code> = 全量资源 sha256（跨块恒定）；Agent <code>eof</code> 后 <strong>SHOULD</strong> 校验重组内容，不符即损坏并重读</td>
+</tr>
+<tr>
+<td><strong>读取中变更</strong></td>
+<td><code>sha256</code> / <code>total_size</code> 一次逻辑读取内 <strong>MUST</strong> 稳定；Agent 跨块发现变化 ⇒ 源被改写，<strong>MUST</strong> 从 offset 0 重读，不拼接错配字节；Computer <strong>SHOULD</strong> 尽力一致快照</td>
+</tr>
+<tr>
+<td><strong>绝对上限（DoS）</strong></td>
+<td>由<strong>铸造通道在铸造时</strong>决断（SKILL → <code>total_size</code> 超 SDK 可配上限即 <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017 too_large</code></a>，不铸造句柄）。<code>client:get_blob</code> 只服务已通过上限的句柄</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">「资源字节」基准</p>
+<p><code>total_size</code> / <code>chunk_offset</code> / <code>sha256</code> 一律基于 <strong>Agent 最终消费的资源字节</strong>——由生产者通道定义（SKILL.md → frontmatter 剥离后 body；其它文件 → 原始字节；占位符不展开）。空资源 = <code>total_size=0</code>，单次响应 <code>eof=true</code>、<code>blob=""</code>。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">预留演进缝隙（勿破坏）</p>
+<p><code>GetBlobReq</code> / <code>GetBlobRet</code> 为开放 TypedDict，未来可<strong>非破坏</strong>追加 <code>content_encoding</code>（gzip 等，缺省 identity；届时 <code>blob</code> = base64 of 已 content-encoded 字节）、<code>etag</code>；<code>4018.details.reason</code> 为开放枚举。offset / total_size / sha256 基于<strong>解码后</strong>资源字节，加压缩不致歧义。</p>
+</div>
+<h3 id="时序以-skill-二进制资源为例">时序（以 SKILL 二进制资源为例）<a class="headerlink" href="#时序以-skill-二进制资源为例" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sequenceDiagram
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    participant A as Agent
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    participant S as Server
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    participant C as Computer
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    A-&gt;&gt;S: client:get_skill(name, rel_path)
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    S-&gt;&gt;C: 转发
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    C-&gt;&gt;C: 解析 rel_path → §9 沙箱 + too_large 校验 → 铸造 blob_handle
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    C-&gt;&gt;S: GetSkillRet { mime_type, total_size, sha256, blob_handle }
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    S-&gt;&gt;A: GetSkillRet
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    loop 直至 eof（pull 即背压）
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>        A-&gt;&gt;S: client:get_blob(blob_handle, chunk_offset)
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        S-&gt;&gt;C: 转发
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>        C-&gt;&gt;C: 解析句柄 → 重施 §9 → 切片
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>        C-&gt;&gt;S: GetBlobRet { blob, chunk_offset, eof, sha256 }
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>        S-&gt;&gt;A: GetBlobRet
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    end
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    Note over A: 重组后校验 sha256
+</code></pre></div>
+<hr />
+<h2 id="4-错误模型">4. 错误模型<a class="headerlink" href="#4-错误模型" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>码</th>
+<th>归属</th>
+<th>触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../error-handling/#skill-resource-not-accessible4017"><code>4017</code></a></td>
+<td><strong>生产者 SKILL</strong></td>
+<td>铸造前解析失败：<code>rel_path</code> 穿越 / <code>.skillenv</code> forbidden / 不存在 / <code>too_large</code>。<strong>不</strong>铸造句柄</td>
+</tr>
+<tr>
+<td>MCP <code>CallToolResult.isError</code></td>
+<td><strong>生产者 tool_call</strong></td>
+<td>工具自身失败沿用 MCP 错误惯例（<strong>不</strong>引入 A2C 事件级码——既有协议不变量）</td>
+</tr>
+<tr>
+<td><a href="../error-handling/#blob-not-accessible4018"><code>4018</code></a></td>
+<td><strong>本通道（拉取期）</strong></td>
+<td>句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（<code>details.reason</code> ∈ <code>invalid_handle</code> / <code>forbidden</code> / <code>gone</code> / <code>range</code>）</td>
+</tr>
+</tbody>
+</table>
+<p>边界清晰：<strong>铸造期</strong>失败按各生产者自身错误惯例（SKILL→<code>4017</code>；tool_call→MCP <code>isError</code>）；<strong>拉取期</strong>的句柄/源/范围一律本通道 <code>4018</code>。拉取契约对所有生产者<strong>完全一致</strong>。</p>
+<hr />
+<h2 id="5-生产者通道接入契约">5. 生产者通道接入契约<a class="headerlink" href="#5-生产者通道接入契约" title="Permanent link">&para;</a></h2>
+<p>任何通道要产出 <code>blob_handle</code>，<strong>MUST</strong>：</p>
+<ol>
+<li>在<strong>自身响应</strong>中铸造不透明、无状态、可重解析的句柄（含足以确定性回源的信息）</li>
+<li>在<strong>铸造时</strong>完成本通道的鉴权与资源上限校验；不通过则<strong>不铸造句柄</strong>、按本通道错误码返回（SKILL → <code>4017</code>）</li>
+<li>文档化句柄的<strong>有效期语义</strong>：本协议不设 TTL；句柄"有效"等价于"源仍被本通道授权且可解析"。源变更由 <code>sha256</code> / <code>total_size</code> 检测，源消失由 <a href="../error-handling/#blob-not-accessible4018"><code>4018 gone</code></a> 表达</li>
+<li>句柄<strong>绝不</strong>编码可被 Agent 利用来越权的明文路径；即便编码，Computer 解析时 <strong>MUST</strong> 重跑本通道边界校验，不信任句柄内容</li>
+</ol>
+<h3 id="一致性铁律所有生产者拉取契约相同仅载体位置随结构而异">一致性铁律：所有生产者拉取契约相同，仅载体位置随结构而异<a class="headerlink" href="#一致性铁律所有生产者拉取契约相同仅载体位置随结构而异" title="Permanent link">&para;</a></h3>
+<p><code>blob_handle</code> 的<strong>语义、拉取（<code>client:get_blob</code>）、<code>sha256</code>/<code>total_size</code> 前置元数据、4018 错误模型、Agent 重组/校验流程</strong>对所有生产者<strong>完全相同</strong>。<strong>唯一</strong>允许的差异是句柄的<strong>承载位置</strong>——且该差异<strong>仅</strong>由"响应结构是否可变"决定，非设计自由度：</p>
+<table>
+<thead>
+<tr>
+<th>生产者</th>
+<th>响应结构</th>
+<th>句柄载体</th>
+<th>对等元数据</th>
+<th>铸造期失败惯例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client:get_skill</code></td>
+<td><code>GetSkillRet</code>（A2C 自有，可改）</td>
+<td><strong>顶层</strong> <code>blob_handle</code></td>
+<td>顶层 <code>total_size</code> / <code>sha256</code> / <code>mime_type</code></td>
+<td>A2C <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017</code></a></td>
+</tr>
+<tr>
+<td><code>client:tool_call</code></td>
+<td>MCP <code>CallToolResult</code>（<strong>标准不可变</strong>）</td>
+<td>content item <code>_meta.</code><strong><code>a2c_blob_handle</code></strong></td>
+<td>item <code>_meta.a2c_total_size</code> / <code>_meta.a2c_sha256</code> + item 既有 <code>mimeType</code></td>
+<td>MCP <code>CallToolResult.isError</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>CallToolResult 走 <code>_meta</code> 旁路与 <code>SMCPTool.meta</code> 的 <code>a2c_tool_meta</code> / <code>MCP_TOOL_ANNOTATION</code> 命名空间旁路<strong>同构</strong>——这是 A2C 在不可变 MCP 结构上扩展的既定手法，不是新约定。</p>
+</blockquote>
+<p>Agent SDK 因此只有"<strong>去哪找句柄</strong>"一处分支（顶层字段 vs 遍历 content item <code>_meta</code>）；句柄拿到后的拉取、<code>sha256</code> 校验、<code>4018</code> 处理是<strong>同一套代码、同一套语义</strong>。</p>
+<p>阈值判定同源：文本 ≤ 内联预算 → 内联；二进制 / 文本超预算 → 句柄。tool_call <strong>逐个</strong>二进制 content item 独立按此预算判定。</p>
+<h3 id="生产者一skill">生产者一：SKILL<a class="headerlink" href="#生产者一skill" title="Permanent link">&para;</a></h3>
+<p><code>client:get_skill</code> 对二进制 / 过大文本资源铸造顶层 <code>blob_handle</code>；铸造前在解析阶段完成 <a href="../skill/#9-安全模型">§9 沙箱</a> 与 <code>too_large</code>。详见 <a href="../skill/#7-事件">SKILL 通道 §7</a>。</p>
+<h3 id="生产者二tool_call">生产者二：tool_call<a class="headerlink" href="#生产者二tool_call" title="Permanent link">&para;</a></h3>
+<p><code>client:tool_call</code> 返回原生 <code>CallToolResult</code>；超内联预算的二进制 content item 清空内联 <code>data</code>/<code>blob</code>、在其 <code>_meta</code> 写 <code>a2c_blob_handle</code>（+<code>a2c_total_size</code>/<code>a2c_sha256</code>）。CallToolResult 仍是合法 MCP 结构；工具自身失败仍走 MCP <code>isError</code>。详见 <a href="../events/#clienttool_call">事件定义 §client:tool_call</a>。</p>
+<hr />
+<h2 id="6-实现要求">6. 实现要求<a class="headerlink" href="#6-实现要求" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Computer MUST 实现</strong> <code>client:get_blob</code>（作为接收方），并对每个句柄解析重施铸造通道鉴权</li>
+<li><strong>Server MUST 路由</strong> <code>client:get_blob</code>（与其它 <code>client:*</code> 一致，按 <code>computer</code>）</li>
+<li><strong>Agent SDK SHOULD 封装</strong> 句柄拉取循环（<code>while not eof: get_blob(handle, offset)</code>），并在 <code>eof</code> 后校验 <code>sha256</code>——可与生产者通道工具封装在同一抽象后，对上层透明</li>
+</ul>
+<blockquote>
+<p>协议规范仅提供 Python reference impl；其它 SDK 的封装由各自决定——A2C-SMCP 协议文档不堆砌多语言示例。</p>
+</blockquote>
+<hr />
+<h2 id="7-参考">7. 参考<a class="headerlink" href="#7-参考" title="Permanent link">&para;</a></h2>
+<ul>
+<li>数据结构：<a href="../data-structures/#通用二进制传输结构"><code>GetBlobReq</code> / <code>GetBlobRet</code> / <code>BlobHandle</code></a></li>
+<li>错误码：<a href="../error-handling/#blob-not-accessible4018"><code>4018 Blob Not Accessible</code></a></li>
+<li>首个生产者：<a href="../skill/">SKILL 通道</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/A2C-SMCP" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
