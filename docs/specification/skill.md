@@ -605,7 +605,7 @@ A2C-SMCP SKILL 通道继承 [marketplace SKILL v1 §1.2 三条强制安全原则
 | 约束 | 说明 |
 |---|---|
 | **Source 信任继承** | MCP Server 上报的 SKILL 信任级别 = MCP Server 自身信任级别。SKILL 物化不创建新的信任边界——脚本执行权限同其 MCP Server 的工具调用权限 |
-| **Staging 隔离** | 单一 Computer 进程的 SKILL 安装目录 **MUST NOT** 跨用户共享（即不能放系统目录如 `/var/lib/a2c-skills`）；多用户场景每用户独立 home |
+| **Staging 隔离** | SKILL 安装目录 **SHOULD** 落每用户私有目录（默认 home / XDG，见 §4）。跨用户隔离交由 **OS 文件权限**（SDK 创建安装目录 **SHOULD** 用 `0o700`）与**部署 / 运维层**保证，**非应用层运行时强制**——与 Claude Code 对 `~/.claude` 的姿态一致。SDK **SHOULD NOT** 用 path 前缀黑名单（如硬拒 `/var/lib/a2c-skills`）充当隔离：前缀枚举拦不全，非有效隔离手段。**部署在多用户主机时，运维 MUST 保证每用户 home 私有** |
 | **name 校验** | `client:get_skill` 入参 name **MUST** 经 §1 lexer 校验；非法 name 立即拒绝（`4016`），不进入 Registry 查询路径 |
 | **name 寻址防越权** | Computer 用 name 在 Registry 内做 O(1) 精确匹配；**禁止**从 name 推导 FS 路径再读文件。Registry 是唯一的 name→path 映射来源 |
 | **rel_path 沙箱** | 包根绝对路径**仅**由 Registry 经 name 解析得到；`rel_path` MUST 相对，`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内。绝对路径 / `..` / 符号链接逃逸 → [`4017`](error-handling.md#skill-resource-not-accessible4017) `traversal`；命中 `.skillenv` 等敏感文件 → `forbidden`（不泄漏存在性）；包内不存在 → `not_found` |
