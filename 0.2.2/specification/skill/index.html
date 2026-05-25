@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -3358,7 +3358,7 @@ Computer 解析 <code>rel_path</code> 后：<strong>文本 MIME 且 <code>total_
 </tr>
 <tr>
 <td><strong>Staging 隔离</strong></td>
-<td>单一 Computer 进程的 SKILL 安装目录 <strong>MUST NOT</strong> 跨用户共享（即不能放系统目录如 <code>/var/lib/a2c-skills</code>）；多用户场景每用户独立 home</td>
+<td>SKILL 安装目录 <strong>SHOULD</strong> 落每用户私有目录（默认 home / XDG，见 §4）。跨用户隔离交由 <strong>OS 文件权限</strong>（SDK 创建安装目录 <strong>SHOULD</strong> 用 <code>0o700</code>）与<strong>部署 / 运维层</strong>保证，<strong>非应用层运行时强制</strong>——与 Claude Code 对 <code>~/.claude</code> 的姿态一致。SDK <strong>SHOULD NOT</strong> 用 path 前缀黑名单（如硬拒 <code>/var/lib/a2c-skills</code>）充当隔离：前缀枚举拦不全，非有效隔离手段。<strong>部署在多用户主机时，运维 MUST 保证每用户 home 私有</strong></td>
 </tr>
 <tr>
 <td><strong>name 校验</strong></td>
