@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -3084,7 +3084,7 @@
 </blockquote>
 <h3 id="a2cskillref">A2CSkillRef<a class="headerlink" href="#a2cskillref" title="Permanent link">&para;</a></h3>
 <p>Skill 引用对象——<code>client:get_skills</code> 返回列表的元素。</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CSkillRef</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CSkillRef</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>       <span class="c1"># 默认 total=True：裸字段 = 必选，NotRequired[] = 可选</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="c1"># ── 主键 ─────────────────────────────────────────</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 必选：合成的全局唯一名（跨工具对齐裸名）</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>                                    <span class="c1"># marketplace: acme-audit:audit / user: my-helper</span>
@@ -3111,6 +3111,80 @@
 <a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="c1"># ── 包元数据派生（非 frontmatter）────────────────</span>
 <a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>    <span class="n">version</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>               <span class="c1"># 来源各异（见下方 note）；user 源缺省/null</span>
 </code></pre></div>
+<p><strong>权威字段表</strong>（SDK 据此落 PEP 655）：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th style="text-align: center;">required?</th>
+<th>含义 / source-of-truth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">✅ <strong>必选</strong></td>
+<td>合成全局唯一名，跨工具对齐裸名（marketplace <code>&lt;plugin&gt;:&lt;skill&gt;</code> / user <code>&lt;skill&gt;</code> / mcp <code>mcp:&lt;server&gt;:&lt;skill&gt;</code>，§1）。协议主键，Agent 当不透明可比较字符串</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">✅ <strong>必选</strong></td>
+<td>完整来源 provenance（<code>mcp:tfrobot-tools</code> / <code>marketplace:acme-skills</code> / <code>user</code>）</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">✅ <strong>必选</strong></td>
+<td>Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问，LLM 永不可见（§9.1）</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">✅ <strong>必选</strong></td>
+<td>SKILL.md frontmatter 强制字段（marketplace §3.1）；跨三 source 均存在</td>
+</tr>
+<tr>
+<td><code>uri</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td><strong>仅 MCP 来源</strong>：<code>skill://host/skill-name</code>，次要身份（§2）</td>
+</tr>
+<tr>
+<td><code>license</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td>frontmatter</td>
+</tr>
+<tr>
+<td><code>compatibility</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td>frontmatter</td>
+</tr>
+<tr>
+<td><code>allowed_tools</code></td>
+<td><code>list[str]</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td>frontmatter <code>allowed-tools</code> 规范化为 list</td>
+</tr>
+<tr>
+<td><code>skill_metadata</code></td>
+<td><code>dict</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td>frontmatter.metadata 透传，A2C 不解释</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td><code>str</code></td>
+<td style="text-align: center;">⬜ 可选</td>
+<td>来源各异（见下方 note）；user 源缺省/null</td>
+</tr>
+</tbody>
+</table>
+<p>必选核心 4 字段跨所有 source 恒存在：Producer（Computer）<strong>MUST</strong> 发齐；Consumer（Agent）可假定其存在，但 <strong>MUST NOT</strong> 假定任一可选字段存在。</p>
 <div class="admonition note">
 <p class="admonition-title"><code>version</code> 来源（非 frontmatter）</p>
 <p>marketplace SKILL v1 frontmatter 恰好 6 字段（<code>name</code> / <code>description</code> / <code>license</code> / <code>compatibility</code> / <code>metadata</code> / <code>allowed-tools</code>），<strong>无 version</strong>。<code>A2CSkillRef.version</code> 的 source-of-truth 按来源区分：</p>

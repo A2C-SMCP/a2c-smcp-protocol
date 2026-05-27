@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -3199,7 +3199,7 @@
 <p>SKILL 通道的请求 / 响应结构。完整通道语义（命名规则、URI、source 模式、安装生命周期、安全模型）见 <a href="../skill/">SKILL 通道</a>。</p>
 <h3 id="a2cskillref">A2CSkillRef<a class="headerlink" href="#a2cskillref" title="Permanent link">&para;</a></h3>
 <p>Skill 引用对象——<code>client:get_skills</code> 返回列表的元素。<code>name</code> 是协议主键（合成的全局唯一名，跨工具对齐裸名：marketplace <code>&lt;plugin&gt;:&lt;skill&gt;</code> / user 裸 <code>&lt;skill&gt;</code> / mcp <code>mcp:&lt;server&gt;:&lt;skill&gt;</code>，见 <a href="../skill/#1-skill-命名">skill.md §1</a>）；Agent 把 <code>name</code> 当<strong>不透明可比较字符串</strong>，判定来源用 <code>source</code> 字段。</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CSkillRef</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2CSkillRef</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>       <span class="c1"># 默认 total=True：裸字段 = 必选，NotRequired[] = 可选</span>
 <a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="c1"># ── 主键 ────────────────────────────────────────────</span>
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 必选：合成全局唯一名（跨工具对齐裸名）</span>
 <a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>                                    <span class="c1"># marketplace: acme-audit:audit / user: my-helper</span>
@@ -3222,6 +3222,16 @@
 <a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a>    <span class="c1"># ── 包元数据派生（非 frontmatter）────────────────────</span>
 <a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>    <span class="n">version</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>               <span class="c1"># 来源各异（见下方 note）；user 源缺省/null</span>
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">必选核心 = <code>name</code> / <code>source</code> / <code>path</code> / <code>description</code>（4 字段）</p>
+<p>这四个字段跨<strong>所有 source</strong>（marketplace / user DropIn / mcp）恒存在，是 <code>A2CSkillRef</code> 的必选核心：</p>
+<ul>
+<li><code>name</code> / <code>source</code>：协议主键与来源 provenance，每条 ref 必有。</li>
+<li><code>path</code>：staging 物化是所有 source 的统一第一步，进入 Registry 的 SKILL 必有可读本地目录（见下方 note）。</li>
+<li><code>description</code>：SKILL.md frontmatter 强制字段（marketplace v1 §3.1 的 6 字段之一），任何合法 SKILL.md 必含。</li>
+</ul>
+<p>其余 6 个（<code>uri</code> / <code>license</code> / <code>compatibility</code> / <code>allowed_tools</code> / <code>skill_metadata</code> / <code>version</code>）为 <code>NotRequired</code>。Producer（Computer）<strong>MUST</strong> 发齐 4 个必选字段；Consumer（Agent）可假定其存在，但 <strong>MUST NOT</strong> 假定任一可选字段存在。SDK 用 PEP 655 跟进时，两种等价写法皆可——本规范取 house 约定（<code>total=True</code> 默认 + <code>NotRequired[]</code>），SDK 亦可用 <code>total=False</code> + <code>Required[]</code>。</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title"><code>path</code> 恒存在；为何无 raw <code>mcp_server</code> 字段</p>
 <p><strong><code>path</code> 必选</strong>：Computer 是 SKILL 管理者，所有 source 落地的统一第一步都是 staging 物化到本地（skill.md §4/§5），故进入 Registry 的 SKILL 必有可读本地目录，不存在"无 baseDir"形态。</p>
