@@ -315,7 +315,7 @@ A2C-SMCP MCP Server 来源的 SKILL 安装生命周期：
 Skill 引用对象——`client:get_skills` 返回列表的元素。
 
 ```python
-class A2CSkillRef(TypedDict, total=False):
+class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，NotRequired[] = 可选
     # ── 主键 ─────────────────────────────────────────
     name: str                       # 必选：合成的全局唯一名（跨工具对齐裸名）
                                     # marketplace: acme-audit:audit / user: my-helper
@@ -342,6 +342,23 @@ class A2CSkillRef(TypedDict, total=False):
     # ── 包元数据派生（非 frontmatter）────────────────
     version: NotRequired[str]               # 来源各异（见下方 note）；user 源缺省/null
 ```
+
+**权威字段表**（SDK 据此落 PEP 655）：
+
+| 字段 | 类型 | required? | 含义 / source-of-truth |
+|---|---|:---:|---|
+| `name` | `str` | ✅ **必选** | 合成全局唯一名，跨工具对齐裸名（marketplace `<plugin>:<skill>` / user `<skill>` / mcp `mcp:<server>:<skill>`，§1）。协议主键，Agent 当不透明可比较字符串 |
+| `source` | `str` | ✅ **必选** | 完整来源 provenance（`mcp:tfrobot-tools` / `marketplace:acme-skills` / `user`） |
+| `path` | `str` | ✅ **必选** | Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问，LLM 永不可见（§9.1） |
+| `description` | `str` | ✅ **必选** | SKILL.md frontmatter 强制字段（marketplace §3.1）；跨三 source 均存在 |
+| `uri` | `str` | ⬜ 可选 | **仅 MCP 来源**：`skill://host/skill-name`，次要身份（§2） |
+| `license` | `str` | ⬜ 可选 | frontmatter |
+| `compatibility` | `str` | ⬜ 可选 | frontmatter |
+| `allowed_tools` | `list[str]` | ⬜ 可选 | frontmatter `allowed-tools` 规范化为 list |
+| `skill_metadata` | `dict` | ⬜ 可选 | frontmatter.metadata 透传，A2C 不解释 |
+| `version` | `str` | ⬜ 可选 | 来源各异（见下方 note）；user 源缺省/null |
+
+必选核心 4 字段跨所有 source 恒存在：Producer（Computer）**MUST** 发齐；Consumer（Agent）可假定其存在，但 **MUST NOT** 假定任一可选字段存在。
 
 !!! note "`version` 来源（非 frontmatter）"
 
