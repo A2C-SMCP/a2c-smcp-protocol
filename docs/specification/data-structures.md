@@ -23,6 +23,8 @@ class AgentCallData(TypedDict):
     req_id: str     # 请求 ID，用于去重和关联
 ```
 
+> **取消事件复用本结构**：`server:tool_call_cancel` / `notify:tool_call_cancel` 直接复用 `AgentCallData`，其中 `req_id` **MUST** 等于被取消的原 `client:tool_call` 的 `req_id`（唯一定位在途调用），且**不含** `computer` 字段。详见 [事件 §server:tool_call_cancel](events.md#servertool_call_cancel)。
+
 ---
 
 ## 工具相关结构
@@ -191,6 +193,45 @@ class GetToolsRet(TypedDict):
     tools: list[SMCPTool]   # 工具列表
     req_id: str             # 请求 ID
 ```
+
+---
+
+### CallToolResult 结果级 A2C 标记 { #calltoolresult-结果级-a2c-标记 }
+
+`client:tool_call` 的响应是 MCP 标准 `CallToolResult`（A2C **不可**改其结构）。A2C 通过 `CallToolResult` 的**结果级元数据字段**承载扩展标记。
+
+!!! warning "元数据落位规则：结果级 `meta` vs 子级 `_meta`"
+
+    A2C 在 MCP 结构上扩展元数据时，**线上字面 key 取决于层级**——以下约定与全部既有用法一致：
+
+    | 层级 | 字面 wire key | 示例 |
+    |------|--------------|------|
+    | **结果级**（`CallToolResult` / `SMCPTool` 顶层）| `meta` | `meta.a2c_cancelled`、`meta.a2c_timeout`、授权失败的 `meta.error_code`（[4006/4007](error-handling.md#mcp-上游授权错误响应)）、`SMCPTool.meta.a2c_tool_meta` |
+    | **子级**（`CallToolResult` content item）/ **MCP `Resource` / `Tool` 级** | `_meta` | content item `_meta.a2c_blob_handle`（[通用二进制传输](#通用二进制传输结构)）、`Resource._meta.fullscreen`（[Desktop](desktop.md)）、`Resource._meta.version`（[SKILL](skill.md)）|
+
+    新增**结果级**标记 **MUST** 落 `meta`；**子级 / Resource 级**标记 **MUST** 落 `_meta`。
+
+**取消 / 超时标记**（均为**结果级 `meta`** 下的 `a2c_*` 命名空间键）:
+
+| key | 类型 | 必选性 | 含义 |
+|-----|------|-------|------|
+| `meta.a2c_cancelled` | bool | 取消时 **MUST** 为 `true` | 标识该结果由 `notify:tool_call_cancel` 中断产生（区别于普通失败/超时）|
+| `meta.a2c_cancel_reason` | str | **SHOULD**（可选）| 诊断性原因，由 Computer 填写（当前恒为 `"agent_requested"`）；仅供观测，不承载控制逻辑 |
+| `meta.a2c_timeout` | bool | 超时时 **SHOULD** 为 `true` | 标识该结果为超时返回（区别于取消）|
+
+被取消时，Computer 对原 `client:tool_call` 的 ack 返回（参考实现 python，reference impl）:
+
+```python
+CallToolResult(
+    content=[TextContent(text="Tool call cancelled", type="text")],
+    isError=True,
+    meta={"a2c_cancelled": True, "a2c_cancel_reason": "agent_requested"},
+)
+```
+
+!!! note "Producer / Consumer 约定"
+
+    Producer（Computer）**MUST** 把标记写在结果级 `meta`。Consumer（Agent）**SHOULD** 对 `meta` / `_meta` 两种线上 key 宽松读取（不同 SDK 序列化路径可能不同），并优先按本规范的结果级 `meta` 取值。配套时序见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)。
 
 ---
 

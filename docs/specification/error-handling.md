@@ -153,10 +153,18 @@ class ErrorPayload(TypedDict, total=False):
 class CallToolResult:
     content: list[TextContent | ImageContent | EmbeddedResource]
     isError: bool  # 是否为错误结果
-    meta: dict     # 元数据
+    meta: dict     # 结果级元数据（线上 key 为 meta，承载 a2c_* 扩展标记）
 ```
 
-当 `isError=True` 时，`content` 中包含错误信息。
+当 `isError=True` 时，`content` 中包含错误信息。`isError=True` 可由**普通失败**、**超时**或**取消**产生；三者通过**结果级 `meta` 标记**区分：
+
+| 终态 | `isError` | 结果级 `meta` 标记 | 说明 |
+|------|-----------|-------------------|------|
+| 普通失败 | `True` | 无 a2c 终态标记（授权失败另带 `meta.error_code`，见 [§MCP 上游授权错误响应](#mcp-上游授权错误响应)）| 工具自身执行失败 |
+| 超时 | `True` | `meta.a2c_timeout = true` | Agent / Computer 端超时；见 [§超时处理](#超时处理) |
+| 取消 | `True` | `meta.a2c_cancelled = true`（+ 可选 `meta.a2c_cancel_reason`）| 由 `notify:tool_call_cancel` 中断；见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel) |
+
+标记完整定义见 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
 ## 超时处理
 
@@ -183,9 +191,11 @@ result = await agent.emit_tool_call(
 CallToolResult(
     content=[TextContent(text="Tool call timeout")],
     isError=True,
-    meta={"timeout": True}
+    meta={"a2c_timeout": True}   # 结果级标记：标识超时（区别于取消的 a2c_cancelled）
 )
 ```
+
+> **命名空间收敛**: 历史示例曾用未加命名空间的 `meta={"timeout": True}`；现统一到 `a2c_*` 命名空间下的 `a2c_timeout`，与 `a2c_cancelled` 一致，均为**结果级 `meta`** 标记。详见 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
 ### Server 端超时
 
@@ -200,6 +210,19 @@ Computer 应在工具执行超时时：
 
 1. 尝试中断工具执行
 2. 返回超时错误
+
+## 取消语义（无 ack、无错误码） { #取消语义无-ack无错误码 }
+
+`server:tool_call_cancel` 为 **fire-and-forget**：Server 收到后仅向房间广播 `notify:tool_call_cancel`，**不回执（无 ack）**。
+
+**取消刻意不分配错误码、不投递扁平 [ErrorPayload](#错误响应格式)**，理由与 [§飞行中断连](#飞行中断连in-flight-disconnect) 同源：
+
+- 无 ack 通道即无错误码读者；取消是**广播通知**而非请求-响应，强行定义回执错误码无意义。
+- Agent 端发出 `server:tool_call_cancel` 后收到的 ack 为 `None` 是**合规预期**，**MUST NOT** 据此判定"未实现 / 失败"。
+
+**取消的"结果"通过原 `client:tool_call` 的 ack 体现**，而非取消事件本身：被中断时 Computer 对原调用返回 `CallToolResult(isError=True, meta={"a2c_cancelled": True})`，见 [§client:tool_call 响应](#clienttool_call-响应)。
+
+**错误码复用 / 不使用**：取消链路**不新增**错误码、亦**不复用**任何既有错误码（`4004 Tool Timeout` 仅用于超时，**不**用于取消）。`req_id` 命中不到在途调用时 Computer **静默忽略**（不回错误码），见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)。
 
 ## 飞行中断连（in-flight disconnect）
 
