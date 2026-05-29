@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -831,6 +831,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#servertool_call_cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        server:tool_call_cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1063,6 +1074,17 @@
     <span class="md-ellipsis">
       
         工具调用流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#工具调用取消流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用取消流程
       
     </span>
   </a>
@@ -1998,6 +2020,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#servertool_call_cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        server:tool_call_cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2230,6 +2263,17 @@
     <span class="md-ellipsis">
       
         工具调用流程
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#工具调用取消流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用取消流程
       
     </span>
   </a>
@@ -2709,7 +2753,7 @@
 <td><code>CANCEL_TOOL_CALL_EVENT</code></td>
 <td><code>server:tool_call_cancel</code></td>
 <td>Agent</td>
-<td>取消工具调用</td>
+<td>取消工具调用（<strong>fire-and-forget，无 ack</strong>）</td>
 <td><code>AgentCallData</code></td>
 </tr>
 <tr>
@@ -2990,16 +3034,30 @@
 <li>从 <code>chunk_offset</code>（缺省 0）取 <code>min(max_chunk_bytes, Computer cap)</code> 字节，恒保证序列化 ≤ Server <code>maxHttpBufferSize</code>；base64 → <code>blob</code>，回填 <code>total_size</code>/<code>sha256</code>/<code>chunk_offset</code>/<code>eof</code></li>
 </ol>
 <p>详见 <a href="../blob-transfer/">通用二进制传输</a>。</p>
+<h4 id="servertool_call_cancel"><code>server:tool_call_cancel</code><a class="headerlink" href="#servertool_call_cancel" title="Permanent link">&para;</a></h4>
+<p>Agent 请求取消一次在途工具调用。<strong>本事件为 fire-and-forget：Server 收到后仅向房间广播 <code>notify:tool_call_cancel</code>，不回执（无 ack）</strong>——语义与 <code>server:update_*</code> 一致。Agent 端发出后收到的 ack 为 <code>None</code> 即为<strong>合规预期</strong>，<strong>不应</strong>据此判定"未实现 / 失败"。</p>
+<p><strong>请求数据 (AgentCallData)</strong>:
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent 名称</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 必须 == 被取消的原 client:tool_call 的 req_id</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">}</span>
+</code></pre></div></p>
+<div class="admonition warning">
+<p class="admonition-title">req_id 是唯一定位键</p>
+<p><code>req_id</code> <strong>MUST</strong> 等于被取消的原 <code>client:tool_call</code> 的 <code>req_id</code>——Computer 据此在在途调用表中定位目标调用。<code>AgentCallData</code> <strong>不含</strong> <code>computer</code> 字段，匹配完全依赖全局唯一、永不复用的 <code>req_id</code>。</p>
+</div>
+<p><strong>Server 处理</strong>: 校验发起方为 Agent 且在房间内后，向该房间广播 <code>notify:tool_call_cancel</code>（<code>skip_sid</code> 发起者）。<strong>不</strong>回执、<strong>不</strong>分配错误码——详见 <a href="../error-handling/#取消语义无-ack无错误码">错误处理 §取消语义</a>。</p>
+<p>取消后原 <code>client:tool_call</code> 的标准响应形状（<code>CallToolResult(isError=True)</code> + 结果级 <code>meta.a2c_cancelled</code>）见 <a href="#notifytool_call_cancel">§notify:tool_call_cancel</a> 与 <a href="../data-structures/#calltoolresult-结果级-a2c-标记">数据结构 §CallToolResult 结果级 A2C 标记</a>。</p>
 <hr />
 <h3 id="房间管理事件">房间管理事件<a class="headerlink" href="#房间管理事件" title="Permanent link">&para;</a></h3>
 <h4 id="serverjoin_office"><code>server:join_office</code><a class="headerlink" href="#serverjoin_office" title="Permanent link">&para;</a></h4>
 <p>Agent 或 Computer 请求加入房间。</p>
 <p><strong>请求数据 (EnterOfficeReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应</strong>: <code>(bool, str | None)</code> - 成功标志和错误信息。</p>
 <p><strong>Server 处理规则</strong>:
@@ -3008,33 +3066,33 @@
 <h4 id="serverleave_office"><code>server:leave_office</code><a class="headerlink" href="#serverleave_office" title="Permanent link">&para;</a></h4>
 <p>Agent 或 Computer 请求离开房间。</p>
 <p><strong>请求数据 (LeaveOfficeReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverlist_room"><code>server:list_room</code><a class="headerlink" href="#serverlist_room" title="Permanent link">&para;</a></h4>
 <p>Agent 查询指定房间内的所有会话信息。</p>
 <p><strong>请求数据 (ListRoomReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
-<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (ListRoomRet)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p>其中 <code>SessionInfo</code>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>   <span class="c1"># 角色</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
-<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="s2">&quot;a2c_version&quot;</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
-<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>   <span class="c1"># 角色</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    <span class="s2">&quot;a2c_version&quot;</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition info">
 <p class="admonition-title">peer 版本可见性</p>
@@ -3050,16 +3108,16 @@
 <h4 id="serverupdate_config"><code>server:update_config</code><a class="headerlink" href="#serverupdate_config" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其配置已更新，Server 随后广播 <code>notify:update_config</code>。</p>
 <p><strong>请求数据 (UpdateComputerConfigReq)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_tool_list"><code>server:update_tool_list</code><a class="headerlink" href="#serverupdate_tool_list" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其工具列表已更新，Server 随后广播 <code>notify:update_tool_list</code>。</p>
 <p><strong>请求数据 (UpdateToolListNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_desktop"><code>server:update_desktop</code><a class="headerlink" href="#serverupdate_desktop" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其桌面内容已更新，Server 随后广播 <code>notify:update_desktop</code>。</p>
@@ -3069,9 +3127,9 @@
 <li>MCP Server 发出 <code>ResourceUpdatedNotification</code> 且目标 URI 为 <code>window://</code></li>
 </ul>
 <p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_desktop</code>。</p>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a> 中的 <a href="../desktop/#desktop-更新机制">更新机制</a>。</p>
@@ -3084,9 +3142,9 @@
 <li><strong>User DropIn</strong>：用户手动增删本地 SKILL，或经 SDK 管理 UX 触发</li>
 </ul>
 <p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_skills</code>。</p>
 <p>详见 <a href="../skill/">SKILL 通道</a> 中的 <a href="../skill/#8-变更检测">变更检测</a>。</p>
@@ -3095,151 +3153,175 @@
 <h4 id="notifyenter_office"><code>notify:enter_office</code><a class="headerlink" href="#notifyenter_office" title="Permanent link">&para;</a></h4>
 <p>Server 广播：有成员加入房间。</p>
 <p><strong>数据结构 (EnterOfficeNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
-<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应自动调用 <code>client:get_tools</code> 获取新 Computer 的工具列表。</p>
 <h4 id="notifyleave_office"><code>notify:leave_office</code><a class="headerlink" href="#notifyleave_office" title="Permanent link">&para;</a></h4>
 <p>Server 广播：有成员离开房间。</p>
 <p><strong>数据结构 (LeaveOfficeNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
-<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
-<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="notifyupdate_config"><code>notify:update_config</code><a class="headerlink" href="#notifyupdate_config" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的配置已更新。</p>
 <p><strong>数据结构 (UpdateMCPConfigNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span>
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
-<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">{</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，可调用 <code>client:get_config</code> 获取最新配置。</p>
 <h4 id="notifyupdate_tool_list"><code>notify:update_tool_list</code><a class="headerlink" href="#notifyupdate_tool_list" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的工具列表已更新。</p>
 <p><strong>数据结构 (UpdateToolListNotification)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">{</span>
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
-<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应调用 <code>client:get_tools</code> 刷新本地工具列表。</p>
 <h4 id="notifyupdate_desktop"><code>notify:update_desktop</code><a class="headerlink" href="#notifyupdate_desktop" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的桌面内容已更新。</p>
 <p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:get_desktop</code> 获取最新桌面。</p>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a> 中的 <a href="../desktop/#完整生命周期时序图">完整生命周期时序图</a>。</p>
 <h4 id="notifyupdate_skills"><code>notify:update_skills</code><a class="headerlink" href="#notifyupdate_skills" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的 SKILL 集合或内容已更新。</p>
 <p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
-<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># SKILL 发生变化的 Computer 名称</span>
-<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># SKILL 发生变化的 Computer 名称</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:get_skills</code> 获取最新 SKILL 清单。</p>
 <p>详见 <a href="../skill/">SKILL 通道</a>。</p>
 <h4 id="notifytool_call_cancel"><code>notify:tool_call_cancel</code><a class="headerlink" href="#notifytool_call_cancel" title="Permanent link">&para;</a></h4>
-<p>Server 广播：某工具调用已被取消。</p>
+<p>Server 广播：某工具调用已被取消。由 <code>server:tool_call_cancel</code> 触发，广播至发起 Agent 所在房间的全部成员。</p>
 <p><strong>数据结构 (AgentCallData)</strong>:
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
-<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID</span>
-<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">{</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID（== 原 client:tool_call 的 req_id）</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="p">}</span>
 </code></pre></div></p>
+<p><strong>Computer 行为</strong>:</p>
+<ul>
+<li>Computer <strong>SHOULD</strong> 按 <code>req_id</code> 在在途调用表中定位并中断对应工具执行；并 <strong>SHOULD</strong> 向下游 MCP Server 发送 MCP <code>notifications/cancelled</code>（协作式取消，best-effort）。</li>
+<li>若 <code>req_id</code> 命中不到在途调用（已完成 / 不存在 / 非本 Computer 承接）→ <strong>静默忽略</strong>（<strong>MUST NOT</strong> 视为错误、<strong>MUST NOT</strong> 回送错误码）。这是协作式取消的固有竞态：若原调用在取消送达前已返回，Agent 将正常收到结果。</li>
+<li>被成功中断时，Computer 对<strong>原 <code>client:tool_call</code></strong> 的 ack 返回 <code>CallToolResult(isError=True)</code>，并在<strong>结果级 <code>meta</code></strong> 写入取消标记 <code>a2c_cancelled=true</code>（+ 可选 <code>a2c_cancel_reason</code>），使 Agent 能区分"取消"与"普通失败/超时"。标记定义见 <a href="../data-structures/#calltoolresult-结果级-a2c-标记">数据结构 §CallToolResult 结果级 A2C 标记</a>。</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">MCP notifications/cancelled 的实现说明</p>
+<p>MCP 官方 SDK 不自动发送 <code>notifications/cancelled</code>、也不公开 client request_id（见 <a href="https://github.com/modelcontextprotocol/python-sdk/issues/1410">modelcontextprotocol/python-sdk#1410</a>）。在官方公开 API 补齐前，SDK 可用受控 workaround 捕获 request_id 并补发。因 MCP 取消为协作式（远端可忽略），此项为 <strong>SHOULD</strong> 而非 MUST。</p>
+</div>
 <hr />
 <h2 id="事件流程图">事件流程图<a class="headerlink" href="#事件流程图" title="Permanent link">&para;</a></h2>
 <h3 id="工具调用流程">工具调用流程<a class="headerlink" href="#工具调用流程" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>sequenceDiagram
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    participant A as Agent
-<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>    participant S as Server
-<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>    participant C as Computer
-<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>
-<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>    A-&gt;&gt;S: client:tool_call (ToolCallReq)
-<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>    S-&gt;&gt;C: client:tool_call (转发)
-<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>    C-&gt;&gt;S: 工具执行结果
-<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a>    S-&gt;&gt;A: 返回结果
-</code></pre></div>
-<h3 id="动态工具发现流程">动态工具发现流程<a class="headerlink" href="#动态工具发现流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>sequenceDiagram
 <a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>    participant A as Agent
 <a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>    participant S as Server
 <a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>    participant C as Computer
 <a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>
-<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>    Note over C: Computer 加入房间
-<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a>    C-&gt;&gt;S: server:join_office
-<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>    S-&gt;&gt;A: notify:enter_office
-<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>    A-&gt;&gt;S: client:get_tools
-<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a>    S-&gt;&gt;C: client:get_tools (转发)
-<a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a>    C-&gt;&gt;S: 工具列表
-<a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a>    S-&gt;&gt;A: GetToolsRet
-<a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a>    Note over A: 注册新工具
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>    A-&gt;&gt;S: client:tool_call (ToolCallReq)
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a>    S-&gt;&gt;C: client:tool_call (转发)
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>    C-&gt;&gt;S: 工具执行结果
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>    S-&gt;&gt;A: 返回结果
 </code></pre></div>
-<h3 id="配置更新流程">配置更新流程<a class="headerlink" href="#配置更新流程" title="Permanent link">&para;</a></h3>
+<h3 id="工具调用取消流程">工具调用取消流程<a class="headerlink" href="#工具调用取消流程" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>sequenceDiagram
 <a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>    participant A as Agent
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a>    participant S as Server
 <a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>    participant C as Computer
 <a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>
-<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>    Note over C: 配置变更
-<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>    C-&gt;&gt;S: server:update_config
-<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a>    S-&gt;&gt;A: notify:update_config
-<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a>    A-&gt;&gt;S: client:get_tools (可选)
-<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a>    S-&gt;&gt;C: 转发
-<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a>    C-&gt;&gt;S: 工具列表
-<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a>    S-&gt;&gt;A: GetToolsRet
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>    A-&gt;&gt;S: client:tool_call (req_id=X) [在途]
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>    Note over A: 超时 / 主动取消
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a>    A-)S: server:tool_call_cancel (req_id=X) [fire-and-forget, 无 ack]
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a>    S-)C: notify:tool_call_cancel (req_id=X) [广播]
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a>    Note over C: 按 req_id 中断在途执行&lt;br/&gt;SHOULD 发 MCP notifications/cancelled
+<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a>    C-&gt;&gt;S: CallToolResult(isError=True, meta.a2c_cancelled=true)
+<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a>    S-&gt;&gt;A: 返回取消响应（原 req_id=X 的 ack）
+</code></pre></div>
+<h3 id="动态工具发现流程">动态工具发现流程<a class="headerlink" href="#动态工具发现流程" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sequenceDiagram
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    participant A as Agent
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    participant S as Server
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>    participant C as Computer
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>
+<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a>    Note over C: Computer 加入房间
+<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>    C-&gt;&gt;S: server:join_office
+<a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>    S-&gt;&gt;A: notify:enter_office
+<a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a>    A-&gt;&gt;S: client:get_tools
+<a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a>    S-&gt;&gt;C: client:get_tools (转发)
+<a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a>    C-&gt;&gt;S: 工具列表
+<a id="__codelineno-39-12" name="__codelineno-39-12" href="#__codelineno-39-12"></a>    S-&gt;&gt;A: GetToolsRet
+<a id="__codelineno-39-13" name="__codelineno-39-13" href="#__codelineno-39-13"></a>    Note over A: 注册新工具
+</code></pre></div>
+<h3 id="配置更新流程">配置更新流程<a class="headerlink" href="#配置更新流程" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>sequenceDiagram
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>    participant A as Agent
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>    participant S as Server
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>    participant C as Computer
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a>    Note over C: 配置变更
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a>    C-&gt;&gt;S: server:update_config
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>    S-&gt;&gt;A: notify:update_config
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a>    A-&gt;&gt;S: client:get_tools (可选)
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>    S-&gt;&gt;C: 转发
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>    C-&gt;&gt;S: 工具列表
+<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a>    S-&gt;&gt;A: GetToolsRet
 </code></pre></div>
 <h3 id="桌面更新流程">桌面更新流程<a class="headerlink" href="#桌面更新流程" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sequenceDiagram
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    participant M as MCP Server
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    participant C as Computer
-<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>    participant S as Server
-<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>    participant A as Agent
-<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a>
-<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>    Note over M: 窗口资源变化
-<a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
-<a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a>    C-&gt;&gt;C: 比较 window:// URI 集合
-<a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a>    C-&gt;&gt;S: server:update_desktop
-<a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a>    S-&gt;&gt;A: notify:update_desktop
-<a id="__codelineno-39-12" name="__codelineno-39-12" href="#__codelineno-39-12"></a>    A-&gt;&gt;S: client:get_desktop
-<a id="__codelineno-39-13" name="__codelineno-39-13" href="#__codelineno-39-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
-<a id="__codelineno-39-14" name="__codelineno-39-14" href="#__codelineno-39-14"></a>    C-&gt;&gt;C: organize_desktop()
-<a id="__codelineno-39-15" name="__codelineno-39-15" href="#__codelineno-39-15"></a>    C-&gt;&gt;S: GetDeskTopRet
-<a id="__codelineno-39-16" name="__codelineno-39-16" href="#__codelineno-39-16"></a>    S-&gt;&gt;A: GetDeskTopRet
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>sequenceDiagram
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>    participant M as MCP Server
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>    participant C as Computer
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>    participant S as Server
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>    participant A as Agent
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a>    Note over M: 窗口资源变化
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a>    C-&gt;&gt;C: 比较 window:// URI 集合
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a>    C-&gt;&gt;S: server:update_desktop
+<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a>    S-&gt;&gt;A: notify:update_desktop
+<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a>    A-&gt;&gt;S: client:get_desktop
+<a id="__codelineno-41-13" name="__codelineno-41-13" href="#__codelineno-41-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-41-14" name="__codelineno-41-14" href="#__codelineno-41-14"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-41-15" name="__codelineno-41-15" href="#__codelineno-41-15"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-41-16" name="__codelineno-41-16" href="#__codelineno-41-16"></a>    S-&gt;&gt;A: GetDeskTopRet
 </code></pre></div>
 <p>详见 <a href="../desktop/">Desktop 桌面系统</a>。</p>
 <h3 id="skill-发现与更新流程">SKILL 发现与更新流程<a class="headerlink" href="#skill-发现与更新流程" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>sequenceDiagram
-<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>    participant SRC as SKILL 源
-<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>    participant C as Computer
-<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>    participant S as Server
-<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>    participant A as Agent
-<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a>
-<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a>    Note over SRC,C: 触发任一：①MCP Server ResourceListChanged/Updated(skill://) ②Marketplace plugin skills git 源重拉对账 ③User DropIn 手动增删 / SDK 管理 UX
-<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>    SRC-&gt;&gt;C: 源变更
-<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a>    C-&gt;&gt;C: 重新枚举 / 增量物化（多 source 统一 staging）
-<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>    C-&gt;&gt;S: server:update_skills
-<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>    S-&gt;&gt;A: notify:update_skills
-<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a>    A-&gt;&gt;S: client:get_skills
-<a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a>    S-&gt;&gt;C: client:get_skills (转发)
-<a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a>    C-&gt;&gt;S: GetSkillsRet
-<a id="__codelineno-40-15" name="__codelineno-40-15" href="#__codelineno-40-15"></a>    S-&gt;&gt;A: GetSkillsRet
-<a id="__codelineno-40-16" name="__codelineno-40-16" href="#__codelineno-40-16"></a>    A-&gt;&gt;S: client:get_skill(name)
-<a id="__codelineno-40-17" name="__codelineno-40-17" href="#__codelineno-40-17"></a>    S-&gt;&gt;C: client:get_skill (转发)
-<a id="__codelineno-40-18" name="__codelineno-40-18" href="#__codelineno-40-18"></a>    C-&gt;&gt;S: GetSkillRet (SKILL.md → body)
-<a id="__codelineno-40-19" name="__codelineno-40-19" href="#__codelineno-40-19"></a>    S-&gt;&gt;A: GetSkillRet
-<a id="__codelineno-40-20" name="__codelineno-40-20" href="#__codelineno-40-20"></a>    Note over A: 读 SKILL.md，发现引用资源
-<a id="__codelineno-40-21" name="__codelineno-40-21" href="#__codelineno-40-21"></a>    A-&gt;&gt;S: client:get_skill(name, rel_path)
-<a id="__codelineno-40-22" name="__codelineno-40-22" href="#__codelineno-40-22"></a>    S-&gt;&gt;C: client:get_skill (转发)
-<a id="__codelineno-40-23" name="__codelineno-40-23" href="#__codelineno-40-23"></a>    C-&gt;&gt;S: GetSkillRet (文本→body / 二进制→blob_handle)
-<a id="__codelineno-40-24" name="__codelineno-40-24" href="#__codelineno-40-24"></a>    S-&gt;&gt;A: GetSkillRet
-<a id="__codelineno-40-25" name="__codelineno-40-25" href="#__codelineno-40-25"></a>    Note over A,C: 若得 blob_handle：循环 client:get_blob(chunk_offset) 直至 eof（pull 即背压）
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>sequenceDiagram
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>    participant SRC as SKILL 源
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>    participant C as Computer
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>    participant S as Server
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>    participant A as Agent
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>    Note over SRC,C: 触发任一：①MCP Server ResourceListChanged/Updated(skill://) ②Marketplace plugin skills git 源重拉对账 ③User DropIn 手动增删 / SDK 管理 UX
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>    SRC-&gt;&gt;C: 源变更
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a>    C-&gt;&gt;C: 重新枚举 / 增量物化（多 source 统一 staging）
+<a id="__codelineno-42-10" name="__codelineno-42-10" href="#__codelineno-42-10"></a>    C-&gt;&gt;S: server:update_skills
+<a id="__codelineno-42-11" name="__codelineno-42-11" href="#__codelineno-42-11"></a>    S-&gt;&gt;A: notify:update_skills
+<a id="__codelineno-42-12" name="__codelineno-42-12" href="#__codelineno-42-12"></a>    A-&gt;&gt;S: client:get_skills
+<a id="__codelineno-42-13" name="__codelineno-42-13" href="#__codelineno-42-13"></a>    S-&gt;&gt;C: client:get_skills (转发)
+<a id="__codelineno-42-14" name="__codelineno-42-14" href="#__codelineno-42-14"></a>    C-&gt;&gt;S: GetSkillsRet
+<a id="__codelineno-42-15" name="__codelineno-42-15" href="#__codelineno-42-15"></a>    S-&gt;&gt;A: GetSkillsRet
+<a id="__codelineno-42-16" name="__codelineno-42-16" href="#__codelineno-42-16"></a>    A-&gt;&gt;S: client:get_skill(name)
+<a id="__codelineno-42-17" name="__codelineno-42-17" href="#__codelineno-42-17"></a>    S-&gt;&gt;C: client:get_skill (转发)
+<a id="__codelineno-42-18" name="__codelineno-42-18" href="#__codelineno-42-18"></a>    C-&gt;&gt;S: GetSkillRet (SKILL.md → body)
+<a id="__codelineno-42-19" name="__codelineno-42-19" href="#__codelineno-42-19"></a>    S-&gt;&gt;A: GetSkillRet
+<a id="__codelineno-42-20" name="__codelineno-42-20" href="#__codelineno-42-20"></a>    Note over A: 读 SKILL.md，发现引用资源
+<a id="__codelineno-42-21" name="__codelineno-42-21" href="#__codelineno-42-21"></a>    A-&gt;&gt;S: client:get_skill(name, rel_path)
+<a id="__codelineno-42-22" name="__codelineno-42-22" href="#__codelineno-42-22"></a>    S-&gt;&gt;C: client:get_skill (转发)
+<a id="__codelineno-42-23" name="__codelineno-42-23" href="#__codelineno-42-23"></a>    C-&gt;&gt;S: GetSkillRet (文本→body / 二进制→blob_handle)
+<a id="__codelineno-42-24" name="__codelineno-42-24" href="#__codelineno-42-24"></a>    S-&gt;&gt;A: GetSkillRet
+<a id="__codelineno-42-25" name="__codelineno-42-25" href="#__codelineno-42-25"></a>    Note over A,C: 若得 blob_handle：循环 client:get_blob(chunk_offset) 直至 eof（pull 即背压）
 </code></pre></div>
 <p>详见 <a href="../blob-transfer/">通用二进制传输</a>。</p>
 <p>详见 <a href="../skill/">SKILL 通道</a>。</p>
@@ -3255,6 +3337,7 @@
 <ul>
 <li>所有 <code>client:*</code> 事件的处理（作为接收方）</li>
 <li>房间管理事件 (<code>server:join_office</code>, <code>server:leave_office</code>)</li>
+<li>（<strong>SHOULD</strong>）<code>notify:tool_call_cancel</code> - 按 <code>req_id</code> 中断在途工具执行，并向下游 MCP Server 发 <code>notifications/cancelled</code></li>
 </ul>
 <h3 id="agent-应该实现">Agent 应该实现<a class="headerlink" href="#agent-应该实现" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3262,6 +3345,7 @@
 <li><code>notify:leave_office</code> - 清理离开 Computer 的工具</li>
 <li><code>notify:update_config</code> / <code>notify:update_tool_list</code> - 刷新工具列表</li>
 <li><code>notify:update_skills</code> - 刷新 SKILL 清单</li>
+<li><code>server:tool_call_cancel</code> - 工具调用超时或需主动取消时发起（fire-and-forget，无 ack）；并据响应结果级 <code>meta.a2c_cancelled</code> 区分取消与普通失败/超时</li>
 </ul>
 <hr />
 <h2 id="参考">参考<a class="headerlink" href="#参考" title="Permanent link">&para;</a></h2>
