@@ -3388,7 +3388,7 @@
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GetSkillRet</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 回显</span>
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>    <span class="n">rel_path</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 回显（缺省请求时为 &quot;SKILL.md&quot;）</span>
-<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>    <span class="n">mime_type</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># 资源 MIME，如 text/markdown / image/png</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>    <span class="n">mime_type</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># 资源 MIME，如 text/markdown / image/png（确定性推断，见 SKILL §6.4）</span>
 <a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>    <span class="n">total_size</span><span class="p">:</span> <span class="nb">int</span>                 <span class="c1"># 资源总字节数</span>
 <a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>    <span class="n">sha256</span><span class="p">:</span> <span class="nb">str</span>                     <span class="c1"># 全量资源 sha256 十六进制（完整性 + 变更检测）</span>
 <a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a>    <span class="n">body</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>          <span class="c1"># 文本且 ≤ 内联预算：直接内容（与 blob_handle 恰一）</span>
@@ -3401,7 +3401,7 @@
 </div>
 <div class="admonition note">
 <p class="admonition-title">内联 vs handle 的判定</p>
-<p>Computer 解析 <code>rel_path</code> 后：<strong>文本 MIME 且 <code>total_size</code> ≤ 内联预算</strong>（保证单条 ack 不超 Server buffer）→ <code>body</code>；<strong>二进制 MIME，或文本超内联预算</strong> → 仅给 <code>blob_handle</code>（不内联任何字节）。<code>body</code> / <code>blob_handle</code> 恰一；Agent <strong>SHOULD</strong> 用 <code>sha256</code> 校验 <code>body</code>，或在 handle 路径于 <code>eof</code> 后校验。</p>
+<p>Computer 解析 <code>rel_path</code> 后：<strong><a href="../skill/#64-mime_type-确定性与文本-mime判据">文本 MIME</a> 且 <code>total_size</code> ≤ 内联预算</strong>（保证单条 ack 不超 Server buffer）→ <code>body</code>；<strong>二进制 MIME，或文本超内联预算</strong> → 仅给 <code>blob_handle</code>（不内联任何字节）。<code>body</code> / <code>blob_handle</code> 恰一；Agent <strong>SHOULD</strong> 用 <code>sha256</code> 校验 <code>body</code>，或在 handle 路径于 <code>eof</code> 后校验。<code>mime_type</code> <strong>MUST</strong> 确定性推断、不依赖宿主 OS 的 MIME 注册表（见 <a href="../skill/#64-mime_type-确定性与文本-mime判据">SKILL §6.4</a>）。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">安全边界与 too_large</p>

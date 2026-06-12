@@ -954,6 +954,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#64-mime_type-确定性与文本-mime判据" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 mime_type 确定性与「文本 MIME」判据
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2071,6 +2082,17 @@
     <span class="md-ellipsis">
       
         GetSkillReq / GetSkillRet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-mime_type-确定性与文本-mime判据" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 mime_type 确定性与「文本 MIME」判据
       
     </span>
   </a>
@@ -3256,8 +3278,67 @@
 <div class="admonition note">
 <p class="admonition-title">「资源字节」基准 / 内联判定 / 完整性</p>
 <p><code>total_size</code> / <code>sha256</code> 基于 <strong>Agent 最终消费的资源字节</strong>：SKILL.md → frontmatter 剥离后 body；其它 → 原始文件字节（占位符均不展开）。空资源 = <code>total_size=0</code>，文本走空 <code>body</code>。
-Computer 解析 <code>rel_path</code> 后：<strong>文本 MIME 且 <code>total_size</code> ≤ 内联预算</strong> → <code>body</code>；<strong>二进制 MIME 或文本超内联预算</strong> → 仅 <code>blob_handle</code>。Agent <strong>SHOULD</strong> 用 <code>sha256</code> 校验 <code>body</code>，或在 handle 路径于 <code>eof</code> 后校验。分块 / 背压 / 演进缝隙等传输语义见 <a href="../blob-transfer/">通用二进制传输</a>。</p>
+Computer 解析 <code>rel_path</code> 后：<strong><a href="#64-mime_type-确定性与文本-mime判据">文本 MIME</a> 且 <code>total_size</code> ≤ 内联预算</strong> → <code>body</code>；<strong>二进制 MIME 或文本超内联预算</strong> → 仅 <code>blob_handle</code>。Agent <strong>SHOULD</strong> 用 <code>sha256</code> 校验 <code>body</code>，或在 handle 路径于 <code>eof</code> 后校验。分块 / 背压 / 演进缝隙等传输语义见 <a href="../blob-transfer/">通用二进制传输</a>。</p>
 </div>
+<h3 id="64-mime_type-确定性与文本-mime判据">6.4 mime_type 确定性与「文本 MIME」判据<a class="headerlink" href="#64-mime_type-确定性与文本-mime判据" title="Permanent link">&para;</a></h3>
+<p><code>GetSkillRet.mime_type</code> 取值，及 §7 处理流程第 6 步的「文本 MIME」内联判定，遵循以下规范约束。三段约束<strong>全部引用既有标准，不另立判定逻辑</strong>，确保 Python / Rust 双实现一致。</p>
+<p><strong>(1) <code>mime_type</code> 确定性约束（MUST）</strong></p>
+<p>Computer 推断 SKILL 子资源 <code>mime_type</code> <strong>MUST</strong> 确定、<strong>MUST NOT</strong> 依赖随宿主环境而变的 OS MIME 注册表 / 系统库（如 Python <code>mimetypes.guess_type</code>、Rust <code>mime_guess</code> 回退宿主库的部分）。推断 <strong>MUST</strong> 基于实现内置、与宿主无关的「扩展名 → MIME」映射（SHOULD 对齐 IANA 注册媒体类型；数据基线可取 freedesktop shared-mime-info / jshttp mime-db）。同一资源跨 OS / 跨 SDK 的 <code>mime_type</code> <strong>MUST</strong> 一致。本约束覆盖全部 <code>mime_type</code> 推断（文本与二进制）。</p>
+<p><strong>(2)「文本 MIME」判据（供 §7 第 6 步引用，任一成立即判定为文本）</strong></p>
+<ul>
+<li>top-level type == <code>text</code>（RFC 2046 §4.1）；或</li>
+<li>structured syntax suffix ∈ {<code>+json</code>, <code>+xml</code>, <code>+yaml</code>}（RFC 6839 / RFC 9512）；或</li>
+<li>essence ∈ {<code>application/json</code>（RFC 8259）、<code>application/xml</code>（RFC 7303）、<code>application/yaml</code>（RFC 9512）、<code>application/toml</code>（IANA, 2024-10-21）、<code>application/javascript</code>}</li>
+</ul>
+<p>此判据与 WHATWG MIME Sniffing Standard 对「JSON MIME type」「XML MIME type」的定义同构（后缀 ∨ essence 白名单）；数据驱动等价物为 freedesktop <code>sub-class-of text/plain</code>。不满足任一条 → 视为二进制，走 <code>blob_handle</code>。</p>
+<p><strong>(3) 最小确定性扩展名映射基线（规范性 SHOULD 表）</strong></p>
+<table>
+<thead>
+<tr>
+<th>扩展名</th>
+<th>MIME</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.md</code> / <code>.markdown</code></td>
+<td><code>text/markdown</code></td>
+<td>RFC 7763</td>
+</tr>
+<tr>
+<td><code>.txt</code></td>
+<td><code>text/plain</code></td>
+<td>RFC 2046</td>
+</tr>
+<tr>
+<td><code>.json</code></td>
+<td><code>application/json</code></td>
+<td>RFC 8259</td>
+</tr>
+<tr>
+<td><code>.xml</code></td>
+<td><code>application/xml</code></td>
+<td>RFC 7303</td>
+</tr>
+<tr>
+<td><code>.yaml</code> / <code>.yml</code></td>
+<td><code>application/yaml</code></td>
+<td>RFC 9512</td>
+</tr>
+<tr>
+<td><code>.toml</code></td>
+<td><code>application/toml</code></td>
+<td>IANA, 2024-10-21</td>
+</tr>
+<tr>
+<td><code>.rst</code></td>
+<td><code>text/x-rst</code></td>
+<td>freedesktop 事实标准（无正式 IANA 注册）</td>
+</tr>
+</tbody>
+</table>
+<p>实现 <strong>MUST</strong> 至少内置上述映射；可扩充，扩充项同样 <strong>MUST</strong> 确定。</p>
 <hr />
 <h2 id="7-事件">7. 事件<a class="headerlink" href="#7-事件" title="Permanent link">&para;</a></h2>
 <h3 id="clientget_skills"><code>client:get_skills</code><a class="headerlink" href="#clientget_skills" title="Permanent link">&para;</a></h3>
@@ -3313,7 +3394,7 @@ Computer 解析 <code>rel_path</code> 后：<strong>文本 MIME 且 <code>total_
 <li>解析 <code>rel_path</code>（缺省 <code>SKILL.md</code>）：<code>safe_join(包根, rel_path)</code> 后 <code>realpath</code> 必须仍在包根内；绝对路径 / <code>..</code> / 符号链接逃逸 / 命中 <code>.skillenv</code> 等敏感文件 / 文件不存在 → <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017</code></a>（<code>details.reason</code> ∈ <code>traversal</code> / <code>forbidden</code> / <code>not_found</code>，详见 §9）</li>
 <li>确定<strong>资源字节</strong>：<code>SKILL.md</code> 剥离 YAML frontmatter（首行 <code>---</code> 到第二个 <code>---</code> 含两端整块）后的 body，其它资源原样文件字节（占位符均<strong>不展开</strong>）；计算 <code>total_size</code> 与全量 <code>sha256</code></li>
 <li>绝对上限校验：<code>total_size</code> 超 SDK 可配上限 → <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017</code></a> <code>details.reason="too_large"</code>（带 <code>details.total_size</code>），<strong>不铸造句柄、零字节传输</strong></li>
-<li>文本 MIME 且 <code>total_size</code> ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 <code>body</code>；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 <code>blob_handle</code>（Agent 转 <a href="../blob-transfer/"><code>client:get_blob</code></a> 拉取）。<code>body</code> / <code>blob_handle</code> 恰一</li>
+<li><a href="#64-mime_type-确定性与文本-mime判据">文本 MIME</a> 且 <code>total_size</code> ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 <code>body</code>；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 <code>blob_handle</code>（Agent 转 <a href="../blob-transfer/"><code>client:get_blob</code></a> 拉取）。<code>body</code> / <code>blob_handle</code> 恰一</li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">占位符展开是 Agent SDK 职责</p>

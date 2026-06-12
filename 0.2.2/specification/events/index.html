@@ -2999,7 +2999,7 @@
 <li>解析 <code>rel_path</code>（缺省 <code>SKILL.md</code>）：<code>safe_join(包根, rel_path)</code> 后 <code>realpath</code> <strong>必须</strong>仍在包根内；绝对路径 / <code>..</code> / 符号链接逃逸 / 命中 <code>.skillenv</code> 等敏感文件 / 文件不存在 → <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017 Skill Resource Not Accessible</code></a>（<code>details.reason</code> ∈ <code>traversal</code> / <code>forbidden</code> / <code>not_found</code>）</li>
 <li>确定<strong>资源字节</strong>：<code>SKILL.md</code> 剥离 YAML frontmatter 后的 body，其它资源原样文件字节（占位符均不展开）；计算 <code>total_size</code> 与全量 <code>sha256</code></li>
 <li>绝对上限校验：<code>total_size</code> 超 SDK 可配上限 → <a href="../error-handling/#skill-resource-not-accessible4017"><code>4017</code></a> <code>details.reason="too_large"</code>（带 <code>details.total_size</code>），<strong>不铸造句柄、零字节传输</strong></li>
-<li>文本 MIME 且 <code>total_size</code> ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 <code>body</code>；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 <code>blob_handle</code>，不内联任何字节。<code>body</code> / <code>blob_handle</code> 恰一</li>
+<li><a href="../skill/#64-mime_type-确定性与文本-mime判据">文本 MIME</a> 且 <code>total_size</code> ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 <code>body</code>；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 <code>blob_handle</code>，不内联任何字节。<code>body</code> / <code>blob_handle</code> 恰一</li>
 </ol>
 <p>详见 <a href="../skill/">SKILL 通道</a>。</p>
 <h4 id="clientget_blob"><code>client:get_blob</code><a class="headerlink" href="#clientget_blob" title="Permanent link">&para;</a></h4>
