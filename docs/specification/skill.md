@@ -424,7 +424,37 @@ class GetSkillRet(TypedDict, total=False):
 !!! note "「资源字节」基准 / 内联判定 / 完整性"
 
     `total_size` / `sha256` 基于 **Agent 最终消费的资源字节**：SKILL.md → frontmatter 剥离后 body；其它 → 原始文件字节（占位符均不展开）。空资源 = `total_size=0`，文本走空 `body`。
-    Computer 解析 `rel_path` 后：**文本 MIME 且 `total_size` ≤ 内联预算** → `body`；**二进制 MIME 或文本超内联预算** → 仅 `blob_handle`。Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。分块 / 背压 / 演进缝隙等传输语义见 [通用二进制传输](blob-transfer.md)。
+    Computer 解析 `rel_path` 后：**[文本 MIME](#64-mime_type-确定性与文本-mime判据) 且 `total_size` ≤ 内联预算** → `body`；**二进制 MIME 或文本超内联预算** → 仅 `blob_handle`。Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。分块 / 背压 / 演进缝隙等传输语义见 [通用二进制传输](blob-transfer.md)。
+
+### 6.4 mime_type 确定性与「文本 MIME」判据
+
+`GetSkillRet.mime_type` 取值，及 §7 处理流程第 6 步的「文本 MIME」内联判定，遵循以下规范约束。三段约束**全部引用既有标准，不另立判定逻辑**，确保 Python / Rust 双实现一致。
+
+**(1) `mime_type` 确定性约束（MUST）**
+
+Computer 推断 SKILL 子资源 `mime_type` **MUST** 确定、**MUST NOT** 依赖随宿主环境而变的 OS MIME 注册表 / 系统库（如 Python `mimetypes.guess_type`、Rust `mime_guess` 回退宿主库的部分）。推断 **MUST** 基于实现内置、与宿主无关的「扩展名 → MIME」映射（SHOULD 对齐 IANA 注册媒体类型；数据基线可取 freedesktop shared-mime-info / jshttp mime-db）。同一资源跨 OS / 跨 SDK 的 `mime_type` **MUST** 一致。本约束覆盖全部 `mime_type` 推断（文本与二进制）。
+
+**(2)「文本 MIME」判据（供 §7 第 6 步引用，任一成立即判定为文本）**
+
+- top-level type == `text`（RFC 2046 §4.1）；或
+- structured syntax suffix ∈ {`+json`, `+xml`, `+yaml`}（RFC 6839 / RFC 9512）；或
+- essence ∈ {`application/json`（RFC 8259）、`application/xml`（RFC 7303）、`application/yaml`（RFC 9512）、`application/toml`（IANA, 2024-10-21）、`application/javascript`}
+
+此判据与 WHATWG MIME Sniffing Standard 对「JSON MIME type」「XML MIME type」的定义同构（后缀 ∨ essence 白名单）；数据驱动等价物为 freedesktop `sub-class-of text/plain`。不满足任一条 → 视为二进制，走 `blob_handle`。
+
+**(3) 最小确定性扩展名映射基线（规范性 SHOULD 表）**
+
+| 扩展名 | MIME | 出处 |
+|---|---|---|
+| `.md` / `.markdown` | `text/markdown` | RFC 7763 |
+| `.txt` | `text/plain` | RFC 2046 |
+| `.json` | `application/json` | RFC 8259 |
+| `.xml` | `application/xml` | RFC 7303 |
+| `.yaml` / `.yml` | `application/yaml` | RFC 9512 |
+| `.toml` | `application/toml` | IANA, 2024-10-21 |
+| `.rst` | `text/x-rst` | freedesktop 事实标准（无正式 IANA 注册） |
+
+实现 **MUST** 至少内置上述映射；可扩充，扩充项同样 **MUST** 确定。
 
 ---
 
@@ -495,7 +525,7 @@ class GetSkillRet(TypedDict, total=False):
 3. 解析 `rel_path`（缺省 `SKILL.md`）：`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内；绝对路径 / `..` / 符号链接逃逸 / 命中 `.skillenv` 等敏感文件 / 文件不存在 → [`4017`](error-handling.md#skill-resource-not-accessible4017)（`details.reason` ∈ `traversal` / `forbidden` / `not_found`，详见 §9）
 4. 确定**资源字节**：`SKILL.md` 剥离 YAML frontmatter（首行 `---` 到第二个 `---` 含两端整块）后的 body，其它资源原样文件字节（占位符均**不展开**）；计算 `total_size` 与全量 `sha256`
 5. 绝对上限校验：`total_size` 超 SDK 可配上限 → [`4017`](error-handling.md#skill-resource-not-accessible4017) `details.reason="too_large"`（带 `details.total_size`），**不铸造句柄、零字节传输**
-6. 文本 MIME 且 `total_size` ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 `body`；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 `blob_handle`（Agent 转 [`client:get_blob`](blob-transfer.md) 拉取）。`body` / `blob_handle` 恰一
+6. [文本 MIME](#64-mime_type-确定性与文本-mime判据) 且 `total_size` ≤ 内联预算（保证单条 ack 不超 Server buffer）→ 填 `body`；二进制 MIME 或文本超内联预算 → 铸造无状态不透明 `blob_handle`（Agent 转 [`client:get_blob`](blob-transfer.md) 拉取）。`body` / `blob_handle` 恰一
 
 !!! note "占位符展开是 Agent SDK 职责"
 

@@ -641,7 +641,7 @@ class GetSkillReq(AgentCallData, total=True):
 class GetSkillRet(TypedDict, total=False):
     name: str                       # 回显
     rel_path: str                   # 回显（缺省请求时为 "SKILL.md"）
-    mime_type: str                  # 资源 MIME，如 text/markdown / image/png
+    mime_type: str                  # 资源 MIME，如 text/markdown / image/png（确定性推断，见 SKILL §6.4）
     total_size: int                 # 资源总字节数
     sha256: str                     # 全量资源 sha256 十六进制（完整性 + 变更检测）
     body: NotRequired[str]          # 文本且 ≤ 内联预算：直接内容（与 blob_handle 恰一）
@@ -655,7 +655,7 @@ class GetSkillRet(TypedDict, total=False):
 
 !!! note "内联 vs handle 的判定"
 
-    Computer 解析 `rel_path` 后：**文本 MIME 且 `total_size` ≤ 内联预算**（保证单条 ack 不超 Server buffer）→ `body`；**二进制 MIME，或文本超内联预算** → 仅给 `blob_handle`（不内联任何字节）。`body` / `blob_handle` 恰一；Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。
+    Computer 解析 `rel_path` 后：**[文本 MIME](skill.md#64-mime_type-确定性与文本-mime判据) 且 `total_size` ≤ 内联预算**（保证单条 ack 不超 Server buffer）→ `body`；**二进制 MIME，或文本超内联预算** → 仅给 `blob_handle`（不内联任何字节）。`body` / `blob_handle` 恰一；Agent **SHOULD** 用 `sha256` 校验 `body`，或在 handle 路径于 `eof` 后校验。`mime_type` **MUST** 确定性推断、不依赖宿主 OS 的 MIME 注册表（见 [SKILL §6.4](skill.md#64-mime_type-确定性与文本-mime判据)）。
 
 !!! note "安全边界与 too_large"
 
