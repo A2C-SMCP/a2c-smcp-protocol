@@ -441,7 +441,7 @@ class GetDeskTopReq(AgentCallData, total=True):
     req_id: str                     # 请求 ID
     computer: str                   # 目标 Computer 名称
     desktop_size: NotRequired[int]  # 可选：限制返回的桌面内容数量
-    window: NotRequired[str]        # 可选：指定获取的 WindowURI
+    window: NotRequired[str]        # 可选：指定获取的 WindowURI（完全相等匹配；未命中返回空，非错误）
 ```
 
 ### Desktop

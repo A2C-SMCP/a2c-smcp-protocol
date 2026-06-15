@@ -265,6 +265,54 @@ flowchart TD
 
 ---
 
+## 指定窗口获取（`window` 参数）
+
+默认情况下 `client:get_desktop` 返回 Computer 组织后的**聚合视图**（所有窗口经过滤、排序、截断）。当 Agent 只关心某一个窗口时，可在 `GetDeskTopReq` 中传入 `window` 字段，**定向获取单个窗口**。
+
+### 请求字段
+
+| 字段 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| `window` | string | 否 | 目标窗口的完整 Window URI（如 `window://com.example.browser/main`）。不传 → 返回聚合视图；传入 → 仅返回匹配该 URI 的窗口 |
+
+### 匹配规则
+
+1. **完全相等匹配（exact full match）**：Computer 以**字符串完全相等**比较 `window` 与每个窗口资源的 URI（`Resource.uri`），**非**前缀匹配、**非**模式匹配。Agent **MUST** 传入与目标 `Resource.uri` 逐字符一致的字符串，否则匹配不到。
+2. **唯一寻址**：Window URI 在单个 MCP Server 内由 `resources/list` 保证唯一、跨 Server **SHOULD** 唯一（见 [URI 格式](#uri-格式)），因此 `window` 在正常情况下**唯一寻址**一个窗口。若因 host 冲突（违反 SHOULD）存在多个完全相同的 URI，则**全部命中**并一并返回。
+3. **跨所有 Server 匹配**：过滤遍历当前所有活动 MCP Server 的窗口资源，不限定某个 Server。
+
+### 过滤时机与组织规则的关系
+
+`window` 过滤**先于** [Desktop 组织策略](#desktop-组织策略) 执行——Computer 先按 URI 过滤出目标窗口，再对过滤后的（通常是单元素）集合套用**完整的组织规则**（按历史 / priority 排序、fullscreen 处理、size 截断）。
+
+这意味着即使 `window` 命中了某个 URI，该窗口仍可能因组织规则被**排除**，最终返回空：
+
+- 窗口**内容为空**（无 `TextResourceContents`、或仅含 `BlobResourceContents`）→ 组织阶段过滤 → 空结果
+- 同时传入 `desktop_size ≤ 0` → 组织阶段返回空列表
+
+> **设计动机**：把 `window` 过滤放在组织之前，使"定向取单窗口"与"取聚合视图"复用同一套组织 / 渲染管线，无需为定向场景维护第二条渲染路径。
+
+### 未命中处理
+
+`window` 未匹配到任何窗口（URI 不存在或拼写不一致）时，Computer 返回 **`desktops` 为空列表**的正常 `GetDeskTopRet`，**不视为错误**——本路由未分配专属错误码（见 [error-handling.md](error-handling.md)）。Agent 应通过空结果自行判断，必要时先用 [`client:get_resources`](events.md#clientget_resources) 枚举可用的 `window://` URI，再以其中的 URI 定向获取。
+
+### 示例
+
+```python
+# 聚合获取（不传 window）
+{"agent": "agent-1", "req_id": "req-1", "computer": "comp-x"}
+
+# 定向获取单个窗口
+{
+    "agent": "agent-1",
+    "req_id": "req-2",
+    "computer": "comp-x",
+    "window": "window://com.example.browser/main",
+}
+```
+
+---
+
 ## Desktop 更新机制
 
 ### 变化检测（Computer 端）
