@@ -909,6 +909,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#指定窗口获取window-参数" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指定窗口获取（window 参数）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="指定窗口获取（window 参数）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#请求字段" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        请求字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#匹配规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        匹配规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#过滤时机与组织规则的关系" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        过滤时机与组织规则的关系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#未命中处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        未命中处理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#desktop-更新机制" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1893,6 +1965,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#指定窗口获取window-参数" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指定窗口获取（window 参数）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="指定窗口获取（window 参数）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#请求字段" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        请求字段
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#匹配规则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        匹配规则
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#过滤时机与组织规则的关系" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        过滤时机与组织规则的关系
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#未命中处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        未命中处理
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#示例_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#desktop-更新机制" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2447,83 +2591,135 @@
 <a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    H -- 遍历完毕 --&gt; M
 </code></pre></div>
 <hr />
+<h2 id="指定窗口获取window-参数">指定窗口获取（<code>window</code> 参数）<a class="headerlink" href="#指定窗口获取window-参数" title="Permanent link">&para;</a></h2>
+<p>默认情况下 <code>client:get_desktop</code> 返回 Computer 组织后的<strong>聚合视图</strong>（所有窗口经过滤、排序、截断）。当 Agent 只关心某一个窗口时，可在 <code>GetDeskTopReq</code> 中传入 <code>window</code> 字段，<strong>定向获取单个窗口</strong>。</p>
+<h3 id="请求字段">请求字段<a class="headerlink" href="#请求字段" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window</code></td>
+<td>string</td>
+<td>否</td>
+<td>目标窗口的完整 Window URI（如 <code>window://com.example.browser/main</code>）。不传 → 返回聚合视图；传入 → 仅返回匹配该 URI 的窗口</td>
+</tr>
+</tbody>
+</table>
+<h3 id="匹配规则">匹配规则<a class="headerlink" href="#匹配规则" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>完全相等匹配（exact full match）</strong>：Computer 以<strong>字符串完全相等</strong>比较 <code>window</code> 与每个窗口资源的 URI（<code>Resource.uri</code>），<strong>非</strong>前缀匹配、<strong>非</strong>模式匹配。Agent <strong>MUST</strong> 传入与目标 <code>Resource.uri</code> 逐字符一致的字符串，否则匹配不到。</li>
+<li><strong>唯一寻址</strong>：Window URI 在单个 MCP Server 内由 <code>resources/list</code> 保证唯一、跨 Server <strong>SHOULD</strong> 唯一（见 <a href="#uri-格式">URI 格式</a>），因此 <code>window</code> 在正常情况下<strong>唯一寻址</strong>一个窗口。若因 host 冲突（违反 SHOULD）存在多个完全相同的 URI，则<strong>全部命中</strong>并一并返回。</li>
+<li><strong>跨所有 Server 匹配</strong>：过滤遍历当前所有活动 MCP Server 的窗口资源，不限定某个 Server。</li>
+</ol>
+<h3 id="过滤时机与组织规则的关系">过滤时机与组织规则的关系<a class="headerlink" href="#过滤时机与组织规则的关系" title="Permanent link">&para;</a></h3>
+<p><code>window</code> 过滤<strong>先于</strong> <a href="#desktop-组织策略">Desktop 组织策略</a> 执行——Computer 先按 URI 过滤出目标窗口，再对过滤后的（通常是单元素）集合套用<strong>完整的组织规则</strong>（按历史 / priority 排序、fullscreen 处理、size 截断）。</p>
+<p>这意味着即使 <code>window</code> 命中了某个 URI，该窗口仍可能因组织规则被<strong>排除</strong>，最终返回空：</p>
+<ul>
+<li>窗口<strong>内容为空</strong>（无 <code>TextResourceContents</code>、或仅含 <code>BlobResourceContents</code>）→ 组织阶段过滤 → 空结果</li>
+<li>同时传入 <code>desktop_size ≤ 0</code> → 组织阶段返回空列表</li>
+</ul>
+<blockquote>
+<p><strong>设计动机</strong>：把 <code>window</code> 过滤放在组织之前，使"定向取单窗口"与"取聚合视图"复用同一套组织 / 渲染管线，无需为定向场景维护第二条渲染路径。</p>
+</blockquote>
+<h3 id="未命中处理">未命中处理<a class="headerlink" href="#未命中处理" title="Permanent link">&para;</a></h3>
+<p><code>window</code> 未匹配到任何窗口（URI 不存在或拼写不一致）时，Computer 返回 <strong><code>desktops</code> 为空列表</strong>的正常 <code>GetDeskTopRet</code>，<strong>不视为错误</strong>——本路由未分配专属错误码（见 <a href="../error-handling/">error-handling.md</a>）。Agent 应通过空结果自行判断，必要时先用 <a href="../events/#clientget_resources"><code>client:get_resources</code></a> 枚举可用的 <code>window://</code> URI，再以其中的 URI 定向获取。</p>
+<h3 id="示例_1">示例<a class="headerlink" href="#示例_1" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 聚合获取（不传 window）</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="p">{</span><span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="s2">&quot;agent-1&quot;</span><span class="p">,</span> <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="s2">&quot;req-1&quot;</span><span class="p">,</span> <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="s2">&quot;comp-x&quot;</span><span class="p">}</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># 定向获取单个窗口</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">{</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="s2">&quot;agent-1&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="s2">&quot;req-2&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="s2">&quot;comp-x&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="s2">&quot;window&quot;</span><span class="p">:</span> <span class="s2">&quot;window://com.example.browser/main&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
 <h2 id="desktop-更新机制">Desktop 更新机制<a class="headerlink" href="#desktop-更新机制" title="Permanent link">&para;</a></h2>
 <h3 id="变化检测computer-端">变化检测（Computer 端）<a class="headerlink" href="#变化检测computer-端" title="Permanent link">&para;</a></h3>
 <p>Computer 通过监听 MCP Server 的资源变更通知来检测桌面变化：</p>
 <h4 id="1-资源列表变化resourcelistchangednotification">1. 资源列表变化（ResourceListChangedNotification）<a class="headerlink" href="#1-资源列表变化resourcelistchangednotification" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>MCP Server 发出 ResourceListChangedNotification
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    → Computer 收集当前所有 window:// URI
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    → 与缓存的 URI 集合比较
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    → 集合不同 → 触发桌面刷新
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    → 集合相同 → 跳过（仅记录日志）
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>MCP Server 发出 ResourceListChangedNotification
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    → Computer 收集当前所有 window:// URI
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    → 与缓存的 URI 集合比较
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    → 集合不同 → 触发桌面刷新
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    → 集合相同 → 跳过（仅记录日志）
 </code></pre></div>
 <h4 id="2-资源内容更新resourceupdatednotification">2. 资源内容更新（ResourceUpdatedNotification）<a class="headerlink" href="#2-资源内容更新resourceupdatednotification" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>MCP Server 发出 ResourceUpdatedNotification (携带具体 URI)
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    → Computer 检查该 URI 是否为 window://
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    → 是 → 直接触发桌面刷新（无需集合比较，降低延迟）
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    → 否 → 忽略
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>MCP Server 发出 ResourceUpdatedNotification (携带具体 URI)
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    → Computer 检查该 URI 是否为 window://
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    → 是 → 直接触发桌面刷新（无需集合比较，降低延迟）
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    → 否 → 忽略
 </code></pre></div>
 <h4 id="3-agent-主动拉取">3. Agent 主动拉取<a class="headerlink" href="#3-agent-主动拉取" title="Permanent link">&para;</a></h4>
 <p>Agent 可在任何时候通过 <code>client:get_desktop</code> 事件主动获取最新桌面，无需等待通知。</p>
 <h3 id="事件流">事件流<a class="headerlink" href="#事件流" title="Permanent link">&para;</a></h3>
 <p>当 Computer 检测到桌面变化时，通过以下事件链通知 Agent：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Computer ──[server:update_desktop]──→ Server ──[notify:update_desktop]──→ Agent
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Computer ──[server:update_desktop]──→ Server ──[notify:update_desktop]──→ Agent
 </code></pre></div>
 <p>两个事件均复用 <code>UpdateComputerConfigReq</code> 数据结构：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># Computer 名称</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># Computer 名称</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">}</span>
 </code></pre></div>
 <p>Agent 收到 <code>notify:update_desktop</code> 后，建议自动调用 <code>client:get_desktop</code> 获取最新桌面。</p>
 <h3 id="完整生命周期时序图">完整生命周期时序图<a class="headerlink" href="#完整生命周期时序图" title="Permanent link">&para;</a></h3>
 <h4 id="初始拉取流程">初始拉取流程<a class="headerlink" href="#初始拉取流程" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sequenceDiagram
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    participant A as Agent
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    participant S as Server
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    participant C as Computer
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    S-&gt;&gt;C: client:get_desktop (转发)
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    C-&gt;&gt;C: organize_desktop()
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    C-&gt;&gt;S: GetDeskTopRet
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    S-&gt;&gt;A: GetDeskTopRet
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sequenceDiagram
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    participant A as Agent
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    participant S as Server
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    participant C as Computer
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    S-&gt;&gt;A: GetDeskTopRet
 </code></pre></div>
 <h4 id="窗口列表变化触发流程">窗口列表变化触发流程<a class="headerlink" href="#窗口列表变化触发流程" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sequenceDiagram
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    participant M as MCP Server
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    participant C as Computer
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    participant S as Server
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    participant A as Agent
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    Note over M: 窗口增删（如新增 window:// 资源）
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    C-&gt;&gt;C: 收集 window:// URI 集合
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    C-&gt;&gt;C: 与缓存比较 → 集合不同
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
-<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    S-&gt;&gt;C: client:get_desktop (转发)
-<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    C-&gt;&gt;C: organize_desktop()
-<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>    C-&gt;&gt;S: GetDeskTopRet
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>    S-&gt;&gt;A: GetDeskTopRet
-</code></pre></div>
-<h4 id="窗口内容变化触发流程">窗口内容变化触发流程<a class="headerlink" href="#窗口内容变化触发流程" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sequenceDiagram
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    participant M as MCP Server
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    participant C as Computer
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    participant S as Server
 <a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    participant A as Agent
 <a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    Note over M: 窗口内容更新
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    M-&gt;&gt;C: ResourceUpdatedNotification (uri=window://...)
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    C-&gt;&gt;C: 确认为 window:// URI
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    C-&gt;&gt;C: organize_desktop()
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>    C-&gt;&gt;S: GetDeskTopRet
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    S-&gt;&gt;A: GetDeskTopRet
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    Note over M: 窗口增删（如新增 window:// 资源）
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    M-&gt;&gt;C: ResourceListChangedNotification
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    C-&gt;&gt;C: 收集 window:// URI 集合
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    C-&gt;&gt;C: 与缓存比较 → 集合不同
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    S-&gt;&gt;A: GetDeskTopRet
+</code></pre></div>
+<h4 id="窗口内容变化触发流程">窗口内容变化触发流程<a class="headerlink" href="#窗口内容变化触发流程" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sequenceDiagram
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    participant M as MCP Server
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    participant C as Computer
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    participant S as Server
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    participant A as Agent
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>    Note over M: 窗口内容更新
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    M-&gt;&gt;C: ResourceUpdatedNotification (uri=window://...)
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    C-&gt;&gt;C: 确认为 window:// URI
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    C-&gt;&gt;S: server:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    S-&gt;&gt;A: notify:update_desktop {&quot;computer&quot;: &quot;...&quot;}
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>    A-&gt;&gt;S: client:get_desktop (GetDeskTopReq)
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>    S-&gt;&gt;C: client:get_desktop (转发)
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>    C-&gt;&gt;C: organize_desktop()
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>    C-&gt;&gt;S: GetDeskTopRet
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>    S-&gt;&gt;A: GetDeskTopRet
 </code></pre></div>
 <hr />
 <h2 id="mcp-server-实现指南">MCP Server 实现指南<a class="headerlink" href="#mcp-server-实现指南" title="Permanent link">&para;</a></h2>
@@ -2531,46 +2727,46 @@
 <p>MCP Server 若要参与 Desktop，必须声明 <code>resources.subscribe</code> 能力。否则 Computer 不会枚举该 Server 的窗口资源，也不会收到该 Server 的资源变更通知。</p>
 <h3 id="暴露窗口资源">暴露窗口资源<a class="headerlink" href="#暴露窗口资源" title="Permanent link">&para;</a></h3>
 <p>在 <code>resources/list</code> 响应中返回 <code>window://</code> URI 的 Resource，并通过 <code>annotations</code> 声明 MCP 标准字段、<code>_meta</code> 声明 A2C 扩展字段：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_resources</span><span class="p">():</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        <span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;应用状态&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;当前应用的运行状态&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>                <span class="n">priority</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>             <span class="c1"># 可选：布局排序（[0.0, 1.0]）</span>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>                <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>   <span class="c1"># 推荐：Window 面向 Agent</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>            <span class="p">),</span>
-<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>                <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># 可选：是否全屏（A2C 扩展）</span>
-<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>            <span class="p">},</span>
-<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>        <span class="p">),</span>
-<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>        <span class="n">Resource</span><span class="p">(</span>
-<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/console&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;控制台输出&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;实时控制台日志&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">priority</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">]),</span>
-<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>        <span class="p">),</span>
-<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>    <span class="p">]</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">list_resources</span><span class="p">()</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_resources</span><span class="p">():</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;应用状态&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;当前应用的运行状态&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>                <span class="n">priority</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>             <span class="c1"># 可选：布局排序（[0.0, 1.0]）</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>                <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">],</span>   <span class="c1"># 推荐：Window 面向 Agent</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>            <span class="p">),</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>            <span class="n">_meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>                <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># 可选：是否全屏（A2C 扩展）</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>            <span class="p">},</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>        <span class="p">),</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>        <span class="n">Resource</span><span class="p">(</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>            <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/console&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;控制台输出&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;实时控制台日志&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>            <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>            <span class="n">annotations</span><span class="o">=</span><span class="n">Annotations</span><span class="p">(</span><span class="n">priority</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">audience</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;assistant&quot;</span><span class="p">]),</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>        <span class="p">),</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>    <span class="p">]</span>
 </code></pre></div>
 <p>每个 Resource 的 <code>uri</code> 必须是有效的 <code>window://</code> URI（参见 <a href="#uri-格式">URI 格式</a>）。字段语义见 <a href="#window-资源元数据">Window 资源元数据</a>。</p>
 <h3 id="提供窗口内容">提供窗口内容<a class="headerlink" href="#提供窗口内容" title="Permanent link">&para;</a></h3>
 <p>实现 <code>resources/read</code>，返回 <code>TextResourceContents</code>：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">read_resource</span><span class="p">()</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_resource</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="k">if</span> <span class="n">uri</span> <span class="o">==</span> <span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">:</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>            <span class="n">contents</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>                <span class="n">TextResourceContents</span><span class="p">(</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>                    <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>                    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>                    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;运行中 | CPU: 45% | 内存: 2.1GB&quot;</span><span class="p">,</span>
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>                <span class="p">)</span>
-<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>            <span class="p">]</span>
-<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>        <span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nd">@server</span><span class="o">.</span><span class="n">read_resource</span><span class="p">()</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read_resource</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="k">if</span> <span class="n">uri</span> <span class="o">==</span> <span class="s2">&quot;window://com.example.myapp/status&quot;</span><span class="p">:</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>        <span class="k">return</span> <span class="n">ReadResourceResult</span><span class="p">(</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>            <span class="n">contents</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>                <span class="n">TextResourceContents</span><span class="p">(</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>                    <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>                    <span class="n">mimeType</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>                    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;运行中 | CPU: 45% | 内存: 2.1GB&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>                <span class="p">)</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>            <span class="p">]</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>        <span class="p">)</span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">BlobResourceContents 不被渲染</p>
@@ -2581,13 +2777,13 @@
 <li><strong>窗口增删时</strong>: 发出 <code>ResourceListChangedNotification</code></li>
 <li><strong>窗口内容变化时</strong>: 发出 <code>ResourceUpdatedNotification</code>（携带具体 <code>window://</code> URI）</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># 窗口列表变化</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_list_changed</span><span class="p">()</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># 窗口内容更新</span>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_updated</span><span class="p">(</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span>
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># 窗口列表变化</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_list_changed</span><span class="p">()</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># 窗口内容更新</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">request_context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send_resource_updated</span><span class="p">(</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;window://com.example.myapp/status&quot;</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="最佳实践">最佳实践<a class="headerlink" href="#最佳实践" title="Permanent link">&para;</a></h3>
 <ol>

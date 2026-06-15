@@ -2889,6 +2889,7 @@
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>ack 语义</strong>：与 <a href="#clientget_tools"><code>client:get_tools</code></a> 一致——成功返回 <code>GetDeskTopRet</code>；协议级错误统一以扁平 ErrorPayload 投递，参见 <a href="../error-handling/#错误响应格式">error-handling.md §错误响应格式</a>。当前协议未为本路由分配专属错误码。</p>
+<p><strong><code>window</code> 定向获取</strong>：不传 <code>window</code> 时返回聚合视图；传入完整 Window URI 则<strong>按字符串完全相等</strong>过滤、仅返回该窗口；URI 未命中返回<strong>空 <code>desktops</code>（非错误）</strong>。过滤先于组织执行，组织规则仍作用于过滤后的集合。完整行为契约见 <a href="../desktop/#指定窗口获取window-参数">Desktop 桌面系统 §指定窗口获取</a>。</p>
 <h4 id="clientget_resources"><code>client:get_resources</code><a class="headerlink" href="#clientget_resources" title="Permanent link">&para;</a></h4>
 <p>枚举指定 MCP Server 暴露的 Resource 列表——透明转发 MCP 标准 <code>resources/list</code>，<strong>不做协议级过滤</strong>。Agent 据此发现 window / 业务自定义 scheme 的资源。</p>
 <p>支持 MCP 标准 cursor 翻页：Agent 首次调用不带 <code>cursor</code>，响应中含 <code>next_cursor</code> 时继续翻页；无 <code>next_cursor</code> 表示已到末尾。</p>

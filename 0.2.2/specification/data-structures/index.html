@@ -3221,7 +3221,7 @@
 <a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="n">req_id</span><span class="p">:</span> <span class="nb">str</span>                     <span class="c1"># 请求 ID</span>
 <a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="n">computer</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 目标 Computer 名称</span>
 <a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>    <span class="n">desktop_size</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>  <span class="c1"># 可选：限制返回的桌面内容数量</span>
-<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="n">window</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>        <span class="c1"># 可选：指定获取的 WindowURI</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="n">window</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>        <span class="c1"># 可选：指定获取的 WindowURI（完全相等匹配；未命中返回空，非错误）</span>
 </code></pre></div>
 <h3 id="desktop">Desktop<a class="headerlink" href="#desktop" title="Permanent link">&para;</a></h3>
 <p>桌面内容类型别名。每个 <code>Desktop</code> 条目是一个字符串，代表一个窗口的渲染结果。</p>
