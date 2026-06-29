@@ -2234,6 +2234,15 @@
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">)</span>
 </code></pre></div>
 <p><strong>注意</strong>: 默认实现仅适用于开发和测试，生产环境应实现自定义认证。</p>
+<div class="admonition note">
+<p class="admonition-title">x-api-key 只是 SDK 默认值，不是协议要求</p>
+<p>上方示例中的 <code>api_key_name="x-api-key"</code> 仅是 <code>DefaultAuthenticationProvider</code> 可配置参数的<strong>默认值</strong>，<strong>不是协议要求</strong>。部署方可以自由选择：</p>
+<ul>
+<li><strong>凭据字段名</strong>：任意字符串。例如使用对下划线敏感的中间件（如默认配置的 nginx 会丢弃带下划线的请求头）的部署可用短横线 <code>x-api-key</code>，而使用自定义 API 网关的部署可用下划线 <code>x_api_key</code>。</li>
+<li><strong>传输位置</strong>：Socket.IO 握手的 <code>auth</code> dict <strong>或</strong> HTTP 请求头——两者都被 <code>AuthenticationProvider</code> 接口签名 <code>authenticate(server, environ, auth, headers)</code> 同时接受。</li>
+</ul>
+<p>因此 SDK 实现 <strong>MUST NOT</strong> 将任何具体字段名硬编码到凭据注入路径中，<strong>SHOULD</strong> 向调用方暴露可自由指定字段名与传输位置的 API。协议层对认证凭据的字段名与位置保持无感知，这是有意的设计。</p>
+</div>
 <h2 id="凭证管理">凭证管理<a class="headerlink" href="#凭证管理" title="Permanent link">&para;</a></h2>
 <h3 id="零凭证传播原则">零凭证传播原则<a class="headerlink" href="#零凭证传播原则" title="Permanent link">&para;</a></h3>
 <p>A2C-SMCP 的核心安全原则是<strong>零凭证传播</strong>：</p>
