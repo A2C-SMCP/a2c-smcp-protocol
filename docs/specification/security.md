@@ -75,6 +75,14 @@ auth = DefaultAuthenticationProvider(
 
 **注意**: 默认实现仅适用于开发和测试，生产环境应实现自定义认证。
 
+!!! note "x-api-key 只是 SDK 默认值，不是协议要求"
+    上方示例中的 `api_key_name="x-api-key"` 仅是 `DefaultAuthenticationProvider` 可配置参数的**默认值**，**不是协议要求**。部署方可以自由选择：
+
+    - **凭据字段名**：任意字符串。例如使用对下划线敏感的中间件（如默认配置的 nginx 会丢弃带下划线的请求头）的部署可用短横线 `x-api-key`，而使用自定义 API 网关的部署可用下划线 `x_api_key`。
+    - **传输位置**：Socket.IO 握手的 `auth` dict **或** HTTP 请求头——两者都被 `AuthenticationProvider` 接口签名 `authenticate(server, environ, auth, headers)` 同时接受。
+
+    因此 SDK 实现 **MUST NOT** 将任何具体字段名硬编码到凭据注入路径中，**SHOULD** 向调用方暴露可自由指定字段名与传输位置的 API。协议层对认证凭据的字段名与位置保持无感知，这是有意的设计。
+
 ## 凭证管理
 
 ### 零凭证传播原则
