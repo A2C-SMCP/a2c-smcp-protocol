@@ -13,7 +13,7 @@ Computer 是 Agent 与一个或多个 MCP Server 之间的协议桥。合规 Com
 
 本页不规定本地 class、trait、线程模型、进程监护、缓存布局、文件 watcher、debounce 时间、CLI UX 或 SDK helper API。只要 wire 行为、事件、响应、错误与安全边界一致，实现可以自由选择内部结构。
 
-可信本地客户端若需要管理 MCP Server 启停、SKILL 暴露、marketplace 或 plugin，应使用独立的 [Computer Management Plane](computer-management.md)。该管理面修改 Computer desired state；本页只规定这些修改完成后 Agent 可观察的协议投影。
+可信本地客户端若需要管理 MCP Server 启停、SKILL 暴露、marketplace 或 plugin，应使用独立的 [Computer Management Plane](computer-management/index.md)。该管理面修改 Computer desired state；本页只规定这些修改完成后 Agent 可观察的协议投影。
 
 ## 2. 生命周期
 
