@@ -1,173 +1,173 @@
-# SDK API Guidance
+# SDK API 指南
 
-This document is non-normative. It describes recommended SDK API capabilities for implementing the [Computer Runtime Contract](runtime-contract.md) without prescribing language-specific class, trait, builder, constructor or async runtime shapes.
+本文档为非规范性内容。它描述实现 [Computer Runtime Contract](runtime-contract.md) 时推荐的 SDK API 能力，不规定语言专属的 class、trait、builder、constructor 或 async runtime 形态。
 
-## 1. Stable Capability Families
+## 1. 稳定能力族
 
-SDKs are encouraged to expose public entry points for these capability families:
+鼓励 SDK 暴露以下能力族的公共入口：
 
-| Capability family | Stable semantic expectation |
+| 能力族 | 稳定语义预期 |
 |---|---|
-| create from config | Create one runtime Computer from declarative config and runtime options |
-| start / stop | Initialize and stop local runtime service activity |
-| connect / disconnect | Establish and end SMCP connection without destroying durable config |
-| join / leave office | Join or leave an Office when not folded into connect/disconnect |
-| sync config | Apply a new config so final public runtime behavior matches it |
-| query projection | Return SDK-visible tools, config, resources, Desktop and SKILL views consistent with protocol projection |
-| plugin lifecycle | Install, enable, disable and uninstall plugin-contributed capabilities |
-| marketplace lifecycle | Add, sync/refresh, list and prune marketplace sources |
-| input values | Resolve, set, clear and inspect input values without exposing secrets to Agent |
-| diagnostics | Return lifecycle state, degraded components, validation errors and last failures |
-| shutdown | Release resources and prevent stale callbacks/events |
+| create from config | 从声明式 config 和 runtime options 创建一个 runtime Computer |
+| start / stop | 初始化和停止本地 runtime service activity |
+| connect / disconnect | 建立和结束 SMCP connection，且不销毁 durable config |
+| join / leave office | 当未折叠进 connect/disconnect 时，加入或离开 Office |
+| sync config | 应用新 config，使最终 public runtime behavior 与其匹配 |
+| query projection | 返回 SDK-visible tools、config、resources、Desktop 和 SKILL 视图，且与协议投影一致 |
+| plugin lifecycle | install、enable、disable 和 uninstall plugin-contributed capabilities |
+| marketplace lifecycle | add、sync/refresh、list 和 prune marketplace sources |
+| input values | resolve、set、clear 和 inspect input values，且不向 Agent 暴露 secrets |
+| diagnostics | 返回 lifecycle state、degraded components、validation errors 和 last failures |
+| shutdown | 释放 resources，并阻止 stale callbacks/events |
 
-The exact names are SDK-specific. For example, one SDK may expose a builder, another may expose a factory, and another may use an async constructor. Conformance is based on behavior.
+具体名称由各 SDK 自行决定。例如，一个 SDK 可以暴露 builder，另一个可以暴露 factory，第三个可以使用 async constructor。Conformance 以行为为准。
 
-## 2. Recommended API Shape Principles
+## 2. API 形态建议原则
 
-SDKs are encouraged to:
+鼓励 SDK：
 
-1. Separate config parsing from side effects. Creating a runtime from config should not connect to Server or execute tools.
-2. Make lifecycle operations explicit and idempotent where practical.
-3. Return public lifecycle state and diagnostics instead of requiring callers to inspect logs or private fields.
-4. Distinguish `disconnect`, `stop` and `shutdown`.
-5. Provide a single `sync_config` semantic operation even if the implementation internally rebuilds the runtime.
-6. Provide typed or structured error categories aligned with [Runtime Contract §6](runtime-contract.md#6-error-categories).
-7. Keep management diagnostics separate from Agent-facing protocol payloads.
-8. Allow callers to inject business auth fields without placing secrets into `a2c_version`, `role`, update notifications or Agent-visible config.
+1. 将 config parsing 与 side effects 分离。从 config 创建 runtime 不应连接 Server 或执行 tools。
+2. 让生命周期操作显式，并在可行时保持幂等。
+3. 返回公开 lifecycle state 和 diagnostics，而不是要求调用方检查 logs 或 private fields。
+4. 区分 `disconnect`、`stop` 和 `shutdown`。
+5. 提供单一 `sync_config` 语义操作，即使实现内部会重建 runtime。
+6. 提供与 [Runtime Contract §6](runtime-contract.md#6-错误类别) 对齐的 typed 或 structured error categories。
+7. 保持 management diagnostics 与 Agent-facing protocol payloads 隔离。
+8. 允许调用方注入业务 auth fields，但不要把 secrets 放入 `a2c_version`、`role`、update notifications 或 Agent-visible config。
 
-## 3. Config And Defaults
+## 3. Config 与默认值
 
-SDKs may use language-native types, but should support shared JSON fixtures for conformance.
+SDK 可以使用语言原生类型，但应支持用于 conformance 的共享 JSON fixtures。
 
-Recommended default behavior:
+推荐默认行为：
 
-| Area | Guidance |
+| 区域 | 指南 |
 |---|---|
-| namespace | Default to `/smcp` |
-| protocol version | Use the SDK's declared A2C-SMCP protocol version in URL query |
-| auth role | Always include `auth.role = "computer"` for Computer connections |
-| auto connect | Document whether start automatically connects; prefer explicit connect for embedders |
-| auto reconnect | If supported, make behavior configurable and observable |
-| disabled servers | Preserve config but exclude capability from Agent-facing projection |
-| forbidden tools | Exclude from tools and reject successful execution |
-| marketplace reconcile | Prefer additive-only startup reconcile and explicit prune/gc |
-| plugin conflict | Reject foreign MCP Server name conflicts before mounting |
-| secret values | Resolve locally and never include in Agent-facing projection |
+| namespace | 默认使用 `/smcp` |
+| protocol version | 在 URL query 中使用 SDK 声明的 A2C-SMCP protocol version |
+| auth role | Computer connections 始终包含 `auth.role = "computer"` |
+| auto connect | 文档化 start 是否自动 connect；对嵌入方优先推荐显式 connect |
+| auto reconnect | 如果支持，应使行为可配置且可观察 |
+| disabled servers | 保留 config，但从 Agent-facing projection 中排除能力 |
+| forbidden tools | 从 tools 中排除，并拒绝成功执行 |
+| marketplace reconcile | 优先采用 additive-only startup reconcile 和 explicit prune/gc |
+| plugin conflict | 挂载前拒绝 foreign MCP Server name conflicts |
+| secret values | 仅本地解析，绝不放入 Agent-facing projection |
 
-## 4. Lifecycle API Guidance
+## 4. Lifecycle API 指南
 
 ### 4.1 Create
 
-SDKs may provide any equivalent of:
+SDK 可以提供任意等价入口：
 
 ```
 runtime = create_computer(config, runtime_options)
 ```
 
-This operation should validate shape and resolve defaults, but avoid network and MCP process side effects.
+该操作应校验 shape 并解析默认值，但避免 network 和 MCP process side effects。
 
 ### 4.2 Start
 
-`start` should initialize local resources, registries, blob resolvers, watchers and MCP manager intent. If start eagerly launches MCP Servers, SDKs should document the policy and expose startup failures as public diagnostics.
+`start` 应初始化本地 resources、registries、blob resolvers、watchers 和 MCP manager intent。如果 start 会立即启动 MCP Servers，SDK 应文档化该 policy，并以 public diagnostics 暴露 startup failures。
 
 ### 4.3 Connect
 
-`connect` should take a Server URL and optional connection options. SDKs should make the final handshake inspectable enough for tests to verify:
+`connect` 应接收 Server URL 和可选 connection options。SDK 应让最终 handshake 足够可检查，以便测试验证：
 
-- `a2c_version` is in URL query.
-- `auth.role` is `"computer"`.
-- caller-supplied auth payload is included without leaking MCP credentials.
-- `server:join_office` is sent when configured.
+- `a2c_version` 位于 URL query 中。
+- `auth.role` 为 `"computer"`。
+- caller-supplied auth payload 已包含，且不会泄露 MCP credentials。
+- 配置后会发送 `server:join_office`。
 
 ### 4.4 Sync Config
 
-SDKs should expose one operation that applies a new desired config. It can be implemented as:
+SDK 应暴露一个应用新 desired config 的操作。它可以实现为：
 
-- incremental update;
-- diff-and-apply;
-- full rebuild behind stable identity;
-- stop/start with projection preservation.
+- incremental update；
+- diff-and-apply；
+- 在稳定 identity 背后 full rebuild；
+- 保持 projection 的 stop/start。
 
-SDKs should document whether in-flight tool calls continue, are cancelled, or are allowed to finish during sync. Regardless of implementation, the final projection must match the new config.
+SDK 应文档化 sync 期间 in-flight tool calls 是继续、被取消，还是允许完成。无论实现方式如何，最终 projection 必须匹配新 config。
 
 ### 4.5 Shutdown
 
-SDKs should provide a terminal cleanup operation. After it completes:
+SDK 应提供一个终止性的 cleanup 操作。完成后：
 
-- no update notification should be emitted;
-- no watcher should call stale callbacks;
-- no old Socket.IO client should ack new requests;
-- owned MCP server resources should be stopped or detached according to documented policy.
+- 不应再发送 update notification；
+- watcher 不应调用 stale callbacks；
+- 旧 Socket.IO client 不应 ack 新请求；
+- owned MCP server resources 应按文档化 policy 被停止或 detach。
 
-## 5. Plugin And Marketplace API Guidance
+## 5. Plugin 与 Marketplace API 指南
 
-SDKs are encouraged to expose plugin and marketplace operations as management APIs, not Agent-facing protocol events.
+鼓励 SDK 把 plugin 和 marketplace 操作暴露为 management APIs，而不是 Agent-facing protocol events。
 
-Recommended plugin operations:
+推荐 plugin operations：
 
-| Operation | Guidance |
+| 操作 | 指南 |
 |---|---|
-| install | Materialize plugin, validate manifest, precheck MCP name conflicts, register SKILL/MCP/input contributions |
-| enable | Mark plugin enabled and reconcile contributions |
-| disable | Mark plugin disabled and make contributions invisible/non-callable |
-| uninstall | Remove plugin records and teardown owned contributions unless caller chooses keep-server policy |
-| info/list | Return management diagnostics and provenance only to trusted caller |
+| install | 物化 plugin、校验 manifest、预检 MCP name conflicts、注册 SKILL/MCP/input contributions |
+| enable | 标记 plugin enabled 并 reconcile contributions |
+| disable | 标记 plugin disabled，并使 contributions 不可见/不可调用 |
+| uninstall | 移除 plugin records 并 teardown owned contributions，除非调用方选择 keep-server policy |
+| info/list | 仅向 trusted caller 返回 management diagnostics 和 provenance |
 
-Recommended marketplace operations:
+推荐 marketplace operations：
 
-| Operation | Guidance |
+| 操作 | 指南 |
 |---|---|
-| add | Add a source declaration after trust/policy approval |
-| sync/refresh | Fetch/update declared sources and register enabled plugin SKILLs |
-| list | Return source status and diagnostics to trusted caller |
-| prune | Explicitly remove orphan materialization after caller confirmation |
+| add | 在 trust/policy approval 后添加 source declaration |
+| sync/refresh | fetch/update declared sources，并注册 enabled plugin SKILLs |
+| list | 向 trusted caller 返回 source status 和 diagnostics |
+| prune | 在调用方确认后显式移除 orphan materialization |
 
-SDKs may support ledger-only operations for non-live contexts, but should document that Agent-facing projection changes require a live runtime reconcile.
+SDK 可以在非 live context 中支持 ledger-only operations，但应文档化：Agent-facing projection changes 需要 live runtime reconcile。
 
-## 6. Inputs And Secret Guidance
+## 6. Inputs 与 Secret 指南
 
-SDKs are encouraged to:
+鼓励 SDK：
 
-1. Keep input definitions separate from resolved values.
-2. Support plugin-scoped input disambiguation to avoid same bare id collision.
-3. Avoid logging resolved secret values.
-4. Expose public diagnostics for missing input values without including actual secrets.
-5. Treat `.skillenv` and local secret files as local-only; never include their contents in `client:get_skill`, `client:get_blob`, `client:get_config` or tool metadata.
+1. 将 input definitions 与 resolved values 分离。
+2. 支持 plugin-scoped input disambiguation，避免相同 bare id 冲突。
+3. 避免记录 resolved secret values。
+4. 为缺失 input values 暴露 public diagnostics，但不包含实际 secrets。
+5. 将 `.skillenv` 和本地 secret files 视为 local-only；绝不把其内容放入 `client:get_skill`、`client:get_blob`、`client:get_config` 或 tool metadata。
 
-## 7. Testing Guidance
+## 7. 测试指南
 
-SDKs should maintain both protocol conformance tests and runtime contract tests:
+SDK 应同时维护 protocol conformance tests 和 runtime contract tests：
 
-| Test class | Validates |
+| 测试类别 | 验证内容 |
 |---|---|
-| wire conformance | `client:*` response shape, flat `ErrorPayload`, update notifications, room behavior |
-| runtime conformance | lifecycle state transitions, `sync_config`, plugin/marketplace semantics, shutdown cleanup |
-| projection conformance | final `get_config`/`get_tools`/`get_skills`/`get_desktop` views after management operations |
-| security conformance | no secret/path leakage, sandbox boundaries, blob handle opacity |
-| cross-SDK fixture conformance | Python/Rust/TypeScript parse the same JSON fixture to equivalent runtime intent |
+| wire conformance | `client:*` response shape、flat `ErrorPayload`、update notifications、room behavior |
+| runtime conformance | lifecycle state transitions、`sync_config`、plugin/marketplace semantics、shutdown cleanup |
+| projection conformance | management operations 后最终 `get_config`/`get_tools`/`get_skills`/`get_desktop` 视图 |
+| security conformance | 无 secret/path leakage、sandbox boundaries、blob handle opacity |
+| cross-SDK fixture conformance | Python/Rust/TypeScript 将同一 JSON fixture 解析为等价 runtime intent |
 
-See [Conformance Tests](conformance-tests.md) for the shared checklist.
+共享 checklist 见 [Conformance Tests](conformance-tests.md)。
 
-## 8. Migration Guidance
+## 8. 迁移指南
 
-SDKs adding this runtime contract to existing APIs are encouraged to:
+鼓励将本 runtime contract 加入既有 API 的 SDK：
 
-1. Keep existing constructors/builders working as compatibility wrappers.
-2. Add shared fixture parsing before changing CLI UX.
-3. Introduce lifecycle state diagnostics without changing Agent-facing wire behavior.
-4. Add conformance tests for current behavior before refactoring internals.
-5. Keep marketplace/plugin management APIs explicitly trusted-local.
+1. 保持既有 constructors/builders 作为 compatibility wrappers 继续工作。
+2. 在改变 CLI UX 前，先加入共享 fixture parsing。
+3. 引入 lifecycle state diagnostics，同时不改变 Agent-facing wire behavior。
+4. 在重构 internals 前，为当前行为补充 conformance tests。
+5. 保持 marketplace/plugin management APIs 明确为 trusted-local。
 
-## 9. Non-Goals
+## 9. 非目标
 
-This guidance does not standardize:
+本指南不标准化：
 
-- a required `Computer` class name;
-- exact builder/factory signatures;
-- local home layout;
-- settings file names;
-- watcher implementation;
-- process supervision model;
-- retry scheduler;
-- CLI commands;
-- UI flows.
+- 必需的 `Computer` class 名；
+- 精确的 builder/factory signatures；
+- 本地 home layout；
+- settings file names；
+- watcher implementation；
+- process supervision model；
+- retry scheduler；
+- CLI commands；
+- UI flows。

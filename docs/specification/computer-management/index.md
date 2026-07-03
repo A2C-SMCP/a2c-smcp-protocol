@@ -1,20 +1,20 @@
-# Computer Management Plane
+# Computer 管理面
 
-本文定义 Computer 侧管理面的协议边界、SDK API 语义和 conformance tests。它面向可信本地客户端，例如桌面 App、管理 UI、CLI、SDK 嵌入方或本地管理代理，用于把声明式 desired state 收敛为一个运行中的 Computer。
+本文定义 Computer 侧管理面的协议边界、SDK API 语义和一致性测试。它面向可信本地客户端，例如桌面 App、管理 UI、CLI、SDK 嵌入方或本地管理代理，用于把声明式 desired state 收敛为一个运行中的 Computer。
 
 Computer Management Plane 不是 Agent-facing SMCP `client:*` 事件面。Agent 不能通过本管理面直接启动/停止 MCP Server、安装 plugin、同步 marketplace、读取本地文件或修改 secret。合规性通过管理操作完成后 Agent 可观察到的 `client:get_*` 响应、`server:update_*` 通知、安全边界和公共 SDK 结果来验证。
 
 ## 1. 分层模型
 
 ```
-Trusted local client / admin UI / CLI
+可信本地客户端 / 管理 UI / CLI
         |
         v
 Computer Management Plane
-        | mutate desired state
+        | 修改 desired state
         v
 Computer runtime
-        | expose observable state
+        | 暴露可观察状态
         v
 SMCP Protocol Plane
         |
@@ -22,7 +22,7 @@ SMCP Protocol Plane
 Agent
 ```
 
-| Layer | Consumer | Producer | 作用 |
+| 层级 | 消费方 | 生产方 | 作用 |
 |---|---|---|---|
 | Computer Management Plane | 可信本地客户端 | Computer SDK / admin adapter | 修改 Computer desired state、管理本地能力 |
 | Computer Runtime Contract | 业务 client / SDK 作者 | Computer SDK | 定义跨语言一致的单 Computer runtime 语义 |
@@ -34,10 +34,10 @@ Agent
 
 | 文档 | 内容 | 规范性 |
 |---|---|---|
-| [Management Protocol Boundary](protocol.md) | 管理面与 Agent-facing 协议面的边界、投影规则、安全边界与证据摘要 | Protocol requirements + boundary clarification |
+| [管理面协议边界](protocol.md) | 管理面与 Agent-facing 协议面的边界、投影规则、安全边界与证据摘要 | Protocol requirements + boundary clarification |
 | [Computer Runtime Contract](runtime-contract.md) | 从声明式 config 创建、启动、连接、同步、停止、关闭一个 runtime Computer 的跨 SDK 语义 | Runtime-contract |
-| [SDK API Guidance](sdk-api-guidance.md) | SDK 应提供的稳定能力族、错误分类、实现建议和迁移建议 | Non-normative SDK guidance |
-| [Conformance Tests](conformance-tests.md) | 协议级与 runtime contract 级共享测试清单、fixture 形状和验收矩阵 | SDK conformance checklist |
+| [SDK API 指南](sdk-api-guidance.md) | SDK 应提供的稳定能力族、错误分类、实现建议和迁移建议 | Non-normative SDK guidance |
+| [一致性测试](conformance-tests.md) | 协议级与 runtime contract 级共享测试清单、fixture 形状和验收矩阵 | SDK conformance checklist |
 
 ## 3. 规范性边界
 

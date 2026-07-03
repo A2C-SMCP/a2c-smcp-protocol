@@ -1,12 +1,12 @@
-# Computer Runtime Contract
+# Computer 运行时契约（Runtime Contract）
 
 本文定义业务 client 可以跨 SDK 依赖的单个 Computer runtime 公共语义。它不是 wire protocol，也不规定 Python、Rust、TypeScript 或其它 SDK 的代码形态。
 
 Runtime contract 的目标是：同一份声明式 `ComputerConfig` 和 `RuntimeOptions` 在不同 SDK 中产生等价 runtime intent，并通过一致的生命周期、错误分类、marketplace/plugin 挂载、`sync_config` final state 和 shutdown 语义交付给业务 client。
 
-## 1. Boundary
+## 1. 边界
 
-Runtime contract owns:
+Runtime contract 负责：
 
 - 从声明式 config 创建一个 runtime Computer。
 - 启动、停止、连接、断开、同步配置、关闭一个 runtime Computer。
@@ -15,195 +15,195 @@ Runtime contract owns:
 - 单个 runtime 与 Agent-facing protocol projection 的一致性。
 - 共享 JSON fixture 与生命周期 conformance tests。
 
-Runtime contract does not own:
+Runtime contract 不负责：
 
 - 多 Computer 编排、UI 状态、账号选择、Server 选择、office 策略和审计流。
 - Python dataclass、Rust builder、TypeScript constructor、trait 名、class 名或 method 名。
 - 内部缓存、锁、watcher、目录布局、进程模型、async runtime、CLI UX。
 
-## 2. Core Objects
+## 2. 核心对象
 
 ### 2.1 ComputerConfig
 
-SDKs SHOULD accept a declarative config object with this semantic content:
+SDK SHOULD 接受一个声明式 config 对象，并具备以下语义内容：
 
-| Field family | Semantic expectation |
+| 字段族 | 稳定语义预期 |
 |---|---|
-| identity | Computer protocol name and optional local display metadata |
-| mcp_servers | MCP Server configs, disabled flags, forbidden tools, tool metadata and transport parameters |
-| inputs | Input definitions used to render MCP Server configs locally |
-| skills | User DropIn roots or equivalent local SKILL source declarations |
-| marketplaces | Known marketplace source declarations and trust/update policy |
-| plugins | Installed/enabled plugin declarations and plugin-scoped capability intent |
-| settings_policy | Scope merge result or equivalent governance policy |
-| connection | Optional default Server URL, namespace, office and auth payload policy |
+| identity | Computer protocol name 和可选本地展示元数据 |
+| mcp_servers | MCP Server configs、disabled flags、forbidden tools、tool metadata 和 transport parameters |
+| inputs | 用于本地渲染 MCP Server configs 的 input definitions |
+| skills | User DropIn roots 或等价本地 SKILL source declarations |
+| marketplaces | Known marketplace source declarations 和 trust/update policy |
+| plugins | Installed/enabled plugin declarations 和 plugin-scoped capability intent |
+| settings_policy | Scope merge result 或等价治理策略 |
+| connection | 可选默认 Server URL、namespace、office 和 auth payload policy |
 
-The config shape may differ by SDK, but shared conformance fixtures MUST be expressible as JSON and map to equivalent runtime intent.
+不同 SDK 的 config shape 可以不同，但共享 conformance fixtures MUST 能表达为 JSON，并映射为等价 runtime intent。
 
 ### 2.2 RuntimeOptions
 
-SDKs SHOULD accept runtime options for environment-specific behavior:
+SDK SHOULD 接受 runtime options，用于表达环境相关行为：
 
-| Option family | Semantic expectation |
+| 选项族 | 稳定语义预期 |
 |---|---|
-| home | Optional local Computer home or storage root |
-| workdirs | Registered workdirs used for capability discovery |
-| secret providers | Local input/secret resolver hooks |
-| auth payload provider | Callback or value used to add non-A2C business auth fields |
-| network options | Socket.IO path, namespace, transport, timeout and reconnect options |
-| blob thresholds | Inline, too-large and chunk-size budgets |
-| policy hooks | Local source trust, plugin approval and management authorization hooks |
-| diagnostics hooks | Logging, metrics and health observers |
+| home | 可选本地 Computer home 或 storage root |
+| workdirs | 用于 capability discovery 的 registered workdirs |
+| secret providers | 本地 input/secret resolver hooks |
+| auth payload provider | 用于添加非 A2C 业务 auth fields 的 callback 或 value |
+| network options | Socket.IO path、namespace、transport、timeout 和 reconnect options |
+| blob thresholds | inline、too-large 和 chunk-size budgets |
+| policy hooks | 本地 source trust、plugin approval 和 management authorization hooks |
+| diagnostics hooks | logging、metrics 和 health observers |
 
-RuntimeOptions MAY choose SDK-specific names and defaults. The final externally visible behavior MUST match the contract.
+RuntimeOptions MAY 使用 SDK-specific 名称和默认值。最终外部可见行为 MUST 符合本 contract。
 
-## 3. Lifecycle States
+## 3. 生命周期状态
 
-SDKs SHOULD expose lifecycle state or equivalent public diagnostics with these semantics:
+SDK SHOULD 暴露生命周期状态或等价公开诊断，并具备以下语义：
 
-| State | Meaning |
+| 状态 | 含义 |
 |---|---|
-| `created` | Runtime object exists but has not initialized local resources |
-| `starting` | Runtime is loading config, resolving local state or starting MCP resources |
-| `started` | Local runtime is initialized; it may or may not be connected to SMCP Server |
-| `connecting` | Runtime is establishing Socket.IO connection and protocol handshake |
-| `connected` | Socket.IO connection is established but Office join may not be complete |
-| `joined_office` | Computer has joined an Office and can receive routed `client:*` events |
-| `syncing` | Runtime is applying a new config or reconciling desired state |
-| `degraded` | Runtime is partially available with public diagnostics |
-| `disconnecting` | Runtime is leaving or closing the Socket.IO connection |
-| `stopping` | Runtime is stopping local MCP/service activity |
-| `stopped` | Runtime has stopped service activity |
-| `shutdown` | Runtime has released resources and should not emit stale events |
-| `error` | Runtime cannot progress without external action or new config |
+| `created` | Runtime object 已存在，但尚未初始化本地资源 |
+| `starting` | Runtime 正在加载 config、解析本地状态或启动 MCP 资源 |
+| `started` | 本地 runtime 已初始化；可能已连接或未连接 SMCP Server |
+| `connecting` | Runtime 正在建立 Socket.IO 连接并执行协议握手 |
+| `connected` | Socket.IO 连接已建立，但 Office join 可能尚未完成 |
+| `joined_office` | Computer 已加入 Office，可以接收路由来的 `client:*` events |
+| `syncing` | Runtime 正在应用新 config 或 reconcile desired state |
+| `degraded` | Runtime 部分可用，并带有公开诊断 |
+| `disconnecting` | Runtime 正在离开或关闭 Socket.IO 连接 |
+| `stopping` | Runtime 正在停止本地 MCP/service activity |
+| `stopped` | Runtime 已停止 service activity |
+| `shutdown` | Runtime 已释放资源，不应再发出 stale events |
+| `error` | Runtime 在没有外部动作或新 config 的情况下无法继续推进 |
 
-SDKs do not need to use these exact strings if they document an equivalent mapping.
+如果 SDK 文档化了等价映射，不需要使用这些精确字符串。
 
-## 4. Required Capabilities
+## 4. 必需能力
 
-### 4.1 Create From Config
+### 4.1 从 Config 创建
 
-SDKs SHOULD provide a stable semantic entry point equivalent to `from_config(config, runtime_options)`.
+SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runtime_options)`。
 
-The operation MUST NOT connect to a remote Server or execute MCP tools merely by parsing config. It MAY validate shape, resolve defaults and construct local runtime intent.
+该操作 MUST NOT 仅因解析 config 就连接远端 Server 或执行 MCP tools。它 MAY 校验 shape、解析默认值并构建本地 runtime intent。
 
-Invalid config MUST return a public validation error with field/path information where practical. It MUST NOT leak secret values in the error.
+无效 config MUST 返回公开 validation error，并在可行时包含 field/path 信息。错误中 MUST NOT 泄露 secret values。
 
 ### 4.2 Start
 
-`start` or equivalent initializes local runtime resources needed before service:
+`start` 或等价操作初始化服务前所需的本地 runtime 资源：
 
-1. Load and validate desired state.
-2. Initialize MCP Server manager intent.
-3. Initialize SKILL registry, blob resolver and Desktop/resource tracking.
-4. Reconcile marketplace/plugin/user/MCP source capability that is available locally.
-5. Build Agent-facing projection.
+1. 加载并校验 desired state。
+2. 初始化 MCP Server manager intent。
+3. 初始化 SKILL registry、blob resolver 和 Desktop/resource tracking。
+4. Reconcile 本地可用的 marketplace/plugin/user/MCP source capability。
+5. 构建 Agent-facing projection。
 
-`start` MAY start MCP Server processes immediately or lazily, but final `client:get_*` behavior after connection MUST match the loaded desired state.
+`start` MAY 立即或惰性启动 MCP Server processes，但连接后的最终 `client:get_*` 行为 MUST 匹配已加载的 desired state。
 
 ### 4.3 Stop
 
-`stop` or equivalent stops service activity without necessarily deleting durable desired state:
+`stop` 或等价操作停止 service activity，但不一定删除 durable desired state：
 
-1. Stop or detach local MCP Server activity according to SDK policy.
-2. Stop watchers and update emitters.
-3. Prevent new Agent-facing work from being accepted after stop completes.
-4. Preserve durable desired state unless the caller explicitly requests deletion.
+1. 按 SDK policy 停止或 detach 本地 MCP Server activity。
+2. 停止 watchers 和 update emitters。
+3. 在 stop 完成后阻止新的 Agent-facing work 被接受。
+4. 保留 durable desired state，除非调用方明确要求删除。
 
 ### 4.4 Connect And Join Office
 
-`connect` or equivalent establishes the protocol connection:
+`connect` 或等价操作建立协议连接：
 
-1. Use `/smcp` namespace unless configured otherwise.
-2. Send URL query `a2c_version`.
-3. Send `auth.role = "computer"` plus caller-provided non-sensitive business auth fields.
-4. Join an Office with `server:join_office` when office config is supplied or when caller requests it.
+1. 除非另有配置，使用 `/smcp` namespace。
+2. 发送 URL query `a2c_version`。
+3. 发送 `auth.role = "computer"`，并附加调用方提供的非敏感业务 auth fields。
+4. 当提供 office config 或调用方要求时，使用 `server:join_office` 加入 Office。
 
-Connect failure MUST be categorized so callers can distinguish protocol version mismatch, auth failure, network failure and join failure.
+连接失败 MUST 被分类，使调用方能区分 protocol version mismatch、auth failure、network failure 和 join failure。
 
 ### 4.5 Disconnect
 
-`disconnect` or equivalent ends the Socket.IO connection without destroying durable local config. After disconnect:
+`disconnect` 或等价操作结束 Socket.IO 连接，但不销毁 durable local config。断开后：
 
-1. Runtime MUST NOT emit `server:update_*` to the previous Office.
-2. Runtime MAY continue local management operations.
-3. Subsequent reconnect MUST project current desired state, not stale state from the prior connection.
+1. Runtime MUST NOT 向之前的 Office 发送 `server:update_*`。
+2. Runtime MAY 继续本地管理操作。
+3. 后续 reconnect MUST 投影当前 desired state，而不是上一次连接留下的 stale state。
 
 ### 4.6 Sync Config
 
-`sync_config(new_config)` or equivalent applies a new desired state to an existing runtime.
+`sync_config(new_config)` 或等价操作把新的 desired state 应用到既有 runtime。
 
-The implementation MAY use incremental update, rebuild, restart, lazy apply or full reconcile. The contract only requires:
+实现 MAY 使用 incremental update、rebuild、restart、lazy apply 或 full reconcile。contract 只要求：
 
-1. The final public runtime state matches `new_config`.
-2. Removed or disabled capabilities do not remain visible or callable.
-3. Newly enabled capabilities become visible after successful reconcile.
-4. Agent-facing projection changes emit the corresponding `server:update_*` if joined to an Office.
-5. Partial failure enters `degraded` or returns a public partial-failure result; it MUST NOT expose ambiguous or policy-rejected capabilities.
-6. Secret values MUST NOT appear in errors, diagnostics sent to Agent, or public protocol projection.
+1. 最终 public runtime state 匹配 `new_config`。
+2. 已移除或禁用的 capabilities 不再保持可见或可调用。
+3. 新启用的 capabilities 在成功 reconcile 后变为可见。
+4. 如果已加入 Office，Agent-facing projection 变化会发送对应 `server:update_*`。
+5. Partial failure 进入 `degraded` 或返回公开 partial-failure result；它 MUST NOT 暴露歧义能力或被 policy-rejected 的能力。
+6. Secret values MUST NOT 出现在 errors、发送给 Agent 的 diagnostics 或 public protocol projection 中。
 
 ### 4.7 Shutdown
 
-`shutdown` or equivalent releases runtime resources:
+`shutdown` 或等价操作释放 runtime 资源：
 
-1. Disconnect from SMCP Server if connected.
-2. Stop MCP Server activity owned by the runtime.
-3. Stop watchers, timers, background tasks and update emitters.
-4. Release blob/spool resources owned by the runtime.
-5. Prevent stale callbacks, `server:update_*` emissions or late tool-call ack attempts after shutdown completes.
+1. 如果已连接，则断开 SMCP Server。
+2. 停止 runtime 拥有的 MCP Server activity。
+3. 停止 watchers、timers、background tasks 和 update emitters。
+4. 释放 runtime 拥有的 blob/spool resources。
+5. 在 shutdown 完成后阻止 stale callbacks、`server:update_*` emissions 或迟到的 tool-call ack attempts。
 
-Durable config deletion is not part of shutdown unless explicitly requested by a separate management operation.
+删除 durable config 不属于 shutdown，除非由独立管理操作明确请求。
 
 ## 5. Marketplace And Plugin Contract
 
-SDKs that expose marketplace/plugin management SHOULD align on these semantics:
+暴露 marketplace/plugin management 的 SDK SHOULD 对齐以下语义：
 
-1. Marketplace reconcile is additive by default: declared sources are installed/updated/refreshed; undeclared but materialized sources are not deleted until explicit prune/gc.
-2. Marketplace sync failure is degraded: other sources can continue; failed source capabilities are not exposed as active if materialization failed.
-3. Plugin id uses the semantic form `<plugin>@<marketplace>` for cross-SDK fixture purposes. SDKs MAY wrap it in typed IDs.
-4. Installing/enabling a plugin reconciles its SKILL, MCP Server, input and tool metadata contributions into existing projection surfaces.
-5. Disabling/removing a plugin makes its contributed capabilities invisible or non-callable.
-6. Foreign MCP Server name conflict SHOULD be rejected before mounting plugin-contributed servers. Plugin-owned servers MAY be updated idempotently.
-7. Plugin-scoped inputs MUST avoid leaking values across plugins with the same bare input id.
+1. Marketplace reconcile 默认 additive：声明的 sources 会被 installed/updated/refreshed；未声明但已物化的 sources 不会被删除，直到 explicit prune/gc。
+2. Marketplace sync failure 是 degraded：其它 sources 可以继续；如果 failed source 物化失败，其能力不会作为 active 暴露。
+3. 为跨 SDK fixture 目的，Plugin id 使用语义形式 `<plugin>@<marketplace>`。SDK MAY 把它包装为 typed IDs。
+4. Installing/enabling plugin 会把它的 SKILL、MCP Server、input 和 tool metadata contributions reconcile 到既有 projection surfaces。
+5. Disabling/removing plugin 会让它贡献的 capabilities 变为不可见或不可调用。
+6. Foreign MCP Server name conflict SHOULD 在挂载 plugin-contributed servers 前被拒绝。Plugin-owned servers MAY 被幂等更新。
+7. Plugin-scoped inputs MUST 避免同一 bare input id 在不同 plugin 间泄露值。
 
-## 6. Error Categories
+## 6. 错误类别
 
-SDKs SHOULD expose public error categories equivalent to:
+SDK SHOULD 暴露等价的公开错误类别：
 
-| Category | Typical triggers | Retryability |
+| 类别 | 典型触发 | 可重试性 |
 |---|---|---|
-| `validation` | Invalid config shape, invalid plugin id, invalid marketplace name, invalid scope | Retry after config fix |
-| `policy` | Source blocked, permission denied, policy-only field in user scope | Retry after policy change |
-| `conflict` | Foreign MCP Server name conflict, concurrent writer conflict | Retry after resolving conflict |
-| `auth` | SMCP auth failure, source auth failure, MCP upstream authorization failure | Retry after credentials/auth flow |
-| `network` | Server unreachable, marketplace fetch failed, transient transport failure | Usually retryable |
-| `protocol_version` | HTTP handshake `4008` | Not retryable without version change |
-| `startup` | MCP Server startup failure, dependency missing | Depends on diagnostic |
-| `partial_failure` | Some sources applied, some failed | Retry failed subset or sync |
-| `shutdown` | Cleanup failure | Retry cleanup or force stop |
+| `validation` | config shape 非法、plugin id 非法、marketplace name 非法、scope 非法 | 修复 config 后重试 |
+| `policy` | Source blocked、permission denied、policy-only field in user scope | policy 变更后重试 |
+| `conflict` | Foreign MCP Server name conflict、concurrent writer conflict | 解决冲突后重试 |
+| `auth` | SMCP auth failure、source auth failure、MCP upstream authorization failure | credentials/auth flow 完成后重试 |
+| `network` | Server unreachable、marketplace fetch failed、transient transport failure | 通常可重试 |
+| `protocol_version` | HTTP handshake `4008` | 不改版本则不可重试 |
+| `startup` | MCP Server startup failure、dependency missing | 取决于 diagnostic |
+| `partial_failure` | Some sources applied, some failed | 重试 failed subset 或 sync |
+| `shutdown` | Cleanup failure | 重试 cleanup 或 force stop |
 
-Errors MUST NOT include secret values. Management errors do not become Agent-facing `ErrorPayload` unless they occur inside an existing `client:*` handler; in that case the existing protocol error shape applies.
+错误 MUST NOT 包含 secret values。管理面错误不会变成 Agent-facing `ErrorPayload`，除非它们发生在既有 `client:*` handler 内；此时适用既有协议错误 shape。
 
-## 7. Client Responsibility
+## 7. Client 责任
 
-Business clients remain responsible for:
+业务 client 仍负责：
 
-- Managing multiple Computer runtimes.
-- Persisting user/workspace account selection.
-- Choosing Server, office and user-facing reconnect policy.
-- Owning product UI state and operation audit logs.
-- Storing secrets according to product policy.
-- Coordinating updates across runtimes.
+- 管理多个 Computer runtimes。
+- 持久化 user/workspace account selection。
+- 选择 Server、office 和 user-facing reconnect policy。
+- 拥有 product UI state 和 operation audit logs。
+- 按产品策略存储 secrets。
+- 协调多个 runtimes 的更新。
 
-The single Computer runtime remains responsible for:
+单个 Computer runtime 仍负责：
 
-- Managing one Computer's MCP lifecycle.
-- Resolving local inputs and secrets.
-- Projecting tools/resources/Desktop/SKILL/Blob to the Agent-facing protocol.
-- Releasing owned resources on shutdown.
+- 管理一个 Computer 的 MCP lifecycle。
+- 解析本地 inputs 和 secrets。
+- 将 tools/resources/Desktop/SKILL/Blob 投影到 Agent-facing protocol。
+- 在 shutdown 时释放拥有的 resources。
 
-## 8. Compatibility
+## 8. 兼容性
 
-Compatibility label: **Runtime-contract**.
+兼容性标签：**Runtime-contract**。
 
-SDKs may need new public API wrappers or conformance fixtures, but no Agent-facing wire schema changes are required.
+SDK 可能需要新增 public API wrappers 或 conformance fixtures，但不需要改变 Agent-facing wire schema。

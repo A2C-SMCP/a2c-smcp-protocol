@@ -1,4 +1,4 @@
 interface:
   display_name: "A2C Computer 协议"
-  short_description: "编写语言无关的 Computer 协议规范指南"
-  default_prompt: "Use $a2c-computer-protocol 编写或修订 A2C-SMCP Computer 侧协议规范，并基于 SDK 行为证据形成结论。"
+  short_description: "编写 Computer 协议与 SDK Runtime Contract 指南"
+  default_prompt: "Use $a2c-computer-protocol 编写或修订 A2C-SMCP Computer 协议、SDK Runtime Contract 或 conformance tests，并基于 SDK 与 client 行为证据形成结论。"
