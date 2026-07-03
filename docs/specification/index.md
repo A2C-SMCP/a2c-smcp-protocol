@@ -109,7 +109,7 @@ Agent ──→ Computer ─┬─→ Excel MCP
 
 - [架构设计](architecture.md) - 角色关系与通信模型
 - [Computer 侧协议框架](computer.md) - Computer 生命周期、事件面、MCP/SKILL/Desktop/Blob 行为边界
-- [Computer Management Plane](computer-management/index.md) - 可信本地客户端通过 SDK/admin surface 管理 Computer desired state
+- [Computer Management Plane](computer-management/index.md) - 管理面与 Agent-facing 协议面的边界、投影规则与 SDK guidance
 - [事件定义](events.md) - 完整事件列表与规范
 - [数据结构](data-structures.md) - 请求/响应数据结构定义
 - [Desktop 桌面系统](desktop.md) - Window URI 规范、桌面组织策略与更新机制

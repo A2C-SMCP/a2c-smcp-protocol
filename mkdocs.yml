@@ -107,6 +107,21 @@ nav:
   - 协议规范:
       - 概述: specification/index.md
       - 架构设计: specification/architecture.md
+      - Computer 侧协议框架: specification/computer.md
+      - Computer Management Plane:
+          - 概览: specification/computer-management/index.md
+          - Lifecycle: specification/computer-management/lifecycle.md
+          - Connection: specification/computer-management/connection.md
+          - Capability Sources: specification/computer-management/capability-sources.md
+          - MCP Server: specification/computer-management/mcp-server.md
+          - Tool Exposure: specification/computer-management/tool-exposure.md
+          - SKILL Exposure: specification/computer-management/skill-exposure.md
+          - Marketplace: specification/computer-management/marketplace.md
+          - Plugin: specification/computer-management/plugin.md
+          - Inputs and Secrets: specification/computer-management/inputs-and-secrets.md
+          - Reconcile and Notifications: specification/computer-management/reconcile-and-notifications.md
+          - Management Errors: specification/computer-management/errors.md
+          - Management Security: specification/computer-management/security.md
       - 事件定义: specification/events.md
       - 数据结构: specification/data-structures.md
       - Desktop 桌面系统: specification/desktop.md
