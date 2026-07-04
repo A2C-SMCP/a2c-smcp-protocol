@@ -34,11 +34,13 @@ SDK SHOULD 接受一个声明式 config 对象，并具备以下语义内容：
 | inputs | 用于本地渲染 MCP Server configs 的 input definitions |
 | skills | User DropIn roots 或等价本地 SKILL source declarations |
 | marketplaces | Known marketplace source declarations 和 trust/update policy |
-| plugins | Installed/enabled plugin declarations 和 plugin-scoped capability intent |
+| plugin_enablement | `enabledPlugins`：per-scope 启用意图（`<plugin>@<marketplace>` → bool）；installation 记录是其派生态，见 §2.3 |
 | settings_policy | Scope merge result 或等价治理策略 |
 | connection | 可选默认 Server URL、namespace、office 和 auth payload policy |
 
 不同 SDK 的 config shape 可以不同，但共享 conformance fixtures MUST 能表达为 JSON，并映射为等价 runtime intent。
+
+> **Installation 与 enablement 是两个独立状态、独立生命周期。** SDK MUST NOT 用单一开关同时表达“已安装”（全局一次）与“本 scope 是否启用”（per-scope）——否则一个 scope 的启用会泄漏到其它 scope。
 
 ### 2.2 RuntimeOptions
 
@@ -56,6 +58,21 @@ SDK SHOULD 接受 runtime options，用于表达环境相关行为：
 | diagnostics hooks | logging、metrics 和 health observers |
 
 RuntimeOptions MAY 使用 SDK-specific 名称和默认值。最终外部可见行为 MUST 符合本 contract。
+
+### 2.3 状态权威与资产分档
+
+**权威方向 MUST 为 意图 → 派生态，不可逆。** 声明式意图（`ComputerConfig` / `enabledPlugins` / marketplace declarations）是唯一权威写入入口。任何命令式管理操作（install / enable / disable / add-marketplace）MUST 先写声明式意图（config-first）；锁 / 物化账本 / 克隆缓存 / 活跃集均为其下游派生物。SDK MUST NOT 写派生态而不写对应意图（写账本却不写 `enabledPlugins` 即 rust-sdk#96 根因）。派生态 MUST 仅由 reconcile 从意图重建，MUST NOT 被直接编辑、也 MUST NOT 作为独立输入参与决策；因此运行时无需为“中间层突变”编写应对逻辑。
+
+分层深度 MUST 按资产是否有远端 fetch 步骤而定：
+
+| 资产类别 | 分层 |
+|---|---|
+| Fetch 资产（marketplace / plugin） | 意图 → 物化账本（派生缓存，记 resolved 版本/位置）→ 克隆缓存 → 活跃集 |
+| 纯声明资产（MCP Server 定义、本地 DropIn SKILL） | 意图 → 活跃集 |
+
+SDK MUST NOT 为纯声明资产引入锁或物化目录。物化账本（若实现保留，如 `installed_plugins.json`）MUST 是可从意图重建的派生缓存，MUST NOT 手编、MUST NOT 提升为权威。
+
+> **物化账本（materialization ledger，如 `installed_plugins.json`）**：reconcile 从意图派生出的、机器本地的物化记录，登记 resolved 身份（version / commitSha）、落地位置（installPath）与能力归属（bundled server 属于哪个 plugin）。它是可弃、可重建的**描述性索引**——记“已物化成什么”，不记“应该是什么”；不是权威、不是复现锁。判据：删除它无损，boot 可从意图重建；缺失只是下次 boot 重新解析。
 
 ## 3. 生命周期状态
 
@@ -154,6 +171,24 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 
 删除 durable config 不属于 shutdown，除非由独立管理操作明确请求。
 
+### 4.8 Boot 治理恢复（Governance Recovery）
+
+从既有 `home` 重建 runtime（进程重启或以相同 `home` 重新构造）时：
+
+1. Boot MUST 以持久化声明式意图为权威，重建派生态与活跃集；`start` 的 reconcile（§4.2 第 4 步）MUST 覆盖此恢复。
+2. 重建后的 Agent-facing projection MUST 完整包含 enabled plugin 贡献的 bundled MCP Server、bundled SKILL 及由其派生的 MCP-source SKILL，且 MUST NOT 依赖任何调用方持有的内存归属表（in-memory ownership map）。
+3. 能力归属元数据（source / marketplace / plugin id 等）MUST 为 boot 的纯函数输出（意图 + resolved location + manifest 重新推导），每次 boot 可复现。
+4. Boot reconcile MUST 幂等且 additive-only；删除 MUST 走独立显式路径（prune / gc），MUST NOT 作为 reconcile 的副作用。
+5. settings / plugin-marketplace / MCP 三条 reconcile pipeline MAY 各自独立执行；本 contract 不要求把它们合并为单一 reconcile。
+
+### 4.9 物化账本地位与运行期稳定性
+
+本 contract 不要求存在 lock 或物化账本文件。复现性 MUST 来自持久化的声明式意图 + reconcile 重解析（`latest-compatible`）：相同意图在同一或不同机器上重建，MUST 产出等价活跃集（marketplace 按声明 ref 解析当前条目，允许上游漂移）。
+
+1. 若实现保留物化账本，它 MUST 只由 reconcile 从意图写入，MUST NOT 被直接编辑，MUST NOT 作为权威来源；它是可弃、可 GC、可从意图重建的派生缓存。
+2. committed pin-lock（记录 `commitSha` / `integrity` 并令 boot 优先按锁复现）是可选、非必需的更强复现扩展；实现 MAY 提供，但 MUST NOT 以派生缓存冒充可复现 lock。
+3. 运行期稳定：会话内派生态快照 SHOULD 冻结；后台或磁盘侧变更 MUST NOT 在运行中打乱已投影的 Agent-facing 状态，而是作为 pending 差异留到下次 boot 吸收。此保证“改配置后再启动”确定、“反复重启”结果一致。
+
 ## 5. Marketplace And Plugin Contract
 
 暴露 marketplace/plugin management 的 SDK SHOULD 对齐以下语义：
@@ -165,6 +200,9 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 5. Disabling/removing plugin 会让它贡献的 capabilities 变为不可见或不可调用。
 6. Foreign MCP Server name conflict SHOULD 在挂载 plugin-contributed servers 前被拒绝。Plugin-owned servers MAY 被幂等更新。
 7. Plugin-scoped inputs MUST 避免同一 bare input id 在不同 plugin 间泄露值。
+8. 安装路径 MUST NOT 作为权威状态。MUST 存在纯函数 `(marketplace, plugin, version) → path`；持久化路径仅为提示，boot MUST 重新校验，失效即重算（worktree / seed 场景 MUST NOT 信任存储的 install location）。
+9. 声明（可提交）与凭据（机器本地）MUST 使用不同持久化契约：secret / OAuth token MUST 存于 keychain 或等价机器本地存储，MUST NOT 落入任何可提交的声明文件。
+10. MCP Server 启停有两套正交开关，MUST 分清并分别应用：project-scope 声明 server 的信任门（`enabledMcpjsonServers` / `disabledMcpjsonServers` / `enableAllProjectMcpServers`）与通用禁用开关（按命名空间键，对 plugin bundled server 亦生效）。plugin bundled server 的启停 MUST NOT 走 project 信任门。
 
 ## 6. 错误类别
 

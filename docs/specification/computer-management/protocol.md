@@ -38,7 +38,7 @@ Computer Management Plane 不定义：
 管理面可以配置 disabled server、forbidden tool、alias、default tool metadata 和 per-tool metadata。完成后：
 
 1. Computer MUST 保证 Agent 看到的每个 `SMCPTool.name` 可路由到唯一目标。
-2. 同名工具冲突 MUST 通过 alias、禁用、配置拒绝或其它管理面策略解决；Computer MUST NOT 让同一个 `tool_name` 随机路由到不同 MCP Server。
+2. 同名工具冲突 MUST 通过一个确定的、文档化的优先级全序解决，对任一 `tool_name` 产出唯一赢家（这正是“MUST NOT 随机路由到不同 MCP Server”的实质）。便利边界冲突（用户 / plugin / 多 scope 同名）MUST 按该全序覆盖（last-wins）并配合命名空间前缀消歧；安全边界冲突（policy / enterprise / 不可验证源）MUST 硬拒绝并 fail-closed。scope 覆盖全序 MUST 文档化。
 3. forbidden 或 disabled 工具 MUST NOT 出现在可调用工具列表中，也 MUST NOT 被 `client:tool_call` 成功执行。
 4. A2C 工具元数据中的复杂结构 MUST 按 [SMCPTool.meta 序列化规范](../data-structures.md#smcptoolmeta-序列化规范) 放入 `meta["a2c_tool_meta"]` JSON 字符串。
 

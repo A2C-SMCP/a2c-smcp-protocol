@@ -114,7 +114,9 @@
 - enabled plugin SKILLs 出现在 `client:get_skills` 中；
 - plugin-contributed MCP servers 通过常规 config/tool projection 出现；
 - 禁用 `audit@acme` 会移除或隐藏其贡献的 capabilities；
-- 仅移除 declaration 不会删除已物化 marketplace，直到显式 prune/gc。
+- 仅移除 declaration 不会删除已物化 marketplace，直到显式 prune/gc；
+- **重启恢复**：以相同 `home` 重建 runtime、执行 boot/reconcile 后，`audit@acme` 的 bundled MCP servers、bundled SKILLs 及其派生 MCP-source SKILLs 重新出现，且无需调用方在内存中记忆归属；
+- **Scope 隔离**：plugin 全局安装、仅在某 scope 启用时，未启用的 scope 的活跃集不出现该 plugin 贡献的能力。
 
 ### 2.5 Secret Inputs
 
@@ -266,6 +268,11 @@
 - Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
 - Plugin uninstall 会移除其 records，并 teardown owned bundled MCP servers，除非显式选择 keep-server policy。
 - Plugin-scoped inputs 会在 plugin server config rendering 前注入。
+- 命令式 install/enable 先写声明式意图（config-first）：安装后 `enabledPlugins`（或等价 per-scope 意图）反映该 plugin，物化账本只作为下游派生物出现。
+- 重启恢复：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
+- disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。
+- 给定 `{settings.json + .mcp.json + 已安装 plugin 目录}` fixture，boot 后的活跃 `{skills, servers}` 集合与来源标注与期望一致。
+- 存储的 install 路径失效时，boot 由 `(marketplace, plugin, version)` 纯函数重算，恢复不受影响。
 
 ## 6. Security Checklist
 
