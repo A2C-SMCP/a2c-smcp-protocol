@@ -1,0 +1,319 @@
+# Computer 管理面一致性测试
+
+本文定义 Computer Management Plane 的 SDK conformance checklist。测试应验证公开 SDK 结果、公开事件、wire 行为、错误分类和安全边界；不得检查私有 registry、缓存、锁、任务图、目录布局或语言专属类型。
+
+## 1. 测试层级
+
+| 层级 | 测试对象 | 必需观察点 |
+|---|---|---|
+| 协议投影 | 通过 SMCP Server 和 Agent 运行的 Computer | `client:*` responses、`server:update_*`、`notify:*`、flat `ErrorPayload` |
+| Runtime contract | 公开 SDK runtime object | lifecycle state、public diagnostics、public errors、final projection |
+| Fixture 对齐 | 共享 JSON config fixtures | 跨 SDK 的等价 runtime intent |
+| 安全 | 公开 SDK 和 Agent-facing protocol | 无 secret/path leakage，sandbox 与 blob boundaries 正确 |
+
+## 2. 共享 Fixtures
+
+一致性测试套件 SHOULD 在各 SDK 间使用同一批 JSON fixtures。具体磁盘位置由 SDK 自行决定，但每个 SDK SHOULD 能加载等价于以下内容的 fixtures：
+
+### 2.1 Minimal Runtime
+
+```json
+{
+  "name": "computer-a",
+  "mcp_servers": [],
+  "inputs": [],
+  "plugins": {},
+  "marketplaces": {}
+}
+```
+
+期望：
+
+- create 成功；
+- start 到达 `started` 或等价状态；
+- `client:get_config` 返回空 `servers`；
+- `client:get_tools` 返回空 `tools`；
+- shutdown 释放 resources。
+
+### 2.2 One Stdio MCP Server
+
+```json
+{
+  "name": "computer-a",
+  "mcp_servers": [
+    {
+      "name": "echo",
+      "type": "stdio",
+      "disabled": false,
+      "forbidden_tools": [],
+      "tool_meta": {},
+      "server_parameters": {
+        "command": "fixture-echo-server",
+        "args": [],
+        "env": null,
+        "cwd": null
+      }
+    }
+  ],
+  "inputs": []
+}
+```
+
+期望：
+
+- enabled server 出现在 `client:get_config` 中；
+- fixture server 暴露的 tools 出现在 `client:get_tools` 中；
+- `client:tool_call` 返回 MCP `CallToolResult`；
+- 移除或禁用 server 后，后续 projection 中移除对应 tools。
+
+### 2.3 Disabled And Forbidden Tools
+
+```json
+{
+  "name": "computer-a",
+  "mcp_servers": [
+    {
+      "name": "tools",
+      "type": "stdio",
+      "disabled": false,
+      "forbidden_tools": ["dangerous_delete"],
+      "tool_meta": {
+        "safe_read": { "tags": ["read"], "auto_apply": true }
+      }
+    }
+  ]
+}
+```
+
+期望：
+
+- forbidden tool 不出现在 `client:get_tools` 中；
+- forbidden tool 不能被成功执行；
+- `safe_read` metadata 以 JSON 字符串出现在 `meta["a2c_tool_meta"]` 下。
+
+### 2.4 Marketplace Plugin
+
+```json
+{
+  "name": "computer-a",
+  "marketplaces": {
+    "acme": {
+      "source": { "type": "git", "url": "file:///fixtures/acme-marketplace" },
+      "autoUpdate": false
+    }
+  },
+  "plugins": {
+    "audit@acme": true
+  }
+}
+```
+
+期望：
+
+- startup reconcile 是 additive；
+- enabled plugin SKILLs 出现在 `client:get_skills` 中；
+- plugin-contributed MCP servers 通过常规 config/tool projection 出现；
+- 禁用 `audit@acme` 会移除或隐藏其贡献的 capabilities；
+- 仅移除 declaration 不会删除已物化 marketplace，直到显式 prune/gc；
+- **重启恢复**：以相同 `home` 重建 runtime、执行 boot/reconcile 后，`audit@acme` 的 bundled MCP servers、bundled SKILLs 及其派生 MCP-source SKILLs 重新出现，且无需调用方在内存中记忆归属；
+- **Scope 隔离**：plugin 全局安装、仅在某 scope 启用时，未启用的 scope 的活跃集不出现该 plugin 贡献的能力。
+
+### 2.5 Secret Inputs
+
+```json
+{
+  "name": "computer-a",
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "api_token",
+      "description": "API token",
+      "password": true
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "secret-server",
+      "type": "stdio",
+      "server_parameters": {
+        "command": "fixture-secret-server",
+        "args": ["${input:api_token}"],
+        "env": { "TOKEN": "${input:api_token}" },
+        "cwd": null
+      }
+    }
+  ]
+}
+```
+
+期望：
+
+- resolved token 只在本地使用；
+- `client:get_config` 不暴露 resolved token；
+- Agent 可见的 errors 和 diagnostics 不包含 token；
+- 具有相同 bare id 的 plugin-scoped input fixtures 不会串值。
+
+## 3. Runtime Contract Checklist
+
+### 3.1 Create From Config
+
+- 给定合法 minimal fixture，创建 runtime 成功且不需要网络访问。
+- 给定非法 JSON shape，SDK 返回公开 `validation` error。
+- 给定非法 plugin id shape，SDK 返回公开 `validation` error。
+- 创建 runtime 不会启动 MCP tool execution。
+- 创建 runtime 不会发送 `server:update_*`。
+
+### 3.2 Start
+
+- `start` 为合法 config 初始化本地 projection。
+- 当一个 MCP Server 启动失败时，startup 进入 `degraded` 或返回 partial diagnostics，且不会把该 server 的 tools 暴露为可用。
+- Startup 不会在 public diagnostics 中暴露 secret values。
+- 重复 `start` 是幂等的，或返回明确 lifecycle conflict。
+
+### 3.3 Connect And Join
+
+- `connect` 在 URL query 中发送 `a2c_version`。
+- `connect` 发送 `auth.role = "computer"`。
+- 配置后包含 caller-provided business auth fields。
+- auth payload 中不包含 MCP credentials 和 `.skillenv` 内容。
+- Join Office 使用 `server:join_office`，并携带 `role = "computer"` 和配置的 Computer name。
+- Protocol version mismatch 被分类为 `protocol_version`。
+- Auth failure 被分类为 `auth`。
+
+### 3.4 Sync Config
+
+- 通过 `sync_config` 添加 MCP Server 后，其 tools 在成功后可见。
+- 通过 `sync_config` 禁用 MCP Server 后，其 tools 从 `client:get_tools` 中移除。
+- 通过 `sync_config` 移除 MCP Server 后，对该 server 调用 `client:get_resources` 返回 `4014`。
+- 修改 tool metadata 会更新 `SMCPTool.meta`。
+- 修改 SKILL sources 会更新 `client:get_skills`。
+- 如果已加入 Office，每个改变 projection 的 sync 会发送相关 `server:update_*` request，或发送等价的合并后集合。
+- Partial failure 不会留下可见的歧义重复 `tool_name` 路由。
+
+### 3.5 Disconnect、Stop、Shutdown
+
+- `disconnect` 结束 Socket.IO connection，且不删除 durable desired state。
+- `disconnect` 后，本地管理变更不会向之前的 Office 发送 update events。
+- `stop` 在完成后阻止新的 Agent-facing service activity。
+- `shutdown` 在需要时断开连接，停止 owned MCP activity，并停止 watchers/timers。
+- `shutdown` 后，stale callbacks 不会发送 `server:update_*`。
+- 重复 `shutdown` 是幂等的，或返回明确 lifecycle state result。
+
+## 4. Protocol Projection Checklist
+
+### 4.1 Config
+
+- `client:get_config` 返回当前安全的 `servers` 和 `inputs`。
+- Disabled servers 要么不存在，要么按既有 config semantics 明确为非 active；它们不暴露 callable tools。
+- Secret values、OAuth tokens、API keys、`.skillenv` 内容和本地 credential file contents 均不存在。
+- Unknown management diagnostics 不存在。
+
+### 4.2 Tools
+
+- `client:get_tools` 只返回 enabled、non-forbidden 且 uniquely routable 的 tools。
+- 存在复杂 A2C metadata 时，`a2c_tool_meta` 是 JSON 字符串。
+- Duplicate tool names 在暴露前通过 alias、disable/reject 或其它 deterministic policy 解决。
+- 对 removed/disabled/forbidden tools 的 `client:tool_call` 不能成功。
+
+### 4.3 Resources
+
+- 带 `resources` capability 的已知 MCP Server 返回透明的 `resources/list` page。
+- 未知 `mcp_server` 返回 flat `ErrorPayload`，且 `code = 4014`。
+- 缺少 `resources` capability 的 server 返回 flat `ErrorPayload`，且 `code = 4015`。
+- Response 不按 scheme、`_meta`、annotations 或 content 过滤。
+
+### 4.4 SKILL
+
+- `client:get_skills` 返回 active refs，并排除 orphan/removed/disabled plugin refs。
+- 必选字段 `name`、`source`、`path`、`description` 存在。
+- `client:get_skill` 中的 invalid `name` 返回 `4016`。
+- Missing/orphan/removed name 返回 `4014`。
+- Traversal、absolute path、`.skillenv`、forbidden file 和 not-found `rel_path` 返回 `4017`。
+- inline budget 内的 text 返回 `body`；binary 或 large text 返回 `blob_handle`；两者绝不同时存在。
+
+### 4.5 Blob
+
+- `client:get_blob` 将 handle 视为 opaque，并按 absolute offset 返回 chunks。
+- Invalid handle 返回 `4018`，并带 `details.reason = "invalid_handle"` 或等价信息。
+- handle mint 后 source 被移除，返回 `4018`，并带 `gone` 或等价信息。
+- Out-of-range offset 返回 `4018`，并带 `range` 或等价信息。
+- `total_size` 和 `sha256` 在一次 logical read 内保持稳定。
+- Blob access 不能读取任意本地文件。
+
+### 4.6 Desktop
+
+- `client:get_desktop` 只返回 valid `window://` rendered entries。
+- 精确 `window` filter 只返回匹配 URI 或空列表。
+- Invalid/empty/unrenderable windows 被跳过。
+- Management diagnostics 和 local paths 不会渲染进 Desktop content。
+
+### 4.7 Cancellation And Timeout
+
+- `server:tool_call_cancel` 保持 fire-and-forget；不需要 ack。
+- Unknown 或 completed `req_id` 被 Computer 忽略，且不产生新协议错误。
+- 成功取消时，原始 `client:tool_call` ack 返回 `CallToolResult(isError=true)`，且结果级 `meta.a2c_cancelled = true`。
+- Timeout 返回 `CallToolResult(isError=true)`，并 SHOULD 包含结果级 `meta.a2c_timeout = true`。
+
+## 5. Marketplace And Plugin Checklist
+
+- Marketplace reconcile 会安装 missing declared marketplace sources。
+- Source change 会在 reconcile 后替换旧 source projection。
+- `autoUpdate` 或 explicit refresh 会更新 declared source。
+- Undeclared materialized marketplaces 不会在 additive startup reconcile 期间被删除。
+- Explicit prune 会移除 marketplace materialization，并注销其 active SKILLs。
+- Plugin install 校验 `<plugin>@<marketplace>` shape。
+- marketplace unknown 时，Plugin install 失败。
+- Plugin install 拒绝 foreign MCP Server name conflict。
+- plugin-owned MCP Server 的 reinstall/enable 是幂等的。
+- Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
+- Plugin uninstall 会移除其 records，并 teardown owned bundled MCP servers，除非显式选择 keep-server policy。
+- Plugin-scoped inputs 会在 plugin server config rendering 前注入。
+- 命令式 install/enable 先写声明式意图（config-first）：安装后 `enabledPlugins`（或等价 per-scope 意图）反映该 plugin，物化账本只作为下游派生物出现。
+- 重启恢复：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
+- disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。
+- 给定 `{settings.json + .mcp.json + 已安装 plugin 目录}` fixture，boot 后的活跃 `{skills, servers}` 集合与来源标注与期望一致。
+- 存储的 install 路径失效时，boot 由 `(marketplace, plugin, version)` 纯函数重算，恢复不受影响。
+
+## 6. Security Checklist
+
+- Agent 不能通过任何 `client:*` event 调用 management mutation。
+- 包含 local paths 的 management errors 不会被复制进 Agent-facing `ErrorPayload.details`。
+- Secret values 不会出现在 `client:get_config`、`client:get_tools`、`client:get_desktop`、`client:get_skill`、`client:get_blob`、update notifications 或 tool metadata 中。
+- SKILL sandbox 防止 traversal、symlink escape 和 forbidden file access。
+- Blob handle parsing 会重新执行 source authorization/boundary checks。
+- Cleanup operations 拒绝删除 authorized Computer local boundary 之外的内容。
+- Policy-rejected marketplace/plugin/source 不贡献任何 visible capability。
+
+## 7. Cross-SDK Parity Matrix
+
+每个 SDK SHOULD 报告以下项目的 pass/fail：
+
+| 区域 | Python | Rust | TypeScript | 备注 |
+|---|---|---|---|---|
+| Config fixture parsing | 必需 | 必需 | 推荐 | 同一 fixture，等价 runtime intent |
+| Lifecycle transitions | 必需 | 必需 | 推荐 | Public state 或 mapped diagnostics |
+| Wire projection | 必需 | 必需 | 推荐 | 通过 test Server + Agent |
+| Marketplace/plugin | feature 存在时必需 | feature 存在时必需 | 推荐 | 允许 feature-gated |
+| Secret safety | 必需 | 必需 | 必需 | 不允许 feature gate |
+| Shutdown cleanup | 必需 | 必需 | 推荐 | 只验证 public effects |
+
+只有当 SDK 不声称具备 marketplace/plugin management capabilities 时，feature-gated SDK 才可以把 marketplace/plugin tests 标记为 not applicable。Protocol projection 和 secret safety tests 对任何 Computer SDK 都仍然是必需项。
+
+## 8. 证据覆盖
+
+当前 Python 和 Rust SDK 已经包含大多数 checklist 区域的证据：
+
+| 区域 | Python tests/source | Rust tests/source |
+|---|---|---|
+| Computer lifecycle and tools | `tests/unit_tests/computer/*`、`tests/integration_tests/computer/*`、`a2c_smcp/computer/computer.py` | `crates/smcp-computer/tests/*`、`tests/v022_integration_matrix.rs`、`crates/smcp-computer/src/computer.rs` |
+| Socket.IO Computer client | `a2c_smcp/computer/socketio/client.py` | `crates/smcp-computer/src/socketio_client.rs` |
+| Settings and reconcile | `a2c_smcp/computer/settings/*`、`tests/unit_tests/computer/settings/*` | `crates/smcp-computer/src/settings/*` unit tests |
+| SKILL/blob/Desktop | `tests/e2e/test_v02_skill_blob_e2e.py`、`tests/integration_tests/test_blob_transfer.py`、desktop tests | `tests/v022_integration_matrix.rs`、`crates/smcp-computer/tests/desktop_integration.rs`、blob/skill modules |
+
+这些是证据指针，不是未来 SDK 的强制文件路径。
+
+## 9. 兼容性
+
+兼容性标签：**Runtime-contract + SDK conformance**。
+
+这些测试不需要改变 wire schema。它们可能暴露 SDK 行为缺口，这些缺口应作为 SDK conformance work 修复。
