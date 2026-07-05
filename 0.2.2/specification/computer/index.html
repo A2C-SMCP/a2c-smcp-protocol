@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/">
+        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/computer/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../architecture/">
       
       
-        <link rel="next" href="architecture/">
+        <link rel="next" href="../computer-management/">
       
       
         
       
       
-      <link rel="icon" href="../assets/favicon.png">
+      <link rel="icon" href="../../assets/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>概述 - A2C-SMCP Protocol</title>
+        <title>Computer 侧协议框架 - A2C-SMCP Protocol</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +53,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#a2c-smcp-协议概述" class="md-skip">
+        <a href="#computer-侧协议框架" class="md-skip">
           跳转至
         </a>
       
@@ -96,9 +96,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href=".." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
       
-  <img src="../assets/logo-white.svg" alt="logo">
+  <img src="../../assets/logo-white.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              概述
+              Computer 侧协议框架
             
           </span>
         </div>
@@ -228,7 +228,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -251,7 +251,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -271,7 +271,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/computer-mcp-config-guide/" class="md-tabs__link">
+        <a href="../../guides/computer-mcp-config-guide/" class="md-tabs__link">
           
   
   
@@ -291,7 +291,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
+        <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
           
   
   
@@ -311,7 +311,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../appendix/faq/" class="md-tabs__link">
+        <a href="../../appendix/faq/" class="md-tabs__link">
           
   
   
@@ -345,9 +345,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
       
-  <img src="../assets/logo-white.svg" alt="logo">
+  <img src="../../assets/logo-white.svg" alt="logo">
 
     </a>
     A2C-SMCP Protocol
@@ -374,7 +374,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -455,6 +455,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -474,7 +530,7 @@
   <span class="md-ellipsis">
     
   
-    概述
+    Computer 侧协议框架
   
 
     
@@ -492,7 +548,7 @@
   <span class="md-ellipsis">
     
   
-    概述
+    Computer 侧协议框架
   
 
     
@@ -520,10 +576,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#什么是-a2c-smcp" class="md-nav__link">
+  <a href="#1-范围与边界" class="md-nav__link">
     <span class="md-ellipsis">
       
-        什么是 A2C-SMCP
+        1. 范围与边界
       
     </span>
   </a>
@@ -531,22 +587,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#设计目标" class="md-nav__link">
+  <a href="#2-生命周期" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设计目标
+        2. 生命周期
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="设计目标">
+    <nav class="md-nav" aria-label="2. 生命周期">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-多-mcp-服务管理问题" class="md-nav__link">
+  <a href="#21-连接" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 多 MCP 服务管理问题
+        2.1 连接
       
     </span>
   </a>
@@ -554,21 +610,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-工具权限与安全挑战" class="md-nav__link">
+  <a href="#22-加入与离开-office" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. 工具权限与安全挑战
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-网络连接与穿透" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. 网络连接与穿透
+        2.2 加入与离开 Office
       
     </span>
   </a>
@@ -581,22 +626,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#核心概念" class="md-nav__link">
+  <a href="#3-agent-可调用事件面" class="md-nav__link">
     <span class="md-ellipsis">
       
-        核心概念
+        3. Agent 可调用事件面
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心概念">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-mcp-server-管理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. MCP Server 管理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. MCP Server 管理">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#三角色模型" class="md-nav__link">
+  <a href="#41-配置可见性" class="md-nav__link">
     <span class="md-ellipsis">
       
-        三角色模型
+        4.1 配置可见性
       
     </span>
   </a>
@@ -604,10 +660,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#房间隔离模型" class="md-nav__link">
+  <a href="#42-工具列表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        房间隔离模型
+        4.2 工具列表
       
     </span>
   </a>
@@ -615,10 +671,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#事件分类" class="md-nav__link">
+  <a href="#43-资源透明转发" class="md-nav__link">
     <span class="md-ellipsis">
       
-        事件分类
+        4.3 资源透明转发
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-mcp-server-生命周期" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 MCP Server 生命周期
       
     </span>
   </a>
@@ -631,10 +698,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#协议优势总结" class="md-nav__link">
+  <a href="#5-工具执行取消与二进制结果" class="md-nav__link">
     <span class="md-ellipsis">
       
-        协议优势总结
+        5. 工具执行、取消与二进制结果
       
     </span>
   </a>
@@ -642,10 +709,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#文档结构" class="md-nav__link">
+  <a href="#6-desktop-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        文档结构
+        6. Desktop 通道
       
     </span>
   </a>
@@ -653,10 +720,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#与-mcp-的关系" class="md-nav__link">
+  <a href="#7-skill-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        与 MCP 的关系
+        7. SKILL 通道
       
     </span>
   </a>
@@ -664,10 +731,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#下一步" class="md-nav__link">
+  <a href="#8-blob-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        下一步
+        8. Blob 通道
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-更新通知" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 更新通知
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-安全不变量" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 安全不变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-非规范性-sdk-证据摘要" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 非规范性 SDK 证据摘要
       
     </span>
   </a>
@@ -678,62 +778,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    架构设计
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="computer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Computer 侧协议框架
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -803,7 +847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="computer-management/" class="md-nav__link">
+      <a href="../computer-management/" class="md-nav__link">
         
   
   
@@ -831,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="computer-management/protocol/" class="md-nav__link">
+      <a href="../computer-management/protocol/" class="md-nav__link">
         
   
   
@@ -859,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="computer-management/runtime-contract/" class="md-nav__link">
+      <a href="../computer-management/runtime-contract/" class="md-nav__link">
         
   
   
@@ -887,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="computer-management/sdk-api-guidance/" class="md-nav__link">
+      <a href="../computer-management/sdk-api-guidance/" class="md-nav__link">
         
   
   
@@ -915,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="computer-management/conformance-tests/" class="md-nav__link">
+      <a href="../computer-management/conformance-tests/" class="md-nav__link">
         
   
   
@@ -951,7 +995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="events/" class="md-nav__link">
+      <a href="../events/" class="md-nav__link">
         
   
   
@@ -979,7 +1023,7 @@
   
   
     <li class="md-nav__item">
-      <a href="data-structures/" class="md-nav__link">
+      <a href="../data-structures/" class="md-nav__link">
         
   
   
@@ -1007,7 +1051,7 @@
   
   
     <li class="md-nav__item">
-      <a href="desktop/" class="md-nav__link">
+      <a href="../desktop/" class="md-nav__link">
         
   
   
@@ -1035,7 +1079,7 @@
   
   
     <li class="md-nav__item">
-      <a href="skill/" class="md-nav__link">
+      <a href="../skill/" class="md-nav__link">
         
   
   
@@ -1063,7 +1107,7 @@
   
   
     <li class="md-nav__item">
-      <a href="blob-transfer/" class="md-nav__link">
+      <a href="../blob-transfer/" class="md-nav__link">
         
   
   
@@ -1091,7 +1135,7 @@
   
   
     <li class="md-nav__item">
-      <a href="room-model/" class="md-nav__link">
+      <a href="../room-model/" class="md-nav__link">
         
   
   
@@ -1119,7 +1163,7 @@
   
   
     <li class="md-nav__item">
-      <a href="versioning/" class="md-nav__link">
+      <a href="../versioning/" class="md-nav__link">
         
   
   
@@ -1147,7 +1191,7 @@
   
   
     <li class="md-nav__item">
-      <a href="error-handling/" class="md-nav__link">
+      <a href="../error-handling/" class="md-nav__link">
         
   
   
@@ -1175,7 +1219,7 @@
   
   
     <li class="md-nav__item">
-      <a href="security/" class="md-nav__link">
+      <a href="../security/" class="md-nav__link">
         
   
   
@@ -1264,7 +1308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/computer-mcp-config-guide/" class="md-nav__link">
+      <a href="../../guides/computer-mcp-config-guide/" class="md-nav__link">
         
   
   
@@ -1353,7 +1397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
+      <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
         
   
   
@@ -1381,7 +1425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrations/v0.2.1-skill-and-blob-transfer/" class="md-nav__link">
+      <a href="../../migrations/v0.2.1-skill-and-blob-transfer/" class="md-nav__link">
         
   
   
@@ -1470,7 +1514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../appendix/faq/" class="md-nav__link">
+      <a href="../../appendix/faq/" class="md-nav__link">
         
   
   
@@ -1527,10 +1571,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#什么是-a2c-smcp" class="md-nav__link">
+  <a href="#1-范围与边界" class="md-nav__link">
     <span class="md-ellipsis">
       
-        什么是 A2C-SMCP
+        1. 范围与边界
       
     </span>
   </a>
@@ -1538,22 +1582,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#设计目标" class="md-nav__link">
+  <a href="#2-生命周期" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设计目标
+        2. 生命周期
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="设计目标">
+    <nav class="md-nav" aria-label="2. 生命周期">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-多-mcp-服务管理问题" class="md-nav__link">
+  <a href="#21-连接" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 多 MCP 服务管理问题
+        2.1 连接
       
     </span>
   </a>
@@ -1561,21 +1605,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-工具权限与安全挑战" class="md-nav__link">
+  <a href="#22-加入与离开-office" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. 工具权限与安全挑战
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-网络连接与穿透" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. 网络连接与穿透
+        2.2 加入与离开 Office
       
     </span>
   </a>
@@ -1588,22 +1621,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#核心概念" class="md-nav__link">
+  <a href="#3-agent-可调用事件面" class="md-nav__link">
     <span class="md-ellipsis">
       
-        核心概念
+        3. Agent 可调用事件面
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="核心概念">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-mcp-server-管理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. MCP Server 管理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. MCP Server 管理">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#三角色模型" class="md-nav__link">
+  <a href="#41-配置可见性" class="md-nav__link">
     <span class="md-ellipsis">
       
-        三角色模型
+        4.1 配置可见性
       
     </span>
   </a>
@@ -1611,10 +1655,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#房间隔离模型" class="md-nav__link">
+  <a href="#42-工具列表" class="md-nav__link">
     <span class="md-ellipsis">
       
-        房间隔离模型
+        4.2 工具列表
       
     </span>
   </a>
@@ -1622,10 +1666,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#事件分类" class="md-nav__link">
+  <a href="#43-资源透明转发" class="md-nav__link">
     <span class="md-ellipsis">
       
-        事件分类
+        4.3 资源透明转发
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-mcp-server-生命周期" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 MCP Server 生命周期
       
     </span>
   </a>
@@ -1638,10 +1693,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#协议优势总结" class="md-nav__link">
+  <a href="#5-工具执行取消与二进制结果" class="md-nav__link">
     <span class="md-ellipsis">
       
-        协议优势总结
+        5. 工具执行、取消与二进制结果
       
     </span>
   </a>
@@ -1649,10 +1704,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#文档结构" class="md-nav__link">
+  <a href="#6-desktop-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        文档结构
+        6. Desktop 通道
       
     </span>
   </a>
@@ -1660,10 +1715,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#与-mcp-的关系" class="md-nav__link">
+  <a href="#7-skill-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        与 MCP 的关系
+        7. SKILL 通道
       
     </span>
   </a>
@@ -1671,10 +1726,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#下一步" class="md-nav__link">
+  <a href="#8-blob-通道" class="md-nav__link">
     <span class="md-ellipsis">
       
-        下一步
+        8. Blob 通道
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-更新通知" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 更新通知
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-安全不变量" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 安全不变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-非规范性-sdk-证据摘要" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 非规范性 SDK 证据摘要
       
     </span>
   </a>
@@ -1706,7 +1794,7 @@
   
   
     <li class="md-path__item">
-      <a href=".." class="md-path__link">
+      <a href="../.." class="md-path__link">
         
   <span class="md-ellipsis">
     首页
@@ -1724,7 +1812,7 @@
     
     
       <li class="md-path__item">
-        <a href="./" class="md-path__link">
+        <a href="../" class="md-path__link">
           
   <span class="md-ellipsis">
     协议规范
@@ -1749,192 +1837,237 @@
   
 
 
-<h1 id="a2c-smcp-协议概述">A2C-SMCP 协议概述<a class="headerlink" href="#a2c-smcp-协议概述" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>版本</strong>: 0.2.2
-<strong>状态</strong>: Release Candidate
-<strong>最后更新</strong>: 2026-01</p>
-</blockquote>
-<h2 id="什么是-a2c-smcp">什么是 A2C-SMCP<a class="headerlink" href="#什么是-a2c-smcp" title="Permanent link">&para;</a></h2>
-<p>A2C-SMCP（Agent To Computer SMCP）是一种远程工具调用协议，定义了 Agent 与承载多路 MCP Server 的 Computer 之间的通信机制。该协议运行在 Socket.IO 之上，通过事件驱动的方式组织消息，并通过房间（Room/Office）机制实现安全隔离。</p>
-<h2 id="设计目标">设计目标<a class="headerlink" href="#设计目标" title="Permanent link">&para;</a></h2>
-<p>A2C-SMCP 旨在解决传统 MCP 协议在复杂 Agent 系统中的以下关键问题：</p>
-<h3 id="1-多-mcp-服务管理问题">1. 多 MCP 服务管理问题<a class="headerlink" href="#1-多-mcp-服务管理问题" title="Permanent link">&para;</a></h3>
-<p>在企业级 AI 应用中，一个 Agent 通常需要协调多个 MCP 服务：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>传统架构（痛点）：
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Agent ─┬─→ Excel MCP
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>       ├─→ 合同生成 MCP
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>       ├─→ ERP 接口 MCP
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>       └─→ 爬虫工具 MCP
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>问题：
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>• Agent 需单独维护每个 MCP 的生命周期
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>• 任一 MCP 崩溃导致整体流程失败
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>• 空闲 MCP 持续占用系统资源
-</code></pre></div>
-<p>A2C-SMCP 通过引入 Computer 抽象层解决此问题：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>SMCP 架构（解决方案）：
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Agent ──→ Computer ─┬─→ Excel MCP
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                    ├─→ 合同生成 MCP
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                    ├─→ ERP 接口 MCP
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                    └─→ 爬虫工具 MCP
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>优势：
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>• 故障隔离：单个 MCP 崩溃不影响 Computer 整体
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>• 热插拔：动态增删工具无需重启 Agent
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>• 统一监护：Computer 内部实施服务健康监测
-</code></pre></div>
-<h3 id="2-工具权限与安全挑战">2. 工具权限与安全挑战<a class="headerlink" href="#2-工具权限与安全挑战" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>安全问题</th>
-<th>传统 MCP 缺陷</th>
-<th>SMCP 解决方案</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>硬编码 Token</td>
-<td>Token 泄露风险</td>
-<td>零凭证传播：敏感 Token 仅存在本地 Computer</td>
-</tr>
-<tr>
-<td>公网暴露端口</td>
-<td>被攻击风险</td>
-<td>无公网暴露：Computer 通过长连接主动对接</td>
-</tr>
-<tr>
-<td>证书冲突</td>
-<td>版权审计问题</td>
-<td>设备绑定：许可证与特定 Computer 硬件绑定</td>
-</tr>
-</tbody>
-</table>
-<h3 id="3-网络连接与穿透">3. 网络连接与穿透<a class="headerlink" href="#3-网络连接与穿透" title="Permanent link">&para;</a></h3>
-<ul>
-<li>通过 Socket.IO 长连接实现内网穿透</li>
-<li>无需公网 IP 或端口映射</li>
-<li>支持 NAT、防火墙、代理等复杂网络环境</li>
-</ul>
-<h2 id="核心概念">核心概念<a class="headerlink" href="#核心概念" title="Permanent link">&para;</a></h2>
-<h3 id="三角色模型">三角色模型<a class="headerlink" href="#三角色模型" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌─────────┐         ┌─────────┐         ┌─────────┐
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│  Agent  │ ←─────→ │  Server │ ←─────→ │Computer │
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>└─────────┘         └─────────┘         └─────────┘
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>   │                     │                   │
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>   │  工具调用发起方     │  信令服务器        │  MCP 服务管理者
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>   │                     │  连接管理          │  工具执行者
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>   │                     │  消息路由          │
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>   │                     │  通知广播          │
-</code></pre></div>
-<table>
-<thead>
-<tr>
-<th>角色</th>
-<th>数量约束</th>
-<th>职责</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Agent</strong></td>
-<td>每个房间最多 1 个</td>
-<td>工具调用发起方，通常为智能体、机器人</td>
-</tr>
-<tr>
-<td><strong>Server</strong></td>
-<td>全局 1 个（逻辑）</td>
-<td>信令中枢，管理连接、房间、路由与广播</td>
-</tr>
-<tr>
-<td><strong>Computer</strong></td>
-<td>每个房间可多个</td>
-<td>MCP Server 宿主，统一管理和暴露工具</td>
-</tr>
-</tbody>
-</table>
-<h3 id="房间隔离模型">房间隔离模型<a class="headerlink" href="#房间隔离模型" title="Permanent link">&para;</a></h3>
-<p>房间（Office）是逻辑隔离单元，用于约束 Agent 与 Computer 的协作范围：</p>
-<ul>
-<li>每个房间通过 <code>office_id</code> 唯一标识</li>
-<li>一个房间内至多包含 <strong>1 个 Agent</strong> 和 <strong>多个 Computer</strong></li>
-<li>跨房间访问被严格禁止</li>
-</ul>
-<h3 id="事件分类">事件分类<a class="headerlink" href="#事件分类" title="Permanent link">&para;</a></h3>
-<p>所有协议事件通过 Socket.IO 命名空间 <code>/smcp</code> 传输，采用前缀约定：</p>
-<table>
-<thead>
-<tr>
-<th>前缀</th>
-<th>方向</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>client:</code></td>
-<td>Agent → Computer</td>
-<td>工具操作类事件，由 Server 路由转发</td>
-</tr>
-<tr>
-<td><code>server:</code></td>
-<td>客户端 → Server</td>
-<td>房间管理、配置更新类事件</td>
-</tr>
-<tr>
-<td><code>notify:</code></td>
-<td>Server → 广播</td>
-<td>状态变更通知，广播给房间内成员</td>
-</tr>
-</tbody>
-</table>
-<h2 id="协议优势总结">协议优势总结<a class="headerlink" href="#协议优势总结" title="Permanent link">&para;</a></h2>
+<h1 id="computer-侧协议框架">Computer 侧协议框架<a class="headerlink" href="#computer-侧协议框架" title="Permanent link">&para;</a></h1>
+<p>本文定义 A2C-SMCP 中 Computer 的外部可观察行为框架。它把现有事件、数据结构、Desktop、SKILL、Blob、房间与安全章节串成一个合规边界；具体字段与错误码仍以被链接的主题章节为准。</p>
+<h2 id="1-范围与边界">1. 范围与边界<a class="headerlink" href="#1-范围与边界" title="Permanent link">&para;</a></h2>
+<p>Computer 是 Agent 与一个或多个 MCP Server 之间的协议桥。合规 Computer 的协议职责是：</p>
 <ol>
-<li><strong>工具热管理</strong>: 动态发现/注册工具，配置热更新</li>
-<li><strong>安全隔离</strong>: 基于房间的权限边界，Agent-Computer 绑定</li>
-<li><strong>网络穿透</strong>: Socket.IO 长连接，免除公网 IP 依赖</li>
-<li><strong>弹性架构</strong>: 多 Computer 支持，分布式工具部署</li>
-<li><strong>标准化接口</strong>: 强类型数据结构，明确的事件边界</li>
+<li>以 <code>auth.role = "computer"</code> 连接 <code>/smcp</code> 命名空间，并通过 <code>server:join_office</code> 加入一个 Office。</li>
+<li>接收 Server 路由的 <code>client:*</code> 事件，执行本地 MCP / SKILL / Blob / Desktop 行为，并在 ack 通道返回成功响应或协议级错误。</li>
+<li>在自身可见能力发生变化时，通过 <code>server:update_*</code> 事件请求 Server 向 Office 广播 <code>notify:update_*</code>。</li>
+<li>持有 MCP Server 凭据与本地资源访问权，但不得把凭据或任意文件读能力暴露给 Agent。</li>
 </ol>
-<h2 id="文档结构">文档结构<a class="headerlink" href="#文档结构" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="architecture/">架构设计</a> - 角色关系与通信模型</li>
-<li><a href="computer/">Computer 侧协议框架</a> - Computer 生命周期、事件面、MCP/SKILL/Desktop/Blob 行为边界</li>
-<li><a href="computer-management/">Computer Management Plane</a> - 管理面与 Agent-facing 协议面的边界、投影规则与 SDK guidance</li>
-<li><a href="events/">事件定义</a> - 完整事件列表与规范</li>
-<li><a href="data-structures/">数据结构</a> - 请求/响应数据结构定义</li>
-<li><a href="desktop/">Desktop 桌面系统</a> - Window URI 规范、桌面组织策略与更新机制</li>
-<li><a href="room-model/">房间模型</a> - 房间隔离机制详解</li>
-<li><a href="error-handling/">错误处理</a> - 错误码与响应格式</li>
-<li><a href="security/">安全考虑</a> - 安全性要求与建议</li>
-</ul>
-<h2 id="与-mcp-的关系">与 MCP 的关系<a class="headerlink" href="#与-mcp-的关系" title="Permanent link">&para;</a></h2>
-<p>A2C-SMCP 构建于 MCP 协议之上：</p>
-<ul>
-<li><strong>MCP Server 开发者</strong>: 无需任何改动，现有 MCP Server 可直接被 Computer 管理；MCP Server 还可通过暴露 <code>window://</code> 资源参与 <a href="desktop/">Desktop 桌面系统</a>，无需任何 SMCP 特定改动。结构化文档分发（PDF / Excel / PPT 等）见独立的 <a href="https://github.com/A2C-SMCP/dpe-protocol">DPE 协议</a></li>
-<li><strong>Agent 开发者</strong>: 仅需实现 SMCP 协议接口，无需关心底层 MCP 细节</li>
-<li><strong>工具调用</strong>: Agent → SMCP → Computer → MCP → 工具</li>
-</ul>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Agent 视角：
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>┌──────────────────────────────────────────────┐
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>│                  A2C-SMCP                    │
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│  ┌────────┐    ┌────────┐    ┌────────────┐ │
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│  │ Agent  │───→│ Server │───→│  Computer  │ │
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│  └────────┘    └────────┘    └────────────┘ │
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>└──────────────────────────────────────────────┘
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>                                      │
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>                               ┌──────┴──────┐
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>                               ▼             ▼
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                          ┌────────┐    ┌────────┐
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                          │MCP Srv1│    │MCP Srv2│
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                          └────────┘    └────────┘
+<p>本页不规定本地 class、trait、线程模型、进程监护、缓存布局、文件 watcher、debounce 时间、CLI UX 或 SDK helper API。只要 wire 行为、事件、响应、错误与安全边界一致，实现可以自由选择内部结构。</p>
+<p>可信本地客户端若需要管理 MCP Server 启停、SKILL 暴露、marketplace 或 plugin，应使用独立的 <a href="../computer-management/">Computer Management Plane</a>。该管理面修改 Computer desired state；本页只规定这些修改完成后 Agent 可观察的协议投影。</p>
+<h2 id="2-生命周期">2. 生命周期<a class="headerlink" href="#2-生命周期" title="Permanent link">&para;</a></h2>
+<h3 id="21-连接">2.1 连接<a class="headerlink" href="#21-连接" title="Permanent link">&para;</a></h3>
+<p>Computer MUST 按 <a href="../events/#连接握手">事件定义 §连接握手</a> 携带 <code>a2c_version</code> URL query，并在 Socket.IO <code>auth</code> 对象中声明：</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;computer&quot;</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
-<h2 id="下一步">下一步<a class="headerlink" href="#下一步" title="Permanent link">&para;</a></h2>
-<ul>
-<li>深入了解：阅读 <a href="architecture/">架构设计</a> 和 <a href="events/">事件定义</a></li>
-<li>常见问题：查看 <a href="../appendix/faq/">FAQ</a></li>
-</ul>
+<p>Computer MAY 在 <code>auth</code> 中携带业务鉴权字段。协议不规定这些字段的名字、位置或认证算法，但 Computer SDK MUST NOT 把 MCP Server 凭据、<code>.skillenv</code> 内容或其它本地 secret 放入 <code>auth</code>。</p>
+<h3 id="22-加入与离开-office">2.2 加入与离开 Office<a class="headerlink" href="#22-加入与离开-office" title="Permanent link">&para;</a></h3>
+<p>Computer MUST 使用 <code>server:join_office</code> 发送 <code>EnterOfficeReq</code>，其中 <code>role</code> MUST 为 <code>"computer"</code>，<code>name</code> 是该 Computer 在 Server 路由中的标识。Server 负责单 Office 绑定与跨房间隔离，见 <a href="../room-model/">房间隔离模型</a>。</p>
+<p>Computer SHOULD 在成功加入 Office 后才发送 <code>server:update_config</code>、<code>server:update_tool_list</code>、<code>server:update_desktop</code> 或 <code>server:update_skills</code>。未加入 Office 时，本地变化可以被记录或合并，但不应产生跨房间可见通知。</p>
+<p>Computer 离开 Office 或断连后，Server MUST 停止向该 Computer 路由新的 <code>client:*</code> 事件。Computer 对已转发且仍在执行的工具调用是否继续运行属于本地副作用策略；若能返回原 ack，则终态仍 MUST 使用本协议定义的 <code>CallToolResult</code> 形状。</p>
+<h2 id="3-agent-可调用事件面">3. Agent 可调用事件面<a class="headerlink" href="#3-agent-可调用事件面" title="Permanent link">&para;</a></h2>
+<p>Computer MUST 实现下列 Server 路由来的 <code>client:*</code> 事件：</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Computer 行为</th>
+<th>成功响应</th>
+<th>失败响应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client:tool_call</code></td>
+<td>路由到目标 MCP Server 工具并执行</td>
+<td>MCP <code>CallToolResult</code></td>
+<td>工具失败仍为 <code>CallToolResult.isError=true</code></td>
+</tr>
+<tr>
+<td><code>client:get_tools</code></td>
+<td>返回当前可用工具聚合视图</td>
+<td><code>GetToolsRet</code></td>
+<td>flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_config</code></td>
+<td>返回 Agent 可见配置</td>
+<td><code>GetComputerConfigRet</code></td>
+<td>flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_desktop</code></td>
+<td>返回 <code>window://</code> 聚合 Desktop</td>
+<td><code>GetDeskTopRet</code></td>
+<td>flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_resources</code></td>
+<td>透明转发指定 MCP Server 的 <code>resources/list</code></td>
+<td><code>GetResourcesRet</code></td>
+<td><code>4014</code> / <code>4015</code> flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_skills</code></td>
+<td>返回当前活跃 SKILL 元数据清单</td>
+<td><code>GetSkillsRet</code></td>
+<td>flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_skill</code></td>
+<td>返回单个 SKILL 包内资源</td>
+<td><code>GetSkillRet</code></td>
+<td><code>4016</code> / <code>4014</code> / <code>4017</code> flat <code>ErrorPayload</code></td>
+</tr>
+<tr>
+<td><code>client:get_blob</code></td>
+<td>按 <code>blob_handle</code> 分块拉取字节</td>
+<td><code>GetBlobRet</code></td>
+<td><code>4018</code> flat <code>ErrorPayload</code></td>
+</tr>
+</tbody>
+</table>
+<p>所有 <code>client:*</code> 事件中的 <code>computer</code> 字段 MUST 与接收方 Computer 的协议名一致。不一致时 Computer MUST NOT 执行目标行为；实现可以返回协议级错误或让路由层失败。Server 仍 MUST 执行同房间路由校验，Computer 侧校验只是防御纵深。</p>
+<p>除 <code>client:tool_call</code> 的工具级失败外，协议级错误 MUST 使用 <a href="../error-handling/#错误响应格式">错误处理 §错误响应格式</a> 的 flat <code>ErrorPayload</code>，不得包装为 <code>{"error": ...}</code>。</p>
+<h2 id="4-mcp-server-管理">4. MCP Server 管理<a class="headerlink" href="#4-mcp-server-管理" title="Permanent link">&para;</a></h2>
+<p>Computer 负责把本地 MCP Server 配置转化为 Agent 可见的工具、资源和窗口视图。</p>
+<h3 id="41-配置可见性">4.1 配置可见性<a class="headerlink" href="#41-配置可见性" title="Permanent link">&para;</a></h3>
+<p><code>client:get_config</code> MUST 返回 Agent 可以安全观察的 <code>servers</code> 与 <code>inputs</code> 结构。Computer MUST NOT 在响应中展开 secret 值、<code>.skillenv</code> 内容、OAuth token、API key、环境变量实际值或本地凭据文件内容。</p>
+<p>输入占位符、env 文件、secret store、value cache 的解析顺序属于 SDK guidance；协议只要求最终 wire 响应不泄露凭据，且工具启动时所需 secret 仅在 Computer 本地解析。</p>
+<h3 id="42-工具列表">4.2 工具列表<a class="headerlink" href="#42-工具列表" title="Permanent link">&para;</a></h3>
+<p>Computer MUST 从已启用且可用的 MCP Server 收集工具并返回 <code>SMCPTool</code>。当工具需要附加 A2C 元数据时，Computer MUST 使用 <a href="../data-structures/#smcptoolmeta-序列化规范">SMCPTool.meta 序列化规范</a>，把复杂结构放在 <code>meta["a2c_tool_meta"]</code> JSON 字符串中。</p>
+<p>当不同 MCP Server 暴露同名工具时，Computer MUST 保证 Agent 看到的工具名可路由到唯一目标，或通过禁用 / 别名 / 配置拒绝使冲突不可见。具体冲突解决 UX 属 SDK guidance；可观察结果不能让同一个 <code>tool_name</code> 随机路由到不同 MCP Server。</p>
+<h3 id="43-资源透明转发">4.3 资源透明转发<a class="headerlink" href="#43-资源透明转发" title="Permanent link">&para;</a></h3>
+<p><code>client:get_resources</code> 是指定 MCP Server 的单页 <code>resources/list</code> 透明转发。Computer MUST NOT 按 scheme、<code>_meta</code>、<code>annotations</code> 或内容过滤该响应，也 MUST NOT 做跨 Server 聚合。未知 <code>mcp_server</code> MUST 返回 <code>4014</code>；目标 MCP Server 未声明 <code>resources</code> capability MUST 返回 <code>4015</code>。</p>
+<h3 id="44-mcp-server-生命周期">4.4 MCP Server 生命周期<a class="headerlink" href="#44-mcp-server-生命周期" title="Permanent link">&para;</a></h3>
+<p>Computer MAY 支持在运行中新增、更新、禁用或移除 MCP Server。协议不规定这些操作的本地入口，但一旦操作完成，Agent 可见状态 MUST 与新配置一致：</p>
+<ol>
+<li>新增或重新启用 MCP Server 后，其可见工具、资源、窗口与 SKILL SHOULD 能通过对应 <code>client:get_*</code> 事件发现。</li>
+<li>更新 MCP Server 配置后，旧配置中不再可用的工具、资源、窗口与 SKILL MUST NOT 继续作为可调用能力暴露。</li>
+<li>禁用或移除 MCP Server 后，Computer MUST NOT 执行该 Server 的工具；相关工具 MUST 从后续 <code>client:get_tools</code> 响应中消失，相关 MCP source SKILL MUST 从后续 <code>client:get_skills</code> 响应中消失或被标记为不可见孤儿。</li>
+<li>被配置为 disabled 或 forbidden 的工具 MUST NOT 出现在可调用工具列表中，也 MUST NOT 被 <code>client:tool_call</code> 成功执行。</li>
+<li>当生命周期变化影响 Agent 可见状态时，Computer SHOULD 发送相应 <code>server:update_config</code>、<code>server:update_tool_list</code>、<code>server:update_desktop</code> 或 <code>server:update_skills</code>。</li>
+</ol>
+<p>进程启动方式、重启策略、健康检查周期、自动重连、退避算法与本地错误恢复属于 SDK guidance；协议只规定变化完成后的可见状态和通知义务。</p>
+<h2 id="5-工具执行取消与二进制结果">5. 工具执行、取消与二进制结果<a class="headerlink" href="#5-工具执行取消与二进制结果" title="Permanent link">&para;</a></h2>
+<p><code>client:tool_call</code> MUST 返回 MCP <code>CallToolResult</code>。工具自身失败、上游执行失败、授权失败、超时与取消都不得改变 <code>CallToolResult</code> 的基本 MCP 形状。</p>
+<p>Computer SHOULD 在工具调用超时时尝试中断底层执行，并在结果级 <code>meta</code> 写入 <code>a2c_timeout = true</code>。Agent 发出的 <code>server:tool_call_cancel</code> 经 Server 广播为 <code>notify:tool_call_cancel</code>；Computer 收到后 MUST 按 <code>req_id</code> 尝试取消本机在途调用。未知或已完成的 <code>req_id</code> MUST 作为幂等 no-op 处理，不返回错误。</p>
+<p>取消成功时，原 <code>client:tool_call</code> 的 ack MUST 返回 <code>CallToolResult(isError=true)</code>，并在结果级 <code>meta</code> 写入 <code>a2c_cancelled = true</code>，SHOULD 写入 <code>a2c_cancel_reason = "agent_requested"</code>。</p>
+<p>当 <code>CallToolResult</code> 中的二进制 content item 超过内联预算时，Computer MUST 按 <a href="../blob-transfer/#5-生产者通道接入契约">通用二进制传输 §生产者通道接入契约</a> 铸造 <code>blob_handle</code>，在 content item <code>_meta</code> 写入 <code>a2c_blob_handle</code>、<code>a2c_total_size</code>、<code>a2c_sha256</code>，并清空该 item 的内联字节载体。小尺寸二进制 MAY 保持内联。</p>
+<h2 id="6-desktop-通道">6. Desktop 通道<a class="headerlink" href="#6-desktop-通道" title="Permanent link">&para;</a></h2>
+<p>Computer MUST 把 MCP Server 暴露的 <code>window://</code> Resource 聚合为 Desktop，行为见 <a href="../desktop/">Desktop 桌面系统</a>。</p>
+<p>框架层要求如下：</p>
+<ol>
+<li><code>client:get_desktop</code> 未带 <code>window</code> 时返回聚合视图；带 <code>window</code> 时按完整 URI 字符串精确匹配。</li>
+<li>Computer MUST 跳过无效 <code>window://</code> URI、空内容窗口以及当前无法渲染的纯 Blob 窗口。</li>
+<li>Computer MUST 使用 Resource <code>annotations.priority</code> 与 <code>_meta.fullscreen</code> 的协议语义组织结果。</li>
+<li>当窗口集合或内容发生变化且 Computer 已在 Office 内时，Computer SHOULD 发送 <code>server:update_desktop</code>。</li>
+</ol>
+<p>资源缓存、订阅管理、debounce 与读取失败重试属于 SDK guidance。</p>
+<h2 id="7-skill-通道">7. SKILL 通道<a class="headerlink" href="#7-skill-通道" title="Permanent link">&para;</a></h2>
+<p>Computer 是 SKILL 管理者。它 MUST 对 Agent 暴露统一的 <code>A2CSkillRef</code> 清单与单资源读取接口，而不要求 Agent 理解 source 的本地物化细节。</p>
+<p>框架层要求如下：</p>
+<ol>
+<li><code>client:get_skills</code> MUST 只返回活跃、已物化、可用的 SKILL；孤儿 SKILL MUST 被排除。</li>
+<li><code>client:get_skill</code> MUST 先校验 name lexer；非法 name 返回 <code>4016</code>。</li>
+<li>合法但未注册、已卸载或已孤儿的 name MUST 返回 <code>4014</code>，并把 name 放入 <code>details</code>。</li>
+<li><code>rel_path</code> MUST 限制在 SKILL 包根内；路径穿越、<code>.skillenv</code>、凭据类文件、包内不存在或超过生产者上限 MUST 返回 <code>4017</code>。</li>
+<li>成功时 <code>body</code> 与 <code>blob_handle</code> MUST 恰一存在；二进制或过大文本 MUST 转 <code>client:get_blob</code>。</li>
+</ol>
+<p>SKILL Home 路径、marketplace 安装 UX、文件 watcher、staging 目录布局、孤儿清理时机属于 SDK guidance；Agent 可见行为以 <a href="../skill/">SKILL 通道</a> 为准。</p>
+<h2 id="8-blob-通道">8. Blob 通道<a class="headerlink" href="#8-blob-通道" title="Permanent link">&para;</a></h2>
+<p>Computer MUST 实现 <code>client:get_blob</code>。<code>blob_handle</code> 对 Agent 是不透明能力引用；Agent MUST NOT 解析、拼接、伪造或跨 Computer 复用。</p>
+<p>Computer 每次处理 <code>client:get_blob</code> 时 MUST：</p>
+<ol>
+<li>解析句柄并识别生产者通道。</li>
+<li>重施铸造通道的授权与边界校验。</li>
+<li>使用资源字节的绝对 <code>chunk_offset</code> 切片。</li>
+<li>返回全量 <code>total_size</code> 与 <code>sha256</code>，并把本块字节 base64 放入 <code>blob</code>。</li>
+<li>对无效句柄、重施鉴权失败、源消失或范围错误返回 <code>4018</code>。</li>
+</ol>
+<p>Computer MUST NOT 把 <code>client:get_blob</code> 实现为任意本地文件读取接口。</p>
+<h2 id="9-更新通知">9. 更新通知<a class="headerlink" href="#9-更新通知" title="Permanent link">&para;</a></h2>
+<p>Computer 在可见状态变化后 SHOULD 使用下列表达式通知 Server；Server 再广播对应 <code>notify:*</code>：</p>
+<table>
+<thead>
+<tr>
+<th>Computer 触发</th>
+<th>Server 广播</th>
+<th>典型触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server:update_config</code></td>
+<td><code>notify:update_config</code></td>
+<td>MCP Server 配置或 Agent 可见 inputs 变化</td>
+</tr>
+<tr>
+<td><code>server:update_tool_list</code></td>
+<td><code>notify:update_tool_list</code></td>
+<td>工具集合、别名、禁用状态或元数据变化</td>
+</tr>
+<tr>
+<td><code>server:update_desktop</code></td>
+<td><code>notify:update_desktop</code></td>
+<td><code>window://</code> 集合或内容变化</td>
+</tr>
+<tr>
+<td><code>server:update_skills</code></td>
+<td><code>notify:update_skills</code></td>
+<td>SKILL 集合、frontmatter 或可读资源变化</td>
+</tr>
+</tbody>
+</table>
+<p>协议不规定 debounce/coalescing 时间。合规实现可以合并多次本地变化，但 SHOULD 保证 Agent 最终能通过对应 <code>client:get_*</code> 拉到新状态。</p>
+<h2 id="10-安全不变量">10. 安全不变量<a class="headerlink" href="#10-安全不变量" title="Permanent link">&para;</a></h2>
+<p>Computer MUST 遵守下列安全不变量：</p>
+<ol>
+<li>不向 Agent 传播 MCP Server token、OAuth credential、API key、<code>.skillenv</code>、用户密码或本地 secret store 值。</li>
+<li>不允许 Agent 通过 SKILL / Blob / Desktop / Resource 通道读取任意本地文件。</li>
+<li>不信任 <code>blob_handle</code> 内部内容；句柄解析后仍必须重新执行源通道边界校验。</li>
+<li>不把敏感信息放入 <code>ErrorPayload.details</code>、工具错误文本或 update notification。</li>
+<li>不绕过 Server 房间隔离；任何可见状态都必须限定在当前 Office 路由内。</li>
+</ol>
+<h2 id="11-非规范性-sdk-证据摘要">11. 非规范性 SDK 证据摘要<a class="headerlink" href="#11-非规范性-sdk-证据摘要" title="Permanent link">&para;</a></h2>
+<p>本框架参考了以下实现路径：</p>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>Python SDK</th>
+<th>Rust SDK</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client:*</code> handler</td>
+<td><code>a2c_smcp/computer/socketio/client.py</code></td>
+<td><code>crates/smcp-computer/src/socketio_client.rs</code></td>
+<td>事件面基本共享</td>
+</tr>
+<tr>
+<td>SKILL registry / sandbox</td>
+<td><code>a2c_smcp/computer/skills/*</code></td>
+<td><code>crates/smcp-computer/src/skills/*</code></td>
+<td>4016/4017/孤儿排除共享</td>
+</tr>
+<tr>
+<td>Blob handle / resolver</td>
+<td><code>a2c_smcp/computer/blob/*</code></td>
+<td><code>crates/smcp-computer/src/blob/*</code></td>
+<td>4018 与重施鉴权共享</td>
+</tr>
+<tr>
+<td>Desktop organize</td>
+<td><code>a2c_smcp/computer/desktop/*</code></td>
+<td><code>crates/smcp-computer/src/desktop/*</code></td>
+<td><code>window</code>、priority、fullscreen 语义共享</td>
+</tr>
+<tr>
+<td>取消 / 超时</td>
+<td><code>Computer.aexecute_tool</code> / <code>acancel_tool</code></td>
+<td><code>Computer::execute_tool_cancellable</code></td>
+<td><code>a2c_cancelled</code> / <code>a2c_timeout</code> 共享</td>
+</tr>
+</tbody>
+</table>
+<p>这些路径只作为行为证据，不把其中的 class、trait、锁、缓存或本地路径提升为协议义务。</p>
 
 
 
@@ -2008,10 +2141,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
