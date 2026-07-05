@@ -181,6 +181,8 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 4. Boot reconcile MUST 幂等且 additive-only；删除 MUST 走独立显式路径（prune / gc），MUST NOT 作为 reconcile 的副作用。
 5. settings / plugin-marketplace / MCP 三条 reconcile pipeline MAY 各自独立执行；本 contract 不要求把它们合并为单一 reconcile。
 
+> **归属恢复 vs 进程拉起（client-owns-MCP-config 边界）**：上文“完整包含 bundled MCP Server”约束的是**归属与身份**——重建后它 MUST 可作为纯函数从意图 + 账本推导（§4.8.2 / §4.8.3），使调用方无需内存 ownership map。但 bundled MCP server 的**进程拉起 / 物化**MAY 需要调用方提供物化 hooks：当 SDK 约定 MCP server 物化归客户端所有（client owns MCP config）时，SDK MUST 使 enabled bundled server **可查询**（供客户端据此物化，或经治理恢复接口显式拉起），但 MAY 不在 boot 内直接启动其进程。此边界 MUST NOT 退化为“调用方凭内存 map 猜归属”。
+
 ### 4.9 物化账本地位与运行期稳定性
 
 本 contract 不要求存在 lock 或物化账本文件。复现性 MUST 来自持久化的声明式意图 + reconcile 重解析（`latest-compatible`）：相同意图在同一或不同机器上重建，MUST 产出等价活跃集（marketplace 按声明 ref 解析当前条目，允许上游漂移）。
