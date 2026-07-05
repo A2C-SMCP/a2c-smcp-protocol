@@ -49,7 +49,6 @@ SDK SHOULD 接受 runtime options，用于表达环境相关行为：
 | 选项族 | 稳定语义预期 |
 |---|---|
 | home | 可选本地 Computer home 或 storage root |
-| workdirs | 用于 capability discovery 的 registered workdirs |
 | secret providers | 本地 input/secret resolver hooks |
 | auth payload provider | 用于添加非 A2C 业务 auth fields 的 callback 或 value |
 | network options | Socket.IO path、namespace、transport、timeout 和 reconnect options |
