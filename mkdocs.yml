@@ -110,18 +110,10 @@ nav:
       - Computer 侧协议框架: specification/computer.md
       - Computer Management Plane:
           - 概览: specification/computer-management/index.md
-          - Lifecycle: specification/computer-management/lifecycle.md
-          - Connection: specification/computer-management/connection.md
-          - Capability Sources: specification/computer-management/capability-sources.md
-          - MCP Server: specification/computer-management/mcp-server.md
-          - Tool Exposure: specification/computer-management/tool-exposure.md
-          - SKILL Exposure: specification/computer-management/skill-exposure.md
-          - Marketplace: specification/computer-management/marketplace.md
-          - Plugin: specification/computer-management/plugin.md
-          - Inputs and Secrets: specification/computer-management/inputs-and-secrets.md
-          - Reconcile and Notifications: specification/computer-management/reconcile-and-notifications.md
-          - Management Errors: specification/computer-management/errors.md
-          - Management Security: specification/computer-management/security.md
+          - 管理面协议边界: specification/computer-management/protocol.md
+          - 运行时契约: specification/computer-management/runtime-contract.md
+          - SDK API 指南: specification/computer-management/sdk-api-guidance.md
+          - 一致性测试: specification/computer-management/conformance-tests.md
       - 事件定义: specification/events.md
       - 数据结构: specification/data-structures.md
       - Desktop 桌面系统: specification/desktop.md
