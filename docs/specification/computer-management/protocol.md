@@ -91,7 +91,7 @@ Computer MAY 对多次本地变化做 debounce 或 coalesce，但 SHOULD 保证 
 
 Marketplace 和 plugin 是管理面概念，不是新的 Agent-facing 协议对象。
 
-当 plugin 被安装或启用时，它提供的 managed capability MUST reconcile 到既有协议表面：
+当 plugin 被**启用**（enable）时，它提供的 managed capability MUST reconcile 到既有协议表面（仅安装、未启用的 plugin MUST NOT 投影，见 [runtime-contract §2.4](runtime-contract.md)）：
 
 | Plugin 贡献 | 投影表面 |
 |---|---|

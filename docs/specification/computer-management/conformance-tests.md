@@ -22,7 +22,8 @@
   "name": "computer-a",
   "mcp_servers": [],
   "inputs": [],
-  "plugins": {},
+  "installedPlugins": [],
+  "enabledPlugins": {},
   "marketplaces": {}
 }
 ```
@@ -102,21 +103,28 @@
       "autoUpdate": false
     }
   },
-  "plugins": {
+  "installedPlugins": ["audit@acme"],
+  "enabledPlugins": {
     "audit@acme": true
   }
 }
 ```
 
-期望：
+期望（`installed_enabled`，如上 fixture）：
 
 - startup reconcile 是 additive；
 - enabled plugin SKILLs 出现在 `client:get_skills` 中；
 - plugin-contributed MCP servers 通过常规 config/tool projection 出现；
-- 禁用 `audit@acme` 会移除或隐藏其贡献的 capabilities；
+- 禁用 `audit@acme`（`enabledPlugins: {"audit@acme": false}`）会移除或隐藏其贡献的 capabilities，但保留其 installation；
 - 仅移除 declaration 不会删除已物化 marketplace，直到显式 prune/gc；
 - **重启恢复**：以相同 `home` 重建 runtime、执行 boot/reconcile 后，`audit@acme` 的 bundled MCP servers、bundled SKILLs 及其派生 MCP-source SKILLs 重新出现，且无需调用方在内存中记忆归属；
 - **Scope 隔离**：plugin 全局安装、仅在某 scope 启用时，未启用的 scope 的活跃集不出现该 plugin 贡献的能力。
+
+期望（`installed_disabled`，把 fixture 改为 `"installedPlugins": ["audit@acme"]` 且 `enabledPlugins` 不含 `audit@acme`）：
+
+- `audit@acme` 出现在已安装列表（installed），但其 SKILLs **不**出现在 `client:get_skills`、bundled MCP server **不**出现在活跃 config/tool projection——即 `install` ≠ activate；
+- **重启恢复保持惰性**：以相同 `home` 重建、boot/reconcile 后，`audit@acme` 仍在已安装列表且仍**不**投影任何能力（不会因重启被激活）；
+- 随后 `enable`（`enabledPlugins: {"audit@acme": true}`）后，其 SKILLs 与 bundled server **一并**出现；若 enable 期间 bundled server 挂载失败，MUST 回滚到 `installed_disabled`（不留「skill 亮、server 未挂」的半态）。
 
 ### 2.5 Secret Inputs
 
@@ -268,8 +276,11 @@
 - Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
 - Plugin uninstall 会移除其 records，并 teardown owned bundled MCP servers，除非显式选择 keep-server policy。
 - Plugin-scoped inputs 会在 plugin server config rendering 前注入。
-- 命令式 install/enable 先写声明式意图（config-first）：安装后 `enabledPlugins`（或等价 per-scope 意图）反映该 plugin，物化账本只作为下游派生物出现。
-- 重启恢复：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
+- 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
+- **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。
+- **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；enable 时 bundled server 挂载失败 MUST 回滚到 `installed_disabled`（不留半态）。
+- 重启恢复（enabled）：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
+- 重启恢复（installed_disabled）：仅 `install`（未 `enable`）后以相同 `home` 重建，boot 后该 plugin 仍在已安装列表但保持惰性——不出现在活跃 skills/servers。
 - disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。
 - 给定 `{settings.json + .mcp.json + 已安装 plugin 目录}` fixture，boot 后的活跃 `{skills, servers}` 集合与来源标注与期望一致。
 - 存储的 install 路径失效时，boot 由 `(marketplace, plugin, version)` 纯函数重算，恢复不受影响。

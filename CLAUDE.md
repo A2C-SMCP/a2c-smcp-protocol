@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **A2C-SMCP Protocol Specification** repository - a documentation-only repo defining how Agents and Computers communicate through a Socket.IO-based remote tool invocation protocol. The deliverable is the specification documents themselves, built using MkDocs and deployed to both GitHub Pages and doc.turingfocus.cn.
 
-**Current Version**: 0.2.3
+**Current Version**: 0.3.0-dev
 
 ## Repository Structure
 

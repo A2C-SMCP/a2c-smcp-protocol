@@ -63,7 +63,7 @@ extra:
   version:
     provider: mike
     alias: true
-  announce: "A2C-SMCP 协议规范文档 - 最新版本：0.2.3"
+  announce: "A2C-SMCP 协议规范文档 - 本文档版本：0.3.0-dev"
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/A2C-SMCP
@@ -128,5 +128,6 @@ nav:
   - 迁移指南:
       - v0.2 升级指南: migrations/v0.2-uri-metadata-refactor.md
       - v0.2.1 SKILL/二进制传输适配: migrations/v0.2.1-skill-and-blob-transfer.md
+      - v0.3.0 plugin install/enable 分离: migrations/v0.3.0-plugin-install-enable-separation.md
   - 附录:
       - 常见问题: appendix/faq.md

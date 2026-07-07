@@ -107,8 +107,8 @@ SDK 应提供一个终止性的 cleanup 操作。完成后：
 
 | 操作 | 指南 |
 |---|---|
-| install | 物化 plugin、校验 manifest、预检 MCP name conflicts、注册 SKILL/MCP/input contributions |
-| enable | 标记 plugin enabled 并 reconcile contributions |
+| install | 物化 plugin、写 `installedPlugins` 意图、校验 manifest、预检 MCP name conflicts；**MUST NOT 激活**（SKILL/MCP/input contributions 待 enable 才注册） |
+| enable | 标记 plugin enabled（写 `enabledPlugins=true`）并 reconcile contributions（skills 与 bundled server 原子一并） |
 | disable | 标记 plugin disabled，并使 contributions 不可见/不可调用 |
 | uninstall | 移除 plugin records 并 teardown owned contributions，除非调用方选择 keep-server policy |
 | info/list | 仅向 trusted caller 返回 management diagnostics 和 provenance |
