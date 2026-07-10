@@ -330,7 +330,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
     # ── 物化输出 ──────────────────────────────────────
     path: str                       # 必选：Computer 本地绝对目录路径
                                     # staging 落盘是所有 source 的统一第一步，故恒存在
-                                    # 面向 Agent SDK（脚本执行/文件访问）；LLM 永不可见（§9.1）
+                                    # 面向 Agent SDK（脚本执行/文件访问）；渲染期可经 ${TFROBOT_SKILL_DIR} 展开为 LLM-facing（§9.1/§9.4）
 
     # ── SKILL.md frontmatter 派生（marketplace §3.1 的 6 字段，无 version）──
     description: str                # 必选：marketplace §3.1
@@ -349,7 +349,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 |---|---|:---:|---|
 | `name` | `str` | ✅ **必选** | 合成全局唯一名，跨工具对齐裸名（marketplace `<plugin>:<skill>` / user `<skill>` / mcp `mcp:<server>:<skill>`，§1）。协议主键，Agent 当不透明可比较字符串 |
 | `source` | `str` | ✅ **必选** | 完整来源 provenance（`mcp:tfrobot-tools` / `marketplace:acme-skills` / `user`） |
-| `path` | `str` | ✅ **必选** | Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问，LLM 永不可见（§9.1） |
+| `path` | `str` | ✅ **必选** | Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问；可执行分叉下经 `${TFROBOT_SKILL_DIR}` 渲染期展开 MAY LLM-facing（§9.1/§9.4） |
 | `description` | `str` | ✅ **必选** | SKILL.md frontmatter 强制字段（marketplace §3.1）；跨三 source 均存在 |
 | `uri` | `str` | ⬜ 可选 | **仅 MCP 来源**：`skill://host/skill-name`，次要身份（§2） |
 | `license` | `str` | ⬜ 可选 | frontmatter |
@@ -374,7 +374,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
 !!! note "`path` 恒存在（不存在"无 baseDir"形态）"
 
-    Computer 是 SKILL 管理者（理念 #2），所有 source（MCP / marketplace / 用户）落地的统一第一步都是 staging 物化到本地安装目录（§4 / §5）。因此**任何进入 Skill Registry 的 SKILL 必有可读本地目录**——`path` 是必选字段。该字段面向 Agent SDK 的脚本执行与文件访问；LLM-facing 流程仍只用 `name` + body（§9.1）。
+    Computer 是 SKILL 管理者（理念 #2），所有 source（MCP / marketplace / 用户）落地的统一第一步都是 staging 物化到本地安装目录（§4 / §5）。因此**任何进入 Skill Registry 的 SKILL 必有可读本地目录**——`path` 是必选字段。该字段面向 Agent SDK 的脚本执行与文件访问；可执行分叉（§9.3）下 Agent SDK 可在渲染期把它展开进 `${TFROBOT_SKILL_DIR}` 供 LLM 构造 Bash 命令（§9.4）。硬秘密边界是 `.skillenv`，非目录路径。
 
 !!! note "为什么没有 raw `mcp_server` 字段"
 
@@ -643,7 +643,7 @@ A2C-SMCP SKILL 通道继承 [marketplace SKILL v1 §1.2 三条强制安全原则
 
 | 原则 | A2C v0.2 通道落位 |
 |---|---|
-| **SKILL 资源访问受控** | LLM 只见 URI 与 SKILL.md body；`path` 仅给 Agent SDK；脚本执行 env 注入由 Computer 完成 |
+| **SKILL 资源访问受控** | 内容访问经 `client:get_skill` 单一通道：按 `name` 寻址 + `rel_path` 沙箱（§9.2），Skill Registry 是唯一 name→path 映射源。可执行分叉（§9.3）下 skill **目录路径 MAY LLM-facing**（`path` / `${TFROBOT_SKILL_DIR}` 渲染期展开的真实绝对目录，§9.4）——Bash 执行 `scripts/` 的必要条件；硬秘密边界是 `.skillenv`（见下方原则三），非目录路径 |
 | **加载方不持久化 SKILL** | A2C-SMCP Computer **是**已授权加载方，物化到 SKILL 安装目录是协议设计，不违反原则；Agent 端 SDK 仍然只把 SKILL 当 data |
 | **敏感凭证 LLM 不可见** | `.skillenv` 在 staging 目录落盘是协议允许的，但 A2C 协议 **MUST** 保证：(a) **无论 `rel_path` 为何**，`client:get_skill` 都不返回 `.skillenv`（命中即 [`4017`](error-handling.md#skill-resource-not-accessible4017) `forbidden`，且不泄漏存在性）；(b) Computer 注入 `.skillenv` 到子进程 env 时不写日志、不进 prompt；(c) 任何场景下 `client:get_skills` / `client:get_skill` 都不暴露 `.skillenv` 解析结果 |
 
@@ -664,6 +664,30 @@ A2C-SMCP SKILL 通道继承 [marketplace SKILL v1 §1.2 三条强制安全原则
 Claude Code 的 MCP Skill 设计是"远程不可信"——不执行 `scripts/`、不暴露 baseDir、不展开 `${CLAUDE_SKILL_DIR}`。A2C-SMCP **有意分叉**：marketplace §0.2 明确 Computer-side SKILL **可执行**，所以 A2C-SMCP 通道保留 `scripts/` 执行能力。这是协议层的设计选择。
 
 为补偿这一信任放宽，A2C-SMCP 通过 **source 信任继承**（脚本执行权限 = MCP Server 调用权限）和 **加载流程隔离**（Computer 是受控物化层，Agent 不直接接触原始 source）来约束风险。
+
+### 9.4 占位符展开与目录路径可见性
+
+§9.3 的「可执行分叉」要求 LLM 能在真实文件系统上用 Bash 跑 `scripts/`——这需要 skill 的**真实绝对目录**可寻址。本节是占位符展开与目录路径可见性的**规范权威**，§7 note / §9.1 / §12 中的相关表述均为其摘要（如有分歧以本节为准）；据此消除历史「远程不可信」姿态残留（早期表述曾对 LLM 展开为不透明 URI / 藏目录路径——在可执行、可信的分叉里既破坏执行又零收益：LLM 本就能在 Computer 上跑 `pwd` / `ls`，目录路径藏不住，真正的秘密由 `.skillenv` 边界独立守护）。
+
+**(1) 占位符集（闭合白名单）**
+
+当前仅定义**单个**占位符 `${TFROBOT_SKILL_DIR}`（花括号语法，对标 Claude Code `${CLAUDE_SKILL_DIR}`）。渲染实现 **MUST** 只对该闭合白名单做替换：未在白名单内的 `${...}` 与裸 `$` 文本 **MUST** 原样透传，保证 SKILL.md 正文里普通 shell 变量 / `$` 金额等文本不被误伤，也为未来扩展（如 `${TFROBOT_SKILL_NAME}`）预留无歧义空间。
+
+**(2) 展开时机 = render-time / Agent SDK**
+
+`${TFROBOT_SKILL_DIR}` 的替换是 **Agent SDK 在 prompt 渲染层**的职责，发生在**把内容拼进 LLM prompt 之前**（对齐 §7 note 与 marketplace v1 §6.2 第一条）。协议层（Computer）经 `client:get_skill` **只投递原始字节、占位符不展开**（`total_size` / `sha256` 基于未展开的资源字节，见 §6 / §7 步骤 4）。SKILL.md 是 markdown 文档、永不被「运行」，其 body 文本的替换只有 render-time 这一个时机——不存在「脚本执行 env」这一 hook 去替换 body 里的占位符。
+
+**(3) 展开目标 = 真实绝对目录（非 URI）**
+
+`${TFROBOT_SKILL_DIR}` **MUST** 展开为 skill 包的**真实绝对目录**，即对应 `A2CSkillRef.path`。**不得**展开为 `skill://` 不透明 URI——`bash` 无法 `cd` 进 URI；且 URI **仅 MCP 源存在**（§2），对 marketplace / user 源根本不可用。稳定标识需求由协议主键 `name` 满足，可执行分叉下 URI 间接层只增负担无收益。
+
+**(4) Computer env 注入 = 运行期子进程 defense-in-depth**
+
+Computer 执行 `scripts/` 子进程时 **MAY** 额外注入同名环境变量 `TFROBOT_SKILL_DIR`（值 = 该 skill 绝对目录），使脚本运行期内部 `$TFROBOT_SKILL_DIR` 自引用也能解析。这是**运行期防御纵深**，**不是** SKILL.md body 文本的渲染机制——两者作用对象不同（一个是正在运行的子进程 env，一个是拼进 prompt 的 body 文本）；(2) 的 render-time 展开不依赖它。
+
+**(5) 秘密边界不变**
+
+目录路径可 LLM-facing 与 §9.1 原则三的凭证保护**正交**：`.skillenv` 仍是硬秘密边界，(a)(b)(c) 一字不改——任何 `rel_path` 都不经 `client:get_skill` 返回 `.skillenv`（[`4017`](error-handling.md#skill-resource-not-accessible4017) `forbidden`，不泄漏存在性），Computer 注入 `.skillenv` 到子进程 env 时不写日志、不进 prompt。**泄露 skill 目录路径 ≠ 泄露秘密**。
 
 ---
 
@@ -782,7 +806,7 @@ A2C-SMCP SKILL 通道在 URI 与命名上**直接对齐** Claude Code 的 MCP Sk
 | 命名格式（mcp） | `<server>:<skill>` | `mcp:<server>:<skill>`（A2C 多源共享，**唯一**保留 `mcp:` 段消歧） |
 | Server 名规范化 | `normalizeNameForMCP()`，含 `claude.ai ` 前缀特例 | 同算法，**不实现** `claude.ai ` 特例 |
 | `scripts/` 执行 | ❌ 禁止（MCP Skill 远程不可信） | ✅ 由 Computer 执行（source 信任继承） |
-| `${SKILL_DIR}` 占位符 | `${CLAUDE_SKILL_DIR}` 对 MCP Skill **无意义** | `${TFROBOT_SKILL_DIR}` 展开为不透明 URI（LLM-facing）/ 真 FS 路径（脚本执行 env，由 Computer 注入） |
+| `${SKILL_DIR}` 占位符 | `${CLAUDE_SKILL_DIR}` 对 MCP Skill **无意义** | `${TFROBOT_SKILL_DIR}` 由 **Agent SDK 渲染期展开为真实绝对目录**（拼进 LLM prompt 前，见 §7 note / §9.4）；Computer 另注入同名 env 供子进程运行期自引用（defense-in-depth，非 body 渲染机制） |
 | `resources/list` cursor 翻页 | 不消费 | Computer 完整消费翻页直至末尾 |
 | Resource Templates | 不消费 | 不消费（与 Claude Code 一致） |
 
