@@ -56,7 +56,7 @@ class SMCPTool(TypedDict):
     meta: NotRequired[Attributes | None]  # 工具元数据（可选）
 ```
 
-**说明**: 当 Computer 管理多个 MCP Server 时，可能存在工具名称冲突。此时可通过 `meta` 中的 `alias` 字段设置别名进行区分。
+**说明**: `name` 承载的是**聚合后的 `exposed_tool_name`**（`{bundle_id}__{alias ?? 原始工具名}`），跨 Server / marketplace / plugin 保证唯一。命名生成、去重与路由规则见 [MCP Tool 命名与路由（BundleID 模型）](#mcp-tool-命名与路由)。
 
 ### SMCPTool.meta 序列化规范 { #smcptoolmeta-序列化规范 }
 
@@ -167,7 +167,8 @@ class ToolMeta(TypedDict, total=False):
     # 返回值对象映射，用于统一不同 MCP 工具的返回格式
 
     alias: NotRequired[str | None]
-    # 工具别名，用于解决不同 Server 下的工具重名冲突
+    # 工具别名。仅替换 exposed_tool_name 的**工具名部分**，仍带 `{bundle_id}__` 前缀
+    # （非对整个 exposed_tool_name 的完全覆盖）；见 [MCP Tool 命名与路由](#mcp-tool-命名与路由)
 
     tags: NotRequired[list[str] | None]
     # 工具标签，用于分类
@@ -730,7 +731,11 @@ MCP Server 配置基类。
 ```python
 class BaseMCPServerConfig(TypedDict):
     name: str
-    # MCP Server 名称
+    # MCP Server 名称（人类可读，非唯一身份；唯一身份见 bundle_id）
+
+    bundle_id: NotRequired[str | None]
+    # MCP Server 唯一标识（软件级 BundleID）。省略时由 name 经确定性算法生成，解析后恒有值。
+    # 同一 bundle_id 视为同一软件，不允许多开。命名/生成/去重/路由见「MCP Tool 命名与路由（BundleID 模型）」。
 
     disabled: bool
     # 是否禁用
@@ -841,6 +846,131 @@ MCPServerConfig = MCPServerStdioConfig | MCPServerStreamableHttpConfig | MCPSSEC
 
 ---
 
+## MCP Tool 命名与路由（BundleID 模型） { #mcp-tool-命名与路由 }
+
+Computer 聚合多个 MCP Server 时，工具名可能跨 Server / marketplace / plugin 重名。由于所有主流 LLM provider 的工具接口**只靠扁平名称区分、无 namespace/分类字段**（Anthropic `^[a-zA-Z0-9_-]{1,128}$`、OpenAI `^[a-zA-Z0-9_-]{1,64}$`，均拒 `.`），A2C 以 **BundleID 模型**为每个聚合工具生成稳定、唯一、provider 兼容的 `exposed_tool_name`。
+
+模型对齐人类世界的软件包管理：一个 **MCP Tool** = 软件的一个功能；一个 **MCP Server** = 一个软件，拥有唯一包标识 **BundleID**。
+
+### BundleID（软件唯一标识） { #bundleid }
+
+- `bundle_id`（[BaseMCPServerConfig](#basemcpserverconfig)）是 MCP Server 的**唯一身份**（软件级）。SDK 管理 MCP 服务的身份 **MUST** 使用 `bundle_id`，**MUST NOT** 使用 `name`。
+- **字符集**：`[A-Za-z0-9_-]`。
+    - **MUST NOT** 含 `.`（provider 侧 tool name 拒 `.`；且 `.`→`_` 清洗非单射）。
+    - **MUST NOT** 含连续下划线 `__`（`__` 是 BundleID 与工具名的保留分隔符，见[唯一性](#bundleid-唯一性)）。
+
+#### 缺省生成（确定性） { #bundleid-缺省生成 }
+
+`bundle_id` 省略时，SDK **MUST** 按下述算法从 `name` 派生。算法**逐字节确定性**，各 SDK（Python / Rust）**MUST** 产出同一结果——一致性由[一致性测试向量](#bundleid-conformance)强制。生成在**加载 / 注册期**完成（derive-on-load），**MUST NOT** 回写配置源（如 `mcp.json`）。
+
+**Step 1 — 规范化 `name`**（按 **Unicode 码点**迭代，Python `for c in name` / Rust `.chars()`；**MUST NOT** 按 UTF-8 字节或 grapheme cluster 迭代）：
+
+1. 凡不属于 ASCII 字符类 `[A-Za-z0-9_-]` 的码点（任何非 ASCII 一律命中）→ 替换为 `_`。**MUST** 用显式 ASCII 类，**MUST NOT** 用 `\w`（各语言 Unicode `\w` 集合不一致）。
+2. 折叠连续的 `_`（**含**原文中已有的 `__`）为单个 `_`；**不折叠** `-`。
+3. 裁剪首尾的 `[_-]`。
+4. **不做**大小写折叠（`MyServer` ≠ `myserver`）。
+
+**Step 2 — 取值**：Step 1 结果**非空** → 即 `bundle_id`。
+
+**Step 3 — fallback**（Step 1 结果为空，如 `name` 全为符号 / CJK / 空串）：`bundle_id = "bundle_" + lowercase_hex(SHA-256(digest_input)[:8])`（即 `bundle_` + 16 个小写 hex 字符）。
+- `digest_input` = 该 Server 的 [connection-identity 字节串](#connection-identity)（**不**用 `name`——它已被证明无法产出合法值）。
+- Hash **MUST** 为 SHA-256；**MUST NOT** 用语言内建 `hash()`（进程级随机化）或任何非密码学 hash。编码 **MUST** 为小写 hex（**禁** base32 / base64——大小写 / padding 有跨实现变体）。
+
+!!! warning "缺省生成 MUST NOT 使用随机 UUID"
+
+    随机 UUID 会**同时**破坏「跨 SDK 逐字节一致」与「重启稳定性」（进程重启后 exposed_tool_name 漂移，Agent 侧全套工具改名）。fallback **MUST** 为确定性摘要。
+
+> **规范化非单射**：`my server` / `my-server` / `my_server` 均 → `my_server`；两个都叫 `everything` 的 Server 均 → `everything`。因此过去按 `name` 不冲突的配置，缺省生成后可能得到相同 `bundle_id` → 属 [no-double-open](#no-double-open) 冲突，走[配置诊断](#config-diagnostics)，由配置人员显式指定 `bundle_id` 解决。
+
+#### connection-identity 字节串 { #connection-identity }
+
+Step 3 fallback 摘要的输入。为避免 JSON 跨语言序列化漂移（转义 / 数字形态 / key 排序），**MUST** 用长度前缀（TLV）字节帧、**MUST NOT** 用 JSON。仅纳入**连接建立字段**：
+
+| type | 纳入字段（顺序固定） |
+|------|--------------------|
+| `stdio` | `type` + `command` + `args`（保序）+ `env`（按 key 码点序排序）|
+| `streamable` / `sse` | `type` + `url` + `headers`（按 key 码点序排序）|
+
+- **排除**：`disabled` / `tool_meta` / `forbidden_tools` / `vrl` / `env_file` / `cwd` / `encoding` / `timeout` 系列——非连接身份，或跨语言类型不一致（如 `timeout` 在 `streamable` 为 ISO-8601 字符串、在 `sse` 为 float）。
+- 编码 UTF-8；`args` **保序**（参数顺序有语义）；`env` / `headers` 按 key 码点序排序（**纳入** env / headers 以区分仅凭连接凭证不同的无名 Server）。空 `args` / `env` → 空集。
+- 精确字节帧（TLV 长度前缀、空值表示、分隔符常量）由[一致性测试向量](#bundleid-conformance)定死。
+
+#### 一致性测试向量（规范夹具） { #bundleid-conformance }
+
+`bundle_id` 缺省生成的跨 SDK 逐字节一致，由**协议仓托管的一致性测试向量**强制：`(name, connection config) → 期望 bundle_id`。向量 **MUST** 覆盖分叉点——CJK `name`、符号 `name`、含原文 `__` 的 `name`、空名 + `stdio`、空名 + `http/sse`。所有 SDK 实现 **MUST** 通过该夹具方为合规。
+
+> 参考实现与向量由 rust-sdk 首版提供、python-sdk 对拍锁定，随协议一并落库（[一致性测试向量 TODO](error-handling.md#todo) 追踪）。
+
+### exposed_tool_name { #exposed_tool_name }
+
+聚合后对外暴露、进入 LLM 工具声明的工具名，即 `SMCPTool.name`（[GetToolsRet](#gettoolsret)）：
+
+```text
+exposed_tool_name = bundle_id + "__" + (alias ?? original_tool_name)
+```
+
+- 所有聚合工具**恒**以 `{bundle_id}__` 开头，归属一眼可辨。
+- `alias`（[ToolMeta.alias](#toolmeta)）仅替换**工具名部分**，仍带 `{bundle_id}__` 前缀。
+- 协议**不采用**「仅冲突时改名」；恒用 BundleID 前缀，避免加载顺序 / server 集合变化导致名称漂移。
+
+#### 唯一性与可解析性 { #bundleid-唯一性 }
+
+- `bundle_id` 不含 `__`，故 `exposed_tool_name` 对 `(bundle_id, tool)` **单射**：`bundle_id` 恒为**第一个 `__` 之前的前缀**。
+- 因此**原始工具名内部允许 `__`**（无需限制）：`b__foo__bar` 必然解析为 `bundle_id=b` / `tool=foo__bar`。
+- 反例（为何禁 BundleID 的 `__`）：若允许 `bundle_id=a__b`，则 `(a__b, c)` 与 `(a, b__c)` 均产出 `a__b__c` → 两个唯一 BundleID 撞同名。禁 `__` 即消除歧义。
+
+!!! note "归属靠映射表，不靠字符串 split"
+
+    `alias` 不可逆推 `original_tool_name`，故**路由 MUST 依赖 [ExposedToolMapping](#exposedtoolmapping)**，**MUST NOT** 对 `exposed_tool_name` 做字符串 split 反解身份。
+
+### 去重：no-double-open { #no-double-open }
+
+- **同一 `bundle_id` = 同一软件，任一时刻只对应一个 Server，MUST NOT 多开。**
+- **加载期（boot / 整表加载）**：重复 `bundle_id`（**无论** connection config 是否相同）**MUST** 视为冲突——仅保留**配置顺序第一个**并启动，其余由 Computer 作[配置诊断](#config-diagnostics)（日志 / 本地 UI）报告，**MUST NOT** 静默丢弃。
+- **运行期（显式 add / update 单个 Server）**：传入已存在的 `bundle_id` **MUST** 按 `bundle_id` **原地更新**（intentional replace；`name` 可变、`bundle_id` 稳定），**不**算冲突——每个 `bundle_id` 仍只对应一个 Server，不破 no-double-open。
+- 确需多实例（如同一浏览器工具的共享 / `--isolated` 两套）→ **以不同 `bundle_id` 表达**（`bundle_id` 由配置人员自由指定）。
+
+### ExposedToolMapping { #exposedtoolmapping }
+
+Computer 侧维护的路由映射；`client:get_tools` 与 `client:tool_call` **MUST** 共享同一份：
+
+```python
+class ExposedToolRoute(TypedDict):
+    bundle_id: str                  # 归属 MCP Server 唯一标识
+    server_name: str                # MCP Server 人类可读名（诊断用）
+    original_tool_name: str         # MCP 上游注册的原始工具名（路由目标）
+    alias: NotRequired[str | None]  # 若配置了别名
+
+# exposed_tool_name -> route
+ExposedToolMapping = dict[str, ExposedToolRoute]
+```
+
+- `client:get_tools` 返回的 `SMCPTool.name` 为 `exposed_tool_name`。
+- `client:tool_call` 的 `tool_name` 传入 `exposed_tool_name`；Computer **MUST** 经此表路由到 `bundle_id` + `original_tool_name` 调用上游 MCP。命中失败 → [`4001`](error-handling.md#工具调用错误码)。
+
+### 长度与 provider 适配
+
+- A2C 协议**不限制** `exposed_tool_name` 长度。不同 provider 上限不同（Anthropic 128 / OpenAI 64 / 部分兼容接口几乎不限），只有 Agent 知道对面是哪个 LLM。
+- **provider 长度合规属 Agent 业务 / 集成层职责，不属协议、不强制进 SDK**：当下游 provider 有限长且 `exposed_tool_name` 超限时，集成层 **MUST** 维护 `短名 ↔ exposed_tool_name` 的**双射**映射、在工具调用回程逆转；短名生成 **MUST** collision-safe（带摘要后缀，**禁裸截断**——两个长名截同前缀会相撞）。
+- **SDK MUST 保持 wire-faithful**：`exposed_tool_name` 原样上 wire、不限长、不改名；SDK **MAY** 提供可选短名 helper，但短名策略 provider-specific，由集成层启用。
+- **A2C wire 恒传 `exposed_tool_name`**；短名仅存在于 Agent↔LLM 之间，**MUST NOT** 出现在任何 A2C 事件载荷中（保三角色纯净）。
+
+> `forbidden_tools`（[BaseMCPServerConfig](#basemcpserverconfig)）**MAY** 按 `original_tool_name` 或 `exposed_tool_name` 匹配禁用。
+
+### 配置诊断（Computer 本地，非协议错误码） { #config-diagnostics }
+
+下列均在**配置加载期**由 Computer 检出，属 **Computer 本地配置诊断**（日志 / 本地 UI），**不进协议错误码**、不由任何 `client:*` 事件触发（对齐 SKILL「物化失败 / 孤儿 / 跨 source 冲突不进协议错误码」先例）。配置人员据此修正配置：
+
+| 诊断 | 触发 | 处置 |
+|------|------|------|
+| 重复 `bundle_id` | 两个及以上 Server 解析出相同 `bundle_id`（[no-double-open](#no-double-open)），仅启动配置顺序第一个 | 确需多实例 → 给冲突项指定**不同** `bundle_id`（如 `playwright` / `playwright_isolated`）|
+| 非法 `bundle_id` | 显式传入含 `.` / 含 `__` / 字符集越界，或[缺省生成](#bundleid-缺省生成)极端输入后仍非法 | 修正为合规 `bundle_id`；**省略** `bundle_id` 不算错误（触发缺省生成）|
+| `exposed_tool_name` 撞名 | **同一** `bundle_id` 内两个工具经 `alias` 产出相同 `exposed_tool_name` | 修正 `tool_meta` 的 `alias`（跨 `bundle_id` 不会撞，无需处理）|
+
+> 运行期例外：`client:tool_call` 的 `tool_name` 在 [ExposedToolMapping](#exposedtoolmapping) 未命中，属客户端运行期错误，走协议错误码 [`4001`](error-handling.md#工具调用错误码)（非本地诊断）。
+
+---
+
 ## 输入配置结构
 
 输入配置用于定义 MCP Server 配置中的动态占位符。
@@ -903,8 +1033,10 @@ MCPServerInput = MCPServerPromptStringInput | MCPServerPickStringInput | MCPServ
 ```python
 from a2c_smcp.types import SERVER_NAME, TOOL_NAME, Attributes, AttributeValue
 
-SERVER_NAME: TypeAlias = str    # MCP Server 名称
-TOOL_NAME: TypeAlias = str      # 工具名称
+SERVER_NAME: TypeAlias = str        # MCP Server 名称（人类可读，非唯一身份）
+BUNDLE_ID: TypeAlias = str          # MCP Server 唯一标识（BundleID）
+TOOL_NAME: TypeAlias = str          # 工具原始名称
+EXPOSED_TOOL_NAME: TypeAlias = str  # 聚合后暴露给 LLM 的工具名 {bundle_id}__{alias??原始名}
 AttributeValue: TypeAlias = str | int | float | bool | None
 Attributes: TypeAlias = dict[str, AttributeValue]
 Desktop: TypeAlias = str        # 桌面内容（字符串形式）
