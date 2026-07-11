@@ -632,7 +632,7 @@ CallToolResult(
 - [ ] 错误追踪 ID（trace_id）
 - [ ] 错误统计和监控接口
 - [ ] 工具元数据层面的 `requires_auth` 标注（见 `security.md`）
-- [ ] BundleID 缺省生成一致性测试向量（规范夹具，rust 首版 + python 对拍；见 [data-structures §一致性测试向量](data-structures.md#bundleid-conformance)）
+- [x] BundleID 缺省生成一致性测试向量（规范夹具，rust 首版 + python 对拍；见 [data-structures §一致性测试向量](data-structures.md#bundleid-conformance)，夹具 [`fixtures/bundle_id_conformance_vectors.json`](data-structures.md#bundleid-conformance)）
 
 ## 参考
 
