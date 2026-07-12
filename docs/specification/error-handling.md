@@ -37,7 +37,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 
 | 代码 | 名称 | 含义 |
 |------|------|------|
-| 4014 | MCP Server Not Found | 引用的 `mcp_server` 名字未注册（见 [§MCP Server Not Found](#mcp-server-not-found4014)）|
+| 4014 | MCP Server Not Found | 引用的 `mcp_server`（bundle_id）未注册（见 [§MCP Server Not Found](#mcp-server-not-found4014)）|
 | 4015 | MCP Capability Not Supported | MCP Server 已注册但未声明所需 capability（见 [§MCP Capability Not Supported](#mcp-capability-not-supported4015)）|
 
 > **BundleID / exposed_tool_name 的配置问题不进协议错误码**：重复 `bundle_id`（[no-double-open](data-structures.md#no-double-open)）、非法 `bundle_id`、同 server 内 alias 撞出相同 `exposed_tool_name`——均在**配置加载期**由 Computer 检出，属 [Computer 本地配置诊断](data-structures.md#config-diagnostics)（日志 / 本地 UI），不由任何 `client:*` 事件触发（对齐 SKILL「物化失败 / 孤儿 / 跨 source 冲突不进协议错误码」先例）。仅 `client:tool_call` 的 `tool_name`（exposed_tool_name）在 [ExposedToolMapping](data-structures.md#exposedtoolmapping) 未命中属运行期客户端错误 → 复用 [`4001 Tool Not Found`](#工具调用错误码)。
@@ -71,7 +71,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 
 ## 错误响应格式
 
-A2C-SMCP 协议级错误（HTTP 握手层 + Socket.IO ack 层）统一采用**扁平 ErrorPayload** shape：标准字段 `code` / `message` 顶层平铺，code-specific 字段（如 `mcp_server_name` / `capability`）顶层并列，诊断信息封装在 `details` 子对象内。
+A2C-SMCP 协议级错误（HTTP 握手层 + Socket.IO ack 层）统一采用**扁平 ErrorPayload** shape：标准字段 `code` / `message` 顶层平铺，code-specific 字段（如 `mcp_server` / `capability`）顶层并列，诊断信息封装在 `details` 子对象内。
 
 !!! warning "无嵌套 envelope"
 
@@ -105,8 +105,8 @@ class ErrorPayload(TypedDict, total=False):
 | code | 顶层 code-specific 字段 | `details` 内推荐 key |
 |------|------------------------|---------------------|
 | `4008` | `server_version` / `client_version` / `min_supported` / `max_supported` | — |
-| `4014` | `mcp_server_name` | — |
-| `4015` | `mcp_server_name` / `capability` | — |
+| `4014` | `mcp_server` | — |
+| `4015` | `mcp_server` / `capability` | — |
 | `4016` | — | `name` |
 | `4017` | — | `reason` / `rel_path` / `total_size` |
 | `4018` | — | `reason` |
@@ -448,7 +448,7 @@ CallToolResult(
 | 字段 | 强度 | 说明 |
 |------|------|------|
 | `meta.error_code` | **MUST** | `4006`（未授权）或 `4007`（授权失效），按上方[判定决策表](#40064007-判定决策表)映射 |
-| `meta.mcp_server` | **MUST** | 触发授权错误的 MCP Server 标识，便于 Agent 定位 |
+| `meta.mcp_server` | **MUST** | 触发授权错误的 MCP Server 的 **bundle_id**（与 `get_config` 归属一致，Agent 可 correlate 到具体 server）|
 | `meta.auth_hint` | **SHOULD** | 面向用户的非敏感提示对象。Computer **SHOULD** 提供以协助 Agent/Host 引导用户；缺失时 Agent 仍能基于 `error_code` 做兜底处理 |
 | `meta.auth_hint.action` | MAY | 机器可读动作标识（如 `user_authorization_required` / `token_refresh_required`），便于 Host 路由到不同 UI |
 | `meta.auth_hint.message` | **SHOULD** | 用户可读的一句话引导（如"请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"）；强烈建议提供以满足最小可用 UX |
@@ -475,7 +475,7 @@ CallToolResult(
 
 ### MCP Server Not Found（4014）
 
-**触发时机**：客户端事件（`client:get_resources` / `client:tool_call` 等）引用的 `mcp_server` 名字在 Computer 上未注册。
+**触发时机**：客户端事件（`client:get_resources` / `client:tool_call` 等）引用的 `mcp_server`（bundle_id）在 Computer 上未注册。
 
 **响应结构**（Socket.IO ack 数据）:
 
@@ -483,7 +483,7 @@ CallToolResult(
 {
   "code": 4014,
   "message": "MCP Server not registered",
-  "mcp_server_name": "com.example.docs"
+  "mcp_server": "office_docs"
 }
 ```
 
@@ -493,7 +493,7 @@ CallToolResult(
 |------|------|------|
 | `code` | 是 | 固定 `4014` |
 | `message` | 是 | 人类可读 |
-| `mcp_server_name` | 是 | 客户端引用的 server 名 |
+| `mcp_server` | 是 | 客户端引用的 server 的 bundle_id |
 
 **Agent 行为建议**：刷新 server list（调用 `client:get_config`）后重试；持续不存在则提示用户 server 已下线。
 
@@ -507,7 +507,7 @@ CallToolResult(
 {
   "code": 4015,
   "message": "MCP Server does not support 'resources' capability",
-  "mcp_server_name": "com.example.docs",
+  "mcp_server": "office_docs",
   "capability": "resources"
 }
 ```
@@ -518,7 +518,7 @@ CallToolResult(
 |------|------|------|
 | `code` | 是 | 固定 `4015` |
 | `message` | 是 | 人类可读 |
-| `mcp_server_name` | 是 | 目标 server |
+| `mcp_server` | 是 | 目标 server 的 bundle_id |
 | `capability` | 是 | 缺失的 capability 名（`resources` / `tools` / `prompts` 等 MCP 标准 capability）|
 
 **Agent 行为建议**：跳过此 server，不再向其发送同类事件；可在 server list UI 中标注能力缺失。

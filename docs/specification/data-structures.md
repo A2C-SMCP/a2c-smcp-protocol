@@ -425,7 +425,7 @@ class GetComputerConfigReq(AgentCallData):
 ```python
 class GetComputerConfigRet(TypedDict):
     inputs: NotRequired[list[MCPServerInput] | None]    # 输入定义列表
-    servers: dict[str, MCPServerConfig]                 # MCP Server 配置映射
+    servers: dict[str, MCPServerConfig]                 # key = bundle_id（server 唯一身份，非 name）
 ```
 
 ---
@@ -495,7 +495,7 @@ class GetResourcesReq(AgentCallData, total=True):
     agent: str                          # Agent 名称
     req_id: str                         # 请求 ID
     computer: str                       # 目标 Computer 名称
-    mcp_server: str                     # 必填：目标 MCP Server 名称（来自 client:get_config 返回的 servers 字典 key）
+    mcp_server: str                     # 必填：目标 MCP Server 的 bundle_id（= client:get_config 返回的 servers 字典 key）
     cursor: NotRequired[str]            # 可选：MCP 标准 cursor 翻页；首次不传或传 null
 ```
 
@@ -731,7 +731,7 @@ MCP Server 配置基类。
 ```python
 class BaseMCPServerConfig(TypedDict):
     name: str
-    # MCP Server 名称（人类可读，非唯一身份；唯一身份见 bundle_id）
+    # MCP Server 名称（纯 display，人类可读）。允许碰撞、永不做键/寻址、不强制唯一；唯一身份见 bundle_id
 
     bundle_id: NotRequired[str | None]
     # MCP Server 唯一标识（软件级 BundleID）。省略时由 name 经确定性算法生成，解析后恒有值。
@@ -859,6 +859,20 @@ Computer 聚合多个 MCP Server 时，工具名可能跨 Server / marketplace /
     - **MUST NOT** 含 `.`（provider 侧 tool name 拒 `.`；且 `.`→`_` 清洗非单射）。
     - **MUST NOT** 含连续下划线 `__`（`__` 是 BundleID 与工具名的保留分隔符，见[唯一性](#bundleid-唯一性)）。
 
+#### 身份正交性：bundle_id vs MCP host vs name { #identity-orthogonality }
+
+A2C 体系存在多类 identifier，**互不相干、勿混用**：
+
+| identifier | 谁定 | 用途 | 是否 A2C server 身份 |
+|---|---|---|---|
+| **`bundle_id`** | 配置人员 / 缺省生成 | A2C server 唯一身份：`get_config` 字典 key、`get_resources.mcp_server`、`4014` / `4015`、`4006` / `4007` 的 `meta.mcp_server` | **是（唯一）** |
+| **`name`** | 配置人员 | 纯 display（人类可读）：**允许碰撞、永不做键/寻址、不强制唯一** | 否 |
+| **MCP resource host**（`window://<host>` / `skill://<host>` 的 `host`）| **MCP Server 自选**（反向域名风格）| MCP `resources/list` 的 URI 命名空间；A2C **透传不解释** | 否（正交）|
+| **SKILL name 的 `<server>` 段**（`mcp:<server>:<skill>`）| 规范化 MCP-source server 名（[skill.md §1](skill.md#1-skill-命名)，Claude Code 对齐）| SKILL 全局唯一合成名的一段；自管唯一（§1.5）| 否（正交）|
+
+- 一个 A2C server（`bundle_id`）内可含多个 MCP-自选 host 的资源；把 server 身份换成 `bundle_id` **与 `window://` / `skill://` / SKILL name 零耦合**。
+- 因 `get_config.servers` 的 key 现为 `bundle_id`，`name` 的旧隐式唯一性（曾作 dict key）**随之撤回**——`name` 可碰撞，仅供展示。
+
 #### 缺省生成（确定性） { #bundleid-缺省生成 }
 
 `bundle_id` 省略时，SDK **MUST** 按下述算法从 `name` 派生。算法**逐字节确定性**，各 SDK（Python / Rust）**MUST** 产出同一结果——一致性由[一致性测试向量](#bundleid-conformance)强制。生成在**加载 / 注册期**完成（derive-on-load），**MUST NOT** 回写配置源（如 `mcp.json`）。
@@ -946,7 +960,7 @@ Computer 侧维护的路由映射；`client:get_tools` 与 `client:tool_call` **
 ```python
 class ExposedToolRoute(TypedDict):
     bundle_id: str                  # 归属 MCP Server 唯一标识
-    server_name: str                # MCP Server 人类可读名（诊断用）
+    server_name: str                # MCP Server 人类可读名（display / 诊断用，非唯一、非身份）
     original_tool_name: str         # MCP 上游注册的原始工具名（路由目标）
     alias: NotRequired[str | None]  # 若配置了别名
 
@@ -1042,7 +1056,7 @@ MCPServerInput = MCPServerPromptStringInput | MCPServerPickStringInput | MCPServ
 ```python
 from a2c_smcp.types import SERVER_NAME, TOOL_NAME, Attributes, AttributeValue
 
-SERVER_NAME: TypeAlias = str        # MCP Server 名称（人类可读，非唯一身份）
+SERVER_NAME: TypeAlias = str        # MCP Server 名称（纯 display，人类可读，可碰撞，非身份）
 BUNDLE_ID: TypeAlias = str          # MCP Server 唯一标识（BundleID）
 TOOL_NAME: TypeAlias = str          # 工具原始名称
 EXPOSED_TOOL_NAME: TypeAlias = str  # 聚合后暴露给 LLM 的工具名 {bundle_id}__{alias??原始名}
