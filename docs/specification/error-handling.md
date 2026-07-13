@@ -371,7 +371,7 @@ sio = socketio.AsyncClient()
 try:
     await sio.connect(
         f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
-        auth={"role": "agent", "agent_id": "..."},
+        auth={"token": "...", "agent_id": "..."},   # role 经 server:join_office 声明
     )
 except socketio.exceptions.ConnectionError as e:
     # python-socketio 在 HTTP 非 2xx 时把 body 放进异常 message

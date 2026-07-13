@@ -60,7 +60,7 @@ sio = socketio.AsyncClient()
 await sio.connect(
     f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
     socketio_path="/smcp",
-    auth={"role": "agent"},
+    auth={"token": "..."},   # 业务层认证数据；role 经 server:join_office 声明
     transports=["polling", "websocket"],   # MUST：首个握手必须走 HTTP polling，4008 body 可读（versioning.md §5）
 )
 ```
@@ -74,7 +74,7 @@ await sio.connect(
 1. 缺失 `a2c_version` → HTTP 400，body `{"code": 400, "message": "Missing a2c_version query parameter"}`
 2. `a2c_version` 格式非法 → HTTP 400，body `{"code": 400, "message": "Invalid a2c_version: ..."}`
 3. `a2c_version` 与 Server 不兼容 → HTTP 400 + `X-A2C-Error-Code: 4008` header + body 见 [`4008 Protocol Version Mismatch`](error-handling.md#协议版本不匹配4008)
-4. 校验通过 → Server 将 `a2c_version` 存入 Socket.IO session，供 `server:list_room` 查询使用；连接进入 Socket.IO 层，`connect` handler 处理 `auth.role`
+4. 校验通过 → Server 将 `a2c_version` 存入 Socket.IO session，供 `server:list_room` 查询使用；连接进入 Socket.IO 层，`connect` handler 处理业务层 `auth`（如 token 校验）。客户端角色（`role`）不在连接握手 `auth` 中，而经 `server:join_office`（[EnterOfficeReq](data-structures.md#enterofficereq)）建立
 
 校验规则（MAJOR.MINOR.PATCH 语义、v0.x 与 v1.0+ 的区别、中间件实现示例）详见 [协议版本与握手](versioning.md)。
 
@@ -96,7 +96,7 @@ sio = socketio.AsyncClient()
 try:
     await sio.connect(
         f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
-        auth={"role": "agent"},
+        auth={"token": "..."},   # role 经 server:join_office 声明
     )
 except socketio.exceptions.ConnectionError as e:
     raw = str(e)

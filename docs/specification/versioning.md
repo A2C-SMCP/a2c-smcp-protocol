@@ -268,7 +268,7 @@ sio = socketio.AsyncClient()
 await sio.connect(
     f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
     socketio_path="/smcp",
-    auth={"role": "agent"},                    # 业务层身份数据
+    auth={"token": "..."},                     # 业务层认证数据（role 经 server:join_office 声明）
     transports=["polling", "websocket"],       # MUST：首个握手必须走 HTTP polling，4008 body 可读（见 §5）
 )
 ```
@@ -437,7 +437,7 @@ sio = socketio.AsyncClient()
 try:
     await sio.connect(
         f"wss://server.example.com?a2c_version={PROTOCOL_VERSION}",
-        auth={"role": "agent"},
+        auth={"token": "..."},   # role 经 server:join_office 声明
     )
 except socketio.exceptions.ConnectionError as e:
     raw = str(e)

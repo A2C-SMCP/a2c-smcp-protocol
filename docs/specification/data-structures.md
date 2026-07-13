@@ -256,28 +256,29 @@ Socket.IO 连接握手阶段的 `auth` 对象。**所有客户端**（Agent / Co
 
 ##### 协议层最小契约
 
-协议在 ConnectAuth 上的**唯一规范要求**是 `role` 字段：
+协议对 ConnectAuth **不设必需字段**——`auth` 是纯业务层对象。客户端角色（`role`）**不经连接握手 `auth` 声明**，而是在加入房间时经 [EnterOfficeReq](#enterofficereq)（`server:join_office`）的 `role` 字段建立，由 Server 据此路由：
 
 ```python
-class ConnectAuth(TypedDict):
-    role: Literal["computer", "agent"]  # 必需：客户端角色
+class ConnectAuth(TypedDict, total=False):
+    # 协议不设必需字段；auth 为纯业务层对象。
+    # 客户端角色（role）不在此声明——经 EnterOfficeReq / server:join_office 建立。
+    token: str  # 业务层认证数据示例（非协议必需）
 ```
 
 | 强度 | 行为约束 |
 |------|---------|
-| **MUST** | Client 提供 `role` 字段，取值为 `"agent"` 或 `"computer"`；Server 据此路由 |
-| **协议未表态** | 其他字段（如 token、api_key、business_meta 等）——是否存在、是否被消费由**业务层**（Server 实现方）自决 |
-| **SHOULD** | 避免把"已有协议事件承载的字段"重复塞进 `auth`。例如 `office_id` / `name` 已由 [EnterOfficeReq](#enterofficereq) 承载，重复放入 `auth` 会造成职责重叠与一致性维护负担；建议 `auth` 仅承载真正的认证数据（token / API key / 用户标识等）|
+| **MAY** | Client 在 `auth` 中放置业务层认证数据（token / API key / 用户标识等）；是否存在、是否被消费由**业务层**（Server 实现方）自决 |
+| **SHOULD** | 避免把"已有协议事件承载的字段"重复塞进 `auth`。`role` / `office_id` / `name` 均已由 [EnterOfficeReq](#enterofficereq) 承载，重复放入 `auth` 会造成职责重叠与一致性维护负担；建议 `auth` 仅承载真正的认证数据（token / API key / 用户标识等）|
 
 ##### 业务层扩展空间
 
 `connect` handler 是 Server 实现方编写的业务代码，A2C-SMCP 协议**不约束**业务层在 `auth` 中放什么、怎么校验。常见扩展场景：
 
-- 鉴权 token：`auth = {"role": "agent", "token": "..."}`
-- 多租户标识：`auth = {"role": "computer", "tenant_id": "..."}`
-- 网关签名：`auth = {"role": "agent", "signature": "..."}`
+- 鉴权 token：`auth = {"token": "..."}`
+- 多租户标识：`auth = {"tenant_id": "..."}`
+- 网关签名：`auth = {"signature": "..."}`
 
-这些都属于业务层职责，协议不评价。SDK 实现方提供的默认行为应只发送 `role`，并提供回调让用户注入业务字段。
+这些都属于业务层职责，协议不评价。SDK 实现方提供的默认行为应只发送业务层认证数据（如 `token`），`role` 经 `server:join_office` 声明；并提供回调让用户注入业务字段。
 
 !!! note "为什么 a2c_version 不在 auth 里"
 
@@ -285,7 +286,7 @@ class ConnectAuth(TypedDict):
 
 ### EnterOfficeReq
 
-加入房间请求。**不再**携带版本信息——版本校验已在连接建立前完成（HTTP 层），身份通过 `auth.role` 声明。
+加入房间请求。**不再**携带版本信息——版本校验已在连接建立前完成（HTTP 层）。客户端角色（`role`）即经本请求的 `role` 字段声明（连接握手 `auth` 不承载 `role`），由 Server 据此路由。
 
 ```python
 class EnterOfficeReq(TypedDict):

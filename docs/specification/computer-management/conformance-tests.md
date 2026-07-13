@@ -181,10 +181,9 @@
 ### 3.3 Connect And Join
 
 - `connect` 在 URL query 中发送 `a2c_version`。
-- `connect` 发送 `auth.role = "computer"`。
-- 配置后包含 caller-provided business auth fields。
+- `connect` 的 `auth` 仅承载 caller-provided business auth fields，不含 `role`。
 - auth payload 中不包含 MCP credentials 和 `.skillenv` 内容。
-- Join Office 使用 `server:join_office`，并携带 `role = "computer"` 和配置的 Computer name。
+- Join Office 使用 `server:join_office`，并携带 `role = "computer"`（角色即在此声明）和配置的 Computer name。
 - Protocol version mismatch 被分类为 `protocol_version`。
 - Auth failure 被分类为 `auth`。
 

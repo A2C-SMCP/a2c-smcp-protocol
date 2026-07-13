@@ -6,7 +6,7 @@
 
 Computer 是 Agent 与一个或多个 MCP Server 之间的协议桥。合规 Computer 的协议职责是：
 
-1. 以 `auth.role = "computer"` 连接 `/smcp` 命名空间，并通过 `server:join_office` 加入一个 Office。
+1. 连接 `/smcp` 命名空间（连接握手 `auth` 仅承载业务鉴权，不含 `role`），并通过 `server:join_office`（`role = "computer"`）加入一个 Office。
 2. 接收 Server 路由的 `client:*` 事件，执行本地 MCP / SKILL / Blob / Desktop 行为，并在 ack 通道返回成功响应或协议级错误。
 3. 在自身可见能力发生变化时，通过 `server:update_*` 事件请求 Server 向 Office 广播 `notify:update_*`。
 4. 持有 MCP Server 凭据与本地资源访问权，但不得把凭据或任意文件读能力暴露给 Agent。
@@ -19,11 +19,7 @@ Computer 是 Agent 与一个或多个 MCP Server 之间的协议桥。合规 Com
 
 ### 2.1 连接
 
-Computer MUST 按 [事件定义 §连接握手](events.md#连接握手) 携带 `a2c_version` URL query，并在 Socket.IO `auth` 对象中声明：
-
-```json
-{ "role": "computer" }
-```
+Computer MUST 按 [事件定义 §连接握手](events.md#连接握手) 携带 `a2c_version` URL query。客户端角色（`role`）不在连接握手 `auth` 中声明，而经 `server:join_office`（见下文 §2.2）建立。
 
 Computer MAY 在 `auth` 中携带业务鉴权字段。协议不规定这些字段的名字、位置或认证算法，但 Computer SDK MUST NOT 把 MCP Server 凭据、`.skillenv` 内容或其它本地 secret 放入 `auth`。
 

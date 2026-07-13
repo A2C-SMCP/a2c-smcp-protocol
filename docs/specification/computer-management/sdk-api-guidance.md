@@ -45,7 +45,7 @@ SDK 可以使用语言原生类型，但应支持用于 conformance 的共享 JS
 |---|---|
 | namespace | 默认使用 `/smcp` |
 | protocol version | 在 URL query 中使用 SDK 声明的 A2C-SMCP protocol version |
-| auth role | Computer connections 始终包含 `auth.role = "computer"` |
+| auth role | `role` 经 `server:join_office`（`EnterOfficeReq.role`）声明；connection `auth` 仅承载业务鉴权（如 token），不含 `role` |
 | auto connect | 文档化 start 是否自动 connect；对嵌入方优先推荐显式 connect |
 | auto reconnect | 如果支持，应使行为可配置且可观察 |
 | disabled servers | 保留 config，但从 Agent-facing projection 中排除能力 |
@@ -75,9 +75,9 @@ runtime = create_computer(config, runtime_options)
 `connect` 应接收 Server URL 和可选 connection options。SDK 应让最终 handshake 足够可检查，以便测试验证：
 
 - `a2c_version` 位于 URL query 中。
-- `auth.role` 为 `"computer"`。
+- 连接 `auth` 不含 `role`（角色经 `server:join_office` 声明）。
 - caller-supplied auth payload 已包含，且不会泄露 MCP credentials。
-- 配置后会发送 `server:join_office`。
+- 配置后会发送 `server:join_office`，其中 `role = "computer"`。
 
 ### 4.4 Sync Config
 

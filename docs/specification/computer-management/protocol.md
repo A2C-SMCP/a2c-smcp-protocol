@@ -117,8 +117,8 @@ Input definitions 和 secret resolution 是 Computer 本地职责。
 
 Management APIs 可以提供 `connect`、`disconnect`、`join`、`leave` 或等价能力。wire contract 保持如下：
 
-1. Computer MUST 使用 URL query `a2c_version` 和 `auth.role = "computer"` 连接 `/smcp`。
-2. Computer MUST 使用 `server:join_office`，其中 `role = "computer"`，并携带用于 Server 路由的 `name`。
+1. Computer MUST 使用 URL query `a2c_version` 连接 `/smcp`；连接握手 `auth` 仅承载业务鉴权，不含 `role`。
+2. Computer MUST 使用 `server:join_office`，其中 `role = "computer"`（角色即在此声明），并携带用于 Server 路由的 `name`。
 3. Computer MUST 遵守单 Office 绑定和 Server 强制的房间隔离。
 4. Management auth payloads MUST NOT 包含 MCP Server credentials、`.skillenv` content 或本地 secret values。
 

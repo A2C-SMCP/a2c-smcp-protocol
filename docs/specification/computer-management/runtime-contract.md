@@ -160,8 +160,8 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 
 1. 除非另有配置，使用 `/smcp` namespace。
 2. 发送 URL query `a2c_version`。
-3. 发送 `auth.role = "computer"`，并附加调用方提供的非敏感业务 auth fields。
-4. 当提供 office config 或调用方要求时，使用 `server:join_office` 加入 Office。
+3. 连接握手 `auth` 仅承载调用方提供的非敏感业务 auth fields（不含 `role`）。
+4. 当提供 office config 或调用方要求时，使用 `server:join_office`（`role = "computer"`，角色即在此声明）加入 Office。
 
 连接失败 MUST 被分类，使调用方能区分 protocol version mismatch、auth failure、network failure 和 join failure。
 
