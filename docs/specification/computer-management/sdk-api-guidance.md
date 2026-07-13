@@ -170,4 +170,5 @@ SDK 应同时维护 protocol conformance tests 和 runtime contract tests：
 - process supervision model；
 - retry scheduler；
 - CLI commands；
-- UI flows。
+- UI flows；
+- 运行期命令式 MCP Server CRUD（对非-bundled server 的 add/update/remove）是落盘为 durable 声明意图（重启存活）还是仅内存生效（持久化留给 host 编辑声明文件）——属管理面（CLI/桌面客户端）与内核间的本地约定（详见 runtime-contract §2.3）。
