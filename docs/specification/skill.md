@@ -59,7 +59,7 @@ A2C-SMCP SKILL 通道遵循以下原则：
 
 ## 1. SKILL 命名
 
-A2C-SMCP SKILL 用**全局唯一的合成 name** 作为协议主键，参考 Claude Code / [tfrobot-marketplace](https://github.com/A2C-SMCP/tfrobot-marketplace) 的单一命名空间设计：name **跨工具直接对齐开放标准**——marketplace 源 `<plugin>:<skill>`、user 源裸 `<skill>`、mcp 源 `mcp:<server>:<skill>`。Agent 与 LLM 始终用 name 引用 SKILL，调用接口跨 source 一致。
+A2C-SMCP SKILL 用**全局唯一的合成 name** 作为协议主键，参考 Claude Code / [tfrobot-marketplace](https://github.com/A2C-SMCP/tfrobot-marketplace) 的单一命名空间设计：name **跨工具直接对齐开放标准**——marketplace 源 `<plugin>:<skill>`、user 源裸 `<skill>`、mcp 源 `mcp:<bundle_id>:<skill>`。Agent 与 LLM 始终用 name 引用 SKILL，调用接口跨 source 一致。
 
 ### 1.1 整体格式
 
@@ -69,7 +69,7 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 |---|---|---|
 | marketplace | `<plugin>:<skill>` | 2 |
 | user | `<skill>`（裸名） | 1 |
-| mcp | `mcp:<server>:<skill>` | 3 |
+| mcp | `mcp:<bundle_id>:<skill>` | 3 |
 
 - `:` 是 A2C 协议层 reserved separator（正式承认，非「待追认」）
 - 整个 name 在单个 Computer 范围内**全局唯一**
@@ -77,7 +77,7 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 
 !!! note "三形态靠段数 + `mcp:` 字面消歧，互不碰撞"
 
-    1 段（user）/ 2 段（marketplace）/ 3 段（mcp）按**段数**互斥；mcp 必带字面首段 `mcp`，故不与 2 段 marketplace 混淆。**唯一**保留前缀的是 mcp 源——若它也退化成 `<server>:<skill>`（2 段）就会与 marketplace `<plugin>:<skill>` 碰撞。一个名为 `mcp` 的 marketplace plugin 产出 `mcp:<skill>`（2 段），仍按**段数**判为 marketplace；SDK / marketplace **SHOULD** 避免把 plugin 命名为 `mcp` 以免人眼混淆。
+    1 段（user）/ 2 段（marketplace）/ 3 段（mcp）按**段数**互斥；mcp 必带字面首段 `mcp`，故不与 2 段 marketplace 混淆。**唯一**保留前缀的是 mcp 源——若它也退化成 `<bundle_id>:<skill>`（2 段）就会与 marketplace `<plugin>:<skill>` 碰撞。一个名为 `mcp` 的 marketplace plugin 产出 `mcp:<skill>`（2 段），仍按**段数**判为 marketplace；SDK / marketplace **SHOULD** 避免把 plugin 命名为 `mcp` 以免人眼混淆。
 
 ### 1.2 各 source 的命名规则
 
@@ -85,56 +85,30 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 |---|---|---|---|
 | Marketplace | `marketplace:<repo>` | `<plugin>:<skill>`（**裸 2 段**，不含 marketplace 名） | `acme-audit:audit` |
 | 用户手动 | `user` | `<skill>`（**裸 1 段**） | `my-helper` |
-| MCP Server | `mcp:<normalized-server>` | `mcp:<normalized-server>:<frontmatter.name>` | `mcp:tfrobot-tools:code-review` |
+| MCP Server | `mcp:<bundle_id>` | `mcp:<bundle_id>:<frontmatter.name>` | `mcp:tfrobot-tools:code-review` |
 
-!!! important "为何对齐裸名（放弃旧版「强制前缀化」）"
+!!! important "为何对齐裸名 / 为何 mcp 段取 bundle_id"
 
     判断基准是**最终用户（SKILL 作者）跨工具互操作体验最优**：同一 SKILL 在 Claude Code / Cursor / A2C 看到的可见 ID 一致，作者文档/提示里引用的名字不因工具而漂移。故 marketplace / user 形态**直接采用 tfrobot-marketplace §6.1 的裸名**。
 
     - **marketplace 名不进可见 ID**：跨 marketplace 的 `<plugin>` 重名在**安装层**用 `<plugin>@<marketplace>` 拦截（tfrobot §2.3），已装集合内 `<plugin>` 唯一 ⇒ `<plugin>:<skill>` 唯一。完整 marketplace 溯源仍由 `source = marketplace:<repo>` 承载
     - **mcp 源保留 `mcp:` 前缀**：多 source 共享场所中，这是把 mcp 与 2 段 marketplace 区分开的**最小**结构标记（见 §1.1 note）；CC 的 mcp skill 是 `<server>:<skill>`，A2C 多加 `mcp:` 是有意的、**唯一**保留的前缀
-    - **碰撞防护模型**：由旧版「结构化前缀」转为「段数 + `mcp:` 字面 + Computer 安装层唯一性」三者协同（校验见 §1.5）
+    - **mcp 段用 `bundle_id` 而非 display `name`**：post-BundleID 模型，MCP Server 的 `name` 是**纯 display、允许碰撞、永不做键/寻址**（见 [数据结构 §身份正交性](data-structures.md#identity-orthogonality)），A2C server 的**唯一身份是 `bundle_id`**（`get_config.servers` key、`get_resources.mcp_server`、`4014/4015` 的 `meta.mcp_server` 全用它）。若 mcp 段仍取 display server 名，两个 `name` 巧合相同、`bundle_id` 不同的合法 Server 会撞出相同 `mcp:<name>:<skill>` → §1.5 被迫拒绝其一、令合法 SKILL 对 Agent 隐身。取 `bundle_id`（[缺省生成](data-structures.md#bundleid-缺省生成)恒有值、[no-double-open](data-structures.md#no-double-open) 保证唯一）则 mcp 形态 name **构造上不碰撞**，且 SKILL 的 server 身份与全协议其余处**统一**。auto-derive 情形下 `bundle_id ≈ 规范化 name`，可读性基本保留（`mcp:tfrobot-tools:code-review`）；仅 hash-fallback 情形退化为不透明串——而这恰是 display 名本就不可靠的情形。mcp 段本就由部署方配置决定、非 SKILL 作者控制，故不损「作者可见 ID 跨工具一致」（该理念保护的是 marketplace / user 两种作者可见形态）
+    - **碰撞防护模型**：marketplace / user 段由「段数 + `mcp:` 字面 + Computer 安装层唯一性」协同；mcp 段由 `bundle_id` 唯一性**从构造上**保证（校验见 §1.5）
 
     > SDK 若扩展自定义 source，其 name 形态 **MUST** 与上述 1/2/3 段 canonical 形态**不相交**（如采用 ≥4 段并带文档化首段标记）且 **MUST** 文档化——否则击穿段数消歧。
 
-### 1.3 MCP Server 名规范化算法
+### 1.3 mcp `<server>` 段 = bundle_id
 
-MCP source 下，原始 server 名经规范化后填入 `<normalized-server>` 段。算法**与 Claude Code 通用规则等价**，但**不**实现其 `claude.ai ` 前缀特例：
+MCP source 下，`<server>` 段**取该 MCP Server 的 `bundle_id`（原样、不再单独规范化）**。`bundle_id` 是 A2C server 的唯一身份，其字符集、缺省生成算法与唯一性保证由[数据结构 §BundleID](data-structures.md#bundleid) 单一来源定义：
 
-```python
-def normalize_mcp_server_segment(name: str) -> str:
-    """
-    A2C-SMCP MCP <server> 段规范化。
-    与 Claude Code normalizeNameForMCP() 通用规则等价。
-    不实现 Claude Code 的 "claude.ai " 前缀折叠 + trim 特例
-    （Anthropic 平台特化，违反 A2C 协议中立性）。
-    """
-    import re
-    return re.sub(r'[^a-zA-Z0-9_-]', '_', name)
-```
+- **字符集**：`[A-Za-z0-9_-]`、**MUST NOT** 含 `.`、**MUST NOT** 含连续 `__`——是 §1.4 lexer `<server>` 段字符集的**严格子集**，直接合法
+- **恒有值**：`bundle_id` 省略时由 [缺省生成](data-structures.md#bundleid-缺省生成) 从 `name` 逐字节确定性派生（空/CJK/全符号 → `bundle_<16hex>` fallback），解析后**恒非空**，故不存在「`<server>` 段为空」的形态
+- **唯一**：同一 `bundle_id` 视为同一软件、[no-double-open](data-structures.md#no-double-open) 禁止多开，故同一 Computer 内 mcp 形态 name 的 `<server>` 段**天然唯一**，无需 SKILL 层再做撞名消歧
 
-**规则要点**：
+!!! note "与 Claude Code 的差异（`<server>` 段取值）"
 
-| 行为 | A2C-SMCP | Claude Code | 备注 |
-|---|---|---|---|
-| 非 `[a-zA-Z0-9_-]` → `_` | ✅ | ✅ | 完全一致 |
-| `claude.ai ` 前缀的 `_` 折叠 + trim | ❌ | ✅（特例） | A2C 不实现，保持协议中立 |
-| 大小写保留 | ✅ | ✅ | `MyServer ≠ myserver` |
-| 长度截断 | ❌ | ❌ | 不做；超长由上层校验 |
-
-**规范化示例**：
-
-| 原始 server 名 | 规范化后 `<server>` 段 |
-|---|---|
-| `tfrobot-tools` | `tfrobot-tools` |
-| `my.api server` | `my_api_server` |
-| `My_Server` | `My_Server` |
-| `服务器` | `___` |
-| `claude.ai my.server` | `claude_ai_my_server` |
-
-!!! note "Claude Code 兼容性差异"
-
-    绝大多数 server 名规范化结果与 Claude Code 一致。仅当 server 名以 `claude.ai ` 开头时，A2C 不做 `_` 折叠 / trim——这是设计选择，不是缺陷。SDK 文档应明示此差异以避免使用者误判。
+    Claude Code 的 mcp skill 用**规范化后的 display server 名**（`normalizeNameForMCP()`）作命名空间段；A2C 改用 `bundle_id`。二者在 `bundle_id` **auto-derive** 情形下多数一致（缺省生成本身即对 `name` 做规范化，`mcp:tfrobot-tools:code-review` 两边同形）；仅在配置人员**显式指定 `bundle_id`** 或触发 **hash fallback** 时分歧。此为 A2C 有意选择——server 身份在 A2C 全协议统一为 `bundle_id`，SKILL 命名空间不应例外。
 
 ### 1.4 命名 lexer 总表
 
@@ -144,7 +118,7 @@ A2C SKILL name 先按**段数**判形态，再逐段 lexer：
 |---|---|---|---|
 | **user**（1 段） | `<skill>` | `[a-z0-9-]`，不以 `-` 始末，无连续 `--`，1–64 | marketplace SKILL v1 §3.1 |
 | **marketplace**（2 段） | `<plugin>` `:` `<skill>` | 两段均同上严格 kebab | marketplace SKILL v1 §2.2 / §3.1 |
-| **mcp**（3 段，首段字面 `mcp`） | `mcp` `:` `<server>` `:` `<skill>` | `<server>`：§1.3 算法（`[A-Za-z0-9_-]`，1–64）；`<skill>`：严格 kebab | A2C §1.3 + marketplace §3.1 |
+| **mcp**（3 段，首段字面 `mcp`） | `mcp` `:` `<server>` `:` `<skill>` | `<server>` = `bundle_id`（§1.3；`[A-Za-z0-9_-]`、无 `.`、无 `__`）；`<skill>`：严格 kebab | 数据结构 §BundleID + marketplace §3.1 |
 
 **消歧规则（lexer 第一步）**：
 
@@ -158,16 +132,17 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 
 | 情形 | Computer 行为 |
 |---|---|
-| `<server>` 规范化后长度 = 0（原始 server 名全是非法字符） | 拒绝该 server 全部 SKILL 注册；记 ERROR |
-| `<server>` 规范化后长度 > 64 | 同上 |
 | `<skill>` leaf 段不符合 marketplace §3.1 格式 | 拒绝该 SKILL 注册；记 ERROR |
-| 两个不同原始 server 规范化后撞名（如 `my.server` 与 `my_server` 都得到 `my_server`） | 拒绝第二注册者；记 ERROR；保留先到者 |
 | 两个不同 marketplace 提供同名 `<plugin>`（合成 `<plugin>:<skill>` 碰撞） | **安装层**按 `<plugin>@<marketplace>` 唯一性拒绝第二个（tfrobot §2.3）；已装集合内 `<plugin>` 唯一 |
-| 同 source 内 frontmatter `name` 重复（违反 marketplace §2.1） | 拒绝第二注册者；记 ERROR |
+| 同 source（含同一 mcp Server）内 frontmatter `name` 重复（违反 marketplace §2.1） | 拒绝第二注册者；记 ERROR |
+
+!!! note "mcp `<server>` 段（= bundle_id）不会撞名"
+
+    `<server>` = `bundle_id`，其唯一性由 [no-double-open](data-structures.md#no-double-open) 在 **manager 注册期**保证（同 `bundle_id` = 同一软件、禁止多开）——两个合法共存的 MCP Server 必有不同 `bundle_id`，故 `mcp:<bundle_id>:<skill>` **构造上不碰撞**，SKILL 层无需再做 server 段撞名消歧。旧版「规范化 display 名 → 撞名 → 拒绝第二注册者」的失效路径**已消除**：不再因 display 名巧合而牺牲合法 SKILL 的可见性。mcp 形态下**仅剩**同一 Server 内 frontmatter `name` 重复一种碰撞（上表末行）。
 
 !!! note "跨 source 类别天然不碰撞"
 
-    user（1 段）/ marketplace（2 段）/ mcp（3 段）按段数互斥，**不可能**跨类别碰撞。碰撞只可能发生在**同类别内**（上表 mcp `<server>` 规范化、marketplace `<plugin>`、同 source frontmatter 重名），均有对应拒绝策略。
+    user（1 段）/ marketplace（2 段）/ mcp（3 段）按段数互斥，**不可能**跨类别碰撞。碰撞只可能发生在**同类别内**（marketplace `<plugin>`、同 source frontmatter 重名），均有对应拒绝策略；mcp `<server>` 段因 `bundle_id` 唯一已从构造上排除。
 
 校验失败不向 Agent 返回硬错误——SKILL 通道的 batch 接口必须对部分失败健壮。
 
@@ -178,12 +153,16 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 | Marketplace repo=`acme-skills` + plugin=`acme-audit` + skill `audit` | `acme-audit:audit` | `marketplace:acme-skills` |
 | Marketplace repo=`acme-skills` + plugin=`pylint-tools` + skill `lint` | `pylint-tools:lint` | `marketplace:acme-skills` |
 | 用户手动 drop + skill `my-helper` | `my-helper` | `user` |
-| MCP server=`tfrobot-tools` + frontmatter.name=`code-review` | `mcp:tfrobot-tools:code-review` | `mcp:tfrobot-tools` |
-| MCP server=`my.api` + frontmatter.name=`csv-aggregator` | `mcp:my_api:csv-aggregator` | `mcp:my_api` |
+| MCP server name=`tfrobot-tools`（bundle_id auto=`tfrobot-tools`）+ frontmatter.name=`code-review` | `mcp:tfrobot-tools:code-review` | `mcp:tfrobot-tools` |
+| MCP server name=`my.api`（bundle_id auto=`my_api`）+ frontmatter.name=`csv-aggregator` | `mcp:my_api:csv-aggregator` | `mcp:my_api` |
+| MCP server 显式 `bundle_id=acme-editor`（name 另有 display）+ frontmatter.name=`format` | `mcp:acme-editor:format` | `mcp:acme-editor` |
+| MCP server name=`服务器`（CJK → hash fallback `bundle_a1b2c3d4e5f60718`）+ frontmatter.name=`summarize` | `mcp:bundle_a1b2c3d4e5f60718:summarize` | `mcp:bundle_a1b2c3d4e5f60718` |
 
-!!! note "name 不再恒以 source 开头"
+第 4–5 行示范 auto-derive 情形下可读性保留；第 6 行示范显式 `bundle_id` 直接进段；第 7 行示范 hash fallback（示例 hex 仅示意）下 mcp 段退化为不透明串——这是 display 名本就不可靠的边角情形，换取的是**构造上不碰撞**。
 
-    旧版 name 总以 source prefix 起始；现在仅 **mcp** 形态 name（`mcp:<server>:...`）与 `source`（`mcp:<server>`）同头。marketplace / user 的 `name` 是裸名，**不**含 `source` 里的 marketplace 名——`source` 独立承载完整 provenance。
+!!! note "name 不再恒以 source 开头；mcp 段取 bundle_id"
+
+    旧版 name 总以 source prefix 起始；现在仅 **mcp** 形态 name（`mcp:<bundle_id>:...`）与 `source`（`mcp:<bundle_id>`）同头，且二者的 server 部分**统一为 `bundle_id`**——与 `get_config.servers` key、`get_resources.mcp_server`、错误码 `meta.mcp_server` 对齐，Agent 可据此把一条 SKILL 关联回它所属的 A2C server。marketplace / user 的 `name` 是裸名，**不**含 `source` 里的 marketplace 名——`source` 独立承载完整 provenance。
 
 ---
 
@@ -211,7 +190,7 @@ skill://host/skill-name
 
 | Source | `A2CSkillRef.uri` |
 |---|---|
-| `mcp:<server>` | 必有；MCP Server 在 `resources/list` 声明 |
+| `mcp:<bundle_id>` | 必有；MCP Server 在 `resources/list` 声明 |
 | `marketplace:<repo>` | 无 |
 | `user` | 无 |
 
@@ -347,7 +326,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
 | 字段 | 类型 | required? | 含义 / source-of-truth |
 |---|---|:---:|---|
-| `name` | `str` | ✅ **必选** | 合成全局唯一名，跨工具对齐裸名（marketplace `<plugin>:<skill>` / user `<skill>` / mcp `mcp:<server>:<skill>`，§1）。协议主键，Agent 当不透明可比较字符串 |
+| `name` | `str` | ✅ **必选** | 合成全局唯一名，跨工具对齐裸名（marketplace `<plugin>:<skill>` / user `<skill>` / mcp `mcp:<bundle_id>:<skill>`，§1）。协议主键，Agent 当不透明可比较字符串 |
 | `source` | `str` | ✅ **必选** | 完整来源 provenance（`mcp:tfrobot-tools` / `marketplace:acme-skills` / `user`） |
 | `path` | `str` | ✅ **必选** | Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问；可执行分叉下经 `${TFROBOT_SKILL_DIR}` 渲染期展开 MAY LLM-facing（§9.1/§9.4） |
 | `description` | `str` | ✅ **必选** | SKILL.md frontmatter 强制字段（marketplace §3.1）；跨三 source 均存在 |
@@ -376,9 +355,9 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
     Computer 是 SKILL 管理者（理念 #2），所有 source（MCP / marketplace / 用户）落地的统一第一步都是 staging 物化到本地安装目录（§4 / §5）。因此**任何进入 Skill Registry 的 SKILL 必有可读本地目录**——`path` 是必选字段。该字段面向 Agent SDK 的脚本执行与文件访问；可执行分叉（§9.3）下 Agent SDK 可在渲染期把它展开进 `${TFROBOT_SKILL_DIR}` 供 LLM 构造 Bash 命令（§9.4）。硬秘密边界是 `.skillenv`，非目录路径。
 
-!!! note "为什么没有 raw `mcp_server` 字段"
+!!! note "为什么没有 raw display `name` 字段（server 身份由 bundle_id 承载）"
 
-    理念 #2：对 Agent 暴露的协议表面**与 source 无关**。原始（未规范化）MCP server 名是 source 实现细节，与 SKILL 不同层级——它属于 MCP 工具/资源通道的寻址键（`client:get_config` 返回的 `servers` key），不应反规范化进每条 SKILL ref。来源追溯由 `source`（规范化、通道内合法）与 MCP 来源的 `uri`（§2 次要身份）承担。若未来确有 raw-name 关联需求，须像 §2 那样补独立 justification，而非加裸字段。
+    理念 #2：对 Agent 暴露的协议表面**与 source 无关**。MCP Server 的 raw display `name` 是纯人类可读、**允许碰撞、非身份**（见 [数据结构 §身份正交性](data-structures.md#identity-orthogonality)），不应进 SKILL ref。SKILL 的 server 身份统一由 **`bundle_id`** 承载——它既是 `client:get_config` 的 `servers` key，也构成 `name`（`mcp:<bundle_id>:<skill>`）与 `source`（`mcp:<bundle_id>`）的 server 部分。故 Agent 无需 raw 名即可把一条 SKILL 关联回对应 A2C server；来源追溯由 `source`（含 `bundle_id`）与 MCP 来源的 `uri`（§2 次要身份）承担。若未来确有 raw display 名关联需求，须像 §2 那样补独立 justification，而非加裸字段。
 
 ### GetSkillsReq / GetSkillsRet
 
@@ -803,8 +782,8 @@ A2C-SMCP SKILL 通道在 URI 与命名上**直接对齐** Claude Code 的 MCP Sk
 | URI scheme | `skill://<namespace>/<skill-name>` | 一致 |
 | 命名格式（marketplace plugin） | `<plugin>:<skill>` | **一致**（裸 2 段，对齐开放标准） |
 | 命名格式（user / bundled） | 裸 `<skill>` | **一致**（裸 1 段） |
-| 命名格式（mcp） | `<server>:<skill>` | `mcp:<server>:<skill>`（A2C 多源共享，**唯一**保留 `mcp:` 段消歧） |
-| Server 名规范化 | `normalizeNameForMCP()`，含 `claude.ai ` 前缀特例 | 同算法，**不实现** `claude.ai ` 特例 |
+| 命名格式（mcp） | `<server>:<skill>`（server = 规范化 display 名） | `mcp:<bundle_id>:<skill>`（A2C 多源共享，**唯一**保留 `mcp:` 段消歧；server 段 = **`bundle_id`** 而非 display 名，§1.3） |
+| mcp `<server>` 段取值 | 规范化 display server 名（`normalizeNameForMCP()`，含 `claude.ai ` 前缀特例） | **`bundle_id`**（[缺省生成](data-structures.md#bundleid-缺省生成)对 `name` 做等价规范化，但**不实现** `claude.ai ` 特例；显式 / fallback 情形与 CC 分歧，§1.3） |
 | `scripts/` 执行 | ❌ 禁止（MCP Skill 远程不可信） | ✅ 由 Computer 执行（source 信任继承） |
 | `${SKILL_DIR}` 占位符 | `${CLAUDE_SKILL_DIR}` 对 MCP Skill **无意义** | `${TFROBOT_SKILL_DIR}` 由 **Agent SDK 渲染期展开为真实绝对目录**（拼进 LLM prompt 前，见 §7 note / §9.4）；Computer 另注入同名 env 供子进程运行期自引用（defense-in-depth，非 body 渲染机制） |
 | `resources/list` cursor 翻页 | 不消费 | Computer 完整消费翻页直至末尾 |
