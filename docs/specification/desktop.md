@@ -191,14 +191,14 @@ Computer 在响应 `client:get_desktop` 时执行 **desktop 组织职能**——
     - 内容为空的窗口（`contents` 为空列表或不存在）
     - URI 无效（非 `window://` 或解析失败）的窗口
     - 仅含 `BlobResourceContents` 的窗口（当前不支持渲染）
-- **分组**: 按所属 MCP Server 名称分组
+- **分组**: 按所属 MCP Server 的 **`bundle_id`** 分组（server 唯一身份，与 [§校验规则第 3 条](#校验规则) 一致；同 display 名、不同 `bundle_id` 的合法共存 server 各自独立分组，不得误并）
 
 ### 步骤 2：服务器优先级排序
 
 根据工具调用历史确定 Server 的展示顺序：
 
-1. **反向遍历**工具调用历史记录，去重后得到最近使用的 Server 列表（最近使用的排在前面）
-2. **未出现在历史中的 Server** 按名称字母序追加到末尾
+1. **反向遍历**工具调用历史记录，按 **`bundle_id`** 去重后得到最近使用的 Server 列表（最近使用的排在前面）——排序/去重键 **MUST 与步骤 1 的分组键一致（`bundle_id`）**，否则同 display 名的两个 server 会在历史中被误并
+2. **未出现在历史中的 Server** 按 `bundle_id` 字典序追加到末尾
 
 !!! note "ToolCallRecord"
 
@@ -208,7 +208,7 @@ Computer 在响应 `client:get_desktop` 时执行 **desktop 组织职能**——
     class ToolCallRecord(TypedDict):
         timestamp: str
         req_id: str
-        server: str       # MCP Server 名称，用于优先级排序
+        server: str       # MCP Server 的 bundle_id（非 display 名），与分组键一致，用于优先级排序
         tool: str
         parameters: dict
         timeout: float | None
@@ -249,7 +249,7 @@ flowchart TD
     A[输入: windows, size, history] --> B{size ≤ 0?}
     B -- 是 --> C[返回空列表]
     B -- 否 --> D[过滤无效/空窗口]
-    D --> E[按 Server 名称分组]
+    D --> E[按 Server bundle_id 分组]
     E --> F[根据工具调用历史排序 Server]
     F --> G[每个 Server 内按 priority 降序排序]
     G --> H{遍历每个 Server}
