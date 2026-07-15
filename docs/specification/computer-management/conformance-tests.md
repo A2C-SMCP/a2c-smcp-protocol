@@ -13,7 +13,15 @@
 
 ## 2. 共享 Fixtures
 
-一致性测试套件 SHOULD 在各 SDK 间使用同一批 JSON fixtures。具体磁盘位置由 SDK 自行决定，但每个 SDK SHOULD 能加载等价于以下内容的 fixtures：
+一致性测试套件 SHOULD 在各 SDK 间使用同一批 JSON fixtures。具体磁盘位置由 SDK 自行决定，但每个 SDK SHOULD 能加载等价于以下内容的 fixtures。
+
+### 2.0 测试学硬条款（防「假绿」）
+
+以下三条源自同一失效模式在两个 SDK 五处独立复发的教训，MUST 遵守：
+
+1. **夹具身份分叉**：一致性夹具中 display `name` 与 `bundle_id` **MUST 取值分叉**（如 name `"stdio srv (display)"` → bundle_id `stdio_srv_display`）。缺省派生下 `bundle_id == normalize(name)`，二者恰好重合会把所有身份裂缝盖住——「按 name 取键」与「按 bundle_id 取键」的实现错误在此类夹具下**双双通过**（零鉴别力）。本文其余章节的示例夹具若未分叉，仅为行文简洁，实现 MUST 分叉。
+2. **异 id 同名共存向量**：「显式不同 `bundleId` + 相同 display name 的 server 合法共存」场景 **MUST 有双端对拍向量**，覆盖：两条均保留（去重不塌陷）、分组/归属/审批各自独立、寻址歧义按 [sdk-api-guidance §5.1](sdk-api-guidance.md) 报错。既有 bundle_id 一致性向量只对拍**生成算法**；寻址行为是缺陷高发的另一半，MUST 单独对拍。
+3. **真实构造路径**：涉及 Computer 聚合状态的契约测试（如 `client:get_config` 投影）**MUST 至少一条用例走真实构造路径**（真实 Computer 构造 + 运行期挂载，含「构造期集合为空、server 全部运行期挂入」的形态），不得全部依赖桩——桩会把生产中恒假的前提固化为真（桩里塞满 server，而真实 CLI 构造期集合恒空）。
 
 ### 2.1 Minimal Runtime
 
