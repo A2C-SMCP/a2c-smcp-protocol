@@ -270,10 +270,12 @@
 - Explicit prune 会移除 marketplace materialization，并注销其 active SKILLs。
 - Plugin install 校验 `<plugin>@<marketplace>` shape。
 - marketplace unknown 时，Plugin install 失败。
-- Plugin install 拒绝 foreign MCP Server name conflict。
-- plugin-owned MCP Server 的 reinstall/enable 是幂等的。
+- Plugin install 对声明依赖的 MCP Server 按 `bundle_id` 依赖预检（数据源 = 运行期权威配置集）：同 `bundle_id` 已存在 → **提示「依赖已满足」并正常安装**（MUST NOT 拒绝）；display 同名、`bundle_id` 不同 → 正常安装（合法共存，MUST NOT 误拒）。
+- 同一声明文件内两个 key 归一到同一 `bundle_id` → 注册边界 fail-fast（提示改名或显式 `bundleId`）。
+- plugin 声明的 MCP Server 的 reinstall/enable 是幂等的。
 - Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
-- Plugin uninstall 会移除其 records，并 teardown owned bundled MCP servers，除非显式选择 keep-server policy。
+- Plugin uninstall 按 §4.9.1 回收判据处理其声明依赖的 server：无其他 plugin 依赖 ∧ 非用户声明 → 回收；用户声明的同 `bundle_id` server 永不连坐；另一 plugin 仍依赖时保留、最后一个依赖者卸载时回收（无泄漏）。
+- uninstall 的停摘名单仅依赖账本自身字段（删除 installPath 树之后仍可精确停摘）。
 - Plugin-scoped inputs 会在 plugin server config rendering 前注入。
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
 - **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。

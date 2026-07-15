@@ -51,7 +51,7 @@ SDK 可以使用语言原生类型，但应支持用于 conformance 的共享 JS
 | disabled servers | 保留 config，但从 Agent-facing projection 中排除能力 |
 | forbidden tools | 从 tools 中排除，并拒绝成功执行 |
 | marketplace reconcile | 优先采用 additive-only startup reconcile 和 explicit prune/gc |
-| plugin conflict | 挂载前拒绝 foreign MCP Server name conflicts |
+| plugin MCP 依赖 | 按 `bundle_id` 依赖预检（读运行期权威配置集）：已存在 = 依赖已满足 → 提示 + 正常安装，不拒绝；同文件多 key 归一同 `bundle_id` 才 fail-fast |
 | secret values | 仅本地解析，绝不放入 Agent-facing projection |
 
 ## 4. Lifecycle API 指南
@@ -107,10 +107,10 @@ SDK 应提供一个终止性的 cleanup 操作。完成后：
 
 | 操作 | 指南 |
 |---|---|
-| install | 物化 plugin、写 `installedPlugins` 意图、校验 manifest、预检 MCP name conflicts；**MUST NOT 激活**（SKILL/MCP/input contributions 待 enable 才注册） |
-| enable | 标记 plugin enabled（写 `enabledPlugins=true`）并 reconcile contributions（skills 与 bundled server 原子一并） |
-| disable | 标记 plugin disabled，并使 contributions 不可见/不可调用 |
-| uninstall | 移除 plugin records 并 teardown owned contributions，除非调用方选择 keep-server policy |
+| install | 物化 plugin、写 `installedPlugins` 意图、校验 manifest、MCP 依赖预检（bundle_id 比对运行期权威集，依赖已满足 → 提示不拒绝）；**MUST NOT 激活**（SKILL/MCP/input contributions 待 enable 才注册） |
+| enable | 标记 plugin enabled（写 `enabledPlugins=true`）并 reconcile contributions（skills 与 bundled server 原子一并；同 `bundle_id` 多来源按 [runtime-contract §2.5 优先序](runtime-contract.md) 合并） |
+| disable | 标记 plugin disabled，并使 contributions 不可见/不可调用；其声明依赖的 server 按 [runtime-contract §4.9.1 回收判据](runtime-contract.md) 处理 |
+| uninstall | 移除 plugin records 并按 §4.9.1 回收判据 teardown（无人再依赖 ∧ 非用户声明才回收；停摘名单在账本移除前取得且仅依赖账本字段） |
 | info/list | 仅向 trusted caller 返回 management diagnostics 和 provenance |
 
 推荐 marketplace operations：

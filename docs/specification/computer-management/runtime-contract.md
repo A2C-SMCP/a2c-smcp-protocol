@@ -96,12 +96,29 @@ Plugin 有两个正交、独立生命周期的状态维度：**是否安装**（
 
 | 操作 | 意图写入 | 物化 / 投影副作用 | 结果态 |
 |---|---|---|---|
-| `install` | `installedPlugins` 增 | 物化（clone / 账本）、校验 manifest、预检 foreign MCP name 冲突；**MUST NOT 激活**、MUST NOT 写 `enabledPlugins` | `installed_disabled` |
+| `install` | `installedPlugins` 增 | 物化（clone / 账本）、校验 manifest、**依赖预检**（plugin 声明依赖的 MCP Server 按 `bundle_id` 与运行期权威配置集比对：已存在 = 依赖已满足 → 提示并正常安装，交 reconcile 收敛，**MUST NOT 以此拒绝安装**；见 §2.5）；**MUST NOT 激活**、MUST NOT 写 `enabledPlugins` | `installed_disabled` |
 | `enable` | `enabledPlugins[scope] = true` | 把 skills 与 bundled MCP server **原子**并入投影（见下）；失败 MUST 回滚到 `installed_disabled` | `installed_enabled` |
 | `disable` | `enabledPlugins[scope] = false` | 从投影移除其贡献；保留 `installedPlugins` 与物化 | `installed_disabled` |
-| `uninstall` | `installedPlugins` 删、清其 `enabledPlugins` 条目 | teardown 物化与 owned server（除非 keep-server policy） | `available` |
+| `uninstall` | `installedPlugins` 删、清其 `enabledPlugins` 条目 | teardown 物化；其声明依赖的 MCP Server 按 §4.9.1 回收判据处理（无人再依赖 ∧ 非用户声明才回收） | `available` |
 
 > **enable 原子性（消除“半态”）。** `enable` MUST 把该 plugin 的 skills 与 bundled MCP server **条目**作为整体一并纳入投影。被禁止的“半态”锚定在**投影面不一致**——skill 已在 `client:get_skills`、而 bundled server 条目缺席于 config/tool 投影（此即 rust-sdk#102）。在 client-owns-MCP-config 下，把 bundled server 记为 **enabled-可查询条目**即已满足原子性——其**进程拉起**是客户端职责（见 §4.8 边界，不算半态），skills 照常一并投影、无需等待其就绪。仅当 server 连投影条目都无法建立（manifest / 物化失败）时，才整体保持 `installed_disabled` 并给出公开诊断。
+
+### 2.5 Plugin 与 MCP Server：依赖关系与来源优先序
+
+**plugin 与 MCP Server 均为一级资源，二者是依赖关系而非所有关系**：plugin 通过 `bundle_id` **声明依赖**某 MCP Server（[身份正交性](../data-structures.md#identity-orthogonality)）。由此：
+
+1. **依赖已满足不是冲突**。install/enable 时若声明的 `bundle_id` 已存在于本地任一来源（如用户 mcp.json 声明），SDK **MUST NOT** 拒绝——MUST 视为「依赖已满足」，SHOULD 提示（复用既有实例、按来源优先序 reconcile、卸载本 plugin 不移除它），随后正常安装。
+2. **仍为硬错误的情形**：同一 mcp.json 文件内两个 key 归一到同一 `bundle_id`（声明面写法错误）——注册边界 MUST fail-fast 并提示改名或显式指定 `bundleId`。
+3. **来源优先序（配置与 enable/disable 开关的合并序，双端 MUST 一致）**，由低到高：
+
+    ```
+    plugin 声明  <  user  <  project  <  local  <  flag  <  policy
+    ```
+
+    - **plugin 声明是最低基线层**：其携带的 server 配置仅在更高来源缺失该 `bundle_id` 时生效，被任何用户侧 scope 覆盖（用户主权）；`origin=plugin` 的可信性由 install ∧ enable 门保证，**不走 settings 信任面**（见 §5 item 10 与 [审批门对齐指南](../../guides/mcp-approval-gate-alignment.md)）。
+    - **settings 与 mcp.json 两套来源 MUST 使用同一优先序**；`flag` 统一为次高（CLI 显式传入的受信覆盖，仅低于 policy）。历史实现把 mcp.json 的 flag 层排为最低（`--config` 老接口遗留），该形态废止。
+    - flag scope 的文件对为 **`--mcp-config`**（flag 层 mcp.json，含 `servers`/`inputs`；由旧 `--config` 更名）与 **`--settings`**（flag 层 settings.json），与其余 scope 的双文件形态对称。
+4. **运行期权威集约束**：依赖预检、`client:get_config` 等 **一切 wire 投影与预检决策 MUST 读取运行期权威配置集**（含动态挂载 / 重挂项），**MUST NOT** 读取构造期快照——快照对运行期变更不可见，会把「依赖已满足」误判为「未满足」并腐蚀账本记录。
 
 ## 3. 生命周期状态
 
@@ -220,6 +237,15 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 2. committed pin-lock（记录 `commitSha` / `integrity` 并令 boot 优先按锁复现）是可选、非必需的更强复现扩展；实现 MAY 提供，但 MUST NOT 以派生缓存冒充可复现 lock。
 3. 运行期稳定：会话内派生态快照 SHOULD 冻结；后台或磁盘侧变更 MUST NOT 在运行中打乱已投影的 Agent-facing 状态，而是作为 pending 差异留到下次 boot 吸收。此保证“改配置后再启动”确定、“反复重启”结果一致。
 
+#### 4.9.1 账本的 MCP 依赖记录与回收判据
+
+账本中每条 plugin 记录以 **`mcpServers: ["<bundle_id>", ...]` 纯数组**登记其声明依赖的 MCP Server（§2.5 依赖关系）：
+
+1. **只记 `bundle_id`**。MUST NOT 记 display `name`（会随显式 `bundleId` 改名而失真；展示用名可从 install_path 实时解析）；MUST NOT 记「安装时本地是否已有」一类**时点快照事实**（如 provenance/introduced 标记）——它会随其他 plugin 的卸载而失真，任何回收/门控/归属判定 MUST NOT 依赖此类字段。
+2. **回收判据（纯函数，零落盘状态）**：disable / uninstall plugin P 时，对其声明的每个 `bundle_id` X——**回收 X ⟺ 无其他 plugin 声明依赖 X ∧ X 非用户声明**（运行期权威配置集中不存在 `origin != plugin` 的 X 条目）。用户自有 server **永不连坐**由「非用户声明」保证；多 plugin 共享依赖由第一条保证。
+3. **uninstall 停摘自足**：停摘名单 MUST 在账本记录移除**之前**取得，且 MUST 仅依赖账本自身字段——MUST NOT 依赖 `installPath` 指向的树（uninstall 流程中该树在停摘前已被删除，「从 install_path 重解析」在此路径恒不成立）。
+4. **旧格式迁移**：检测到旧账本格式（如 name 数组）MUST 整条丢弃、经 reconcile 从 `installedPlugins` 意图重建（§4.9 判据「删除它无损」），MUST NOT 编写 name→bundle_id 映射迁移逻辑。
+
 ## 5. Marketplace And Plugin Contract
 
 暴露 marketplace/plugin management 的 SDK SHOULD 对齐以下语义：
@@ -229,11 +255,11 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 3. 为跨 SDK fixture 目的，Plugin id 使用语义形式 `<plugin>@<marketplace>`。SDK MAY 把它包装为 typed IDs。
 4. **Enabling** plugin 会把它的 SKILL、MCP Server、input 和 tool metadata contributions reconcile 到既有 projection surfaces（skills 与 bundled server 原子一并，见 §2.4）。**Installing** 只物化并写 `installedPlugins`，MUST NOT 进入 projection。
 5. Disabling/removing plugin 会让它贡献的 capabilities 变为不可见或不可调用。
-6. Foreign MCP Server name conflict SHOULD 在挂载 plugin-contributed servers 前被拒绝。Plugin-owned servers MAY 被幂等更新。
+6. plugin 声明依赖的 MCP Server 以 **`bundle_id`** 与运行期权威配置集比对（§2.5）：已存在 = **依赖已满足**，MUST NOT 拒绝，SHOULD 提示并交 reconcile 按来源优先序收敛；display name 相同、`bundle_id` 不同是协议允许的合法共存，MUST NOT 视为冲突。唯一硬错误是同一声明文件内多 key 归一同 `bundle_id`（fail-fast，§2.5 第 2 条）。
 7. Plugin-scoped inputs MUST 避免同一 bare input id 在不同 plugin 间泄露值。
 8. 安装路径 MUST NOT 作为权威状态。MUST 存在纯函数 `(marketplace, plugin, version) → path`；持久化路径仅为提示，boot MUST 重新校验，失效即重算（worktree / seed 场景 MUST NOT 信任存储的 install location）。
 9. 声明（可提交）与凭据（机器本地）MUST 使用不同持久化契约：secret / OAuth token MUST 存于 keychain 或等价机器本地存储，MUST NOT 落入任何可提交的声明文件。
-10. MCP Server 启停有两套正交开关，MUST 分清并分别应用：project-scope 声明 server 的信任门（`enabledMcpjsonServers` / `disabledMcpjsonServers` / `enableAllProjectMcpServers`）与通用禁用开关（按命名空间键，对 plugin bundled server 亦生效）。plugin bundled server 的启停 MUST NOT 走 project 信任门。
+10. MCP Server 启停有两套正交开关，MUST 分清并分别应用：project-scope 声明 server 的信任门（`enabledMcpjsonServers` / `disabledMcpjsonServers` / `enableAllProjectMcpServers`）与通用禁用开关（按 `bundle_id` 键，**仅作用于声明的 server**）。plugin 声明依赖的 server **MUST NOT 进入任何审批/信任门的迭代**（在迭代层过滤，禁止「进门后豁免」的档位；其启停由 plugin enable/disable **整体**控制——单独打掉某个 bundled server 会产生 §2.4 明令禁止的半态；管理员经 policy `enabledPlugins: false` 可强停整个 plugin）。审批/信任门的实现 MUST NOT 依赖物化账本的名集（见 [审批门对齐指南](../../guides/mcp-approval-gate-alignment.md)）。
 
 ## 6. 错误类别
 
@@ -243,7 +269,7 @@ SDK SHOULD 暴露等价的公开错误类别：
 |---|---|---|
 | `validation` | config shape 非法、plugin id 非法、marketplace name 非法、scope 非法 | 修复 config 后重试 |
 | `policy` | Source blocked、permission denied、policy-only field in user scope | policy 变更后重试 |
-| `conflict` | Foreign MCP Server name conflict、concurrent writer conflict | 解决冲突后重试 |
+| `conflict` | 同一声明文件内多 key 归一同 `bundle_id`（§2.5 fail-fast）、concurrent writer conflict | 解决冲突后重试 |
 | `auth` | SMCP auth failure、source auth failure、MCP upstream authorization failure | credentials/auth flow 完成后重试 |
 | `network` | Server unreachable、marketplace fetch failed、transient transport failure | 通常可重试 |
 | `protocol_version` | HTTP handshake `4008` | 不改版本则不可重试 |
