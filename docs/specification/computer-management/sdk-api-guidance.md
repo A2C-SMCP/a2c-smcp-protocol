@@ -124,7 +124,25 @@ SDK 应提供一个终止性的 cleanup 操作。完成后：
 
 SDK 可以在非 live context 中支持 ledger-only operations，但应文档化：Agent-facing projection changes 需要 live runtime reconcile。
 
-## 6. Inputs 与 Secret 指南
+### 5.1 MCP Server 寻址：库层收 bundle_id，name 解析只在人机面
+
+**库层公开 API**（remove / unmount / start / stop 等治理与生命周期操作）**一律收 `bundle_id`**，无 name 启发式、无回退猜测——「入参即身份」。理由：治理路径（uninstall / disable / rollback / 账本）全程持 bundle_id；name→id 启发式放库层会让每个外部集成方各继承一次不可靠推断（name 空间与 id 空间在缺省派生下大面积重叠，重叠处「先按 name 再回退按 id」不可靠）。
+
+**name→id 解析（`resolve_target` 语义）只存在于人机面（CLI / REPL 等）**，该用户可见行为**双端 MUST 逐字一致**：
+
+1. token 按 display name 在活跃配置集反查，**唯一命中** → 解析为其 bundle_id，执行；
+2. 0 命中且 token 是合法 bundle_id → 按 bundle_id 执行；仍无 → 报错「未找到」；
+3. **多命中**（同名合法共存）→ 报错并列出各候选的 **bundle_id + display name + 归属**（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；
+4. **MUST NOT** 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错；
+5. 未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。
+
+```
+$ server rm filesystem
+⚠️ 有 2 个 server 叫 filesystem:
+   filesystem      (user)
+   bundle_a3f9c2e1 (plugin:fs-tools)
+请用 bundle_id 重试
+```
 
 鼓励 SDK：
 

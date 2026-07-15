@@ -125,6 +125,7 @@ nav:
       - 安全考虑: specification/security.md
   - 开发指南:
       - Computer MCP 配置指南: guides/computer-mcp-config-guide.md
+      - MCP 审批门对齐指南: guides/mcp-approval-gate-alignment.md
   - 迁移指南:
       - v0.2 升级指南: migrations/v0.2-uri-metadata-refactor.md
       - v0.2.1 SKILL/二进制传输适配: migrations/v0.2.1-skill-and-blob-transfer.md
