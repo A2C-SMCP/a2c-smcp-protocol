@@ -50,6 +50,7 @@ SMCP 协议中的工具定义，用于工具列表返回。
 ```python
 class SMCPTool(TypedDict):
     name: str                           # 工具名称
+    bundle_id: str                      # 所属 MCP Server 的 bundle_id（解析后值）
     description: str                    # 工具描述
     params_schema: dict                 # 参数 JSON Schema
     return_schema: dict | None          # 返回值 JSON Schema（可选）
@@ -57,6 +58,8 @@ class SMCPTool(TypedDict):
 ```
 
 **说明**: `name` 承载的是**聚合后的 `exposed_tool_name`**（`{bundle_id}__{alias ?? 原始工具名}`），跨 Server / marketplace / plugin 保证唯一。命名生成、去重与路由规则见 [MCP Tool 命名与路由（BundleID 模型）](#mcp-tool-命名与路由)。
+
+**`bundle_id` 不变量**：值 **MUST** 为该工具所属 MCP Server 的**解析后** `bundle_id`（`resolve_bundle_id` 产物，恒非空；不是配置中的显式声明值，缺省声明下二者可能不同），与 [`GetComputerConfigRet.servers`](#getcomputerconfigret) 的字典 key、错误码 [`meta.mcp_server`](error-handling.md) 属**同一身份空间**——Agent 据此把工具归属回具体 server（分组展示、关联配置与资源），**MUST NOT** 通过切分 `name` 的 `__` 前缀反推归属（`name` 对 Agent 是不透明整串，本字段即归属的唯一正解）。
 
 ### SMCPTool.meta 序列化规范 { #smcptoolmeta-序列化规范 }
 
