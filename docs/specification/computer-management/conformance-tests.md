@@ -283,6 +283,7 @@
 - plugin 声明的 MCP Server 的 reinstall/enable 是幂等的。
 - Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
 - Plugin uninstall 按 §4.9.1 回收判据处理其声明依赖的 server：无其他 plugin 依赖 ∧ 非用户声明 → 回收；用户声明的同 `bundle_id` server 永不连坐；另一 plugin 仍依赖时保留、最后一个依赖者卸载时回收（无泄漏）。
+- **回收判据 origin 向量**（[Discussion #32 裁决](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/32)）：「非用户声明」MUST 评估在带 `origin` 的运行期权威配置集上（runtime-contract §2.5 第 5 条）。四景 MUST 双端对拍：① X 经 flag（`--mcp-config`）挂载（`origin=flag`）→ 卸载声明依赖 X 的 plugin **不回收** X；② X 经宿主构造入参挂载（`origin=embed`）→ 同上**不回收**；③ X 仅由 plugin 声明（`origin=plugin`、无其他 plugin 依赖）→ **回收**；④ 同 `bundle_id` 混源碰撞（plugin 声明 + flag 声明并存，flag > plugin）→ **不回收**。夹具遵 §2.0 name/bundle_id 分叉条款。
 - uninstall 的停摘名单仅依赖账本自身字段（删除 installPath 树之后仍可精确停摘）。
 - Plugin-scoped inputs 会在 plugin server config rendering 前注入。
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。

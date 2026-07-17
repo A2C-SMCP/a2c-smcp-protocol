@@ -112,13 +112,15 @@ Plugin 有两个正交、独立生命周期的状态维度：**是否安装**（
 3. **来源优先序（配置与 enable/disable 开关的合并序，双端 MUST 一致）**，由低到高：
 
     ```
-    plugin 声明  <  user  <  project  <  local  <  flag  <  policy
+    plugin 声明  <  user  <  project  <  local  <  embed  <  flag  <  policy
     ```
 
     - **plugin 声明是最低基线层**：其携带的 server 配置仅在更高来源缺失该 `bundle_id` 时生效，被任何用户侧 scope 覆盖（用户主权）；`origin=plugin` 的可信性由 install ∧ enable 门保证，**不走 settings 信任面**（见 §5 item 10 与 [审批门对齐指南](../../guides/mcp-approval-gate-alignment.md)）。
     - **settings 与 mcp.json 两套来源 MUST 使用同一优先序**；`flag` 统一为次高（CLI 显式传入的受信覆盖，仅低于 policy）。历史实现把 mcp.json 的 flag 层排为最低（`--config` 老接口遗留），该形态废止。
     - flag scope 的文件对为 **`--mcp-config`**（flag 层 mcp.json，含 `servers`/`inputs`；由旧 `--config` 更名）与 **`--settings`**（flag 层 settings.json），与其余 scope 的双文件形态对称。
+    - **`embed` 为宿主构造挂载层**（embedded-constructor，如 `Computer(mcp_servers=...)` 构造入参）：代码级显式意图，与 `flag` 同属「调用方显式受信层」——宿主自身 flag 仍可覆盖代码默认，policy 最高不变。它是**非-plugin** origin，参与 §4.9.1-2 回收判据「非用户声明」的判定（宿主自有 server 不因 plugin 卸载连坐）。
 4. **运行期权威集约束**：依赖预检、`client:get_config` 等 **一切 wire 投影与预检决策 MUST 读取运行期权威配置集**（含动态挂载 / 重挂项），**MUST NOT** 读取构造期快照——快照对运行期变更不可见，会把「依赖已满足」误判为「未满足」并腐蚀账本记录。
+5. **运行期权威配置集 MUST 携带 `origin`**（[Discussion #32 裁决](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/32)）：该集合定义为 **resolve 后带 `origin` 的集合**，每条挂载路径 MUST 在其中留下携带正确 origin 的条目——durable scopes（`user` / `project` / `local` / `policy`）、flag（`--mcp-config`）、embedded-constructor（`embed`）；**唯 plugin-enable 路径产生 `origin == plugin`**。origin 的取得机制不钉——scope 纯推导（查询时从声明面推导）与挂载时标记（注册接缝携归属入参）**行为等价即合规**——但 MUST 可从当次 boot 的声明式输入（文件、flag、构造入参、plugin 意图）重建，MUST NOT 落盘为快照（§4.9.1-1 禁账本 provenance 不变）。本条只做 scope 级 plugin/非-plugin 二分，**不引入租户级归属**（嵌入式多实例 ownership 混源轴维持共识外）。
 
 ## 3. 生命周期状态
 
@@ -242,7 +244,7 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 账本中每条 plugin 记录以 **`mcpServers: ["<bundle_id>", ...]` 纯数组**登记其声明依赖的 MCP Server（§2.5 依赖关系）：
 
 1. **只记 `bundle_id`**。MUST NOT 记 display `name`（会随显式 `bundleId` 改名而失真；展示用名可从 install_path 实时解析）；MUST NOT 记「安装时本地是否已有」一类**时点快照事实**（如 provenance/introduced 标记）——它会随其他 plugin 的卸载而失真，任何回收/门控/归属判定 MUST NOT 依赖此类字段。
-2. **回收判据（纯函数，零落盘状态）**：disable / uninstall plugin P 时，对其声明的每个 `bundle_id` X——**回收 X ⟺ 无其他 plugin 声明依赖 X ∧ X 非用户声明**（运行期权威配置集中不存在 `origin != plugin` 的 X 条目）。用户自有 server **永不连坐**由「非用户声明」保证；多 plugin 共享依赖由第一条保证。
+2. **回收判据（纯函数，零落盘状态）**：disable / uninstall plugin P 时，对其声明的每个 `bundle_id` X——**回收 X ⟺ 无其他 plugin 声明依赖 X ∧ X 非用户声明**（运行期权威配置集中不存在 `origin != plugin` 的 X 条目）。用户自有 server **永不连坐**由「非用户声明」保证；多 plugin 共享依赖由第一条保证。「X 非用户声明」MUST 评估在 **§2.5 第 5 条定义的带 `origin` 的运行期权威配置集**之上——**MUST NOT** 以裸 manager 活跃集（无 origin）判定（transient flag 挂载与 embedded-constructor 挂载在其中与 plugin 挂载可观测同形，会连坐用户 / 宿主自有 server）；**MUST NOT** 以「活跃集 ∖ 全 plugin 声明集」差集判定（回收候选必然落在 plugin 声明集内，该差集对其恒空，判定退化为死代码——已实测证伪）。
 3. **uninstall 停摘自足**：停摘名单 MUST 在账本记录移除**之前**取得，且 MUST 仅依赖账本自身字段——MUST NOT 依赖 `installPath` 指向的树（uninstall 流程中该树在停摘前已被删除，「从 install_path 重解析」在此路径恒不成立）。
 4. **旧格式迁移**：检测到旧账本格式（如 name 数组）MUST 整条丢弃、经 reconcile 从 `installedPlugins` 意图重建（§4.9 判据「删除它无损」），MUST NOT 编写 name→bundle_id 映射迁移逻辑。
 

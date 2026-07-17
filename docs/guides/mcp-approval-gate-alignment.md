@@ -13,14 +13,14 @@
 
 ## 2. 档位表（顺序即优先级，先到先决）
 
-审批门只对**声明的 server**（mcp.json 各 scope 条目）判定；输入为 `(bundle_id, settings, trusted_origin)`：
+审批门只对**声明的 server** 判定——mcp.json 各 scope 条目 + 宿主 embed 构造声明（[runtime-contract §2.5 第 3 条](../specification/computer-management/runtime-contract.md)），embed 条目进门迭代意味着企业 policy 拒绝名单与通用禁用开关对其**同样适用**（用户/管理员保留最终关停权）；输入为 `(bundle_id, settings, trusted_origin)`：
 
 | 档 | 判据 | 结果 |
 |---|------|------|
 | 1 | `deniedMcpServers` 含该 bundle_id（企业拒绝名单） | `DISABLED` |
 | 2 | `allowedMcpServers` 非空且不含该 bundle_id（企业白名单） | `DISABLED` |
 | 3 | `disabledMcpjsonServers` 含该 bundle_id（disabled 优先于 enabled） | `DISABLED` |
-| 4 | `trusted_origin`（user / flag / policy scope 声明） | `ENABLED` |
+| 4 | `trusted_origin`（user / flag / **embed** / policy 声明） | `ENABLED` |
 | 5 | `enabledMcpjsonServers` 含该 bundle_id（**判据仅取自受信 scope，见 §2.1**） | `ENABLED` |
 | 6 | `enableAllProjectMcpServers == true`（**判据仅取自受信 scope，见 §2.1**） | `ENABLED` |
 | 7 | 否则（工作区共享且未决） | `PENDING`（弹批准框） |
