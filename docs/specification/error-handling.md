@@ -439,9 +439,27 @@ CallToolResult(
 **简明判别**：
 
 - 区分点是"**用户是否曾经授权**"——`4006` = 没授权过 / 凭证不存在；`4007` = 曾授权但当前不可用
-- 当 Computer 无法可靠判别时，倾向于报 `4006`（提示用户重新走授权流程是稳妥兜底）
+- 当 Computer **已判定上游失败属授权类**但无法区分 401 与 403 时，**MUST** 报 `4006`（见[降级语义](#降级语义授权类失败的硬映射)；提示用户重新走授权流程是稳妥兜底）
 
 **Agent 行为差异**：Agent 收到 `4006` 应引导用户**首次/重新**完成授权；收到 `4007` 应引导用户**检查权限设置或重新授权**——区别仅在 UX 文案，机器路由可统一。
+
+### 降级语义：授权类失败的硬映射
+
+[判定决策表](#40064007-判定决策表)假定 Computer 能观测到上游的明确表现（HTTP 状态码、Token 过期信号等）。现实中，MCP 客户端库可能把授权失败吸收进自有错误变体而**丢失原始状态码**——例如 rmcp 把 `401 + WWW-Authenticate` 短路成 `AuthRequired` 语义变体、其字符串化不含 `401` 字样；mcp-python 在某些路径把 401/403 抛进传输任务组并拆连接，调用方既拿不到状态码也拿不到结构化错误。为防止此类情形让授权失败被错误降级，Computer **MUST** 遵守：
+
+- 一旦**判定上游失败属授权类**——无论依据是 HTTP 状态码、库的语义错误变体、还是 `WWW-Authenticate` 响应头——**MUST** 按[判定决策表](#40064007-判定决策表)映射为 `4006` 或 `4007`，**MUST NOT** 降级为 `4003 Tool Execution Failed` 或通用工具执行错误。
+- 当上游失败**已判定属授权类**但**无法区分** 401 与 403（库只给出"需要授权"语义而无状态码）时，**MUST** 报 `4006`（提示用户重新走授权流程是稳妥兜底）。
+
+> 本条把原"简明判别"中"无法可靠判别时倾向报 4006"由建议升格为 **MUST**，并显式覆盖"客户端库吞掉状态码"这一[判定决策表](#40064007-判定决策表)未直接处理的维度。"**是否进 4006/4007 而非掉出表外**"是协议硬约束；至于 Computer 靠状态码匹配、错误变体 downcast、还是传输层拦截来**判定**授权类，属 SDK 自治——协议只规定结果，不规定方法。
+
+### 可观测判据：禁止挂起至超时
+
+授权失败的 surfacing **MUST NOT** 表现为调用挂起至 Agent 超时：
+
+- 上游对 `tools/call` 返回授权失败（401/403/语义变体）后，Computer **MUST** 在有限时间内产出携带 `meta.error_code` 的 `CallToolResult`（`isError=true`），而非让 `client:tool_call` 的响应永远悬空。
+- 即使底层 MCP 客户端库在授权失败时拆除传输连接、关闭读流、或把异常投递给后台任务组（使调用方收不到结构化错误），Computer **MUST** 在自身层面兜底：检测到该路径无响应时，按[降级语义](#降级语义授权类失败的硬映射)合成 `4006`/`4007` 结果返回，不得任由调用挂起到自身或 Agent 超时。
+
+> 此条针对两类已坐实的同族失效：python-sdk 在 mcp-python `streamable_http.py` `post_writer` 上 401/403 被抛进传输任务组→拆连接关 `read_stream`→`call_tool` 挂起至 agent timeout；rust-sdk 在 rmcp POST 200 + SSE 流阶段 401 只 `warn` 不通知 pending responder。检测与兜底机制归 SDK 自治，但"**不得挂起**"是对端可感的硬约束。真实传输 conformance 向量见 [`fixtures/auth_error_conformance_vectors.json`](fixtures/auth_error_conformance_vectors.json) 与 [Computer 管理面一致性测试 → §4.8 上游授权错误 surfacing](computer-management/conformance-tests.md#48-上游授权错误-surfacing40064007)。
 
 ### 字段说明
 

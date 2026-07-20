@@ -1,0 +1,47 @@
+{
+  "$schema_note": "A2C-SMCP 协议 0.3.0 上游 MCP 授权错误（4006/4007）surfacing 一致性测试向量（跨 SDK 逐字节一致锚点）。source of truth = a2c-smcp-protocol docs/specification/error-handling.md §「MCP 上游授权错误响应」（判定决策表 + 降级语义 + 可观测判据）。双 SDK MUST 用真实传输构造路径覆盖——真实 MCP server：握手 initialize 放行，仅 tools/call 返指定状态；禁止以合成 MCPClientError / ProtocolError 对象充数（见 computer-management/conformance-tests.md §2.0 测试学硬条款第 3 条）。每景 expected.error_code 与 expected.hangs 双端 MUST 一致。",
+  "transport_coverage": "覆盖 streamable_http（经 MCP 客户端库：python 用 mcp-python、rust 用 rmcp）路径；手写 SSE 客户端路径（rust-sdk sse_client.rs）作为补充景。stdio 无 HTTP 状态码，不纳入本向量。挂起判定用 time-box（如 tokio::time::timeout / asyncio.wait_for）区分「返 Err/结果」与「挂起」。",
+  "fixture_setup": {
+    "real_server_contract": "起一个本地 HTTP server 扮演受保护 MCP Server：initialize / notifications:initialized 正常放行（建立会话），仅对 tools/call 请求按 vector.upstream 返回指定 HTTP 状态/header；POST 200 + SSE 景则先回 200 起 SSE 流，再在流内注入 401 终止。",
+    "computer_action": "Computer 经其 MCP 客户端库完成 initialize，再调用 tools/call；SDK 自身或测试用 time-box 包裹 call_tool，观察返回的 CallToolResult.meta.error_code 与是否在有限时间内返回。"
+  },
+  "vectors": [
+    {
+      "desc": "403 Forbidden → 4007（已授权但 scope/权限不足）",
+      "transport": "streamable_http",
+      "upstream": {"status": 403, "www_authenticate": null},
+      "expected": {"error_code": 4007, "isError": true, "hangs": false},
+      "rationale": "决策表第 3 行；状态码经 reqwest error_for_status 保留，分类器命中 forbidden/403 marker。双端基线景。"
+    },
+    {
+      "desc": "401 无 WWW-Authenticate → 4006（凭证缺失/未提供）",
+      "transport": "streamable_http",
+      "upstream": {"status": 401, "www_authenticate": null},
+      "expected": {"error_code": 4006, "isError": true, "hangs": false},
+      "rationale": "决策表第 2 行；裸 401 经 error_for_status 保留状态码，命中 unauthorized/401 marker。双端基线景。"
+    },
+    {
+      "desc": "401 带 WWW-Authenticate → 4006（OAuth 合规标准应答；库可能吸收为 AuthRequired 语义变体丢状态码）",
+      "transport": "streamable_http",
+      "upstream": {"status": 401, "www_authenticate": "Bearer realm=\"mcp\""},
+      "expected": {"error_code": 4006, "isError": true, "hangs": false},
+      "rationale": "RFC 6750 §3 要求受保护资源 401 MUST 带 WWW-Authenticate——此景是授权类失败的规范形态，MUST 命中 4006。rmcp 在此景短路成 StreamableHttpError::AuthRequired（Display 仅 \"Auth required\"、丢状态码与 header 值），字符串分类器漏报；本向量强制 SDK 用结构化判定（downcast 语义变体 / 拦截响应头）覆盖此景，验证降级语义 MUST 条款。",
+      "known_failure_before_fix": "rust-sdk 结构化 downcast 落地前，本景 classify 返 None → 降级通用 ProtocolError；python-sdk 传输层捕获落地前，本景挂起。修复后双端 MUST 翻转为 4006。"
+    },
+    {
+      "desc": "POST 200 + SSE 流内 401 → 4006 且不挂起（流阶段授权失败不得静默）",
+      "transport": "streamable_http",
+      "upstream": {"post_status": 200, "sse_inner_status": 401},
+      "expected": {"error_code": 4006, "isError": true, "hangs": false},
+      "rationale": "rmcp 对 Event::StreamResult 的错误仅 tracing::warn 不通知 pending responder；mcp-python 在 post_writer 把 401/403 抛进任务组拆连接。两种库行为都使该 tools/call 响应永不到达。本向量验证可观测判据 MUST 条款：Computer MUST 在自身层兜底，检测无响应路径后按降级语义合成 4006，不得挂至自身/Agent 超时。",
+      "known_failure_before_fix": "双端兜底落地前，本景 hang 至 manager/agent timeout；修复后 MUST 在有限时间内返回 4006。"
+    },
+    {
+      "desc": "手写 SSE 客户端：tools/call 返 401 → 4006（rust-sdk sse_client.rs 路径）",
+      "transport": "sse_handwritten",
+      "upstream": {"status": 401},
+      "expected": {"error_code": 4006, "isError": true, "hangs": false},
+      "rationale": "rust-sdk 手写 SSE 客户端在非 2xx 时合成含 \"401 Unauthorized\" 的 JSON-RPC error 塞回 response 通道，分类器可达。本景确认该路径不被传输层捕获改造破坏。仅 rust-sdk 适用，python-sdk 无对应手写 SSE 路径可 N/A。"
+    }
+  ]
+}

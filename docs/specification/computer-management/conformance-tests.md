@@ -269,6 +269,22 @@
 - 成功取消时，原始 `client:tool_call` ack 返回 `CallToolResult(isError=true)`，且结果级 `meta.a2c_cancelled = true`。
 - Timeout 返回 `CallToolResult(isError=true)`，并 SHOULD 包含结果级 `meta.a2c_timeout = true`。
 
+### 4.8 上游授权错误 Surfacing（4006/4007）
+
+MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.md → MCP 上游授权错误响应](../error-handling.md#mcp-上游授权错误响应)）：检测点归 SDK 自治，但结果与可观测判据双端 **MUST** 一致。
+
+- Computer 判定上游失败**属授权类**（含 MCP 客户端库吞掉状态码、只给语义变体的情形，如 rmcp `AuthRequired`）后，`client:tool_call` 的 `CallToolResult` **MUST** 携带 `meta.error_code` ∈ {4006, 4007}、`isError=true`、`meta.mcp_server` = 该 server 的 bundle_id；**MUST NOT** 降级为 `4003` 或通用工具执行错误（[降级语义](../error-handling.md#降级语义授权类失败的硬映射)）。
+- 授权失败 **MUST NOT** 表现为调用挂起至超时；Computer **MUST** 在有限时间内产出上述结果（[可观测判据](../error-handling.md#可观测判据禁止挂起至超时)）。
+
+**真实传输四景对拍向量**（[`fixtures/auth_error_conformance_vectors.json`](../fixtures/auth_error_conformance_vectors.json)，源自 [Discussion #34](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/34) 裁决）——双端 MUST 用真实 MCP server（initialize 放行、仅 `tools/call` 返指定状态）覆盖，禁止以合成错误对象充数（遵 [§2.0 测试学硬条款第 3 条](#20-测试学硬条款防假绿)）：
+
+1. `403` → 4007（双端基线，状态码经 `error_for_status` 保留）
+2. `401` 无 `WWW-Authenticate` → 4006（双端基线）
+3. `401` **带** `WWW-Authenticate`（RFC 6750 §3 要求的 OAuth 合规标准应答）→ **4006** —— rmcp 此景短路 `AuthRequired` 丢状态码、修复前漏报，本景强制 SDK 用结构化判定（downcast 语义变体 / 拦截响应头）覆盖；修复后双端 MUST 翻转为 4006
+4. `POST 200` + SSE 流内 `401` → **4006 且不挂起** —— rmcp/mcp-python 此景使响应永不到达，本景强制 Computer 自身兜底合成 4006；修复后双端 MUST 在有限时间内返回而非挂至超时
+
+挂起判定用 time-box（`tokio::time::timeout` / `asyncio.wait_for`）区分「返结果」与「挂起」。rust-sdk 另有手写 SSE 客户端路径景（`sse_client.rs` 合成含 `"401"` 的 JSON-RPC error），python-sdk 无对应手写 SSE 路径可 N/A。
+
 ## 5. Marketplace And Plugin Checklist
 
 - Marketplace reconcile 会安装 missing declared marketplace sources。
