@@ -276,16 +276,15 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - Computer 判定上游失败**属授权类**（含 MCP 客户端库吞掉状态码、只给语义变体的情形，如 rmcp `AuthRequired`）后，`client:tool_call` 的 `CallToolResult` **MUST** 携带 `meta.error_code` ∈ {4006, 4007}、`isError=true`、`meta.mcp_server` = 该 server 的 bundle_id；**MUST NOT** 降级为 `4003`、亦 **MUST NOT** 返回缺 `meta.error_code` 的 `isError=true` 通用失败结果（[降级语义](../error-handling.md#降级语义授权类失败的硬映射)）。
 - 授权失败 **MUST NOT** 表现为调用挂起至超时；Computer **MUST** 在自身超时或 Agent 超时之前（取较早者）产出上述结果（[可观测判据](../error-handling.md#可观测判据禁止挂起至超时)）。
 
-**真实传输四景对拍向量（双端 MUST 覆盖）+ 一景 rust-sdk 手写 SSE 补充（python-sdk 可 N/A）**（[`fixtures/auth_error_conformance_vectors.json`](../fixtures/auth_error_conformance_vectors.json)，源自 [Discussion #34](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/34) 裁决）——双端 MUST 用真实 MCP server（initialize 放行、仅 `tools/call` 返指定状态）覆盖，禁止以合成错误对象充数（遵 [§2.0 测试学硬条款第 3 条](#20-测试学硬条款防假绿)）：
+**真实传输三景对拍向量（双端 MUST 覆盖）+ 一景 rust-sdk 手写 SSE 补充（python-sdk 可 N/A）**（[`fixtures/auth_error_conformance_vectors.json`](../fixtures/auth_error_conformance_vectors.json)，源自 [Discussion #34](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/34) 裁决）——双端 MUST 用真实 MCP server（initialize 放行、仅 `tools/call` 返指定状态）覆盖，禁止以合成错误对象充数（遵 [§2.0 测试学硬条款第 3 条](#20-测试学硬条款防假绿)）：
 
 1. `403` → 4007（双端基线，状态码经 `error_for_status` 保留）
 2. `401` 无 `WWW-Authenticate` → 4006（双端基线）
 3. `401` **带** `WWW-Authenticate`（RFC 6750 §3 要求的 OAuth 合规标准应答）→ **4006** —— rmcp 此景短路 `AuthRequired` 丢状态码、修复前漏报，本景强制 SDK 用结构化判定（downcast 语义变体 / 拦截响应头）覆盖；修复后双端 MUST 翻转为 4006
-4. `POST 200` + SSE 流内 `401` → **4006 且不挂起** —— rmcp/mcp-python 此景使响应永不到达，本景强制 Computer 在已观测到流内授权失败信号后自身兜底合成 4006；修复后双端 MUST 在自身/Agent 超时之前返回而非挂至超时
 
 挂起判定用 time-box（`tokio::time::timeout` / `asyncio.wait_for`）区分「返结果」与「挂起」。rust-sdk 另有手写 SSE 客户端路径景（`sse_client.rs` 合成含 `"401"` 的 JSON-RPC error），python-sdk 无对应手写 SSE 路径可 N/A。
 
-**范围外（OOS）**：① **握手阶段（initialize）返 401** 不在本向量——该路径在 rmcp 进 fatal lifecycle、不进 `tools/call` 分类，归属 server registration lifecycle 而非 surfacing；如未来需协议约束应另行立条。② [判定决策表](../error-handling.md#40064007-判定决策表) Row 4（Token 过期 + refresh 失败 → 4007）非 `tools/call` 请求-响应、Row 6（凭证存在但 scope 不足、上游无显式 401/403 → 4007）缺可稳定复现的真实上游构造——这两行的判定由 SDK 单元测试覆盖语义即可，不纳入真实传输向量。
+**范围外（OOS）**：① **握手阶段（initialize）返 401** 不在本向量——该路径在 rmcp 进 fatal lifecycle、不进 `tools/call` 分类，归属 server registration lifecycle 而非 surfacing；如未来需协议约束应另行立条。② [判定决策表](../error-handling.md#40064007-判定决策表) Row 4（Token 过期 + refresh 失败 → 4007）非 `tools/call` 请求-响应、Row 6（凭证存在但 scope 不足、上游无显式 401/403 → 4007）缺可稳定复现的真实上游构造——这两行的判定由 SDK 单元测试覆盖语义即可，不纳入真实传输向量。③ **流内授权失败不单独建模**：合规 MCP server 按 MCP 授权规范在 HTTP 层 **POST 阶段**返 401/403（已由上述三景覆盖），SSE 流内不承载授权失败——流内 JSON-RPC error event 经正常错误路径回灌（双端库均正常处理，分类器覆盖即可，无需兜底），流传输层错误（连接断 / 重连失败，无授权信号）归 [`4003`](../error-handling.md#工具调用错误码) 或超时而非授权语义。
 
 ## 5. Marketplace And Plugin Checklist
 

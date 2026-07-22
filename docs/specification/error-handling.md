@@ -459,7 +459,9 @@ CallToolResult(
 - 上游对 `tools/call` 返回授权失败（401/403/语义变体）后，Computer **MUST** 在自身超时或 Agent 超时之前（取较早者）产出携带 `meta.error_code` 的 `CallToolResult`（`isError=true`），而非让 `client:tool_call` 的响应永远悬空。conformance 通过 time-box 二元观测验证（返结果 vs 挂起）；具体 time-box 阈值归 SDK 自治，协议只约束"不得挂至超时"。
 - 当 Computer **已观测到授权失败信号**（HTTP 状态码 / 库语义错误变体 / `WWW-Authenticate` 响应头）但 `CallToolResult` 因底层库拆连接、关流、或把异常投递给后台任务组而**不会经原路径返回**时，Computer **MUST** 在自身层面兜底，按[降级语义](#降级语义授权类失败的硬映射)合成 `4006`/`4007` 结果返回。**仅在已观测到授权失败信号的前提下**才合成授权错误——纯网络抖动 / provider 5xx / 无授权信号的超时等"无响应"不得归类为授权失败（见[判定决策表](#40064007-判定决策表) 5xx 行 → `4003`）。
 
-> 此条针对两类已坐实的同族失效：python-sdk 在 mcp-python `streamable_http.py` `post_writer` 上 401/403 被抛进传输任务组→拆连接关 `read_stream`→`call_tool` 挂起至 agent timeout；rust-sdk 在 rmcp POST 200 + SSE 流阶段 401 只 `warn` 不通知 pending responder。检测与兜底机制归 SDK 自治，但"**不得挂起**"是对端可感的硬约束。真实传输 conformance 向量见 [`fixtures/auth_error_conformance_vectors.json`](fixtures/auth_error_conformance_vectors.json) 与 [Computer 管理面一致性测试 → §4.8 上游授权错误 surfacing](computer-management/conformance-tests.md#48-上游授权错误-surfacing40064007)。
+> 此条针对已坐实的失效：python-sdk 在 mcp-python `streamable_http.py` `post_writer` 上 401/403 被抛进传输任务组→拆连接关 `read_stream`→`call_tool` 挂起至 agent timeout（**POST 阶段**授权失败）。检测与兜底机制归 SDK 自治，但"**不得挂起**"是对端可感的硬约束。真实传输 conformance 向量见 [`fixtures/auth_error_conformance_vectors.json`](fixtures/auth_error_conformance_vectors.json) 与 [Computer 管理面一致性测试 → §4.8 上游授权错误 surfacing](computer-management/conformance-tests.md#48-上游授权错误-surfacing40064007)。
+
+> **不建模"流内授权失败"**：合规 MCP server 按 MCP 授权规范在 **HTTP 层 POST 阶段**返 401/403（已由 conformance 向量覆盖），SSE 流内不承载授权失败。故 (a) 流内 JSON-RPC error event 经正常错误路径回灌（双端库均正常处理，分类器覆盖即可，无需兜底）、(b) 流传输层错误（连接断 / 重连失败，无授权信号）不归授权语义（按 [判定决策表](#40064007-判定决策表) 5xx/网络行 → `4003` 或超时）均不单独建模为授权向量。
 
 ### 字段说明
 
