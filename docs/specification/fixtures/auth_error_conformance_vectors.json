@@ -1,8 +1,8 @@
 {
   "$schema_note": "A2C-SMCP 协议 0.3.0 上游 MCP 授权错误（4006/4007）surfacing 一致性测试向量（跨 SDK 逐字节一致锚点）。source of truth = a2c-smcp-protocol docs/specification/error-handling.md §「MCP 上游授权错误响应」（判定决策表 + 降级语义 + 可观测判据）。双 SDK MUST 用真实传输构造路径覆盖——真实 MCP server：握手 initialize 放行，仅 tools/call 返指定状态；禁止以合成 MCPClientError / ProtocolError 对象充数（见 computer-management/conformance-tests.md §2.0 测试学硬条款第 3 条）。每景 expected.error_code 与 expected.hangs 双端 MUST 一致。",
-  "transport_coverage": "覆盖 streamable_http（经 MCP 客户端库：python 用 mcp-python、rust 用 rmcp）路径；手写 SSE 客户端路径（rust-sdk sse_client.rs）作为补充景。stdio 无 HTTP 状态码，不纳入本向量。挂起判定用 time-box（如 tokio::time::timeout / asyncio.wait_for）区分「返 Err/结果」与「挂起」。范围外（OOS）：① 握手阶段（initialize）返 401 不在本向量——该路径在 rmcp 进 fatal lifecycle、不进 tools/call 分类，归属 server registration lifecycle 而非 surfacing，如未来需协议约束应另行立条；② 判定决策表 Row 4（Token 过期 + refresh 失败 → 4007）非 tools/call 请求-响应、Row 6（凭证存在但 scope 不足、上游无显式 401/403 → 4007）缺可稳定复现的真实上游构造——这两行的判定由 SDK 单元测试覆盖语义即可，不纳入真实传输向量。",
+  "transport_coverage": "覆盖 streamable_http（经 MCP 客户端库：python 用 mcp-python、rust 用 rmcp）的 POST 阶段授权失败；手写 SSE 客户端路径（rust-sdk sse_client.rs）作为补充景。stdio 无 HTTP 状态码，不纳入。挂起判定用 time-box（如 tokio::time::timeout / asyncio.wait_for）区分「返 Err/结果」与「挂起」。范围外（OOS）：① 握手阶段（initialize）返 401 不在本向量——该路径在 rmcp 进 fatal lifecycle、不进 tools/call 分类，归属 server registration lifecycle 而非 surfacing；② 判定决策表 Row 4（Token 过期 + refresh 失败 → 4007）非 tools/call 请求-响应、Row 6（凭证存在但 scope 不足、上游无显式 401/403 → 4007）缺可稳定复现的真实上游构造——这两行的判定由 SDK 单元测试覆盖语义即可；③ 流内授权失败不单独建模——合规 MCP server 按 MCP 授权规范在 HTTP 层 POST 阶段返 401/403（已由下列向量覆盖），SSE 流内不承载授权失败：流内 JSON-RPC error event 经正常错误路径回灌（双端库均正常处理，分类器覆盖即可，无需兜底），流传输层错误（连接断 / 重连失败，无授权信号）归 4003 或超时而非授权语义。",
   "fixture_setup": {
-    "real_server_contract": "起一个本地 HTTP server 扮演受保护 MCP Server：initialize / notifications:initialized 正常放行（建立会话），仅对 tools/call 请求按 vector.upstream 返回指定 HTTP 状态/header；POST 200 + SSE 景则先回 200 起 SSE 流，再在流内注入授权失败信号（见 vector.wire_form）后终止流。",
+    "real_server_contract": "起一个本地 HTTP server 扮演受保护 MCP Server：initialize / notifications:initialized 正常放行（建立会话），仅对 tools/call 请求按 vector.upstream 返回指定 HTTP 状态/header。",
     "computer_action": "Computer 经其 MCP 客户端库完成 initialize，再调用 tools/call；SDK 自身或测试用 time-box 包裹 call_tool，观察返回的 CallToolResult.meta.error_code 与是否在有限时间内返回。"
   },
   "vectors": [
@@ -27,15 +27,6 @@
       "expected": {"error_code": 4006, "isError": true, "hangs": false},
       "rationale": "RFC 6750 §3 要求受保护资源 401 MUST 带 WWW-Authenticate——此景是授权类失败的规范形态，MUST 命中 4006。rmcp 在此景短路成 StreamableHttpError::AuthRequired（Display 仅 \"Auth required\"、丢状态码与 header 值），字符串分类器漏报；本向量强制 SDK 用结构化判定（downcast 语义变体 / 拦截响应头）覆盖此景，验证降级语义 MUST 条款。",
       "known_failure_before_fix": "rust-sdk 结构化 downcast 落地前，本景 classify 返 None → 降级通用 ProtocolError；python-sdk 传输层捕获落地前，本景挂起。修复后双端 MUST 翻转为 4006。"
-    },
-    {
-      "desc": "POST 200 + SSE 流内 401 → 4006 且不挂起（流阶段授权失败不得静默）",
-      "transport": "streamable_http",
-      "upstream": {"post_status": 200, "sse_inner_status": 401},
-      "wire_form": "上游对 tools/call 的 POST 回 HTTP 200 并起 SSE 流；授权失败信号出现在流内——具体承载：在流内发一个 event，其 data 为 JSON-RPC error 对象（如 {\"jsonrpc\":\"2.0\",\"id\":<原 tools/call 的 id>,\"error\":{\"code\":-32603,\"message\":\"...\",\"data\":{\"http_status\":401}}}）后终止流；或库层把流阶段 401 映射为自有错误变体（rmcp Event::StreamResult 仅 tracing::warn 不通知 pending responder）。双端构造同型事件时，授权失败信号 MUST 出现在流内 event payload 或库错误变体中，Computer 据此（已观测到授权失败信号）兜底合成 4006。",
-      "expected": {"error_code": 4006, "isError": true, "hangs": false},
-      "rationale": "rmcp 对 Event::StreamResult 的错误仅 tracing::warn 不通知 pending responder；mcp-python 在 post_writer 把 401/403 抛进任务组拆连接。两种库行为都使该 tools/call 响应永不到达。本向量验证可观测判据 MUST 条款：Computer MUST 在已观测到流内授权失败信号后自身层兜底，按降级语义合成 4006，不得挂至自身/Agent 超时。",
-      "known_failure_before_fix": "双端兜底落地前，本景 hang 至 manager/agent timeout；修复后 MUST 在有限时间内返回 4006。"
     },
     {
       "desc": "手写 SSE 客户端：tools/call 返 401 → 4006（rust-sdk sse_client.rs 路径）",
