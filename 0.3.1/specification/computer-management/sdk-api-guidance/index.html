@@ -1,0 +1,2226 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Agent To Computer Socket.IO-based MCP Protocol Specification">
+      
+      
+      
+        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/computer-management/sdk-api-guidance/">
+      
+      
+        <link rel="prev" href="../runtime-contract/">
+      
+      
+        <link rel="next" href="../conformance-tests/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>SDK API 指南 - A2C-SMCP Protocol</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sdk-api-指南" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../.." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            A2C-SMCP Protocol
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              SDK API 指南
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  协议规范
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../guides/computer-mcp-config-guide/" class="md-tabs__link">
+          
+  
+  
+  开发指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
+          
+  
+  
+  迁移指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../appendix/faq/" class="md-tabs__link">
+          
+  
+  
+  附录
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    A2C-SMCP Protocol
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议规范
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    协议规范
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../computer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer 侧协议框架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer Management Plane
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Computer Management Plane
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    管理面协议边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runtime-contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行时契约
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK API 指南
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK API 指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-稳定能力族" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 稳定能力族
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-api-形态建议原则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. API 形态建议原则
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-config-与默认值" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Config 与默认值
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-lifecycle-api-指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Lifecycle API 指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Lifecycle API 指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-sync-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Sync Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Shutdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-plugin-与-marketplace-api-指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Plugin 与 Marketplace API 指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Plugin 与 Marketplace API 指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-mcp-server-寻址库层收-bundle_idname-解析只在人机面" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 MCP Server 寻址：库层收 bundle_id，name 解析只在人机面
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-测试指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 测试指南
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-迁移指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 迁移指南
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-非目标" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 非目标
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conformance-tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    一致性测试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件定义
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data-structures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据结构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skill/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SKILL 通道
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../blob-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    通用二进制传输
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../room-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    房间模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议版本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    错误处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安全考虑
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    开发指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/computer-mcp-config-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer MCP 配置指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/mcp-approval-gate-alignment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP 审批门对齐指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    迁移指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    迁移指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2 升级指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../migrations/v0.2.1-skill-and-blob-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.1 SKILL/二进制传输适配
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../migrations/v0.3.0-plugin-install-enable-separation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.3.0 plugin install/enable 分离
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    附录
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    附录
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../appendix/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    常见问题
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-稳定能力族" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 稳定能力族
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-api-形态建议原则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. API 形态建议原则
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-config-与默认值" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Config 与默认值
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-lifecycle-api-指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Lifecycle API 指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Lifecycle API 指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Create
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-sync-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Sync Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Shutdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-plugin-与-marketplace-api-指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Plugin 与 Marketplace API 指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Plugin 与 Marketplace API 指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-mcp-server-寻址库层收-bundle_idname-解析只在人机面" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 MCP Server 寻址：库层收 bundle_id，name 解析只在人机面
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-测试指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 测试指南
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-迁移指南" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 迁移指南
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-非目标" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 非目标
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    协议规范
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Computer Management Plane
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sdk-api-指南">SDK API 指南<a class="headerlink" href="#sdk-api-指南" title="Permanent link">&para;</a></h1>
+<p>本文档为非规范性内容。它描述实现 <a href="../runtime-contract/">Computer Runtime Contract</a> 时推荐的 SDK API 能力，不规定语言专属的 class、trait、builder、constructor 或 async runtime 形态。</p>
+<h2 id="1-稳定能力族">1. 稳定能力族<a class="headerlink" href="#1-稳定能力族" title="Permanent link">&para;</a></h2>
+<p>鼓励 SDK 暴露以下能力族的公共入口：</p>
+<table>
+<thead>
+<tr>
+<th>能力族</th>
+<th>稳定语义预期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>create from config</td>
+<td>从声明式 config 和 runtime options 创建一个 runtime Computer</td>
+</tr>
+<tr>
+<td>start / stop</td>
+<td>初始化和停止本地 runtime service activity</td>
+</tr>
+<tr>
+<td>connect / disconnect</td>
+<td>建立和结束 SMCP connection，且不销毁 durable config</td>
+</tr>
+<tr>
+<td>join / leave office</td>
+<td>当未折叠进 connect/disconnect 时，加入或离开 Office</td>
+</tr>
+<tr>
+<td>sync config</td>
+<td>应用新 config，使最终 public runtime behavior 与其匹配</td>
+</tr>
+<tr>
+<td>query projection</td>
+<td>返回 SDK-visible tools、config、resources、Desktop 和 SKILL 视图，且与协议投影一致</td>
+</tr>
+<tr>
+<td>plugin lifecycle</td>
+<td>install、enable、disable 和 uninstall plugin-contributed capabilities</td>
+</tr>
+<tr>
+<td>marketplace lifecycle</td>
+<td>add、sync/refresh、list 和 prune marketplace sources</td>
+</tr>
+<tr>
+<td>input values</td>
+<td>resolve、set、clear 和 inspect input values，且不向 Agent 暴露 secrets</td>
+</tr>
+<tr>
+<td>diagnostics</td>
+<td>返回 lifecycle state、degraded components、validation errors 和 last failures</td>
+</tr>
+<tr>
+<td>shutdown</td>
+<td>释放 resources，并阻止 stale callbacks/events</td>
+</tr>
+</tbody>
+</table>
+<p>具体名称由各 SDK 自行决定。例如，一个 SDK 可以暴露 builder，另一个可以暴露 factory，第三个可以使用 async constructor。Conformance 以行为为准。</p>
+<h2 id="2-api-形态建议原则">2. API 形态建议原则<a class="headerlink" href="#2-api-形态建议原则" title="Permanent link">&para;</a></h2>
+<p>鼓励 SDK：</p>
+<ol>
+<li>将 config parsing 与 side effects 分离。从 config 创建 runtime 不应连接 Server 或执行 tools。</li>
+<li>让生命周期操作显式，并在可行时保持幂等。</li>
+<li>返回公开 lifecycle state 和 diagnostics，而不是要求调用方检查 logs 或 private fields。</li>
+<li>区分 <code>disconnect</code>、<code>stop</code> 和 <code>shutdown</code>。</li>
+<li>提供单一 <code>sync_config</code> 语义操作，即使实现内部会重建 runtime。</li>
+<li>提供与 <a href="../runtime-contract/#6-错误类别">Runtime Contract §6</a> 对齐的 typed 或 structured error categories。</li>
+<li>保持 management diagnostics 与 Agent-facing protocol payloads 隔离。</li>
+<li>允许调用方注入业务 auth fields，但不要把 secrets 放入 <code>a2c_version</code>、<code>role</code>、update notifications 或 Agent-visible config。</li>
+</ol>
+<h2 id="3-config-与默认值">3. Config 与默认值<a class="headerlink" href="#3-config-与默认值" title="Permanent link">&para;</a></h2>
+<p>SDK 可以使用语言原生类型，但应支持用于 conformance 的共享 JSON fixtures。</p>
+<p>推荐默认行为：</p>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>指南</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namespace</td>
+<td>默认使用 <code>/smcp</code></td>
+</tr>
+<tr>
+<td>protocol version</td>
+<td>在 URL query 中使用 SDK 声明的 A2C-SMCP protocol version</td>
+</tr>
+<tr>
+<td>auth role</td>
+<td><code>role</code> 经 <code>server:join_office</code>（<code>EnterOfficeReq.role</code>）声明；connection <code>auth</code> 仅承载业务鉴权（如 token），不含 <code>role</code></td>
+</tr>
+<tr>
+<td>auto connect</td>
+<td>文档化 start 是否自动 connect；对嵌入方优先推荐显式 connect</td>
+</tr>
+<tr>
+<td>auto reconnect</td>
+<td>如果支持，应使行为可配置且可观察</td>
+</tr>
+<tr>
+<td>disabled servers</td>
+<td>保留 config，但从 Agent-facing projection 中排除能力</td>
+</tr>
+<tr>
+<td>forbidden tools</td>
+<td>从 tools 中排除，并拒绝成功执行</td>
+</tr>
+<tr>
+<td>marketplace reconcile</td>
+<td>优先采用 additive-only startup reconcile 和 explicit prune/gc</td>
+</tr>
+<tr>
+<td>plugin MCP 依赖</td>
+<td>按 <code>bundle_id</code> 依赖预检（读运行期权威配置集）：已存在 = 依赖已满足 → 提示 + 正常安装，不拒绝；同文件多 key 归一同 <code>bundle_id</code> 才 fail-fast</td>
+</tr>
+<tr>
+<td>secret values</td>
+<td>仅本地解析，绝不放入 Agent-facing projection</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-lifecycle-api-指南">4. Lifecycle API 指南<a class="headerlink" href="#4-lifecycle-api-指南" title="Permanent link">&para;</a></h2>
+<h3 id="41-create">4.1 Create<a class="headerlink" href="#41-create" title="Permanent link">&para;</a></h3>
+<p>SDK 可以提供任意等价入口：</p>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>runtime = create_computer(config, runtime_options)
+</code></pre></div>
+<p>该操作应校验 shape 并解析默认值，但避免 network 和 MCP process side effects。</p>
+<h3 id="42-start">4.2 Start<a class="headerlink" href="#42-start" title="Permanent link">&para;</a></h3>
+<p><code>start</code> 应初始化本地 resources、registries、blob resolvers、watchers 和 MCP manager intent。如果 start 会立即启动 MCP Servers，SDK 应文档化该 policy，并以 public diagnostics 暴露 startup failures。</p>
+<h3 id="43-connect">4.3 Connect<a class="headerlink" href="#43-connect" title="Permanent link">&para;</a></h3>
+<p><code>connect</code> 应接收 Server URL 和可选 connection options。SDK 应让最终 handshake 足够可检查，以便测试验证：</p>
+<ul>
+<li><code>a2c_version</code> 位于 URL query 中。</li>
+<li>连接 <code>auth</code> 不含 <code>role</code>（角色经 <code>server:join_office</code> 声明）。</li>
+<li>caller-supplied auth payload 已包含，且不会泄露 MCP credentials。</li>
+<li>配置后会发送 <code>server:join_office</code>，其中 <code>role = "computer"</code>。</li>
+</ul>
+<h3 id="44-sync-config">4.4 Sync Config<a class="headerlink" href="#44-sync-config" title="Permanent link">&para;</a></h3>
+<p>SDK 应暴露一个应用新 desired config 的操作。它可以实现为：</p>
+<ul>
+<li>incremental update；</li>
+<li>diff-and-apply；</li>
+<li>在稳定 identity 背后 full rebuild；</li>
+<li>保持 projection 的 stop/start。</li>
+</ul>
+<p>SDK 应文档化 sync 期间 in-flight tool calls 是继续、被取消，还是允许完成。无论实现方式如何，最终 projection 必须匹配新 config。</p>
+<h3 id="45-shutdown">4.5 Shutdown<a class="headerlink" href="#45-shutdown" title="Permanent link">&para;</a></h3>
+<p>SDK 应提供一个终止性的 cleanup 操作。完成后：</p>
+<ul>
+<li>不应再发送 update notification；</li>
+<li>watcher 不应调用 stale callbacks；</li>
+<li>旧 Socket.IO client 不应 ack 新请求；</li>
+<li>owned MCP server resources 应按文档化 policy 被停止或 detach。</li>
+</ul>
+<h2 id="5-plugin-与-marketplace-api-指南">5. Plugin 与 Marketplace API 指南<a class="headerlink" href="#5-plugin-与-marketplace-api-指南" title="Permanent link">&para;</a></h2>
+<p>鼓励 SDK 把 plugin 和 marketplace 操作暴露为 management APIs，而不是 Agent-facing protocol events。</p>
+<p>推荐 plugin operations：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>指南</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>install</td>
+<td>物化 plugin、写 <code>installedPlugins</code> 意图、校验 manifest、MCP 依赖预检（bundle_id 比对运行期权威集，依赖已满足 → 提示不拒绝）；<strong>MUST NOT 激活</strong>（SKILL/MCP/input contributions 待 enable 才注册）</td>
+</tr>
+<tr>
+<td>enable</td>
+<td>标记 plugin enabled（写 <code>enabledPlugins=true</code>）并 reconcile contributions（skills 与 bundled server 原子一并；同 <code>bundle_id</code> 多来源按 <a href="../runtime-contract/">runtime-contract §2.5 优先序</a> 合并）</td>
+</tr>
+<tr>
+<td>disable</td>
+<td>标记 plugin disabled，并使 contributions 不可见/不可调用；其声明依赖的 server 按 <a href="../runtime-contract/">runtime-contract §4.9.1 回收判据</a> 处理</td>
+</tr>
+<tr>
+<td>uninstall</td>
+<td>移除 plugin records 并按 §4.9.1 回收判据 teardown（无人再依赖 ∧ 非用户声明才回收；停摘名单在账本移除前取得且仅依赖账本字段）</td>
+</tr>
+<tr>
+<td>info/list</td>
+<td>仅向 trusted caller 返回 management diagnostics 和 provenance</td>
+</tr>
+</tbody>
+</table>
+<p>推荐 marketplace operations：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>指南</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>add</td>
+<td>在 trust/policy approval 后添加 source declaration</td>
+</tr>
+<tr>
+<td>sync/refresh</td>
+<td>fetch/update declared sources，并注册 enabled plugin SKILLs</td>
+</tr>
+<tr>
+<td>list</td>
+<td>向 trusted caller 返回 source status 和 diagnostics</td>
+</tr>
+<tr>
+<td>prune</td>
+<td>在调用方确认后显式移除 orphan materialization</td>
+</tr>
+</tbody>
+</table>
+<p>SDK 可以在非 live context 中支持 ledger-only operations，但应文档化：Agent-facing projection changes 需要 live runtime reconcile。</p>
+<h3 id="51-mcp-server-寻址库层收-bundle_idname-解析只在人机面">5.1 MCP Server 寻址：库层收 bundle_id，name 解析只在人机面<a class="headerlink" href="#51-mcp-server-寻址库层收-bundle_idname-解析只在人机面" title="Permanent link">&para;</a></h3>
+<p><strong>库层公开 API</strong>（remove / unmount / start / stop 等治理与生命周期操作）<strong>一律收 <code>bundle_id</code></strong>，无 name 启发式、无回退猜测——「入参即身份」。理由：治理路径（uninstall / disable / rollback / 账本）全程持 bundle_id；name→id 启发式放库层会让每个外部集成方各继承一次不可靠推断（name 空间与 id 空间在缺省派生下大面积重叠，重叠处「先按 name 再回退按 id」不可靠）。</p>
+<p><strong>name→id 解析（<code>resolve_target</code> 语义）只存在于人机面（CLI / REPL 等）</strong>，该用户可见行为<strong>双端 MUST 逐字一致</strong>：</p>
+<ol>
+<li>token 按 display name 在活跃配置集反查，<strong>唯一命中</strong> → 解析为其 bundle_id，执行；</li>
+<li>0 命中且 token 是合法 bundle_id → 按 bundle_id 执行；仍无 → 报错「未找到」；</li>
+<li><strong>多命中</strong>（同名合法共存）→ 报错并列出各候选的 <strong>bundle_id + display name + 归属</strong>（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；</li>
+<li><strong>MUST NOT</strong> 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错；</li>
+<li>未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。</li>
+</ol>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$ server rm filesystem
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>⚠️ 有 2 个 server 叫 filesystem:
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>   filesystem      (user)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>   bundle_a3f9c2e1 (plugin:fs-tools)
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>请用 bundle_id 重试
+</code></pre></div>
+<p>鼓励 SDK：</p>
+<ol>
+<li>将 input definitions 与 resolved values 分离。</li>
+<li>支持 plugin-scoped input disambiguation，避免相同 bare id 冲突。</li>
+<li>避免记录 resolved secret values。</li>
+<li>为缺失 input values 暴露 public diagnostics，但不包含实际 secrets。</li>
+<li>将 <code>.skillenv</code> 和本地 secret files 视为 local-only；绝不把其内容放入 <code>client:get_skill</code>、<code>client:get_blob</code>、<code>client:get_config</code> 或 tool metadata。</li>
+</ol>
+<h2 id="7-测试指南">7. 测试指南<a class="headerlink" href="#7-测试指南" title="Permanent link">&para;</a></h2>
+<p>SDK 应同时维护 protocol conformance tests 和 runtime contract tests：</p>
+<table>
+<thead>
+<tr>
+<th>测试类别</th>
+<th>验证内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wire conformance</td>
+<td><code>client:*</code> response shape、flat <code>ErrorPayload</code>、update notifications、room behavior</td>
+</tr>
+<tr>
+<td>runtime conformance</td>
+<td>lifecycle state transitions、<code>sync_config</code>、plugin/marketplace semantics、shutdown cleanup</td>
+</tr>
+<tr>
+<td>projection conformance</td>
+<td>management operations 后最终 <code>get_config</code>/<code>get_tools</code>/<code>get_skills</code>/<code>get_desktop</code> 视图</td>
+</tr>
+<tr>
+<td>security conformance</td>
+<td>无 secret/path leakage、sandbox boundaries、blob handle opacity</td>
+</tr>
+<tr>
+<td>cross-SDK fixture conformance</td>
+<td>Python/Rust/TypeScript 将同一 JSON fixture 解析为等价 runtime intent</td>
+</tr>
+</tbody>
+</table>
+<p>共享 checklist 见 <a href="../conformance-tests/">Conformance Tests</a>。</p>
+<h2 id="8-迁移指南">8. 迁移指南<a class="headerlink" href="#8-迁移指南" title="Permanent link">&para;</a></h2>
+<p>鼓励将本 runtime contract 加入既有 API 的 SDK：</p>
+<ol>
+<li>保持既有 constructors/builders 作为 compatibility wrappers 继续工作。</li>
+<li>在改变 CLI UX 前，先加入共享 fixture parsing。</li>
+<li>引入 lifecycle state diagnostics，同时不改变 Agent-facing wire behavior。</li>
+<li>在重构 internals 前，为当前行为补充 conformance tests。</li>
+<li>保持 marketplace/plugin management APIs 明确为 trusted-local。</li>
+</ol>
+<h2 id="9-非目标">9. 非目标<a class="headerlink" href="#9-非目标" title="Permanent link">&para;</a></h2>
+<p>本指南不标准化：</p>
+<ul>
+<li>必需的 <code>Computer</code> class 名；</li>
+<li>精确的 builder/factory signatures；</li>
+<li>本地 home layout；</li>
+<li>settings file names；</li>
+<li>watcher implementation；</li>
+<li>process supervision model；</li>
+<li>retry scheduler；</li>
+<li>CLI commands；</li>
+<li>UI flows；</li>
+<li>运行期命令式 MCP Server CRUD（对非-bundled server 的 add/update/remove）是落盘为 durable 声明意图（重启存活）还是仅内存生效（持久化留给 host 编辑声明文件）——属管理面（CLI/桌面客户端）与内核间的本地约定（详见 runtime-contract §2.3）。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/A2C-SMCP" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
