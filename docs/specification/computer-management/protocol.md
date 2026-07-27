@@ -111,7 +111,7 @@ Input definitions 和 secret resolution 是 Computer 本地职责。
 1. `client:get_config` MAY 暴露 Agent 理解配置所需的 input definitions，但 MUST NOT 暴露已解析的 secret 值。
 2. Placeholder rendering、env file loading、command inputs、value cache 和 plugin-scoped input disambiguation 属于管理面/runtime 关注点，不是 Agent 协议字段。
 3. `.skillenv`、OAuth tokens、API keys、password values、本地 secret store paths 以及包含凭据的 command output MUST NOT 出现在 Agent-facing responses 或 `ErrorPayload.details` 中。
-4. Plugin-scoped inputs MAY 在内部消歧，但最终投影 MUST 避免跨 plugin 值泄露。
+4. Plugin-scoped inputs MAY 在内部消歧（解析序见 [runtime-contract §5.11](runtime-contract.md)），但最终投影 MUST 避免跨 plugin 值泄露。
 
 ## 6. 连接边界
 

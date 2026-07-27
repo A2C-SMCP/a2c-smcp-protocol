@@ -303,6 +303,7 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - **回收判据 origin 向量**（[Discussion #32 裁决](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/32)）：「非用户声明」MUST 评估在带 `origin` 的运行期权威配置集上（runtime-contract §2.5 第 5 条）。四景 MUST 双端对拍：① X 经 flag（`--mcp-config`）挂载（`origin=flag`）→ 卸载声明依赖 X 的 plugin **不回收** X；② X 经宿主构造入参挂载（`origin=embed`）→ 同上**不回收**；③ X 仅由 plugin 声明（`origin=plugin`、无其他 plugin 依赖）→ **回收**；④ 同 `bundle_id` 混源碰撞（plugin 声明 + flag 声明并存，flag > plugin）→ **不回收**。夹具遵 §2.0 name/bundle_id 分叉条款。
 - uninstall 的停摘名单仅依赖账本自身字段（删除 installPath 树之后仍可精确停摘）。
 - Plugin-scoped inputs 会在 plugin server config rendering 前注入。
+- **Plugin input 解析序**（[runtime-contract §5.11](runtime-contract.md)）四景 MUST 双端对拍，夹具遵 §2.0 name/bundle_id 分叉条款：① scoped 与 global 同存且同 kind → **scoped 胜**；② scoped 缺失、global 存在且同 kind → **回退 global**；③ 跨 kind 不回退（scoped secret 缺失 MUST NOT 回退 global value，反之亦然 → 产出 scoped 缺失错误）；④ 显式完整引用 `${input:<P>@<M>/<id>}` → **直接命中 scoped、不回退全局**。未绑定 plugin 的 server 裸引用仅解析 global 属行为不变，不单列向量。
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
 - **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。
 - **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；enable 时 bundled server 挂载失败 MUST 回滚到 `installed_disabled`（不留半态）。

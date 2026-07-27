@@ -262,6 +262,7 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 8. 安装路径 MUST NOT 作为权威状态。MUST 存在纯函数 `(marketplace, plugin, version) → path`；持久化路径仅为提示，boot MUST 重新校验，失效即重算（worktree / seed 场景 MUST NOT 信任存储的 install location）。
 9. 声明（可提交）与凭据（机器本地）MUST 使用不同持久化契约：secret / OAuth token MUST 存于 keychain 或等价机器本地存储，MUST NOT 落入任何可提交的声明文件。
 10. MCP Server 启停有两套正交开关，MUST 分清并分别应用：project-scope 声明 server 的信任门（`enabledMcpjsonServers` / `disabledMcpjsonServers` / `enableAllProjectMcpServers`）与通用禁用开关（按 `bundle_id` 键，**仅作用于声明的 server**）。plugin 声明依赖的 server **MUST NOT 进入任何审批/信任门的迭代**（在迭代层过滤，禁止「进门后豁免」的档位；其启停由 plugin enable/disable **整体**控制——单独打掉某个 bundled server 会产生 §2.4 明令禁止的半态；管理员经 policy `enabledPlugins: false` 可强停整个 plugin）。审批/信任门的实现 MUST NOT 依赖物化账本的名集（见 [审批门对齐指南](../../guides/mcp-approval-gate-alignment.md)）。
+11. **Plugin input 解析序**。渲染绑定 plugin `P@M`（P = plugin、M = marketplace，语义形式见第 3 条）的 MCP server config 时，裸引用 `${input:<id>}` 的解析序 **MUST** 为：① 先尝试 plugin-scoped id `<P>@<M>/<id>`；② 若未命中、且存在**同 kind**（value / secret 一致）的全局 input `<id>` → 回退全局；③ 若仍不可解析 → SDK **MUST** 产出**结构化缺失错误**（§6 `missing_input`），其 `id` = 完整 scoped id `<P>@<M>/<id>`（补救方式由 embedding client 决定，协议不规定）。补充：**显式完整引用** `${input:<P>@<M>/<id>}` 直接命中 scoped、**不**回退全局；**未绑定 plugin** 的 server（用户自定义）裸引用**仅**解析全局 `<id>`、无 scoped 步（行为不变）；**跨 kind 不回退**——scoped secret 缺失时 **MUST NOT** 回退全局 value（反之亦然），直接产出 scoped 缺失错误；scoped 缺失错误 **MUST NOT** 透露 global 侧是否命中。本条 **resolver-agnostic**：规定"SDK 用哪个 id 去问 resolver"、不规定 resolver 实现（交互式 prompt 与运行期 client 注入两条路径套用同一序）。本条与第 7 条对偶——第 7 条禁止串值、本条规定取值序。
 
 ## 6. 错误类别
 
@@ -270,6 +271,7 @@ SDK SHOULD 暴露等价的公开错误类别：
 | 类别 | 典型触发 | 可重试性 |
 |---|---|---|
 | `validation` | config shape 非法、plugin id 非法、marketplace name 非法、scope 非法 | 修复 config 后重试 |
+| `missing_input` | plugin input 解析序（§5.11）耗尽仍不可解析 | embedding client 注入值后重试 |
 | `policy` | Source blocked、permission denied、policy-only field in user scope | policy 变更后重试 |
 | `conflict` | 同一声明文件内多 key 归一同 `bundle_id`（§2.5 fail-fast）、concurrent writer conflict | 解决冲突后重试 |
 | `auth` | SMCP auth failure、source auth failure、MCP upstream authorization failure | credentials/auth flow 完成后重试 |
