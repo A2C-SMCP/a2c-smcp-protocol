@@ -29,7 +29,7 @@
 
     旧实现在档 3 与 4 之间存在「`bundled.contains(name)` → ENABLED」档位。它是安全缺陷：真正的 plugin bundled server **从不进入** mcp.json 解析层（bundled 走 enable→mount，不落 mcp.json），因此该档**唯一可达路径**是「project/local 声明的 server 借用了某已装 plugin 的 server 名」——即 100% 借名跳过批准门（攻击者只需猜中受害者装过的任一插件的 server 名）。
 
-    - **plugin 声明的 server MUST 不进入审批门迭代**——在迭代层过滤（`origin == plugin` 的条目不进门），**禁止**写成门内新档位（「进门后豁免」形状即旧档位复发，即便判据换成 origin 也重新违反 item 10「两套开关分别应用」）。其可信性由 install ∧ enable 门保证（[runtime-contract §2.5](../specification/computer-management/runtime-contract.md)）。
+    - **plugin 声明的 server，当其 enable 判据来自受信 scope 时，MUST 不进入审批门迭代**——在迭代层过滤（`origin == plugin` 的条目不进门），**禁止**写成门内新档位（「进门后豁免」形状即旧档位复发，即便判据换成 origin 也重新违反 item 10「两套开关分别应用」）。其可信性由 install ∧ 受信 scope enable 门保证（[runtime-contract §2.5](../specification/computer-management/runtime-contract.md)）。**project scope 供给 `enabledPlugins=true` 时相反：该 bundled server MUST 进门迭代落 PENDING**（见 [§2.2](#22-plugin-enable-路径的同构约束enabledplugins)）。
     - **审批门实现 MUST NOT 依赖物化账本 / bundled 名集**。
     - **可验收信号**：门函数签名不含 `bundled` 入参；代码库中不存在「读账本聚合 bundled 名集」的函数（如 `bundled_mcp_server_names()`）——「函数不存在」比「文档说别用」可靠。
     - 上述是下方 §2.1 通则的一个具体形状。**只钉形状不钉通则会被同构路径绕过**——见 §2.1。
@@ -41,6 +41,8 @@
 > **审批门的输入 MUST 来自比被判定 server 更高信任的来源；任何 scope 都不得为「自身是否受信」提供判据。**
 
 审批门存在的**全部目的**就是把关 project scope（不受信、随 git 分发）声明的 server。若放任 project scope 自己供给「我受信」的判据，则整个门形同虚设（自我批准闭环）。据此，按判据的**方向**分别约束：
+
+> 本通则不限于下表 5 个门字段——**任何为 server 受信供给判据的路径均受其约束**，含 plugin-enable 路径（`enabledPlugins`），见 [§2.2](#22-plugin-enable-路径的同构约束enabledplugins)。
 
 | 档 | 字段 | 方向 | 可供给 scope | 理由 |
 |---|------|------|-------------|------|
@@ -57,6 +59,23 @@
     `.tfrobot/settings.json`（project scope）与 `mcp.json` 一样**入 git、随仓库分发**。若 gate 接受它供给档⑤/⑥，被 clone 的仓库携一份 `{"enableAllProjectMcpServers": true}` 即可让其 `mcp.json` 里的任意 server **启动期无提示直挂**——比档④更易达成（档④尚需猜中某已装插件的 bundled server 名；本路径无需装任何插件、无需任何名字）。
 
 **落地（SDK 自治，双端一致）**：在既有 `POLICY_ONLY_FIELDS` 过滤通道旁增一个 `TRUSTED_SCOPE_ONLY_FIELDS`（= enable 方向 gate 判据，拒 `project`）类目，复用现成的过滤 + 记错管线即可。**可验收信号**：以 project scope `settings.json` 供给 `enableAllProjectMcpServers: true` + project `mcp.json` 声明未批准 server → 该 server verdict MUST 为 `PENDING`（非 `ENABLED`），且 project 供给该字段产生一条 settings 校验错误。
+
+### 2.2 plugin-enable 路径的同构约束（`enabledPlugins`）
+
+§2.1 通则不限于上表 5 个门字段——任何为 server 受信供给判据的路径都受其约束。plugin bundled server 的免批准特权（[runtime-contract §5 item 10 / §2.5 第 3 条](../specification/computer-management/runtime-contract.md)「origin=plugin 的可信性由 install ∧ enable 门保证」）也不例外：「enable」这一半判据来自 `enabledPlugins`，而 `enabledPlugins` 有 per-scope 三态合并（user < project < local，runtime-contract §2.4）。当 project scope 供给 `enabledPlugins=true` 时，project scope 正在为 bundled server 是否受信提供判据——即通则所禁的自我批准闭环。
+
+| `enabledPlugins` 供给 scope | 该 plugin 的 bundled server |
+|---|---|
+| `user` / `local` / `flag` / `policy`（受信 scope） | 免批准（滤出审批门迭代，现状保持） |
+| `project`（入 git、随仓库分发） | **回落审批门** —— 进门迭代落 `PENDING`（与 project-scope 声明 server 同视） |
+
+**约束（MUST）**：project scope 供给的 `enabledPlugins=true` **不构成** bundled server 的免批准判据。这与档⑤/档⑥ 拒 project scope 同构（self-approval 闭环）：被 clone 的仓库携一份 `enabledPlugins: {"evil@mp": true}` 即可让其 bundled server 启动期免提示直挂——攻击者无需猜任何 server 名（marketplace 须已在受害者本地 `known_marketplaces.json`，非零点击）。
+
+**方向性**：仅 ENABLE 方向受限。project scope 的 `enabledPlugins: false`（显式禁用）保留有效——与档③ `disabledMcpjsonServers`「DENY 方向任意 scope、fail-safe 永远更安全」同姿；**不应**把 `enabledPlugins` 加入 `TRUSTED_SCOPE_ONLY_FIELDS` 整字段过滤（会破坏 runtime-contract §2.4 三态合并语义，project 的 `false` 被吞，且殃及 disable 方向）。
+
+**落地（SDK 自治，双端一致）**：bundled server 采集逻辑须感知激活 plugin 的 enable 判据来源 scope（仅 project 供给 → 投影为 `PENDING` 而非 `ENABLED`）。**实现 MUST NOT 以新增审批门档位达成**（「`origin==plugin ∧ project-enable → PENDING`」是 §2 danger note 明禁的「进门后豁免/进门后降级」形状变体）——project-enabled bundled server 落 `PENDING` 是「它没获得免批准特权、作为未决 server 自然落档⑦」，不是「进门后改判」。TOFU 审批一次后写 `local` scope，与既有批准写助手（只写 local）对称。
+
+**可验收信号**：project scope `settings.json` 供给 `enabledPlugins: {"x@mp": true}` + 该 plugin 声明某 bundled server 且 plugin 已 installed → 该 bundled server verdict MUST 为 `PENDING`（非 `ENABLED`）；同一 plugin 改由 user scope `enabledPlugins` 激活 → verdict `ENABLED`（免批准保持）。
 
 ## 3. settings 校验 fail-fast
 
