@@ -11,9 +11,18 @@
 - **为什么**：按 name 授予信任会让「同名两条 server 共用一份审批」——你批准了 plugin 带的 `filesystem`，你自己那个恰好也叫 `filesystem` 的 server 自动免批准（真实信任泄漏）。bundle_id 键与 `get_config.servers` key、工具前缀 `{bundle_id}__`、错误码 `meta.mcp_server` 同一身份空间，零桥接。
 - **hash-fallback 形态的免费收益**：bundle_id 为连接身份摘要形态时，改连接参数 ⇒ bundle_id 变 ⇒ 旧审批自然失效 ⇒ TOFU 语义。
 
-## 2. 档位表（顺序即优先级，先到先决）
+## 2. 档位表（安全层 vs 信任层，顺序即优先级，先到先决）
 
-审批门只对**声明的 server** 判定——mcp.json 各 scope 条目 + 宿主 embed 构造声明（[runtime-contract §2.5 第 3 条](../specification/computer-management/runtime-contract.md)），embed 条目进门迭代意味着企业 policy 拒绝名单与通用禁用开关对其**同样适用**（用户/管理员保留最终关停权）；输入为 `(bundle_id, settings, trusted_origin)`：
+审批门拆为两层，MUST 分别判定（与 [runtime-contract §5 item 10](../specification/computer-management/runtime-contract.md) 对齐）：
+
+| 层 | 范围 | 方向 | 适用对象 |
+|---|------|------|---------|
+| **安全层** | Gate 1-3（denied / allowed / disabledMcpjson） | DENY / 白名单收窄 / 用户侧禁用 | **所有 server（含 plugin baseline）** |
+| **信任层** | Gate 4-7（trusted_origin / enabledMcpjson / enableAllProject / PENDING） | ENABLE | **仅声明 server + project-enable bundled server** |
+
+plugin 受信 scope enable 的 bundled server 免批准——**免的是信任层**，安全层仍必经（见 [§2.3](#23-安全层对-plugin-baseline-的生效语义)）。信任层输入为 `(bundle_id, settings, trusted_origin)`，安全层输入为 `(bundle_id, policy_settings)`：
+
+档位表（对进入对应层的 server 判定；安全层 ∀ server，信任层仅声明 server + project-enable bundled）：
 
 | 档 | 判据 | 结果 |
 |---|------|------|
@@ -29,7 +38,7 @@
 
     旧实现在档 3 与 4 之间存在「`bundled.contains(name)` → ENABLED」档位。它是安全缺陷：真正的 plugin bundled server **从不进入** mcp.json 解析层（bundled 走 enable→mount，不落 mcp.json），因此该档**唯一可达路径**是「project/local 声明的 server 借用了某已装 plugin 的 server 名」——即 100% 借名跳过批准门（攻击者只需猜中受害者装过的任一插件的 server 名）。
 
-    - **plugin 声明的 server，当其 enable 判据来自受信 scope 时，MUST 不进入审批门迭代**——在迭代层过滤（`origin == plugin` 的条目不进门），**禁止**写成门内新档位（「进门后豁免」形状即旧档位复发，即便判据换成 origin 也重新违反 item 10「两套开关分别应用」）。其可信性由 install ∧ 受信 scope enable 门保证（[runtime-contract §2.5](../specification/computer-management/runtime-contract.md)）。**project scope 供给 `enabledPlugins=true` 时相反：该 bundled server MUST 进门迭代落 PENDING**（见 [§2.2](#22-plugin-enable-路径的同构约束enabledplugins)）。
+    - **plugin 声明的 server，当其 enable 判据来自受信 scope 时，MUST 不进入信任层迭代（Gate 4-7）**——在迭代层过滤（`origin == plugin` 的条目不进信任层），但 MUST 仍经过安全层（Gate 1-3）。**禁止**写成门内新档位（「进门后豁免」形状即旧档位复发，即便判据换成 origin 也重新违反 item 10「两套开关分别应用」）。其可信性由 install ∧ 受信 scope enable 门保证（[runtime-contract §2.5](../specification/computer-management/runtime-contract.md)）。**project scope 供给 `enabledPlugins=true` 时相反：该 bundled server MUST 进门迭代落 PENDING**（见 [§2.2](#22-plugin-enable-路径的同构约束enabledplugins)）。
     - **审批门实现 MUST NOT 依赖物化账本 / bundled 名集**。
     - **可验收信号**：门函数签名不含 `bundled` 入参；代码库中不存在「读账本聚合 bundled 名集」的函数（如 `bundled_mcp_server_names()`）——「函数不存在」比「文档说别用」可靠。
     - 上述是下方 §2.1 通则的一个具体形状。**只钉形状不钉通则会被同构路径绕过**——见 §2.1。
@@ -66,7 +75,7 @@
 
 | `enabledPlugins` 供给 scope | 该 plugin 的 bundled server |
 |---|---|
-| `user` / `local` / `flag` / `policy`（受信 scope） | 免批准（滤出审批门迭代，现状保持） |
+| `user` / `local` / `flag` / `policy`（受信 scope） | 免批准——免信任层（滤出 Gate 4-7 迭代），安全层（Gate 1-3）仍必经（见 [§2.3](#23-安全层对-plugin-baseline-的生效语义)） |
 | `project`（入 git、随仓库分发） | **回落审批门** —— 进门迭代落 `PENDING`（与 project-scope 声明 server 同视） |
 
 **约束（MUST）**：project scope 供给的 `enabledPlugins=true` **不构成** bundled server 的免批准判据。这与档⑤/档⑥ 拒 project scope 同构（self-approval 闭环）：被 clone 的仓库携一份 `enabledPlugins: {"evil@mp": true}` 即可让其 bundled server 启动期免提示直挂——攻击者无需猜任何 server 名（marketplace 须已在受害者本地 `known_marketplaces.json`，非零点击）。
@@ -76,6 +85,37 @@
 **落地（SDK 自治，双端一致）**：bundled server 采集逻辑须感知激活 plugin 的 enable 判据来源 scope（仅 project 供给 → 投影为 `PENDING` 而非 `ENABLED`）。**实现 MUST NOT 以新增审批门档位达成**（「`origin==plugin ∧ project-enable → PENDING`」是 §2 danger note 明禁的「进门后豁免/进门后降级」形状变体）——project-enabled bundled server 落 `PENDING` 是「它没获得免批准特权、作为未决 server 自然落档⑦」，不是「进门后改判」。TOFU 审批一次后写 `local` scope，与既有批准写助手（只写 local）对称。
 
 **可验收信号**：project scope `settings.json` 供给 `enabledPlugins: {"x@mp": true}` + 该 plugin 声明某 bundled server 且 plugin 已 installed → 该 bundled server verdict MUST 为 `PENDING`（非 `ENABLED`）；同一 plugin 改由 user scope `enabledPlugins` 激活 → verdict `ENABLED`（免批准保持）。
+
+### 2.3 安全层对 plugin baseline 的生效语义
+
+plugin 受信 scope enable 的 bundled server 免批准——**免的是信任层**（Gate 4-7），**安全层**（Gate 1-3）仍必经（[runtime-contract §5 item 10](../specification/computer-management/runtime-contract.md)）。安全层判定是纯函数 `(bundle_id, policy_settings) → {PASS, DISABLED}`，在 reconcile 阶段 `collect_enabled_bundled_servers` 采集**之后**、挂载**之前**执行。
+
+**生效时机**：
+
+```
+enable → reconcile →
+  1. collect_enabled_bundled_servers（采集完整意图清单）
+  2. 安全层判定：逐 bundle_id 过 Gate 1-3
+     - DISABLED → 不进投影（continue），产出结构化诊断（类别 policy）
+     - PASS → 继续
+  3. 信任层判定（仅声明 server + project-enable bundled 进门）
+  4. 挂载
+```
+
+**半态澄清**：安全层按 `bundle_id` 全局拒绝**不产生** [runtime-contract §2.4](../specification/computer-management/runtime-contract.md) 所禁半态。理由：安全层过滤发生在「skill + bundled server 原子投影」之前，被拒绝的 server 与同 plugin 的 skill 一并不入投影——这与 `policy enabledPlugins: false` 整体关停 plugin 是同构的「整包不投影」，而非「只打掉 server、skill 仍在」的半态。单独打掉某 bundled server（通过非 policy 手段，如在 mcp.json 中覆盖）仍属半态禁令。
+
+**实现约束（MUST）**：
+
+- 安全层判定 MUST NOT 限定"声明 server"范围——collect 采集到的 plugin bundled server 与声明 server **同一判定通道**。
+- `disabledMcpjsonServers`（Gate 3）虽在安全层，其判据来自**任意 scope**（含 project）——DENY 方向 fail-safe，"更严格永远安全"（§2.1 通则）。
+- 被安全层 DISABLED 的 bundled server **MUST NOT 出现在 `pending_bundled_servers`**——避免"待批准一个已被 policy 拒绝的 server"的 UX 陷阱。
+- `list_pending_bundled_approvals` 类查询接口 MUST 同步过滤安全层 Disabled。
+
+**可验收信号**：
+
+- policy `deniedMcpServers` 含 `bundle_id_X` → user scope enabled plugin 声明依赖 X → X 不挂载、不出现在 `pending_bundled_servers`、产出 `policy` 类别诊断
+- 同 plugin 的 skill 正常投影（server 被安全层拒绝 ≠ 整 plugin 被关停，但 skill 投影因安全层在原子投影前发生，skill 也一并被抑制——与被 policy `enabledPlugins: false` 整体关停在投影面的效果一致）
+- Gate 3（`disabledMcpjsonServers`）由 project scope 供给 → 对 plugin bundled server 同样生效（fail-safe）
 
 ## 3. settings 校验 fail-fast
 
