@@ -131,10 +131,11 @@ SDK 可以在非 live context 中支持 ledger-only operations，但应文档化
 **name→id 解析（`resolve_target` 语义）只存在于人机面（CLI / REPL 等）**，该用户可见行为**双端 MUST 逐字一致**：
 
 1. token 按 display name 在活跃配置集反查，**唯一命中** → 解析为其 bundle_id，执行；
-2. 0 命中且 token 是合法 bundle_id → 按 bundle_id 执行；仍无 → 报错「未找到」；
-3. **多命中**（同名合法共存）→ 报错并列出各候选的 **bundle_id + display name + 归属**（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；
-4. **MUST NOT** 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错；
-5. 未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。
+2. **多命中**，且 token 精确等于其中某候选的 bundle_id → 按该 bundle_id 执行（用户已显式表达身份意图，不应报「请用 bundle_id 重试」）；
+3. **多命中**，且 token 不等于任何候选的 bundle_id → 报错并列出各候选的 **bundle_id + display name + 归属**（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；
+4. 0 命中且 token 是合法且已注册的 bundle_id → 按 bundle_id 执行；仍无 → 报错「未找到」；
+5. **MUST NOT** 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错。精确 bundle_id 匹配（步骤 2）是执行用户已显式表达的身份意图，不属于「任意规则」范畴；
+6. 未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。
 
 ```
 $ server rm filesystem
