@@ -1,0 +1,3863 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Agent To Computer Socket.IO-based MCP Protocol Specification">
+      
+      
+      
+        <link rel="canonical" href="https://doc.turingfocus.cn/a2c-smcp/latest/specification/error-handling/">
+      
+      
+        <link rel="prev" href="../versioning/">
+      
+      
+        <link rel="next" href="../security/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>错误处理 - A2C-SMCP Protocol</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#a2c-smcp-错误处理规范" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-header__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            A2C-SMCP Protocol
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              错误处理
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  协议规范
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/computer-mcp-config-guide/" class="md-tabs__link">
+          
+  
+  
+  开发指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-tabs__link">
+          
+  
+  
+  迁移指南
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../appendix/faq/" class="md-tabs__link">
+          
+  
+  
+  附录
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="A2C-SMCP Protocol" class="md-nav__button md-logo" aria-label="A2C-SMCP Protocol" data-md-component="logo">
+      
+  <img src="../../assets/logo-white.svg" alt="logo">
+
+    </a>
+    A2C-SMCP Protocol
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/A2C-SMCP/a2c-smcp-protocol" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    a2c-smcp-protocol
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议规范
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    协议规范
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer 侧协议框架
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer Management Plane
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Computer Management Plane
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer-management/protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    管理面协议边界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer-management/runtime-contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    运行时契约
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer-management/sdk-api-guidance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SDK API 指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../computer-management/conformance-tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    一致性测试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件定义
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-structures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据结构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop 桌面系统
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skill/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SKILL 通道
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../blob-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    通用二进制传输
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../room-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    房间模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    协议版本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    错误处理
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    错误处理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误码定义" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误码定义
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误码定义">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#通用错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通用错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#工具调用错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-server-路由错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server 路由错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skill-通道错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SKILL 通道错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#通用二进制传输错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通用二进制传输错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#连接与房间管理错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        连接与房间管理错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误响应格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误响应格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误响应格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flat-errorpayload-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flat ErrorPayload schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#传输分层" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        传输分层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#各错误码标准字段总表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        各错误码标准字段总表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-字段约束协议级" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 字段约束（协议级）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="details 字段约束（协议级）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#details-内禁止包含的敏感信息" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 内禁止包含的敏感信息
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-反序列化建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 反序列化建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#事件级错误处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        事件级错误处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="事件级错误处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serverjoin_office-响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        server:join_office 响应
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clienttool_call-响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        client:tool_call 响应
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#超时处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        超时处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="超时处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computer-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Computer 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#取消语义无-ack无错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        取消语义（无 ack、无错误码）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#飞行中断连in-flight-disconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        飞行中断连（in-flight disconnect）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#重试策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        重试策略
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="重试策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#建议的重试策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        建议的重试策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#指数退避示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指数退避示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误传播" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误传播
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误传播">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#工具调用错误传播链" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用错误传播链
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#日志记录建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        日志记录建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#协议版本不匹配4008" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        协议版本不匹配（4008）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="协议版本不匹配（4008）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4008-是-http-body-code不是-ws-close-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4008 是 HTTP body code，不是 WS close code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-响应规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP 响应规范
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字段说明
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-实现要求" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-解析示例reference-impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 解析示例（reference impl）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-上游授权错误响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP 上游授权错误响应
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP 上游授权错误响应">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#授权失败的响应结构" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        授权失败的响应结构
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#40064007-判定决策表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4006/4007 判定决策表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#降级语义授权类失败的硬映射" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        降级语义：授权类失败的硬映射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#可观测判据禁止挂起至超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可观测判据：禁止挂起至超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字段说明
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="字段说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auth_hint-安全边界" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auth_hint 安全边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-server-not-found4014" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Not Found（4014）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-capability-not-supported4015" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Capability Not Supported（4015）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-skill-name4016" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Skill Name（4016）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skill-resource-not-accessible4017" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skill Resource Not Accessible（4017）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blob-not-accessible4018" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blob Not Accessible（4018）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TODO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#参考" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参考
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安全考虑
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    开发指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/computer-mcp-config-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Computer MCP 配置指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/mcp-approval-gate-alignment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP 审批门对齐指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    迁移指南
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    迁移指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.2-uri-metadata-refactor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2 升级指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.2.1-skill-and-blob-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.2.1 SKILL/二进制传输适配
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrations/v0.3.0-plugin-install-enable-separation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v0.3.0 plugin install/enable 分离
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    附录
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    附录
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendix/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    常见问题
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="页面目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      页面目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#概述" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        概述
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误码定义" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误码定义
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误码定义">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#通用错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通用错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#工具调用错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-server-路由错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server 路由错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skill-通道错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SKILL 通道错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#通用二进制传输错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通用二进制传输错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#连接与房间管理错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        连接与房间管理错误码
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误响应格式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误响应格式
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误响应格式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flat-errorpayload-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flat ErrorPayload schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#传输分层" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        传输分层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#各错误码标准字段总表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        各错误码标准字段总表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#details-字段约束协议级" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 字段约束（协议级）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="details 字段约束（协议级）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#details-内禁止包含的敏感信息" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        details 内禁止包含的敏感信息
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-反序列化建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 反序列化建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#事件级错误处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        事件级错误处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="事件级错误处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#serverjoin_office-响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        server:join_office 响应
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clienttool_call-响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        client:tool_call 响应
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#超时处理" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        超时处理
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="超时处理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#computer-端超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Computer 端超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#取消语义无-ack无错误码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        取消语义（无 ack、无错误码）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#飞行中断连in-flight-disconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        飞行中断连（in-flight disconnect）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#重试策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        重试策略
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="重试策略">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#建议的重试策略" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        建议的重试策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#指数退避示例" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指数退避示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#错误传播" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        错误传播
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="错误传播">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#工具调用错误传播链" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工具调用错误传播链
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#日志记录建议" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        日志记录建议
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#协议版本不匹配4008" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        协议版本不匹配（4008）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="协议版本不匹配（4008）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4008-是-http-body-code不是-ws-close-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4008 是 HTTP body code，不是 WS close code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-响应规范" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP 响应规范
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字段说明
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-实现要求" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK 实现要求
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-解析示例reference-impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python 解析示例（reference impl）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-上游授权错误响应" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP 上游授权错误响应
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP 上游授权错误响应">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#授权失败的响应结构" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        授权失败的响应结构
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#40064007-判定决策表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4006/4007 判定决策表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#降级语义授权类失败的硬映射" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        降级语义：授权类失败的硬映射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#可观测判据禁止挂起至超时" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可观测判据：禁止挂起至超时
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#字段说明_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        字段说明
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="字段说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auth_hint-安全边界" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auth_hint 安全边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-server-not-found4014" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Not Found（4014）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-capability-not-supported4015" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Capability Not Supported（4015）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-skill-name4016" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Skill Name（4016）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skill-resource-not-accessible4017" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skill Resource Not Accessible（4017）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blob-not-accessible4018" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blob Not Accessible（4018）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TODO
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#参考" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参考
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    协议规范
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="a2c-smcp-错误处理规范">A2C-SMCP 错误处理规范<a class="headerlink" href="#a2c-smcp-错误处理规范" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>状态</strong>: 草案</p>
+<p>本章节目前为草案状态，具体错误码与结构仍在演进中。</p>
+</blockquote>
+<h2 id="概述">概述<a class="headerlink" href="#概述" title="Permanent link">&para;</a></h2>
+<p>A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Computer 之间能够正确传递和处理错误信息。</p>
+<h2 id="错误码定义">错误码定义<a class="headerlink" href="#错误码定义" title="Permanent link">&para;</a></h2>
+<h3 id="通用错误码">通用错误码<a class="headerlink" href="#通用错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+<th>典型触发场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td>Bad Request</td>
+<td>无效请求格式</td>
+<td>数据结构校验失败、字段缺失或类型错误</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Unauthorized</td>
+<td>未授权</td>
+<td>认证失败、Token 无效</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden</td>
+<td>权限违规</td>
+<td>跨房间访问、Agent 独占冲突、未授权操作</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found</td>
+<td>资源不存在</td>
+<td>工具或 Computer 不存在、MCP 配置缺失</td>
+</tr>
+<tr>
+<td>408</td>
+<td>Timeout</td>
+<td>请求超时</td>
+<td>工具调用超过约定超时时间未返回</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Error</td>
+<td>内部错误</td>
+<td>Server 或 Computer 端逻辑异常</td>
+</tr>
+</tbody>
+</table>
+<h3 id="工具调用错误码">工具调用错误码<a class="headerlink" href="#工具调用错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4001</td>
+<td>Tool Not Found</td>
+<td><code>tool_name</code> 在指定 MCP Server 中不存在；<strong>不</strong>含 <code>mcp_server</code> 本身缺失场景（用 <a href="#mcp-server-not-found4014">4014</a>）</td>
+</tr>
+<tr>
+<td>4002</td>
+<td>Tool Disabled</td>
+<td>工具被禁用</td>
+</tr>
+<tr>
+<td>4003</td>
+<td>Tool Execution Failed</td>
+<td>工具执行失败</td>
+</tr>
+<tr>
+<td>4004</td>
+<td>Tool Timeout</td>
+<td>工具执行超时</td>
+</tr>
+<tr>
+<td>4005</td>
+<td>Tool Requires Confirmation</td>
+<td>工具需要二次确认</td>
+</tr>
+<tr>
+<td>4006</td>
+<td>Tool Authorization Required</td>
+<td>工具需要 MCP 上游授权（如 OAuth 2.0），Computer 当前无有效凭证或尚未完成授权（见下方<a href="#40064007-判定决策表">4006/4007 判定决策表</a>）</td>
+</tr>
+<tr>
+<td>4007</td>
+<td>Tool Authorization Failed</td>
+<td>MCP 上游授权流程失败、Token 已失效、刷新失败、或权限不足（见下方<a href="#40064007-判定决策表">4006/4007 判定决策表</a>）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mcp-server-路由错误码">MCP Server 路由错误码<a class="headerlink" href="#mcp-server-路由错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4014</td>
+<td>MCP Server Not Found</td>
+<td>引用的 <code>mcp_server</code>（bundle_id）未注册（见 <a href="#mcp-server-not-found4014">§MCP Server Not Found</a>）</td>
+</tr>
+<tr>
+<td>4015</td>
+<td>MCP Capability Not Supported</td>
+<td>MCP Server 已注册但未声明所需 capability（见 <a href="#mcp-capability-not-supported4015">§MCP Capability Not Supported</a>）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>BundleID / exposed_tool_name 的配置问题不进协议错误码</strong>：重复 <code>bundle_id</code>（<a href="../data-structures/#no-double-open">no-double-open</a>）、非法 <code>bundle_id</code>、同 server 内 alias 撞出相同 <code>exposed_tool_name</code>——均在<strong>配置加载期</strong>由 Computer 检出，属 <a href="../data-structures/#config-diagnostics">Computer 本地配置诊断</a>（日志 / 本地 UI），不由任何 <code>client:*</code> 事件触发（对齐 SKILL「物化失败 / 孤儿 / 跨 source 冲突不进协议错误码」先例）。仅 <code>client:tool_call</code> 的 <code>tool_name</code>（exposed_tool_name）在 <a href="../data-structures/#exposedtoolmapping">ExposedToolMapping</a> 未命中属运行期客户端错误 → 复用 <a href="#工具调用错误码"><code>4001 Tool Not Found</code></a>。</p>
+</blockquote>
+<h3 id="skill-通道错误码">SKILL 通道错误码<a class="headerlink" href="#skill-通道错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4016</td>
+<td>Invalid Skill Name</td>
+<td><code>client:get_skill</code> 入参 <code>name</code> 格式非法（违反 SKILL name lexer 规则；见 <a href="#invalid-skill-name4016">§Invalid Skill Name</a>）</td>
+</tr>
+<tr>
+<td>4017</td>
+<td>Skill Resource Not Accessible</td>
+<td><code>client:get_skill</code> 的 <code>rel_path</code> 路径穿越 / 命中禁止文件 / 包内不存在（见 <a href="#skill-resource-not-accessible4017">§Skill Resource Not Accessible</a>）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>复用与不使用</strong>：SKILL <code>name</code> <strong>格式合法但不存在</strong>（不存在 / 已卸载 / 已孤儿）复用 <a href="#mcp-server-not-found4014"><code>4014 MCP Server Not Found</code></a> 语义；<code>name</code> 格式非法 → <code>4016</code>；<code>name</code> 有效但 <code>rel_path</code> 不可达 → <code>4017</code>。SKILL 通道<strong>不使用</strong> <a href="#mcp-capability-not-supported4015"><code>4015</code></a>——未声明 <code>resources</code> capability 的 server 在物化阶段即被排除，不会上送 Agent。物化失败 / 孤儿 / 跨 source 冲突等内部事故不进协议错误码（Computer 日志即可，batch 接口对部分失败健壮）。二进制 / 过大文本经 <code>blob_handle</code> 转 <a href="../blob-transfer/"><code>client:get_blob</code></a>：<strong>铸造期</strong>的沙箱与上限属 <code>4017</code>，<strong>拉取期</strong>的句柄/源/范围属 <a href="#blob-not-accessible4018"><code>4018</code></a>，二者不重叠。</p>
+</blockquote>
+<h3 id="通用二进制传输错误码">通用二进制传输错误码<a class="headerlink" href="#通用二进制传输错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4018</td>
+<td>Blob Not Accessible</td>
+<td><code>client:get_blob</code> 句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（见 <a href="#blob-not-accessible4018">§Blob Not Accessible</a>）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>边界</strong>：<code>4018</code> 属传输<strong>拉取期</strong>。资源的鉴权与绝对上限由<strong>铸造句柄的生产者通道</strong>在铸造期决断（SKILL → <code>4017</code>，不通过则不铸造句柄）。详见 <a href="../blob-transfer/">通用二进制传输</a>。</p>
+</blockquote>
+<h3 id="连接与房间管理错误码">连接与房间管理错误码<a class="headerlink" href="#连接与房间管理错误码" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4008</td>
+<td>Protocol Version Mismatch</td>
+<td>HTTP 握手阶段，URL query 中的 <code>a2c_version</code> 与 Server 不兼容</td>
+</tr>
+<tr>
+<td>4101</td>
+<td>Room Full</td>
+<td>房间已有 Agent</td>
+</tr>
+<tr>
+<td>4102</td>
+<td>Room Not Found</td>
+<td>房间不存在</td>
+</tr>
+<tr>
+<td>4103</td>
+<td>Not In Room</td>
+<td>未加入房间</td>
+</tr>
+<tr>
+<td>4104</td>
+<td>Cross Room Access</td>
+<td>跨房间访问被拒绝</td>
+</tr>
+</tbody>
+</table>
+<h2 id="错误响应格式">错误响应格式<a class="headerlink" href="#错误响应格式" title="Permanent link">&para;</a></h2>
+<p>A2C-SMCP 协议级错误（HTTP 握手层 + Socket.IO ack 层）统一采用<strong>扁平 ErrorPayload</strong> shape：标准字段 <code>code</code> / <code>message</code> 顶层平铺，code-specific 字段（如 <code>mcp_server</code> / <code>capability</code>）顶层并列，诊断信息封装在 <code>details</code> 子对象内。</p>
+<div class="admonition warning">
+<p class="admonition-title">无嵌套 envelope</p>
+<p>协议<strong>不使用</strong> <code>{"error": {"code": ..., "message": ...}}</code> 形式的嵌套包装。SDK 反序列化时直接读取顶层字段，<strong>禁止</strong>二次 unwrap。</p>
+</div>
+<blockquote>
+<p><strong>作用域</strong>：本节定义<strong>所有 <code>client:*</code> 事件 ack 层与 HTTP 握手层</strong>的协议级错误响应 shape——任一 <code>client:*</code> 路由（包括 <code>client:get_tools</code> / <code>client:get_desktop</code> 等历史未列举专属错误码的路由）在 ack 通道上返回的协议级错误，<strong>均</strong> MUST 采用本节定义的扁平 shape；SDK 路由层 MUST 对 ack payload 命中 <code>ErrorPayload</code>（即顶层含 <code>code</code> 且语义匹配）做原样透传，<strong>不得</strong>按路由开关此契约。<strong>不</strong>适用：(a) <code>server:join_office</code> 等返回 <code>(success, error_msg)</code> 元组的事件，见 <a href="#事件级错误处理">§事件级错误处理</a>；(b) <code>client:tool_call</code> 工具失败，使用 MCP <code>CallToolResult.isError=true</code>，见 <a href="#错误传播">§错误传播</a>。</p>
+</blockquote>
+<h3 id="flat-errorpayload-schema">Flat ErrorPayload schema<a class="headerlink" href="#flat-errorpayload-schema" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ErrorPayload</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">code</span><span class="p">:</span> <span class="nb">int</span>                       <span class="c1"># 必选：错误码</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>                    <span class="c1"># 必选：人类可读描述</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">details</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>      <span class="c1"># 可选：诊断容器，仅供日志 / 调试</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="c1"># 各错误码可附加 code-specific 顶层字段，详见下方总表</span>
+</code></pre></div>
+<h3 id="传输分层">传输分层<a class="headerlink" href="#传输分层" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>错误码</th>
+<th>承载方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP 握手层</td>
+<td><code>4008</code></td>
+<td>HTTP 400 响应 body（JSON）+ <code>X-A2C-Error-Code</code> header（冗余诊断）</td>
+</tr>
+<tr>
+<td>Socket.IO ack 层</td>
+<td><code>4014</code> / <code>4015</code></td>
+<td>ack callback 第一参（dict）</td>
+</tr>
+</tbody>
+</table>
+<p>两层使用<strong>同一种</strong> flat shape，差别仅在传输通道。</p>
+<h3 id="各错误码标准字段总表">各错误码标准字段总表<a class="headerlink" href="#各错误码标准字段总表" title="Permanent link">&para;</a></h3>
+<p>除 <code>code</code> / <code>message</code> 外的顶层 code-specific 字段，以及 <code>details</code> 内推荐 key：</p>
+<table>
+<thead>
+<tr>
+<th>code</th>
+<th>顶层 code-specific 字段</th>
+<th><code>details</code> 内推荐 key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>4008</code></td>
+<td><code>server_version</code> / <code>client_version</code> / <code>min_supported</code> / <code>max_supported</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>4014</code></td>
+<td><code>mcp_server</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>4015</code></td>
+<td><code>mcp_server</code> / <code>capability</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>4016</code></td>
+<td>—</td>
+<td><code>name</code></td>
+</tr>
+<tr>
+<td><code>4017</code></td>
+<td>—</td>
+<td><code>reason</code> / <code>rel_path</code> / <code>total_size</code></td>
+</tr>
+<tr>
+<td><code>4018</code></td>
+<td>—</td>
+<td><code>reason</code></td>
+</tr>
+</tbody>
+</table>
+<p>各错误码完整 payload 示例与触发时机详见对应章节（<a href="#协议版本不匹配4008">§4008</a> / <a href="#mcp-server-not-found4014">§4014</a> / <a href="#mcp-capability-not-supported4015">§4015</a>）。</p>
+<h3 id="details-字段约束协议级"><code>details</code> 字段约束（协议级）<a class="headerlink" href="#details-字段约束协议级" title="Permanent link">&para;</a></h3>
+<p><code>details</code> 是<strong>诊断信息容器</strong>，承载日志 / 调试上下文。协议级约束：</p>
+<ul>
+<li>Agent <strong>MUST NOT</strong> 把 <code>details</code> 内容透传给最终用户——避免泄露内部实现细节</li>
+<li>协议级标准 key 见上表；新增 standard key 算 minor 升级</li>
+<li>业务自定义 key 可附加，<strong>不进入</strong>协议演进语义（不算 breaking）</li>
+</ul>
+<h4 id="details-内禁止包含的敏感信息"><code>details</code> 内禁止包含的敏感信息<a class="headerlink" href="#details-内禁止包含的敏感信息" title="Permanent link">&para;</a></h4>
+<ul>
+<li>API 密钥或 Token</li>
+<li>内部 IP 地址或端口</li>
+<li>数据库连接信息</li>
+<li>用户密码或凭证</li>
+<li>堆栈跟踪（生产环境）</li>
+</ul>
+<h3 id="sdk-反序列化建议">SDK 反序列化建议<a class="headerlink" href="#sdk-反序列化建议" title="Permanent link">&para;</a></h3>
+<p>按 <code>code</code> 分发到 code-specific TypedDict 解析，<strong>不要</strong>写 over-generic <code>details: dict</code> 把所有顶层字段折叠收集——会丢失类型信息与 IDE 推导能力。</p>
+<blockquote>
+<p><strong>注</strong>：协议规范仅提供 Python reference impl。其他 SDK 由各自实现决定具体解析模式——A2C-SMCP 协议文档不堆砌多语言示例。</p>
+</blockquote>
+<h2 id="事件级错误处理">事件级错误处理<a class="headerlink" href="#事件级错误处理" title="Permanent link">&para;</a></h2>
+<h3 id="serverjoin_office-响应">server:join_office 响应<a class="headerlink" href="#serverjoin_office-响应" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 成功</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 失败</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Room already has an agent&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="clienttool_call-响应">client:tool_call 响应<a class="headerlink" href="#clienttool_call-响应" title="Permanent link">&para;</a></h3>
+<p>工具调用使用 MCP 的 <code>CallToolResult</code> 结构返回结果：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">CallToolResult</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">content</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TextContent</span> <span class="o">|</span> <span class="n">ImageContent</span> <span class="o">|</span> <span class="n">EmbeddedResource</span><span class="p">]</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">isError</span><span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># 是否为错误结果</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span>     <span class="c1"># 结果级元数据（线上 key 为 meta，承载 a2c_* 扩展标记）</span>
+</code></pre></div>
+<p>当 <code>isError=True</code> 时，<code>content</code> 中包含错误信息。<code>isError=True</code> 可由<strong>普通失败</strong>、<strong>超时</strong>或<strong>取消</strong>产生；三者通过<strong>结果级 <code>meta</code> 标记</strong>区分：</p>
+<table>
+<thead>
+<tr>
+<th>终态</th>
+<th><code>isError</code></th>
+<th>结果级 <code>meta</code> 标记</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>普通失败</td>
+<td><code>True</code></td>
+<td>无 a2c 终态标记（授权失败另带 <code>meta.error_code</code>，见 <a href="#mcp-上游授权错误响应">§MCP 上游授权错误响应</a>）</td>
+<td>工具自身执行失败</td>
+</tr>
+<tr>
+<td>超时</td>
+<td><code>True</code></td>
+<td><code>meta.a2c_timeout = true</code></td>
+<td>Agent / Computer 端超时；见 <a href="#超时处理">§超时处理</a></td>
+</tr>
+<tr>
+<td>取消</td>
+<td><code>True</code></td>
+<td><code>meta.a2c_cancelled = true</code>（+ 可选 <code>meta.a2c_cancel_reason</code>）</td>
+<td>由 <code>notify:tool_call_cancel</code> 中断；见 <a href="../events/#notifytool_call_cancel">事件 §notify:tool_call_cancel</a></td>
+</tr>
+</tbody>
+</table>
+<p>标记完整定义见 <a href="../data-structures/#calltoolresult-结果级-a2c-标记">数据结构 §CallToolResult 结果级 A2C 标记</a>。</p>
+<h2 id="超时处理">超时处理<a class="headerlink" href="#超时处理" title="Permanent link">&para;</a></h2>
+<h3 id="agent-端超时">Agent 端超时<a class="headerlink" href="#agent-端超时" title="Permanent link">&para;</a></h3>
+<p>Agent 在发起工具调用时指定 <code>timeout</code>：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">emit_tool_call</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">tool_name</span><span class="o">=</span><span class="s2">&quot;slow_tool&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>  <span class="c1"># 30 秒超时</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
+</code></pre></div>
+<p>超时后，Agent 应：</p>
+<ol>
+<li>发送 <code>server:tool_call_cancel</code> 取消请求</li>
+<li>返回超时错误给调用方</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 超时返回示例</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">CallToolResult</span><span class="p">(</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Tool call timeout&quot;</span><span class="p">)],</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a2c_timeout&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>   <span class="c1"># 结果级标记：标识超时（区别于取消的 a2c_cancelled）</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p><strong>命名空间收敛</strong>: 历史示例曾用未加命名空间的 <code>meta={"timeout": True}</code>；现统一到 <code>a2c_*</code> 命名空间下的 <code>a2c_timeout</code>，与 <code>a2c_cancelled</code> 一致，均为<strong>结果级 <code>meta</code></strong> 标记。详见 <a href="../data-structures/#calltoolresult-结果级-a2c-标记">数据结构 §CallToolResult 结果级 A2C 标记</a>。</p>
+</blockquote>
+<h3 id="server-端超时">Server 端超时<a class="headerlink" href="#server-端超时" title="Permanent link">&para;</a></h3>
+<p>Server 在转发请求时应设置合理的超时：</p>
+<ul>
+<li>使用 Agent 请求中的 <code>timeout</code> 值</li>
+<li>添加少量缓冲时间（如 5 秒）</li>
+</ul>
+<h3 id="computer-端超时">Computer 端超时<a class="headerlink" href="#computer-端超时" title="Permanent link">&para;</a></h3>
+<p>Computer 应在工具执行超时时：</p>
+<ol>
+<li>尝试中断工具执行</li>
+<li>返回超时错误</li>
+</ol>
+<h2 id="取消语义无-ack无错误码">取消语义（无 ack、无错误码）<a class="headerlink" href="#取消语义无-ack无错误码" title="Permanent link">&para;</a></h2>
+<p><code>server:tool_call_cancel</code> 为 <strong>fire-and-forget</strong>：Server 收到后仅向房间广播 <code>notify:tool_call_cancel</code>，<strong>不回执（无 ack）</strong>。</p>
+<p><strong>取消刻意不分配错误码、不投递扁平 <a href="#错误响应格式">ErrorPayload</a></strong>，理由与 <a href="#飞行中断连in-flight-disconnect">§飞行中断连</a> 同源：</p>
+<ul>
+<li>无 ack 通道即无错误码读者；取消是<strong>广播通知</strong>而非请求-响应，强行定义回执错误码无意义。</li>
+<li>Agent 端发出 <code>server:tool_call_cancel</code> 后收到的 ack 为 <code>None</code> 是<strong>合规预期</strong>，<strong>MUST NOT</strong> 据此判定"未实现 / 失败"。</li>
+</ul>
+<p><strong>取消的"结果"通过原 <code>client:tool_call</code> 的 ack 体现</strong>，而非取消事件本身：被中断时 Computer 对原调用返回 <code>CallToolResult(isError=True, meta={"a2c_cancelled": True})</code>，见 <a href="#clienttool_call-响应">§client:tool_call 响应</a>。</p>
+<p><strong>错误码复用 / 不使用</strong>：取消链路<strong>不新增</strong>错误码、亦<strong>不复用</strong>任何既有错误码（<code>4004 Tool Timeout</code> 仅用于超时，<strong>不</strong>用于取消）。<code>req_id</code> 命中不到在途调用时 Computer <strong>静默忽略</strong>（不回错误码），见 <a href="../events/#notifytool_call_cancel">事件 §notify:tool_call_cancel</a>。</p>
+<h2 id="飞行中断连in-flight-disconnect">飞行中断连（in-flight disconnect）<a class="headerlink" href="#飞行中断连in-flight-disconnect" title="Permanent link">&para;</a></h2>
+<p>Agent 发出 <code>client:*</code> 事件后，在 Server 转发 / Computer 处理 / 响应回程任一阶段断连，Server <strong>MAY</strong> 静默丢弃此 in-flight 请求（<strong>不 ack、不投递扁平 ErrorPayload</strong>）。</p>
+<p><strong>理由（为什么不分配新错误码）</strong>：</p>
+<ul>
+<li>ack callback 归属于 originator socket——originator 断连后，ack 投递路径本身已经消失，"错误码"没有读者，强行定义无意义</li>
+<li>是否在线属于 <strong>Socket.IO 传输层</strong>关注点，A2C 应用层不应越界用错误码表达连接状态——保持职责分层</li>
+<li>与"Computer 已响应但 Agent 在响应送达前断连"在本质上是同一类事件（originator 不可达），协议不为该类事件分配专属错误码</li>
+</ul>
+<p><strong>Agent 实现要求</strong>：</p>
+<ul>
+<li><strong>MUST NOT</strong> 依赖 ack 超时检测自身断连——使用 Socket.IO <code>disconnect</code> / <code>connect_error</code> 事件</li>
+<li><code>client:get_*</code> 类事件建议本地 ack 等待超时 <strong>≥ 30s</strong>（覆盖 Server 路由 + Computer 处理冗余）</li>
+<li><code>client:tool_call</code> 沿用 payload 内 <code>timeout</code> + Server 处理冗余（不另设 ack 超时）</li>
+</ul>
+<p><strong>Server 实现要求</strong>：</p>
+<ul>
+<li>in-flight 路径上发现 originator session 已不可达（如 <code>session is None</code> / SID 已注销）时，<strong>MUST NOT</strong> crash</li>
+<li>推荐 raise 一个受控的 namespace 异常（如 <code>SMCPNamespaceError</code>），由框架级 handler 静默收编为"不 ack"——<strong>不</strong>使用 <code>assert</code>（生产 <code>-O</code> 模式会被剥离）</li>
+<li><strong>MAY</strong> 写入审计日志；<strong>MUST NOT</strong> 向 Computer 或其它房间成员广播"originator gone"事件</li>
+<li>已转发给 Computer 的请求若回程时 originator 已断连，Server 直接丢弃响应，<strong>不</strong>回滚 Computer 端副作用——副作用幂等性是 Computer 自身的设计契约</li>
+</ul>
+<h2 id="重试策略">重试策略<a class="headerlink" href="#重试策略" title="Permanent link">&para;</a></h2>
+<h3 id="建议的重试策略">建议的重试策略<a class="headerlink" href="#建议的重试策略" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>错误类型</th>
+<th>是否重试</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400 Bad Request</td>
+<td>否</td>
+<td>修复请求后重试</td>
+</tr>
+<tr>
+<td>401 Unauthorized</td>
+<td>否</td>
+<td>重新认证后重试</td>
+</tr>
+<tr>
+<td>403 Forbidden</td>
+<td>否</td>
+<td>不重试</td>
+</tr>
+<tr>
+<td>404 Not Found</td>
+<td>否</td>
+<td>不重试</td>
+</tr>
+<tr>
+<td>408 Timeout</td>
+<td>可选</td>
+<td>指数退避重试</td>
+</tr>
+<tr>
+<td>500 Internal Error</td>
+<td>可选</td>
+<td>指数退避重试</td>
+</tr>
+</tbody>
+</table>
+<h3 id="指数退避示例">指数退避示例<a class="headerlink" href="#指数退避示例" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">retry_with_backoff</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>            <span class="k">return</span> <span class="k">await</span> <span class="n">func</span><span class="p">()</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>                <span class="k">raise</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>            <span class="n">wait_time</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="错误传播">错误传播<a class="headerlink" href="#错误传播" title="Permanent link">&para;</a></h2>
+<h3 id="工具调用错误传播链">工具调用错误传播链<a class="headerlink" href="#工具调用错误传播链" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>MCP Server → Computer → Server → Agent
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>     │           │          │        │
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>     └───────────┴──────────┴────────┘
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>                错误信息保留
+</code></pre></div>
+<p>每一层应：</p>
+<ol>
+<li>记录错误日志</li>
+<li>将错误信息向上传播</li>
+<li>不丢失原始错误细节</li>
+</ol>
+<h3 id="日志记录建议">日志记录建议<a class="headerlink" href="#日志记录建议" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 推荐的日志格式</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">&quot;Tool call failed&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="n">req_id</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">&quot;tool_name&quot;</span><span class="p">:</span> <span class="n">tool_name</span><span class="p">,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="n">computer</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">message</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">)</span>
+</code></pre></div>
+<h2 id="协议版本不匹配4008">协议版本不匹配（4008）<a class="headerlink" href="#协议版本不匹配4008" title="Permanent link">&para;</a></h2>
+<p><strong>触发时机</strong>：客户端（Agent / Computer）通过 Socket.IO 连接 Server，<strong>HTTP 中间件层</strong>校验 URL query 中的 <code>a2c_version</code> 发现与 Server 不兼容。校验发生在 Socket.IO 处理之前，业务代码无法影响。</p>
+<h3 id="4008-是-http-body-code不是-ws-close-code">4008 是 HTTP body code，不是 WS close code<a class="headerlink" href="#4008-是-http-body-code不是-ws-close-code" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">明确语义边界</p>
+<p><strong>4008 是 ErrorPayload.code 字段值，承载于 HTTP 400 响应 body 中</strong>。
+4008 <strong>不是</strong> WebSocket close code。polling 握手路径上版本校验在 HTTP 层完成、发生在 WS 帧建立之前。
+WS-only 直连握手另有拒绝形态：支持 ASGI denial-response 的栈仍回<strong>字节一致</strong>的 4008 HTTP body；不支持时回退到协议指定的、与 <code>4008</code> <strong>取不同值</strong>的 WebSocket close code <code>4900</code>（详见 <a href="../versioning/#5-websocket-only-握手的版本拒绝形态">versioning.md §5</a>）。
+SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code）与 <code>4900</code>（WS close code）混淆或互换。</p>
+</div>
+<h3 id="http-响应规范">HTTP 响应规范<a class="headerlink" href="#http-响应规范" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>HTTP/1.1 400 Bad Request
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Content-Type: application/json
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>X-A2C-Error-Code: 4008
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>{
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  &quot;code&quot;: 4008,
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>  &quot;message&quot;: &quot;Protocol version mismatch&quot;,
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  &quot;server_version&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>  &quot;client_version&quot;: &quot;0.1.5&quot;,
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  &quot;min_supported&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  &quot;max_supported&quot;: &quot;0.2.999&quot;
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>}
+</code></pre></div>
+<p><code>X-A2C-Error-Code</code> 响应 header 是冗余诊断辅助：当客户端无法访问 body 时（罕见 transport 边角情况），可从 header 中识别错误类型。<strong>不替代</strong> body，body 是 single source of truth。</p>
+<h3 id="字段说明">字段说明<a class="headerlink" href="#字段说明" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4008</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读的错误信息</td>
+</tr>
+<tr>
+<td><code>server_version</code></td>
+<td>是</td>
+<td>Server 当前支持的协议版本（Client 据此决定是否升级）</td>
+</tr>
+<tr>
+<td><code>client_version</code></td>
+<td>是</td>
+<td>Server 从 URL query 读取的客户端版本（回显供诊断）</td>
+</tr>
+<tr>
+<td><code>min_supported</code></td>
+<td>是</td>
+<td>Server 支持的最低协议版本</td>
+</tr>
+<tr>
+<td><code>max_supported</code></td>
+<td>是</td>
+<td>Server 支持的最高协议版本</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sdk-实现要求">SDK 实现要求<a class="headerlink" href="#sdk-实现要求" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Client SDK <strong>必须</strong>解析 HTTP 400 的响应 body，识别 <code>code: 4008</code>，转化为专属异常（如 <code>ProtocolVersionError</code>），<strong>禁止</strong>静默重试</li>
+<li>异常信息应明确告知用户两边版本，便于快速判断应升级哪端</li>
+<li>客户端 transport 顺序 <strong>SHOULD</strong> 配置为 <code>polling → websocket</code>（绝大多数 socketio 客户端默认即如此），保证首个握手请求是 HTTP polling，body 可访问</li>
+<li>可选：SDK 在本地日志中打印诊断信息（当前 SDK 声称的 PROTOCOL_VERSION 常量、接收到的 server_version）</li>
+</ul>
+<h3 id="python-解析示例reference-impl">Python 解析示例（reference impl）<a class="headerlink" href="#python-解析示例reference-impl" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">socketio</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2c_smcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">PROTOCOL_VERSION</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2c_smcp.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProtocolVersionError</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>   <span class="c1"># role 经 server:join_office 声明</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="p">)</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="k">except</span> <span class="n">socketio</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="c1"># python-socketio 在 HTTP 非 2xx 时把 body 放进异常 message</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="n">raw</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="k">raise</span>  <span class="c1"># 非协议级错误，保持原异常</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="k">raise</span> <span class="n">ProtocolVersionError</span><span class="p">(</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>        <span class="p">)</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    <span class="k">raise</span>
+</code></pre></div>
+<blockquote>
+<p><strong>注</strong>：协议规范仅提供 Python reference impl。其他 SDK（Rust / TypeScript / Go 等）的具体解析模式由各 SDK 自行决定——A2C-SMCP 协议文档不堆砌多语言示例。</p>
+</blockquote>
+<p>详细的版本语义、兼容性规则与握手流程见 <a href="../versioning/">协议版本与握手</a>。</p>
+<hr />
+<h2 id="mcp-上游授权错误响应">MCP 上游授权错误响应<a class="headerlink" href="#mcp-上游授权错误响应" title="Permanent link">&para;</a></h2>
+<p>MCP 协议自身定义了工具服务器的 OAuth 2.0 授权流程。A2C-SMCP 不介入该握手过程；本章仅定义<strong>授权结果如何向 Agent 反馈</strong>，使 Agent 能够区分"工具坏了"与"工具需要用户授权"。</p>
+<blockquote>
+<p><strong>完整的安全边界、Computer 实现要求与 Agent 行为约束，见 <a href="../security/#mcp-上游授权oauth-20-等"><code>security.md</code> → MCP 上游授权（OAuth 2.0 等）</a>。</strong> 本章仅承载<strong>响应结构与错误码</strong>，行为层约束以 <code>security.md</code> 为准，避免重复维护。</p>
+</blockquote>
+<h3 id="授权失败的响应结构">授权失败的响应结构<a class="headerlink" href="#授权失败的响应结构" title="Permanent link">&para;</a></h3>
+<p>当 Computer 调用 MCP 工具因上游授权问题失败时，使用 <code>CallToolResult</code> 返回错误，并在 <code>meta</code> 中携带结构化提示：</p>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">CallToolResult</span><span class="p">(</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;此工具需要授权 GitHub 账号后方可使用&quot;</span><span class="p">)],</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="mi">4006</span><span class="p">,</span>  <span class="c1"># 或 4007</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="s2">&quot;github-mcp&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">&quot;auth_hint&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>            <span class="c1"># 可选：引导用户完成授权的提示信息</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;user_authorization_required&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;请在 Computer 宿主环境完成 GitHub OAuth 登录后重试&quot;</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>        <span class="p">}</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="p">}</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="40064007-判定决策表">4006/4007 判定决策表<a class="headerlink" href="#40064007-判定决策表" title="Permanent link">&para;</a></h3>
+<p>为消除"未授权 vs 授权失败"的边界歧义，Computer <strong>MUST</strong> 按下表把上游 MCP Server / OAuth Provider 的具体表现映射到协议错误码：</p>
+<table>
+<thead>
+<tr>
+<th>上游表现</th>
+<th>错误码</th>
+<th>语义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Computer 从未为该 MCP Server 配置授权（无 token / 无 client credentials）</td>
+<td><strong>4006</strong></td>
+<td>用户<strong>首次</strong>授权</td>
+</tr>
+<tr>
+<td>上游返回 HTTP 401 Unauthorized（凭证缺失、非法、未提供）</td>
+<td><strong>4006</strong></td>
+<td>用户<strong>重新</strong>授权</td>
+</tr>
+<tr>
+<td>上游返回 HTTP 403 Forbidden（已登录但权限/scope 不足）</td>
+<td><strong>4007</strong></td>
+<td>已授权但能力不足，用户调整 scope 或换账号</td>
+</tr>
+<tr>
+<td>Token 过期 + 刷新失败（refresh_token 无效 / 被撤销）</td>
+<td><strong>4007</strong></td>
+<td>历史授权失效，用户需重新走 OAuth 流程</td>
+</tr>
+<tr>
+<td>用户已主动 revoke OAuth 授权</td>
+<td><strong>4007</strong></td>
+<td>历史授权已被撤销</td>
+</tr>
+<tr>
+<td>凭证存在但 scope 不足（上游未明确返回 401/403，但断言权限不够）</td>
+<td><strong>4007</strong></td>
+<td>同 403 类，归"已授权但失败"</td>
+</tr>
+<tr>
+<td>OAuth provider 自身故障（5xx / 网络）</td>
+<td><strong>4003 Tool Execution Failed</strong></td>
+<td>不属于授权语义，按通用工具失败处理</td>
+</tr>
+</tbody>
+</table>
+<p><strong>简明判别</strong>：</p>
+<ul>
+<li>区分点是"<strong>用户是否曾经授权</strong>"——<code>4006</code> = 没授权过 / 凭证不存在；<code>4007</code> = 曾授权但当前不可用</li>
+<li>当 Computer <strong>已判定上游失败属授权类</strong>但无法区分 401 与 403 时，<strong>MUST</strong> 报 <code>4006</code>（见<a href="#降级语义授权类失败的硬映射">降级语义</a>；提示用户重新走授权流程是稳妥兜底）</li>
+</ul>
+<p><strong>Agent 行为差异</strong>：Agent 收到 <code>4006</code> 应引导用户<strong>首次/重新</strong>完成授权；收到 <code>4007</code> 应引导用户<strong>检查权限设置或重新授权</strong>——区别仅在 UX 文案，机器路由可统一。</p>
+<h3 id="降级语义授权类失败的硬映射">降级语义：授权类失败的硬映射<a class="headerlink" href="#降级语义授权类失败的硬映射" title="Permanent link">&para;</a></h3>
+<p><a href="#40064007-判定决策表">判定决策表</a>假定 Computer 能观测到上游的明确表现（HTTP 状态码、Token 过期信号等）。现实中，MCP 客户端库可能把授权失败吸收进自有错误变体而<strong>丢失原始状态码</strong>——例如 rmcp 把 <code>401 + WWW-Authenticate</code> 短路成 <code>AuthRequired</code> 语义变体、其字符串化不含 <code>401</code> 字样；mcp-python 在某些路径把 401/403 抛进传输任务组并拆连接，调用方既拿不到状态码也拿不到结构化错误。为防止此类情形让授权失败被错误降级，Computer <strong>MUST</strong> 遵守：</p>
+<ul>
+<li>一旦<strong>判定上游失败属授权类</strong>——无论依据是 HTTP 状态码、库的语义错误变体、还是 <code>WWW-Authenticate</code> 响应头——<strong>MUST</strong> 按<a href="#40064007-判定决策表">判定决策表</a>映射为 <code>4006</code> 或 <code>4007</code>；<strong>MUST NOT</strong> 降级为 <code>4003 Tool Execution Failed</code>，亦 <strong>MUST NOT</strong> 返回缺 <code>meta.error_code</code> 的 <code>isError=true</code> 通用失败结果。</li>
+<li>当上游失败<strong>已判定属授权类</strong>但<strong>无法区分</strong> 401 与 403（库只给出"需要授权"语义而无状态码）时，<strong>MUST</strong> 报 <code>4006</code>（提示用户重新走授权流程是稳妥兜底）。</li>
+</ul>
+<blockquote>
+<p>本条把原"简明判别"中"无法可靠判别时倾向报 4006"由建议升格为 <strong>MUST</strong>，并显式覆盖"客户端库吞掉状态码"这一<a href="#40064007-判定决策表">判定决策表</a>未直接处理的维度。"<strong>是否进 4006/4007 而非掉出表外</strong>"是协议硬约束；至于 Computer 靠状态码匹配、错误变体 downcast、还是传输层拦截来<strong>判定</strong>授权类，属 SDK 自治——协议只规定结果，不规定方法。</p>
+</blockquote>
+<h3 id="可观测判据禁止挂起至超时">可观测判据：禁止挂起至超时<a class="headerlink" href="#可观测判据禁止挂起至超时" title="Permanent link">&para;</a></h3>
+<p>授权失败的 surfacing <strong>MUST NOT</strong> 表现为调用挂起至 Agent 超时：</p>
+<ul>
+<li>上游对 <code>tools/call</code> 返回授权失败（401/403/语义变体）后，Computer <strong>MUST</strong> 在自身超时或 Agent 超时之前（取较早者）产出携带 <code>meta.error_code</code> 的 <code>CallToolResult</code>（<code>isError=true</code>），而非让 <code>client:tool_call</code> 的响应永远悬空。conformance 通过 time-box 二元观测验证（返结果 vs 挂起）；具体 time-box 阈值归 SDK 自治，协议只约束"不得挂至超时"。</li>
+<li>当 Computer <strong>已观测到授权失败信号</strong>（HTTP 状态码 / 库语义错误变体 / <code>WWW-Authenticate</code> 响应头）但 <code>CallToolResult</code> 因底层库拆连接、关流、或把异常投递给后台任务组而<strong>不会经原路径返回</strong>时，Computer <strong>MUST</strong> 在自身层面兜底，按<a href="#降级语义授权类失败的硬映射">降级语义</a>合成 <code>4006</code>/<code>4007</code> 结果返回。<strong>仅在已观测到授权失败信号的前提下</strong>才合成授权错误——纯网络抖动 / provider 5xx / 无授权信号的超时等"无响应"不得归类为授权失败（见<a href="#40064007-判定决策表">判定决策表</a> 5xx 行 → <code>4003</code>）。</li>
+</ul>
+<blockquote>
+<p>此条针对已坐实的失效：python-sdk 在 mcp-python <code>streamable_http.py</code> <code>post_writer</code> 上 401/403 被抛进传输任务组→拆连接关 <code>read_stream</code>→<code>call_tool</code> 挂起至 agent timeout（<strong>POST 阶段</strong>授权失败）。检测与兜底机制归 SDK 自治，但"<strong>不得挂起</strong>"是对端可感的硬约束。真实传输 conformance 向量见 <a href="../fixtures/auth_error_conformance_vectors.json"><code>fixtures/auth_error_conformance_vectors.json</code></a> 与 <a href="../computer-management/conformance-tests/#48-上游授权错误-surfacing40064007">Computer 管理面一致性测试 → §4.8 上游授权错误 surfacing</a>。</p>
+<p><strong>不建模"流内授权失败"</strong>：合规 MCP server 按 MCP 授权规范在 <strong>HTTP 层 POST 阶段</strong>返 401/403（已由 conformance 向量覆盖），SSE 流内不承载授权失败。故 (a) 流内 JSON-RPC error event 经正常错误路径回灌（双端库均正常处理，分类器覆盖即可，无需兜底）、(b) 流传输层错误（连接断 / 重连失败，无授权信号）不归授权语义（按 <a href="#40064007-判定决策表">判定决策表</a> 5xx/网络行 → <code>4003</code> 或超时）均不单独建模为授权向量。</p>
+</blockquote>
+<h3 id="字段说明_1">字段说明<a class="headerlink" href="#字段说明_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>强度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meta.error_code</code></td>
+<td><strong>MUST</strong></td>
+<td><code>4006</code>（未授权）或 <code>4007</code>（授权失效），按上方<a href="#40064007-判定决策表">判定决策表</a>映射</td>
+</tr>
+<tr>
+<td><code>meta.mcp_server</code></td>
+<td><strong>MUST</strong></td>
+<td>触发授权错误的 MCP Server 的 <strong>bundle_id</strong>（与 <code>get_config</code> 归属一致，Agent 可 correlate 到具体 server）</td>
+</tr>
+<tr>
+<td><code>meta.auth_hint</code></td>
+<td><strong>SHOULD</strong></td>
+<td>面向用户的非敏感提示对象。Computer <strong>SHOULD</strong> 提供以协助 Agent/Host 引导用户；缺失时 Agent 仍能基于 <code>error_code</code> 做兜底处理</td>
+</tr>
+<tr>
+<td><code>meta.auth_hint.action</code></td>
+<td>MAY</td>
+<td>机器可读动作标识（如 <code>user_authorization_required</code> / <code>token_refresh_required</code>），便于 Host 路由到不同 UI</td>
+</tr>
+<tr>
+<td><code>meta.auth_hint.message</code></td>
+<td><strong>SHOULD</strong></td>
+<td>用户可读的一句话引导（如"请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"）；强烈建议提供以满足最小可用 UX</td>
+</tr>
+</tbody>
+</table>
+<h4 id="auth_hint-安全边界">auth_hint 安全边界<a class="headerlink" href="#auth_hint-安全边界" title="Permanent link">&para;</a></h4>
+<p><code>auth_hint</code> 是协议层<strong>唯一</strong>面向 Agent 暴露的授权相关字段。为防止凭证经此通道泄漏给 Agent，Computer <strong>MUST NOT</strong> 在 <code>auth_hint</code>（任何子字段）中包含以下任何一类内容：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>禁止字段示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问凭证</td>
+<td><code>access_token</code> / <code>refresh_token</code> / <code>id_token</code> / <code>bearer_token</code> / 任何形式的 Token</td>
+</tr>
+<tr>
+<td>OAuth 流程参数</td>
+<td><code>code</code> / <code>code_verifier</code> / <code>code_challenge</code> / <code>state</code> / <code>nonce</code></td>
+</tr>
+<tr>
+<td>客户端凭证</td>
+<td><code>client_id</code> / <code>client_secret</code> / <code>assertion</code> / <code>client_assertion</code></td>
+</tr>
+<tr>
+<td>完整授权 URL</td>
+<td>任何包含上述 query 参数的完整 URL（即使已经 url-encode 也禁止）</td>
+</tr>
+<tr>
+<td>用户敏感数据</td>
+<td>用户密码、TOTP/OTP、安全问题答案</td>
+</tr>
+</tbody>
+</table>
+<p>允许包含：</p>
+<ul>
+<li>自然语言描述（"需要登录 GitHub 后重试"）</li>
+<li>MCP Server 名称、工具名称</li>
+<li>不含敏感参数的着陆页 URL（如 <code>https://example.com/login</code>，无 query）</li>
+</ul>
+<blockquote>
+<p>完整凭证传播禁令见 <a href="../security/#零凭证传播原则"><code>security.md</code> → 零凭证传播原则</a>。<code>auth_hint</code> 是该原则下的<strong>唯一豁免</strong>——豁免范围严格限于上表"允许包含"部分。</p>
+</blockquote>
+<h3 id="mcp-server-not-found4014">MCP Server Not Found（4014）<a class="headerlink" href="#mcp-server-not-found4014" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：客户端事件（<code>client:get_resources</code> / <code>client:tool_call</code> 等）引用的 <code>mcp_server</code>（bundle_id）在 Computer 上未注册。</p>
+<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4014</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server not registered&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;office_docs&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4014</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>mcp_server</code></td>
+<td>是</td>
+<td>客户端引用的 server 的 bundle_id</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Agent 行为建议</strong>：刷新 server list（调用 <code>client:get_config</code>）后重试；持续不存在则提示用户 server 已下线。</p>
+<h3 id="mcp-capability-not-supported4015">MCP Capability Not Supported（4015）<a class="headerlink" href="#mcp-capability-not-supported4015" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：MCP Server 已注册，但未声明所请求事件依赖的 capability。例如 <code>client:get_resources</code> 调用时该 server 未声明 <code>resources</code> capability。</p>
+<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4015</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server does not support &#39;resources&#39; capability&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;office_docs&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;capability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;resources&quot;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4015</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>mcp_server</code></td>
+<td>是</td>
+<td>目标 server 的 bundle_id</td>
+</tr>
+<tr>
+<td><code>capability</code></td>
+<td>是</td>
+<td>缺失的 capability 名（<code>resources</code> / <code>tools</code> / <code>prompts</code> 等 MCP 标准 capability）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Agent 行为建议</strong>：跳过此 server，不再向其发送同类事件；可在 server list UI 中标注能力缺失。</p>
+<h3 id="invalid-skill-name4016">Invalid Skill Name（4016）<a class="headerlink" href="#invalid-skill-name4016" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：<code>client:get_skill</code> 入参 <code>name</code> 不符合 SKILL name lexer 规则（<a href="../skill/#14-命名-lexer-总表">skill.md §1.4</a>）——段数 ∉ {1, 2, 3}、3 段但首段 ≠ <code>mcp</code>、或某段字符集非法（leaf 段须符合 marketplace SKILL v1 §3.1）。<strong>注意 user 源裸名为合法 1 段、无 <code>:</code></strong>，不因「缺 <code>:</code>」判错。属<strong>参数校验类硬错</strong>：Computer 在进入 Skill Registry 查询路径<strong>之前</strong>即拒绝（防止从 name 推导 FS 路径越权）。</p>
+<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4016</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Invalid skill name format&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bad name!!&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4016</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>details.name</code></td>
+<td>否</td>
+<td>被拒的原始 name，仅供诊断（Agent <strong>MUST NOT</strong> 透传给最终用户）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>与 4014 的边界</strong>：<code>name</code> <strong>格式合法但不存在</strong>（未注册 / 已卸载 / 孤儿）→ 复用 <a href="#mcp-server-not-found4014"><code>4014</code></a>；<code>name</code> <strong>格式非法</strong> → <code>4016</code>。两者互斥：Computer 先做 lexer 校验（不过则 <code>4016</code>），通过后再查 Registry（未命中则 <code>4014</code>）。</p>
+<p><strong>Agent 行为建议</strong>：<code>4016</code> 属客户端构造错误，<strong>不应</strong>重试同一 name；应回溯 <code>client:get_skills</code> 返回的 <code>A2CSkillRef.name</code> 原样使用，不要自行拼接 / 改写。</p>
+<h3 id="skill-resource-not-accessible4017">Skill Resource Not Accessible（4017）<a class="headerlink" href="#skill-resource-not-accessible4017" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：<code>client:get_skill</code> 的 <code>name</code> 合法且命中 Registry，但 <code>rel_path</code> 无法安全服务。Computer 在 Registry 解析出包根后、读取文件前完成校验（包根绝对路径来源<strong>唯一</strong>是 Registry，<strong>禁止</strong>从 <code>name</code> / <code>rel_path</code> 推导）。</p>
+<p><strong>判定</strong>：<code>rel_path</code> 缺省 <code>SKILL.md</code>；<code>safe_join(包根, rel_path)</code> 后 <code>realpath</code> 必须仍落在包根内。下列任一 → <code>4017</code>：</p>
+<table>
+<thead>
+<tr>
+<th><code>details.reason</code></th>
+<th>触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>traversal</code></td>
+<td><code>rel_path</code> 为绝对路径、含 <code>..</code>、或符号链接逃逸出包根</td>
+</tr>
+<tr>
+<td><code>forbidden</code></td>
+<td>命中敏感文件（<code>.skillenv</code> 及 Computer 判定的凭证类文件）——<strong>无论是否存在一律按 forbidden</strong>，MUST NOT 泄漏存在性</td>
+</tr>
+<tr>
+<td><code>not_found</code></td>
+<td>路径合法且在包根内，但目标文件不存在</td>
+</tr>
+<tr>
+<td><code>too_large</code></td>
+<td>资源总字节数超过 SDK 可配的绝对上限——<strong>首块前即拒，零字节传输</strong>，带 <code>details.total_size</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4017</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Skill resource not accessible&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;traversal&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;rel_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../etc/passwd&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4017</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>details.reason</code></td>
+<td>是</td>
+<td><code>traversal</code> / <code>forbidden</code> / <code>not_found</code> / <code>too_large</code>（开放枚举，未来可非破坏新增）</td>
+</tr>
+<tr>
+<td><code>details.rel_path</code></td>
+<td>否</td>
+<td>被拒的原始 <code>rel_path</code>，仅供诊断（Agent <strong>MUST NOT</strong> 透传给最终用户）</td>
+</tr>
+<tr>
+<td><code>details.total_size</code></td>
+<td>否</td>
+<td>仅 <code>too_large</code>：资源总字节数，供 Agent 告知用户/降级决策</td>
+</tr>
+</tbody>
+</table>
+<p><strong>安全不变量</strong>：<code>forbidden</code> 对"文件不存在"与"文件存在但敏感"返回<strong>同一</strong> reason，不暴露敏感文件存在性。<code>.skillenv</code> 在任何 <code>rel_path</code> 下都不可经此通道读出——这是 <a href="../skill/#9-安全模型">SKILL 通道 §9 安全模型</a> 的硬约束，不是可选项。</p>
+<p><strong>Agent 行为建议</strong>：<code>traversal</code> / <code>forbidden</code> 属客户端构造错误，<strong>不重试</strong>；<code>not_found</code> 说明 SKILL.md 披露的路径与实际包内容不一致，可回退到仅用 SKILL.md body；<code>too_large</code> 不重试，依 <code>details.total_size</code> 向用户说明或改用其它策略（该资源不经此通道传输）。<code>rel_path</code> 应严格取自 SKILL.md 正文披露的引用，不自行拼接。</p>
+<blockquote>
+<p><strong>成功路径</strong>：解析通过且未超上限时，文本可内联走 <code>body</code>；二进制 / 过大文本则 <code>get_skill</code> 铸造 <code>blob_handle</code>，字节经 <a href="../blob-transfer/"><code>client:get_blob</code></a> 拉取（拉取期错误见 <a href="#blob-not-accessible4018"><code>4018</code></a>）。</p>
+</blockquote>
+<h3 id="blob-not-accessible4018">Blob Not Accessible（4018）<a class="headerlink" href="#blob-not-accessible4018" title="Permanent link">&para;</a></h3>
+<p><strong>触发时机</strong>：<code>client:get_blob</code> 拉取阶段——<code>blob_handle</code> 无法解析回一个<strong>当前仍被铸造通道授权</strong>的可读源。资源的鉴权与绝对上限已在<strong>铸造期</strong>由生产者通道决断（不通过则根本没有句柄），故 <code>4018</code> 只承载拉取期失败。</p>
+<p><strong>判定</strong>：</p>
+<table>
+<thead>
+<tr>
+<th><code>details.reason</code></th>
+<th>触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_handle</code></td>
+<td><code>blob_handle</code> 格式非法 / 非本 Computer 铸造 / 无法识别</td>
+</tr>
+<tr>
+<td><code>forbidden</code></td>
+<td>句柄可解析，但<strong>重施铸造通道鉴权失败</strong>（如 SKILL 现已 orphan、<code>.skillenv</code> 等仍禁止）——防御纵深，句柄内容<strong>绝不</strong>被直接信任</td>
+</tr>
+<tr>
+<td><code>gone</code></td>
+<td>源已不可达：SKILL 卸载 / 文件删除 / 内容已无法服务</td>
+</tr>
+<tr>
+<td><code>range</code></td>
+<td><code>chunk_offset &lt; 0</code> 或 <code>&gt; total_size</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
+<div class="language-json highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4018</span><span class="p">,</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Blob not accessible&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gone&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>字段说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必需</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>是</td>
+<td>固定 <code>4018</code></td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>是</td>
+<td>人类可读</td>
+</tr>
+<tr>
+<td><code>details.reason</code></td>
+<td>是</td>
+<td><code>invalid_handle</code> / <code>forbidden</code> / <code>gone</code> / <code>range</code>（开放枚举，未来可非破坏新增）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>安全不变量</strong>：<code>client:get_blob</code> <strong>不是</strong>任意文件读原语。Computer 每次解析句柄 <strong>MUST</strong> 重跑铸造通道的边界校验（SKILL → <a href="../skill/#9-安全模型">§9 沙箱</a>）；句柄即便编码了路径也<strong>绝不</strong>被直接信任。<code>.skillenv</code> 等敏感文件因在铸造期已被 <code>4017 forbidden</code> 拦截，<strong>永不</strong>会有指向它的句柄。</p>
+<p><strong>Agent 行为建议</strong>：<code>invalid_handle</code> / <code>forbidden</code> 不重试；<code>gone</code> 回到生产者通道重新获取（如重新 <code>client:get_skill</code> 取新 <code>blob_handle</code>）；<code>range</code> 修正 <code>chunk_offset</code> 后重试。跨块若 <code>sha256</code> / <code>total_size</code> 变化，从 offset 0 重读。</p>
+<h2 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>以下功能尚未实现，计划在后续版本中完善：</p>
+</blockquote>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 统一的错误码定义文件</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 错误码国际化支持</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 错误追踪 ID（trace_id）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 错误统计和监控接口</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 工具元数据层面的 <code>requires_auth</code> 标注（见 <code>security.md</code>）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> BundleID 缺省生成一致性测试向量（规范夹具，rust 首版 + python 对拍；见 <a href="../data-structures/#bundleid-conformance">data-structures §一致性测试向量</a>，夹具 <a href="../data-structures/#bundleid-conformance"><code>fixtures/bundle_id_conformance_vectors.json</code></a>）</li>
+</ul>
+<h2 id="参考">参考<a class="headerlink" href="#参考" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MCP CallToolResult: https://github.com/modelcontextprotocol/specification</li>
+<li>Socket.IO 错误处理: https://socket.io/docs/v4/handling-errors/</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/A2C-SMCP" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
