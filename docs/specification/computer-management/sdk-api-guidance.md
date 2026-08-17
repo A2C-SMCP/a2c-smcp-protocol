@@ -130,11 +130,12 @@ SDK 可以在非 live context 中支持 ledger-only operations，但应文档化
 
 **name→id 解析（`resolve_target` 语义）只存在于人机面（CLI / REPL 等）**，该用户可见行为**双端 MUST 逐字一致**：
 
-1. token 按 display name 在活跃配置集反查，**唯一命中** → 解析为其 bundle_id，执行；
-2. 0 命中且 token 是合法 bundle_id → 按 bundle_id 执行；仍无 → 报错「未找到」；
-3. **多命中**（同名合法共存）→ 报错并列出各候选的 **bundle_id + display name + 归属**（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；
-4. **MUST NOT** 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错；
-5. 未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。
+1. token 按 display name 在**活跃配置集 ∪ 声明面**反查（术语定义见下方），**唯一命中** → 解析为其 bundle_id，执行；
+2. **多命中**，且 token 精确等于其中某候选的 bundle_id → 按该 bundle_id 执行（用户已显式表达身份意图，不应报「请用 bundle_id 重试」）；
+3. **多命中**，且 token 不等于任何候选的 bundle_id → 报错并列出各候选的 **bundle_id + display name + 归属**（用户/哪个 plugin），要求用户改用 bundle_id 重试——只列 bundle_id 用户分不清哪个是自己的；
+4. 0 命中且 token 是合法 bundle_id 且**存在于查找空间**（活跃配置集 ∪ 声明面）→ 按 bundle_id 执行；仍无 → 报错「未找到」；
+5. **MUST NOT** 以字典序最小等任意规则「确定性地选一个」——那是把不确定的错变成确定的错。精确 bundle_id 匹配（步骤 2）是执行用户已显式表达的身份意图，不属于「任意规则」范畴；
+6. 未命中/多命中 MUST 报错，MUST NOT 静默成功（假成功回执：打印「已停止」而 server 仍在跑，用户无从察觉）。
 
 ```
 $ server rm filesystem
@@ -143,6 +144,21 @@ $ server rm filesystem
    bundle_a3f9c2e1 (plugin:fs-tools)
 请用 bundle_id 重试
 ```
+
+**术语定义**：
+
+- **活跃配置集（active config set）**：Computer 运行期当前持有且可操作进程的 MCP Server 配置集合。它只包含**已挂载**（mounted）的 server，不含仅落盘声明但尚未通过审批门或尚未 reconcile 的条目。
+- **声明面（declaration surface）**：通过 `resolve_mcp_declarations` / `declared_mcp_servers` 读出的、所有已落盘的 MCP Server 声明，**无论其当前是否已挂载**。声明面的 origin 含 `user` / `project` / `local` / `embed` / `flag` / `policy`（plugin 拥有的 bundled server 不走声明面，其归属另有 ledger 途径）。
+- **查找空间（search space）**：§5.1 步骤 1 的查找空间为**活跃配置集 ∪ 声明面**，以 `bundle_id` 去重。取并集而非单取活跃配置集，是为了让 `remove` 等具有双空间语义（声明优先、无声明则看运行期投影）的操作可达声明面目标；仅取活跃配置集会丢失仅落盘声明但尚未挂载的条目，导致部分 target 从 CLI 无路可达。
+
+**生命周期动词对"已声明未挂载"的规范行为**：
+
+查找空间 ∪ 声明面后，`start` / `stop` 可能解析到「仅声明而尚未挂载」的目标。`start` / `stop` 操作的是运行期进程，非声明生命周期——对该态：
+
+- **`stop <已声明未挂载>`**：MUST 诚实陈述 "Server X not mounted; nothing to stop"，**MUST NOT** 打印「停止完成」（假成功回执——打印「已停止」而 server 仍在跑，用户无从察觉）。
+- **`start <已声明未挂载>`**：MUST 诚实陈述 "Server X declared but not mounted; it may be pending the approval gate"，**MUST NOT** 透传库层内部错误（如 `Unknown server bundle_id: ...`——内部概念泄露给用户）。
+
+SDK 应在人机面解析完成后、调用库层 API 前增加挂载态检查（如 python `_resolve_lifecycle_target`、rust `stop_receipt` 模式），而非依赖库层 API 的失败回执来间接表现。本规范行为与 §5.1 步骤 6（MUST NOT 静默成功）形成互补：步骤 6 覆盖「拼错的名字」，本段覆盖「名字拼对、但目标尚未挂载」。
 
 鼓励 SDK：
 

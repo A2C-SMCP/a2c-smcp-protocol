@@ -76,7 +76,12 @@ CallToolResult 返回给 Agent
       "id": "LOG_LEVEL",
       "type": "pickString",
       "description": "日志级别",
-      "options": ["DEBUG", "INFO", "WARNING", "ERROR"],
+      "options": [
+        { "label": "调试", "value": "DEBUG" },
+        { "label": "信息", "value": "INFO" },
+        { "label": "警告", "value": "WARNING" },
+        { "label": "错误", "value": "ERROR" }
+      ],
       "default": "INFO"
     }
   ],
@@ -215,7 +220,7 @@ ${input:<id>}
 | 类型 | 说明 | 关键字段 |
 |------|------|----------|
 | `promptString` | 文本输入提示 | `default`, `password` |
-| `pickString` | 从选项列表中选择 | `options`, `default` |
+| `pickString` | 从选项列表中选择 | `options`（`[{label, value}]` 结构化列表）, `default` |
 | `command` | 执行命令并使用其输出 | `command`, `args` |
 
 === "Python"
@@ -234,11 +239,15 @@ ${input:<id>}
         password=True,
     )
 
-    # 选择输入
+    # 选择输入（label 用于展示，value 是注入配置的实际值）
     env_input = MCPServerPickStringInput(
         id="ENVIRONMENT",
         description="部署环境",
-        options=["dev", "staging", "prod"],
+        options=[
+            {"label": "开发", "value": "dev"},
+            {"label": "预发", "value": "staging"},
+            {"label": "生产", "value": "prod"},
+        ],
         default="dev",
     )
 
@@ -266,11 +275,15 @@ ${input:<id>}
         password: Some(true),
     });
 
-    // 选择输入
+    // 选择输入（label 用于展示，value 是注入配置的实际值）
     let env = MCPServerInput::PickString(PickStringInput {
         id: "ENVIRONMENT".into(),
         description: "部署环境".into(),
-        options: vec!["dev".into(), "staging".into(), "prod".into()],
+        options: vec![
+            PickStringOption { label: "开发".into(), value: "dev".into() },
+            PickStringOption { label: "预发".into(), value: "staging".into() },
+            PickStringOption { label: "生产".into(), value: "prod".into() },
+        ],
         default: Some("dev".into()),
     });
 
@@ -303,9 +316,14 @@ Input 值的解析遵循**责任链模式**，按顺序尝试多个提供者（P
        │ 用户取消
        ▼
 3. 默认值回退 (default 字段)
+       │ 无 default
+       ▼
+4. 首项回退（pickString 专属，MAY，不反向持久化）
 ```
 
 这意味着在 CI/CD 环境中可以通过设置环境变量完全跳过交互式输入，而在本地开发时则会弹出交互提示。
+
+`pickString` 的取值校验：已存值必须匹配至少一个 `option.value`，否则产出结构化 `invalid_selection` 错误（**不回退** default 或首项）；真正无用户值时才走解析链的 default → 首项回退（[runtime-contract §5.12](../specification/computer-management/runtime-contract.md)）。
 
 ### 环境变量命名规则（双端统一规范）
 
@@ -341,10 +359,12 @@ Input 值的解析遵循**责任链模式**，按顺序尝试多个提供者（P
 
 ### 缓存机制
 
-已解析的 Input 值会被缓存，同一身份在同一会话中不会重复解析。缓存键中的 server 上下文 **MUST 使用 `bundle_id`**（与 env 命名一致，运行期唯一标识；使用 display name 会让同名 server 串用彼此的解析值）：
+已解析的 Input 值会被缓存，**单次渲染内**相同 id 不会重复解析（同一 server 的单次 config 渲染中每个 input id 只解析一次）。缓存键中的 server 上下文 **MUST 使用 `bundle_id`**（与 env 命名一致，运行期唯一标识；使用 display name 会让同名 server 串用彼此的解析值）：
 
 - **Python SDK**：`InputResolver` 内部缓存，支持 `clear_cache()` 手动清除
 - **Rust SDK**：`InputHandler` 按 `(input_id, bundle_id, tool_name, metadata)` 组合键缓存，支持 `with_cache(false)` 禁用
+
+缓存**不跨实际启动边界**：每次实际 start / restart MUST 从 raw config 重新解析（[runtime-contract §5.13](../specification/computer-management/runtime-contract.md)）——用户改选后重启即生效；运行中进程不热更新。
 
 ### 安全注意事项
 
@@ -645,7 +665,11 @@ VRL 语法在配置加载阶段即进行校验：
     "id": "MODEL",
     "type": "pickString",
     "description": "选择使用的模型",
-    "options": ["gpt-4", "claude-3", "gemini-pro"],
+    "options": [
+      { "label": "GPT-4", "value": "gpt-4" },
+      { "label": "Claude 3", "value": "claude-3" },
+      { "label": "Gemini Pro", "value": "gemini-pro" }
+    ],
     "default": "claude-3"
   }
 ]

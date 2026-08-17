@@ -1024,6 +1024,16 @@ class MCPServerPromptStringInput(MCPServerInputBase):
     password: NotRequired[bool | None]      # 是否为密码（隐藏输入）
 ```
 
+### PickStringOption
+
+`pickString` 输入的单个可选项：`label` 用于展示，`value` 是注入配置的实际值——两者解耦，选项可以是机器值（区域码 / URL / ID）而不牺牲可读性。
+
+```python
+class PickStringOption(TypedDict):
+    label: str    # 展示标签（UI 呈现）
+    value: str    # 传值（注入 ${input:<id>} 的实际值）
+```
+
 ### MCPServerPickStringInput
 
 选择输入类型。
@@ -1031,9 +1041,20 @@ class MCPServerPromptStringInput(MCPServerInputBase):
 ```python
 class MCPServerPickStringInput(MCPServerInputBase):
     type: Literal["pickString"]
-    options: list[str]                      # 可选项列表
-    default: NotRequired[str | None]        # 默认值
+    options: list[PickStringOption]         # 可选项列表（结构化 {label, value}）
+    default: NotRequired[str | None]        # 默认值（若存在且非 None，MUST 匹配至少一个 option.value）
 ```
+
+约束（MUST）：
+
+- `options` 至少一项；每个 `label` / `value` 非空字符串
+- `label` 与 `value` 均**允许重复**（不要求唯一）；SDK / client **MUST NOT** 按 `value` 反推原选 `label`
+- `default` 若存在**且非 None**，**MUST** 匹配至少一个 `option.value`，否则配置校验拒绝；显式 `null` 视为无默认（不拒绝，解析时走无值解析链）
+- 已存值匹配任一 `option.value` 即合法；不匹配时的失效语义见 [runtime-contract §5.12](computer-management/runtime-contract.md)
+
+!!! warning "0.3.2 破坏性变更：旧 `options: list[str]` 直接拒绝"
+
+    0.3.2 起 `options` 为结构化 `[{label, value}]` 列表。旧形式 `"options": ["a", "b"]`（字符串数组）是**非法 config**，SDK MUST 以 `validation` 错误拒绝（报错应指路新结构）。**不提供 alias、不设迁移期**——协议尚未正式上线，无存量兼容包袱。
 
 ### MCPServerCommandInput
 
@@ -1045,6 +1066,8 @@ class MCPServerCommandInput(MCPServerInputBase):
     command: str                            # 要执行的命令
     args: NotRequired[dict[str, str] | None]  # 命令参数
 ```
+
+运行时语义：`command` 仅在实际启动（含重解析）时执行，其输出**不持久化**。
 
 ### MCPServerInput
 

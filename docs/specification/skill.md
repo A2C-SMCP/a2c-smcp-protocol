@@ -208,6 +208,76 @@ Agent 不应基于 `uri` 字段做协议逻辑判断；它仅是来源追溯用�
 | **B. archive** | `source = "archive"`<br>`archive_uri: str`<br>`archive_format: "tar.gz" \| "zip"`<br>`archive_sha256: str`（可选） | HTTP GET 拉取 → 校验 sha256 → 解包到 staging | 远程 MCP Server，整包分发 |
 | **C. resources** | `source = "resources"` | Computer 枚举 `skill://<this>/**` 子资源，逐个 `resources/read`，按相对路径写入 staging | 远程 MCP Server，无打包能力；子文件作为独立 MCP Resource 暴露 |
 
+!!! important "`source` 只允许出现在 SKILL 根资源上"
+
+    mode 声明（`_meta.source`）属于 **SKILL 根**；`skill://<root>/**` 子资源 **MUST NOT** 声明 `source`。子资源携带 `source` 会被 Computer 误判为独立 SKILL 根 → 重复物化（ERROR 刷屏 + staging 目录抖动）+ 同源 frontmatter `name` 冲突（[§1.5](#15-校验失败处理) 拒绝第二注册者）。
+
+### mode C 可注册形状
+
+mode C 的 SKILL 在 `resources/list` 中呈现为**一个根资源 + 若干子资源**：
+
+| URI | `_meta` | 语义 |
+|---|---|---|
+| `skill://<host>/<skill-name>` | `source = "resources"` | **声明节点**——Computer 据此识别 SKILL 根 |
+| `skill://<host>/<skill-name>/**` | 无（MUST NOT 带 `source`） | 包内文件——Computer 按 URI 前缀枚举、逐个 `resources/read`、按相对路径写入 staging |
+
+规范性约束：
+
+1. **`SKILL.md` MUST 作为子资源暴露**，位置 `<root>/SKILL.md`（根下**一级**）。[§4](#4-computer-实施期望) 要求 staging 产物符合 marketplace SKILL v1 §2 包结构（`SKILL.md` 必存在）——mode C 下该结构**由子资源 URI 布局达成**。未在 `<root>/SKILL.md` 暴露 SKILL.md 的 mode C SKILL **无法注册**（staged 目录缺 SKILL.md → 注册失败，仅 ERROR 日志不向 Agent 硬报错，见 [§5](#5-安装生命周期)）。
+2. **根是纯声明节点**：mode C 物化**从不 `resources/read` 根**——根 content 不被 Computer 消费。provider **SHOULD NOT** 依赖根 content 被读取；可为根返回索引 / 空 / 任意内容（只需对其它 MCP client 友好）。根的 `name` / `mimeType` 不参与物化；`mimeType` 取 `inode/directory`（FastMCP 惯例）或任意值皆可。
+3. 子资源以 `<root>/` 前缀挂载，staging 相对路径 = URI path 去掉 `<root>/` 前缀（任意深度）；`scripts/` / `references/` / `assets/` 等包内文件与 SKILL.md 同法暴露。
+
+**`resources/list` + `resources/read` 完整示例**（mode C）：
+
+```python
+# MCP Server 端代码示意
+@server.list_resources()
+async def list_resources():
+    return [
+        # 根：声明节点，content 不被 Computer 消费
+        Resource(
+            uri="skill://com.example.skills/csv-aggregator",
+            name="csv-aggregator",          # 与 SKILL.md frontmatter.name 一致
+            description="把多个 CSV 文件按规则聚合并生成报告。",
+            mimeType="inode/directory",
+            annotations=Annotations(
+                audience=["assistant"],     # 推荐声明
+            ),
+            _meta={
+                "source": "resources",
+                "version": "1.2.0",
+            },
+        ),
+        # 子资源：MUST NOT 声明 _meta.source
+        Resource(
+            uri="skill://com.example.skills/csv-aggregator/SKILL.md",
+            name="SKILL.md",
+            mimeType="text/markdown",
+        ),
+        Resource(
+            uri="skill://com.example.skills/csv-aggregator/scripts/run.py",
+            name="run.py",
+            mimeType="text/x-python",
+        ),
+    ]
+
+_CONTENT = {
+    # 子资源返回真实内容；根可返回索引 / 空 / 任意内容（不被 Computer 消费）
+    "skill://com.example.skills/csv-aggregator": "# csv-aggregator\n\n包索引页（Computer 不读取）。",
+    "skill://com.example.skills/csv-aggregator/SKILL.md": SKILL_MD_TEXT,
+    "skill://com.example.skills/csv-aggregator/scripts/run.py": RUN_PY_TEXT,
+}
+
+@server.read_resource()
+async def read_resource(uri):
+    key = str(uri)
+    if key not in _CONTENT:
+        raise FileNotFoundError(f"resource not found: {key}")
+    return _CONTENT[key]
+```
+
+Computer 物化该形状：`SKILL.md` → `<staging>/SKILL.md`，`scripts/run.py` → `<staging>/scripts/run.py`（[§4](#4-computer-实施期望) 包结构达成）。
+
 ### 推荐附加字段
 
 | `_meta` 字段 | 类型 | 用途 |
@@ -225,7 +295,7 @@ Agent 不应基于 `uri` 字段做协议逻辑判断；它仅是来源追溯用�
 - frontmatter 字段升级 / 迁移由 marketplace 单方主导，不需联动改 `_meta` 命名
 - A2C 不重复定义 SKILL 元数据 schema，与 marketplace 完全脱钩
 
-### MCP Server `resources/list` 示例
+### archive 模式 `resources/list` 示例
 
 ```python
 # MCP Server 端代码示意
@@ -745,7 +815,7 @@ Computer 据此完成 staging。SKILL.md frontmatter 的其他字段（`license`
 |---|---|
 | `mounted` | MCP Server 与 Computer 同机；SKILL 已在本地 FS 可达。最简单，零拷贝 |
 | `archive` | 远程 MCP Server 但有打包能力。一次下载，整体校验，缓存高效 |
-| `resources` | 远程 MCP Server 且无打包能力。每个子文件作为独立 MCP Resource 暴露在 `resources/list` 中，Computer 按 URI prefix 枚举 |
+| `resources` | 远程 MCP Server 且无打包能力。每个子文件作为独立 MCP Resource 暴露在 `resources/list` 中，Computer 按 URI prefix 枚举；根/子资源 URI 形状见 [§3「mode C 可注册形状」](#mode-c-可注册形状) |
 
 ### 11.5 变更通知
 
@@ -770,6 +840,7 @@ await server.request_context.session.send_resource_updated(
 4. **声明 `_meta.version`** 便于 Computer 做更新检测
 5. **`archive` 模式声明 `archive_sha256`** 让 Computer 能校验完整性
 6. **不要在 `_meta` 重复 SKILL.md frontmatter 字段**——Computer 以本地 SKILL.md 为权威源
+7. **mode C 下把 `SKILL.md` 作为 `<root>/SKILL.md` 子资源暴露**——根仅作声明节点、子资源不带 `_meta.source`（[§3「mode C 可注册形状」](#mode-c-可注册形状)）
 
 ---
 
@@ -790,6 +861,8 @@ A2C-SMCP SKILL 通道在 URI 与命名上**直接对齐** Claude Code 的 MCP Sk
 | Resource Templates | 不消费 | 不消费（与 Claude Code 一致） |
 
 MCP Server 实现者若同时面向 Claude Code 与 A2C-SMCP：声明 `_meta.source` 等 A2C 扩展字段对 Claude Code **透明无害**（Claude Code 忽略未知 `_meta` 字段）；唯一需要注意的是 `claude.ai ` 前缀的 server 名在两边规范化结果会不同。
+
+mode C 双目标提示：CC 不认识「根 = 声明节点」语义（它忽略 `_meta.source`），会把根按普通 skill 资源呈现。双目标 provider 可让根 content 同时承载完整 SKILL.md 正文——对 A2C **无害**（根 content 不被消费），对 CC 友好；子资源则被 CC 按普通资源呈现、不影响其读根。
 
 ---
 

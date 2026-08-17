@@ -1,6 +1,6 @@
 # 协议版本与握手
 
-**当前协议版本**: `0.3.1`
+**当前协议版本**: `0.3.2-dev`
 
 A2C-SMCP 作为三方参与（Agent / Server / Computer）的协议，必须保证同一房间内的成员以兼容的协议版本通信。本规范定义协议版本号语义、兼容性判定规则，以及在 **Socket.IO 连接的 HTTP 层**完成的版本校验流程。
 
@@ -169,9 +169,9 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 已发布线的纯 bugfix 可在发布分支单独出 PATCH（如 `0.2.4`），与进行中的 `-dev` 周期并行、互不影响。
 
-### 当前开发中版本：v0.3.0（未发布）
+### 当前开发中版本：v0.3.2（未发布）
 
-`0.3.0-dev` 正在开发，**尚未发布**（两站 `latest` 仍为 `0.2.3`）。它含一项**破坏性行为变更**：plugin `install` 与 `enable` 分离——`install` 不再激活，`enabledPlugins` 缺省语义翻转为「absent = 未启用」（详见 [v0.3.0 迁移指南](../migrations/v0.3.0-plugin-install-enable-separation.md)）。发布前进入的其它变更一并折入 0.3.0。
+`0.3.2-dev` 正在开发，**尚未发布**（两站 `latest` 仍为 `0.3.1`）。它含一项**破坏性行为变更**：PickString `options` 结构化——`options: list[str]` 改为 `options: list[PickStringOption {label, value}]`，旧字符串数组形式**直接拒绝**（`validation` 错误，报错指路新结构），不提供 alias、不设迁移期（协议尚未正式上线，无存量兼容包袱，故不单独提供迁移指南）。另含一项**行为变更**：MCP server 实际 start / restart 从 raw config 重新解析 Input——用户改选后重启生效，运行中不热更新（[runtime-contract §5.13](computer-management/runtime-contract.md)）。发布前进入的其它变更一并折入 0.3.2。
 
 ---
 
