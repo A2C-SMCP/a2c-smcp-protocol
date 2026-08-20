@@ -395,11 +395,16 @@ ToolMeta 为每个工具附加额外的元数据，增强工具管理能力。�
 
 ### default_tool_meta 与 tool_meta 合并策略
 
-配置中可以同时指定 `default_tool_meta`（全局默认）和 `tool_meta`（按工具名指定）。两者的合并遵循**浅合并**策略：
+配置中可以同时指定 `default_tool_meta`（全局默认）和 `tool_meta`（按工具名指定）；此外 MCP Server 还可在工具上**声明默认 tags**（`Tool._meta["a2c_tool_meta"].tags`，白名单仅此一项）。三者的合并遵循**三层浅合并**策略（规范权威见 [data-structures §ToolMeta 三层合并规则](../specification/data-structures.md#toolmeta-三层合并规则)）：
+
+```
+tool_meta[tool] > default_tool_meta > Server 声明（最低层）
+```
 
 1. 如果某工具在 `tool_meta` 中有专属配置，其非 `null` 字段**覆盖** `default_tool_meta` 的同名字段
 2. `default_tool_meta` 中有而 `tool_meta` 中为 `null` 的字段保持默认值
-3. 如果工具既无专属配置也无默认配置，则没有 ToolMeta
+3. **Server 声明 tags 恒为最低层**：配置两层未覆盖时默认生效；配置中 `tags: []` 可**显式清除** Server 声明；Server 声明中的其它字段（如 `auto_apply`）一律不生效
+4. 如果工具既无专属配置也无默认配置也无 Server 声明，则没有 ToolMeta
 
 **示例**：
 
@@ -430,6 +435,8 @@ ToolMeta 为每个工具附加额外的元数据，增强工具管理能力。�
 | 其它工具 | `tags=["browser"], auto_apply=true` |
 
 合并后的 ToolMeta 以 JSON 序列化后存入 `SMCPTool.meta["a2c_tool_meta"]`。详细的序列化规范请参阅 [SMCPTool.meta 序列化规范](../specification/data-structures.md#smcptoolmeta-序列化规范)。
+
+**Server 声明示例**：Server 的工具 `navigate` 自带 `_meta["a2c_tool_meta"] = {"tags": ["browser"]}`，无任何配置 → 出线 `a2c_tool_meta` 的 `tags=["browser"]`；配置 `tool_meta["navigate"].tags = []` → 出线 `tags=[]`（Server 声明被显式清除）。
 
 ### alias 实战：跨 Server 同名工具
 

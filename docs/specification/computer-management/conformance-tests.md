@@ -169,6 +169,36 @@
 - Agent 可见的 errors 和 diagnostics 不包含 token；
 - 具有相同 bare id 的 plugin-scoped input fixtures 不会串值。
 
+### 2.6 Server-Declared Tool Tags
+
+fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 中声明：
+
+```json
+"_meta": {
+  "custom_key": "v",
+  "a2c_tool_meta": { "tags": ["read"], "auto_apply": true }
+}
+```
+
+九类向量（#1–#8 在 manager 层 reconcile 后 `Tool.meta` 断言；wire 字符串化是既有既定行为，key 顺序不参与判定）：
+
+| # | 配置 | 期望终值（`meta["a2c_tool_meta"]` 解析后） |
+|---|---|---|
+| 1 | 无任何 `tool_meta` / `default_tool_meta` | `tags=["read"]`、`auto_apply=null`（声明中白名单外字段消失）；`custom_key` 原样保留 |
+| 2 | `default_tool_meta.tags=["default"]` | `tags=["default"]`（default 覆盖 Server 声明） |
+| 3 | `default_tool_meta.tags=["default"]` + `tool_meta["safe_read"].tags=["specific"]` | `tags=["specific"]`（tool_meta 覆盖 default） |
+| 4 | `default_tool_meta.tags=["default"]` + `tool_meta["safe_read"].tags=[]` | `tags=[]`（显式清除所有下层值） |
+| 5 | 仅 `tool_meta["safe_read"].auto_apply=true`（无 tags 配置） | `tags=["read"]`（配置只含 auto_apply 时仍继承 Server tags）、`auto_apply=true` |
+| 6 | 声明含 `auto_apply=true`（任意配置） | 终值 `auto_apply` 恒来自配置（无配置 → `null`），Server 自声明**不进入终值** |
+| 7 | 声明畸形：`tags` 为字符串 / 声明非对象 / 含白名单外字段 | `tools/list` 正常、工具可用；声明丢弃 + warning 诊断；有配置终值 → 维持配置 canonical，无配置终值 → `a2c_tool_meta` 键**删除** |
+| 8 | 声明合法 + 配置覆盖 | 原生 `_meta` key（`custom_key`）原样保留；原 `a2c_tool_meta` 被 canonical **整体覆写**（不字段级残留） |
+| 9 | 上述各输入 | Python / Rust 对同一输入，reconcile 后 `Tool.meta` 逐字段一致 |
+
+期望补充：
+
+- Server 声明中的 `auto_apply` 等白名单外字段在 reconcile 后**彻底消失**（任何配置下都不出现在 canonical 终值）；
+- 畸形声明不产生公开错误——Agent 看到的错误与诊断不含 Server 声明原始内容。
+
 ## 3. Runtime Contract Checklist
 
 ### 3.1 Create From Config

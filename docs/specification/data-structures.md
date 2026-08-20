@@ -71,7 +71,7 @@ class SMCPTool(TypedDict):
 
 | Key | 写入方 | 说明 |
 |-----|-------|------|
-| `a2c_tool_meta` | A2C 系统（Computer） | A2C 配置的工具元数据（tags、auto_apply、alias 等） |
+| `a2c_tool_meta` | **终值**：A2C 系统（Computer）；**声明层**：MCP Server（仅 `tags`，合并最低层） | A2C 工具元数据（tags、auto_apply、alias 等）；三层合并规则见 [§ToolMeta](#toolmeta) |
 | `MCP_TOOL_ANNOTATION` | A2C 系统（Computer） | MCP 标准工具注解（destructive、readOnlyHint 等） |
 | 其他任意 key | MCP Server 自身 | MCP Server 在 `Tool._meta` 中设置的原生元数据 |
 
@@ -101,6 +101,8 @@ for tool in tools:
         auto_apply = tool_meta.get("auto_apply")  # bool | None
         alias = tool_meta.get("alias")        # str | None
 ```
+
+**canonical 出线形式**：解析后 dict **含 ToolMeta 全字段**，未设置者为 `null`（如 `auto_apply: null`）——双 SDK 出线 MUST 同形（见下方场景 2 示例）。对拍判定面为**解析后字段值逐字段一致**；JSON 字符串内 key 顺序不参与判定（wire 层字符串化是既有既定行为，不属合并语义）。
 
 #### 完整 JSON 示例
 
@@ -176,6 +178,43 @@ class ToolMeta(TypedDict, total=False):
     tags: NotRequired[list[str] | None]
     # 工具标签，用于分类
 ```
+
+### ToolMeta 三层合并规则 { #toolmeta-三层合并规则 }
+
+最终写入 `SMCPTool.meta["a2c_tool_meta"]` 的值是**三层合并**产物（v0.4.0 起）：
+
+```
+tool_meta[tool]（最具体） > default_tool_meta（配置默认） > Server 声明（最低层）
+```
+
+**Server 声明层**：MCP Server 可在 `Tool._meta["a2c_tool_meta"]` 中声明默认元数据，**白名单仅 `tags` 一项**：
+
+- `tags`：✅ 纯语义分类，可声明；类型 MUST 为 `list[str]`
+- `auto_apply`：❌ **MUST NOT 参与**——「跳过用户二次确认」是策略/安全字段，Server 自声明等于自我授权执行（提权向量），reconcile 后必须彻底消失
+- `alias` / `ret_object_mapper` / 其它任意字段：首版一律不参与声明合并
+
+**合并语义**：
+
+- 数组字段（`tags`）按字段**整体替换**，不做 union
+- 字段缺失或 `null`：继承下一层；`tags: []`：**显式清除**下层值
+- Server 只能提供最低层 `tags`；`auto_apply` 等其它 ToolMeta 字段仍只来自 Computer 配置
+
+**无条件 reconcile（MUST）**：
+
+Computer 对**每个 Tool** MUST 消费并校验 Server 声明（即使 `tool_meta` 与 `default_tool_meta` 均不存在）：
+
+| Server 声明 | 配置终值 | 输出 `a2c_tool_meta` |
+|---|---|---|
+| 合法 | 有 | 三层合并 canonical 覆写 |
+| 合法 | 无 | tags-only canonical 覆写 |
+| 非法 | 有 | 配置 canonical 覆写（维持现状） |
+| 非法 | 无 | **删除该 key** |
+
+- 畸形声明（非对象 / 含白名单外字段 / `tags` 非 `list[str]`）→ 丢弃声明 + 本地诊断（warning 级，按 server 聚合防洪泛），**MUST NOT** 令 `tools/list` 失败或令工具消失
+- 其它 MCP 原生 `_meta` key 全程原样保留
+- MCP Server **MUST NOT** 期待 `a2c_tool_meta` 被 native passthrough——该 key 的最终值恒为 Computer 写入（即使来源是声明值）
+- 老 Computer 无配置时可能原样透传该 key，是**既有历史行为、非契约**：白名单与 canonical-final 保证自实现无条件 reconcile 的 Computer 起成立
+- Server 输入只读取 `tags`：实现 MUST 用仅含 `tags` 的私有输入结构或显式字段提取，**MUST NOT** 复用完整 `ToolMeta` 作输入模型（防 `extra` 自定义字段静默进入 canonical）
 
 ### GetToolsReq
 
