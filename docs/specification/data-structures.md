@@ -670,7 +670,7 @@ class GetSkillRet(TypedDict, total=False):
 
 ## 通用二进制传输结构
 
-通用 Agent←Computer 字节拉取通道的结构。完整语义（句柄契约、生产者-消费者模型、安全模型）见 [通用二进制传输](blob-transfer.md)。
+通用 Agent↔Computer 双向字节搬运通道的结构（下行拉取 + 上行落盘）。完整语义（句柄契约、生产者-消费者模型、写入沙箱、安全模型）见 [通用二进制传输](blob-transfer.md)。
 
 ### BlobHandle
 
@@ -680,7 +680,7 @@ BlobHandle: TypeAlias = str   # 不透明、Computer 铸造、无状态可重解
 
 由某生产者通道在其响应中铸造。Agent 视为**不透明**：MUST NOT 解析 / 拼接 / 伪造。Computer 每次调用即时解析，**无 session / 无 TTL**；解析时**重新施加铸造通道的鉴权**（SKILL → §9 沙箱）。
 
-载体随响应结构而异，**语义与拉取契约完全一致**（详见 [通用二进制传输 §5](blob-transfer.md#5-生产者通道接入契约)）：
+载体随响应结构而异，**语义与拉取契约完全一致**（详见 [通用二进制传输 §6](blob-transfer.md#6-下行生产者通道接入契约)）：
 
 | 生产者 | 句柄载体 | 对等元数据 |
 |---|---|---|
@@ -688,6 +688,8 @@ BlobHandle: TypeAlias = str   # 不透明、Computer 铸造、无状态可重解
 | MCP `CallToolResult`（标准不可变） | content item `_meta.a2c_blob_handle` | item `_meta.a2c_total_size` / `_meta.a2c_sha256` + 既有 `mimeType` |
 
 `_meta` 旁路与 [`SMCPTool.meta` 命名空间约定](#smcptoolmeta-序列化规范)（`a2c_tool_meta` 等）同构——A2C 在不可变 MCP 结构上扩展的既定手法。
+
+> **上行不铸句柄**：`client:put_blob` 走 [PutBlobReq / PutBlobRet](#putblobreq)，Computer 落盘后返回绝对 `landing_path`（非 `blob_handle`）；句柄契约仅适用于下行。
 
 ### GetBlobReq
 
@@ -723,6 +725,42 @@ class GetBlobRet(TypedDict, total=False):
     - `sha256` / `total_size` 一次逻辑读取内 **MUST** 稳定；跨块变化 ⇒ 源被改写，Agent **MUST** 从 offset 0 重读。Computer **SHOULD** 尽力一致快照。
     - `GetBlobReq` / `GetBlobRet` 为开放 TypedDict，未来可**非破坏**追加 `content_encoding`（gzip 等，缺省 identity）/ `etag`；offset / total_size / sha256 基于**解码后**资源字节，加压缩不致歧义。
     - 句柄失效 / 源消失 / 范围越界 → [`4018`](error-handling.md#blob-not-accessible4018)。
+
+### PutBlobReq
+
+```python
+class PutBlobReq(AgentCallData, total=True):
+    agent: str                          # Agent 名称
+    req_id: str                         # 请求 ID
+    computer: str                       # 目标 Computer 名称
+    upload_id: NotRequired[str]         # 可选：缺省即首块（offset 0），Computer 分配并回传
+    chunk_offset: int                   # 本块起始字节偏移
+                                        # MUST == Computer 已收字节（in-order，无稀疏缓冲）
+    eof: bool                           # 末块标志
+    total_size: NotRequired[int]        # 仅首块：声明总字节（MUST ≥ 1）
+    sha256: NotRequired[str]            # 仅首块：声明全量 sha256（十六进制）
+    name_hint: NotRequired[str]         # 仅首块：建议文件名；Computer 消毒后采用或自定
+    blob: str                           # base64，本块字节
+```
+
+### PutBlobRet
+
+```python
+class PutBlobRet(TypedDict, total=False):
+    upload_id: str            # 首块 ack 回传；后续块回显
+    chunk_offset: int         # 回显本块起始字节偏移
+    landing_path: str         # 仅末块 ack：landing root 内绝对路径（Computer 生成安全名）
+    total_size: int           # 仅末块 ack：实际落盘字节（== 声明值才成功）
+    sha256: str               # 仅末块 ack：Computer 重算全量 sha256（== 声明值）
+    req_id: str               # 请求 ID
+```
+
+!!! note "上行写入语义"
+
+    - **声明-校验镜像**：下行「Computer 声明、Agent 校验」；上行「Agent 首块声明 `total_size`/`sha256`，Computer 增量计算、末块重算比对」，不符 → [`4019 integrity`](error-handling.md#blob-write-failed4019)（丢弃不落盘）。
+    - **有界会话**：`upload_id` 会话为 Computer 侧受限状态，MUST 有界（闲置超时 / 并发上限 / 孤儿 `.part` 由 landing GC 回收，阈值 SDK 自治）；过期 / 未知 → `4019 invalid_upload`，并发打满 → `4019 busy`。**无跨尝试断点**：失败重试 = 新 `upload_id` 从 0 重传。
+    - **能力门控 = 版本握手**：v0.x MINOR 严格匹配 + 同房间传递 ⇒ Agent 以「自身 minor ≥ 0.4 且已连接」为门控，无协商字段；0.4.x Computer MUST 实现（详见 [通用二进制传输 §3](blob-transfer.md#3-事件-clientput_blob上行写入)）。
+    - **写入沙箱**：落点由 Computer 决断（landing root，config-first），`landing_path` 构造上严格落于 root 内；`landingRoot` 仅 trusted/policy scope 可设（project scope MUST 拒绝）；GC 严格限于 landing root（详见 [§7](blob-transfer.md#7-写入侧契约landing-沙箱)）。
 
 ---
 

@@ -171,7 +171,7 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 ### 最近发布：v0.3.2
 
-`0.3.2` 已发布，两站 `latest` 均指向 `0.3.2`，当前**无开启中的 `-dev` 周期**。它含一项**破坏性行为变更**：PickString `options` 结构化——`options: list[str]` 改为 `options: list[PickStringOption {label, value}]`，旧字符串数组形式**直接拒绝**（`validation` 错误，报错指路新结构），不提供 alias、不设迁移期（协议尚未正式上线，无存量兼容包袱，故不单独提供迁移指南）。另含一项**行为变更**：MCP server 实际 start / restart 从 raw config 重新解析 Input——用户改选后重启生效，运行中不热更新（[runtime-contract §5.13](computer-management/runtime-contract.md)）。发布前进入的其它变更一并折入 0.3.2。
+`0.3.2` 已发布，两站 `latest` 均指向 `0.3.2`。`0.4.0` 的 `-dev` 周期已开启——首项纳入为 `client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性变更）。0.3.2 含一项**破坏性行为变更**：PickString `options` 结构化——`options: list[str]` 改为 `options: list[PickStringOption {label, value}]`，旧字符串数组形式**直接拒绝**（`validation` 错误，报错指路新结构），不提供 alias、不设迁移期（协议尚未正式上线，无存量兼容包袱，故不单独提供迁移指南）。另含一项**行为变更**：MCP server 实际 start / restart 从 raw config 重新解析 Input——用户改选后重启生效，运行中不热更新（[runtime-contract §5.13](computer-management/runtime-contract.md)）。发布前进入的其它变更一并折入 0.3.2。
 
 ---
 

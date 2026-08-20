@@ -56,8 +56,9 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 代码 | 名称 | 含义 |
 |------|------|------|
 | 4018 | Blob Not Accessible | `client:get_blob` 句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（见 [§Blob Not Accessible](#blob-not-accessible4018)）|
+| 4019 | Blob Write Failed | `client:put_blob` 会话无效 / 声明非法 / 顺序错乱 / 超上限 / 会话繁忙 / 沙箱不可写 / 完整性不符 / IO 失败（见 [§Blob Write Failed](#blob-write-failed4019)）|
 
-> **边界**：`4018` 属传输**拉取期**。资源的鉴权与绝对上限由**铸造句柄的生产者通道**在铸造期决断（SKILL → `4017`，不通过则不铸造句柄）。详见 [通用二进制传输](blob-transfer.md)。
+> **边界**：`4018` 属传输**下行拉取期**；`4019` 属传输**上行写入期**，二者方向相反、互不重叠。下行资源的鉴权与绝对上限由**铸造句柄的生产者通道**在铸造期决断（SKILL → `4017`，不通过则不铸造句柄）；上行资源的绝对上限由 **Computer 在首块决断**（`total_size` 超限 → `4019 too_large`，零字节落盘）。`4017`（SKILL 铸造期专属）与 MCP `CallToolResult.isError`（MCP 事件专属）**均不用于上行**。详见 [通用二进制传输](blob-transfer.md)。
 
 ### 连接与房间管理错误码
 
@@ -110,6 +111,7 @@ class ErrorPayload(TypedDict, total=False):
 | `4016` | — | `name` |
 | `4017` | — | `reason` / `rel_path` / `total_size` |
 | `4018` | — | `reason` |
+| `4019` | — | `reason` / `upload_id` / `chunk_offset` / `total_size` |
 
 各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015)）。
 
@@ -642,6 +644,52 @@ CallToolResult(
 **安全不变量**：`client:get_blob` **不是**任意文件读原语。Computer 每次解析句柄 **MUST** 重跑铸造通道的边界校验（SKILL → [§9 沙箱](skill.md#9-安全模型)）；句柄即便编码了路径也**绝不**被直接信任。`.skillenv` 等敏感文件因在铸造期已被 `4017 forbidden` 拦截，**永不**会有指向它的句柄。
 
 **Agent 行为建议**：`invalid_handle` / `forbidden` 不重试；`gone` 回到生产者通道重新获取（如重新 `client:get_skill` 取新 `blob_handle`）；`range` 修正 `chunk_offset` 后重试。跨块若 `sha256` / `total_size` 变化，从 offset 0 重读。
+
+### Blob Write Failed（4019）
+
+**触发时机**：`client:put_blob` 写入阶段——上传会话不被接纳 / 声明非法 / 分块顺序错乱 / 超出上限 / 沙箱不可写 / 完整性不符 / 落盘 IO 失败。绝对上限（`total_size` 声明）在**首块**由 Computer 决断（超限零字节落盘），其余失败发生在会话存续或末块定稿时。
+
+**判定**：
+
+| `details.reason` | 触发 |
+|---|---|
+| `invalid_upload` | `upload_id` 格式非法 / 非本 Computer 分配 / 已过期（会话闲置超时 / 孤儿回收后） |
+| `invalid_declaration` | 首块声明非法：`total_size < 1`、字段缺失、声明字段在后续块重复携带 |
+| `range` | `chunk_offset != 已收字节`（in-order 违反，无稀疏缓冲）；或末块 `chunk_offset + 本块字节数 != total_size` |
+| `too_large` | 首块声明 `total_size` 超 Computer 可配上限 → **拒绝且零字节落盘** |
+| `busy` | 并发上传会话数已达 Computer 可配上限——Agent **SHOULD** 退避后从 0 重传（新 `upload_id`） |
+| `forbidden` | landing root 未配置 / 不可写（fail-closed）；或 Computer 拒绝创建会话 |
+| `integrity` | 末块定稿时重算 sha256 与首块声明不符 → **丢弃 `.part`，不返回 `landing_path`** |
+| `io_error` | 落盘 IO 失败（磁盘满 / 权限 / 文件系统错误） |
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4019,
+  "message": "Blob write failed",
+  "details": { "reason": "invalid_upload", "upload_id": "..." }
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4019` |
+| `message` | 是 | 人类可读 |
+| `details.reason` | 是 | `invalid_upload` / `invalid_declaration` / `range` / `too_large` / `busy` / `forbidden` / `integrity` / `io_error`（开放枚举，未来可非破坏新增）|
+| `details.upload_id` | 否 | 出错的 `upload_id`（若有） |
+| `details.chunk_offset` | 否 | 出错的块偏移（`range` 时） |
+| `details.total_size` | 否 | 超限时的声明值 / Computer 上限（`too_large` 时） |
+
+**复用与不使用**：上行写入期一律 `4019`，**不使用** [`4018`](#blob-not-accessible4018)（下行拉取期专属，方向相反）、**不使用** [`4017`](#skill-resource-not-accessible4017)（SKILL 铸造期专属）、**不使用** MCP `CallToolResult.isError`（本事件为 A2C 自有事件，非 MCP 事件）。
+
+**安全不变量**：`client:put_blob` **不是**任意文件写原语——落点由 Computer 决断（landing root，config-first），`name_hint` 消毒后采用或自定，路径穿越 MUST fail-closed；`landingRoot` 仅 trusted/policy scope 可设，project scope 提供 MUST 被拒绝（防 clone 仓库重定向写目标）。`integrity` / `too_large` / `forbidden` 路径下**零产物**：无 `.part` 残留、无部分文件可见。GC 严格限于 landing root（[computer-management §7 不变量 #5](computer-management/protocol.md#7-安全不变量)）。
+
+**Agent 行为建议**：`invalid_upload` → 新 `upload_id` 从 0 重传；`invalid_declaration` / `range` 属客户端构造错误，检查声明与偏移后重传（新会话）；`too_large` → 不重试，改用分治 / 压缩 / 留上下文策略；`busy` → 退避等待后重试；`forbidden` / `io_error` → 不重试，字节留上下文（Computer 侧状态问题，无法靠重传解决）；`integrity` → 检查本地字节（本地损坏 / 传输损坏）后从 0 重传。
+
+**版本错配叙述**：`4019` 是 0.4.0 新增码。旧 SDK 收到 4019 会按其既有「未知错误码」行为处理（如旧 rust-sdk 按成功形态误解析）——与既有加性错误码（4006-4018）的版本错配故事一致，随版本推进自然消解，非阻塞项。
 
 ## TODO
 

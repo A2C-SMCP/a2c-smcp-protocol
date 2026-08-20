@@ -132,6 +132,7 @@ except socketio.exceptions.ConnectionError as e:
 | `GET_SKILLS_EVENT` | `client:get_skills` | 获取 Computer 已纳管的 SKILL 清单（轻量元数据，不含 body）| `GetSkillsReq` | `GetSkillsRet` |
 | `GET_SKILL_EVENT` | `client:get_skill` | 获取 SKILL 包内资源：文本内联 `body`，二进制/过大返 `blob_handle` | `GetSkillReq` | `GetSkillRet` |
 | `GET_BLOB_EVENT` | `client:get_blob` | 通用：按 `blob_handle` 分块拉取 Computer 字节资源 | `GetBlobReq` | `GetBlobRet` |
+| `PUT_BLOB_EVENT` | `client:put_blob` | 通用：分块上行落盘到 Computer 授权 landing root，返回绝对 `landing_path` | `PutBlobReq` | `PutBlobRet` |
 
 ### Server 事件（客户端 → Server）
 
@@ -203,7 +204,7 @@ Agent ←───────────────────────�
 - Agent SDK 用**同一** `client:get_blob` 拉取/校验/4018 处理，仅"去哪找 handle"一处分支
 - `CallToolResult` schema 不变，仍是合法 MCP 结构；工具失败仍走 MCP `CallToolResult.isError`（不引入 A2C 事件级错误码，[作用域见 error-handling](error-handling.md#错误响应格式)）
 
-详见 [通用二进制传输 §5](blob-transfer.md#5-生产者通道接入契约)。
+详见 [通用二进制传输 §6](blob-transfer.md#6-下行生产者通道接入契约)。
 
 #### `client:get_tools`
 
@@ -449,6 +450,74 @@ Agent ←───────────────────────�
 4. 从 `chunk_offset`（缺省 0）取 `min(max_chunk_bytes, Computer cap)` 字节，恒保证序列化 ≤ Server `maxHttpBufferSize`；base64 → `blob`，回填 `total_size`/`sha256`/`chunk_offset`/`eof`
 
 详见 [通用二进制传输](blob-transfer.md)。
+
+#### `client:put_blob`
+
+通用二进制传输上行：Agent 把（二进制 / 大文本）内容分块落盘到 Computer 授权 landing root，返回绝对 `landing_path` 供后续 [`client:tool_call`](#clienttool_call) 参数直接引用（Bash / MCP 工具二次分析）。`client:get_blob` 的方向镜像：`chunk_offset` / `eof` 由 Agent 驱动，`sha256` / `total_size` 由 **Agent 声明、Computer 校验**；会话有界（闲置超时 / 并发上限 / 孤儿 GC）；能力门控 = 版本握手（Agent 自身 minor ≥ 0.4 且已连接 ⇒ 房间内 Computer 同 minor ⇒ 必有本事件）。
+
+**请求数据 (PutBlobReq)**:
+```python
+{
+    "agent": str,          # Agent 标识
+    "req_id": str,         # 请求 ID
+    "computer": str,       # 目标 Computer 名称
+    "upload_id": str,      # 可选：缺省即首块（offset 0），Computer 分配并回传
+    "chunk_offset": int,   # 本块起始字节偏移；MUST == Computer 已收字节（in-order）
+    "eof": bool,           # 末块标志
+    "total_size": int,     # 仅首块：声明总字节（MUST ≥ 1）
+    "sha256": str,         # 仅首块：声明全量 sha256（十六进制）
+    "name_hint": str,      # 仅首块可选：建议文件名；Computer 消毒后采用或自定
+    "blob": str            # base64，本块字节
+}
+```
+
+**响应数据 (PutBlobRet)**:
+```python
+{
+    "upload_id": str,      # 首块 ack 回传；后续块回显
+    "chunk_offset": int,   # 回显本块起始字节偏移
+    "landing_path": str,   # 仅末块 ack：landing root 内绝对路径（安全名）
+    "total_size": int,     # 仅末块 ack：实际落盘字节（== 声明值才成功）
+    "sha256": str,         # 仅末块 ack：Computer 重算全量 sha256（== 声明值）
+    "req_id": str
+}
+```
+
+**Computer 处理流程**：
+
+1. **首块**：校验声明（`total_size ≥ 1`）→ 非法 → [`4019 Blob Write Failed`](error-handling.md#blob-write-failed4019) `invalid_declaration`；超上限 → `4019` `too_large`（**零字节落盘**）；并发打满 → `4019` `busy`；通过 → 创建会话（`.part` + 增量 hasher + 已收字节），分配 `upload_id` 回传
+2. **后续块**：`upload_id` 未知 / 过期 → `4019` `invalid_upload`；`chunk_offset != 已收字节` → `4019` `range`；声明字段（`total_size`/`sha256`/`name_hint`）仅首块携带
+3. 每块 base64 解码追加 `.part`、增量 hasher 更新；单块序列化后 MUST ≤ Server `maxHttpBufferSize`
+4. **末块**（`eof=true`，offset + 本块字节 == `total_size`）：重算 sha256 比对 → 不符 → `4019` `integrity`（丢弃不返回 path）；通过 → 原子 rename 进 landing root → 返回 `landing_path` / `total_size` / `sha256`
+5. landing root 未配置 / 不可写 → `4019` `forbidden`；磁盘 IO 失败 → `4019` `io_error`
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant S as Server
+    participant C as Computer
+
+    A->>S: client:put_blob（首块：total_size, sha256, name_hint?）
+    S->>C: 转发
+    C->>C: 校验声明（too_large / busy → 4019 零落盘）→ 创建会话
+    C->>S: PutBlobRet { upload_id }
+    S->>A: PutBlobRet { upload_id }
+    loop 中间块（ack-paced 即节流）
+        A->>S: client:put_blob（upload_id, chunk_offset, blob）
+        S->>C: 转发
+        C->>C: in-order 校验 → 追加 .part + hasher.update
+        C->>S: PutBlobRet { upload_id, chunk_offset }
+        S->>A: PutBlobRet
+    end
+    A->>S: client:put_blob（末块 eof=true）
+    S->>C: 转发
+    C->>C: sha256 重算比对 → 原子 rename 进 landing root
+    C->>S: PutBlobRet { landing_path, total_size, sha256 }
+    S->>A: PutBlobRet
+    Note over A: landing_path 直接嵌入后续 tool_call 参数（Bash / MCP）
+```
+
+详见 [通用二进制传输 §3 / §7](blob-transfer.md#3-事件-clientput_blob上行写入)。
 
 #### `server:tool_call_cancel`
 
@@ -872,6 +941,7 @@ sequenceDiagram
 - `notify:leave_office` - 清理离开 Computer 的工具
 - `notify:update_config` / `notify:update_tool_list` - 刷新工具列表
 - `notify:update_skills` - 刷新 SKILL 清单
+- `client:put_blob` - 上行落盘循环（首块声明 `total_size`/`sha256` → ack-paced 逐块发送 → 末块取 `landing_path`），能力门控 = 自身 minor ≥ 0.4（版本握手传递性，无需协商字段）
 - `server:tool_call_cancel` - 工具调用超时或需主动取消时发起（fire-and-forget，无 ack）；并据响应结果级 `meta.a2c_cancelled` 区分取消与普通失败/超时
 - （集成层，条件 **MUST**）provider 长度适配：`exposed_tool_name` 可能超下游 provider 限长——超限时集成层 MUST 维护 `短名 ↔ exposed_tool_name` 双射（collision-safe，禁裸截断），仅用于 Agent↔LLM；SDK 保持 wire-faithful，A2C wire 恒传 `exposed_tool_name`（[长度与 provider 适配](data-structures.md#mcp-tool-命名与路由)）
 
