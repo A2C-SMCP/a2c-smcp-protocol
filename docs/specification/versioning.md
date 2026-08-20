@@ -175,7 +175,7 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 ### 当前周期：0.4.0-dev
 
-`0.4.0` 的 `-dev` 周期已开启。首项纳入为 `client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性变更）；发布前进入的其它变更一并折入 0.4.0。
+`0.4.0` 的 `-dev` 周期已开启。首项纳入为 `client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性变更）；随后纳入 SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）。发布前进入的其它变更一并折入 0.4.0。
 
 ---
 

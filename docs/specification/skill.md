@@ -144,6 +144,10 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 
     user（1 段）/ marketplace（2 段）/ mcp（3 段）按段数互斥，**不可能**跨类别碰撞。碰撞只可能发生在**同类别内**（marketplace `<plugin>`、同 source frontmatter 重名），均有对应拒绝策略；mcp `<server>` 段因 `bundle_id` 唯一已从构造上排除。
 
+!!! note "tags 不参与校验（纯透传元数据）"
+
+    frontmatter `tags` 是纯分类元数据：Computer 物化时**不校验、不解释**，仅在填充 `A2CSkillRef.tags` 时做最小形状检查——非 `list[str]` 则**省略该字段**并记诊断日志，SKILL 照常注册，**不**触发本节任何拒绝路径。`tags` 的 schema 由 marketplace SKILL v1 单方主导，A2C 不重复定义。
+
 校验失败不向 Agent 返回硬错误——SKILL 通道的 batch 接口必须对部分失败健壮。
 
 ### 1.6 合成示例
@@ -287,7 +291,7 @@ Computer 物化该形状：`SKILL.md` → `<staging>/SKILL.md`，`scripts/run.py
 
 ### frontmatter 是否需要镜像到 `_meta`？
 
-**不需要**。Computer 在 staging 完成后**直接读取本地 SKILL.md 的 YAML frontmatter** 作为元数据权威源。MCP Server 不必把 marketplace §3 的 6 个字段（`name` / `description` / `license` / `compatibility` / `metadata` / `allowed-tools`）镜像进 `_meta`——多写无害，但协议层不强求。
+**不需要**。Computer 在 staging 完成后**直接读取本地 SKILL.md 的 YAML frontmatter** 作为元数据权威源。MCP Server 不必把 marketplace §3 的 7 个字段（`name` / `description` / `license` / `compatibility` / `tags` / `metadata` / `allowed-tools`）镜像进 `_meta`——多写无害，但协议层不强求。
 
 这条设计带来的红利：
 
@@ -381,11 +385,13 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
                                     # staging 落盘是所有 source 的统一第一步，故恒存在
                                     # 面向 Agent SDK（脚本执行/文件访问）；渲染期可经 ${TFROBOT_SKILL_DIR} 展开为 LLM-facing（§9.1/§9.4）
 
-    # ── SKILL.md frontmatter 派生（marketplace §3.1 的 6 字段，无 version）──
+    # ── SKILL.md frontmatter 派生（marketplace §3 的 7 字段，无 version）──
     description: str                # 必选：marketplace §3.1
     license: NotRequired[str]
     compatibility: NotRequired[str]
     allowed_tools: NotRequired[list[str]]   # frontmatter "allowed-tools" 规范化为 list
+    tags: NotRequired[list[str]]            # frontmatter "tags" 透传（分类元数据）
+                                            # 纯透传不校验：非 list[str] → 省略该字段（见 §1.5）
     skill_metadata: NotRequired[dict]       # frontmatter.metadata map 透传
                                             # A2C 不解释，仅作跨工具互操作 passthrough
     # ── 包元数据派生（非 frontmatter）────────────────
@@ -404,6 +410,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 | `license` | `str` | ⬜ 可选 | frontmatter |
 | `compatibility` | `str` | ⬜ 可选 | frontmatter |
 | `allowed_tools` | `list[str]` | ⬜ 可选 | frontmatter `allowed-tools` 规范化为 list |
+| `tags` | `list[str]` | ⬜ 可选 | frontmatter `tags` 透传（分类元数据）；非 `list[str]` → 省略该字段（§1.5） |
 | `skill_metadata` | `dict` | ⬜ 可选 | frontmatter.metadata 透传，A2C 不解释 |
 | `version` | `str` | ⬜ 可选 | 来源各异（见下方 note）；user 源缺省/null |
 
@@ -411,7 +418,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
 !!! note "`version` 来源（非 frontmatter）"
 
-    marketplace SKILL v1 frontmatter 恰好 6 字段（`name` / `description` / `license` / `compatibility` / `metadata` / `allowed-tools`），**无 version**。`A2CSkillRef.version` 的 source-of-truth 按来源区分：
+    marketplace SKILL v1 frontmatter 恰好 7 字段（`name` / `description` / `license` / `compatibility` / `tags` / `metadata` / `allowed-tools`），**无 version**。`A2CSkillRef.version` 的 source-of-truth 按来源区分：
 
     | Source | `version` 来源 |
     |---|---|
@@ -807,7 +814,7 @@ async def list_resources():
     ]
 ```
 
-Computer 据此完成 staging。SKILL.md frontmatter 的其他字段（`license` / `compatibility` / `metadata` / `allowed-tools`）由 Computer 在 staging 后读取，**不需要**镜像到 `_meta`。
+Computer 据此完成 staging。SKILL.md frontmatter 的其他字段（`license` / `compatibility` / `tags` / `metadata` / `allowed-tools`）由 Computer 在 staging 后读取，**不需要**镜像到 `_meta`。
 
 ### 11.4 三种 source 模式选择
 
