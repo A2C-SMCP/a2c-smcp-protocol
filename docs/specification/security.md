@@ -253,6 +253,26 @@ def handle_request(request):
     pass
 ```
 
+## 写入通道安全（Landing 沙箱）
+
+`client:put_blob` 的上行写入落盘能力，安全边界如下（完整契约见 [通用二进制传输 §3 / §7](blob-transfer.md)）：
+
+### 沙箱边界（fail-closed）
+
+- **落点由 Computer 决断**：Agent 只能把字节写进 Computer 显式授权的 landing root，**不是**任意文件写原语
+- `name_hint` 中的穿越组件 MUST 被消毒剥离或忽略（Computer 自定安全名），落点**构造上**严格落于 root 内；landing root 未配置 / 不可写 → [`4019 forbidden`](error-handling.md#blob-write-failed4019)，**零字节落盘**
+- `integrity`（sha256 不符）/ `too_large`（声明超限）路径下**零产物**：`.part` 丢弃、无部分文件可见
+
+### 受信配置与 GC 边界
+
+- **`landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设**；`project` scope 提供该键 MUST 被拒绝——project settings 入 git 随仓库分发，clone 的仓库不得把写目标重定向到任意路径（[computer-management §7 不变量 #6](computer-management/protocol.md#7-安全不变量)）
+- 上传会话**有界 MUST**：闲置超时 + 并发上限 + 孤儿 `.part` 回收（阈值 SDK 自治），防无界会话 DoS
+- GC 严格限于 landing root 内（canonicalize + realpath 围栏），不越授权边界（[computer-management §7 不变量 #5](computer-management/protocol.md#7-安全不变量)）
+
+### 路径披露权衡
+
+`PutBlobRet.landing_path` 为绝对路径，会暴露 landing root 的位置（含 OS 用户名级别信息）。此披露为**有意设计**：不构成凭据边界（拥有本地 Bash 类工具的 Agent 本就能自行发现），且不带来新能力（写任意路径仍被 `put_blob` 原语锁死）；换取的是工具参数直接可用、Agent 感知不到沙箱存在。
+
 ## 日志与审计
 
 ### 安全日志

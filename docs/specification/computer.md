@@ -90,7 +90,7 @@ Computer SHOULD 在工具调用超时时尝试中断底层执行，并在结果�
 
 取消成功时，原 `client:tool_call` 的 ack MUST 返回 `CallToolResult(isError=true)`，并在结果级 `meta` 写入 `a2c_cancelled = true`，SHOULD 写入 `a2c_cancel_reason = "agent_requested"`。
 
-当 `CallToolResult` 中的二进制 content item 超过内联预算时，Computer MUST 按 [通用二进制传输 §生产者通道接入契约](blob-transfer.md#5-生产者通道接入契约) 铸造 `blob_handle`，在 content item `_meta` 写入 `a2c_blob_handle`、`a2c_total_size`、`a2c_sha256`，并清空该 item 的内联字节载体。小尺寸二进制 MAY 保持内联。
+当 `CallToolResult` 中的二进制 content item 超过内联预算时，Computer MUST 按 [通用二进制传输 §生产者通道接入契约](blob-transfer.md#6-下行生产者通道接入契约) 铸造 `blob_handle`，在 content item `_meta` 写入 `a2c_blob_handle`、`a2c_total_size`、`a2c_sha256`，并清空该 item 的内联字节载体。小尺寸二进制 MAY 保持内联。
 
 ## 6. Desktop 通道
 
