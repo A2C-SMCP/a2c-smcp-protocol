@@ -403,7 +403,7 @@ tool_meta[tool] > default_tool_meta > Server 声明（最低层）
 
 1. 如果某工具在 `tool_meta` 中有专属配置，其非 `null` 字段**覆盖** `default_tool_meta` 的同名字段
 2. `default_tool_meta` 中有而 `tool_meta` 中为 `null` 的字段保持默认值
-3. **Server 声明 tags 恒为最低层**：配置两层未覆盖时默认生效；配置中 `tags: []` 可**显式清除** Server 声明；Server 声明中的其它字段（如 `auto_apply`）一律不生效
+3. **Server 声明 tags 恒为最低层**：配置两层未覆盖时默认生效；配置中 `tags: []` 可**显式清除**下层（`default_tool_meta` 与 Server 声明）值；Server 声明中的其它字段（如 `auto_apply`）一律不生效（字段级过滤，`tags` 仍生效）
 4. 如果工具既无专属配置也无默认配置也无 Server 声明，则没有 ToolMeta
 
 **示例**：

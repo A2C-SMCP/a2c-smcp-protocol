@@ -71,7 +71,7 @@ class SMCPTool(TypedDict):
 
 | Key | 写入方 | 说明 |
 |-----|-------|------|
-| `a2c_tool_meta` | **终值**：A2C 系统（Computer）；**声明层**：MCP Server（仅 `tags`，合并最低层） | A2C 工具元数据（tags、auto_apply、alias 等）；三层合并规则见 [§ToolMeta](#toolmeta) |
+| `a2c_tool_meta` | **终值**：A2C 系统（Computer）；**声明层**：MCP Server（仅 `tags`，合并最低层） | A2C 工具元数据（tags、auto_apply、alias 等）；三层合并规则见 [§ToolMeta 三层合并规则](#toolmeta-三层合并规则) |
 | `MCP_TOOL_ANNOTATION` | A2C 系统（Computer） | MCP 标准工具注解（destructive、readOnlyHint 等） |
 | 其他任意 key | MCP Server 自身 | MCP Server 在 `Tool._meta` 中设置的原生元数据 |
 
@@ -106,7 +106,7 @@ for tool in tools:
 
 #### 完整 JSON 示例
 
-**场景 1**: `default_tool_meta = null`（未配置元数据）
+**场景 1**: `default_tool_meta = null`（未配置元数据且 Server 未声明）
 
 ```json
 {
@@ -193,6 +193,8 @@ tool_meta[tool]（最具体） > default_tool_meta（配置默认） > Server �
 - `auto_apply`：❌ **MUST NOT 参与**——「跳过用户二次确认」是策略/安全字段，Server 自声明等于自我授权执行（提权向量），reconcile 后必须彻底消失
 - `alias` / `ret_object_mapper` / 其它任意字段：首版一律不参与声明合并
 
+白名单外字段走**字段级过滤**：字段值不参与合并（reconcile 后消失），声明其余部分（`tags`）仍生效——「含白名单外字段」**不是**畸形判据。
+
 **合并语义**：
 
 - 数组字段（`tags`）按字段**整体替换**，不做 union
@@ -210,7 +212,7 @@ Computer 对**每个 Tool** MUST 消费并校验 Server 声明（即使 `tool_me
 | 非法 | 有 | 配置 canonical 覆写（维持现状） |
 | 非法 | 无 | **删除该 key** |
 
-- 畸形声明（非对象 / 含白名单外字段 / `tags` 非 `list[str]`）→ 丢弃声明 + 本地诊断（warning 级，按 server 聚合防洪泛），**MUST NOT** 令 `tools/list` 失败或令工具消失
+- 畸形声明（非对象 / `tags` 非 `list[str]`）→ 丢弃声明 + 本地诊断（见 [配置诊断](#config-diagnostics)），**MUST NOT** 令 `tools/list` 失败或令工具消失
 - 其它 MCP 原生 `_meta` key 全程原样保留
 - MCP Server **MUST NOT** 期待 `a2c_tool_meta` 被 native passthrough——该 key 的最终值恒为 Computer 写入（即使来源是声明值）
 - 老 Computer 无配置时可能原样透传该 key，是**既有历史行为、非契约**：白名单与 canonical-final 保证自实现无条件 reconcile 的 Computer 起成立
@@ -1073,6 +1075,7 @@ ExposedToolMapping = dict[str, ExposedToolRoute]
 | 重复 `bundle_id` | 两个及以上 Server 解析出相同 `bundle_id`（[no-double-open](#no-double-open)），仅启动配置顺序第一个 | 确需多实例 → 给冲突项指定**不同** `bundle_id`（如 `playwright` / `playwright_isolated`）|
 | 非法 `bundle_id` | 显式传入含 `.` / 含 `__` / 字符集越界，或[缺省生成](#bundleid-缺省生成)极端输入后仍非法 | 修正为合规 `bundle_id`；**省略** `bundle_id` 不算错误（触发缺省生成）|
 | `exposed_tool_name` 撞名 | **同一** `bundle_id` 内两个工具经 `alias` 产出相同 `exposed_tool_name` | 修正 `tool_meta` 的 `alias`（跨 `bundle_id` 不会撞，无需处理）|
+| 畸形 ToolMeta Server 声明 | 工具声明非对象 / `tags` 非 `list[str]`（[三层合并规则](#toolmeta-三层合并规则)；白名单外字段字段级过滤，**不**触发本诊断）| Server 作者修正声明；Computer 丢弃声明 + warning 诊断（按 server 聚合防刷屏）|
 
 > 运行期例外：`client:tool_call` 的 `tool_name` 在 [ExposedToolMapping](#exposedtoolmapping) 未命中，属客户端运行期错误，走协议错误码 [`4001`](error-handling.md#工具调用错误码)（非本地诊断）。
 

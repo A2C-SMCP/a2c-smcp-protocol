@@ -40,7 +40,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4014 | MCP Server Not Found | 引用的 `mcp_server`（bundle_id）未注册（见 [§MCP Server Not Found](#mcp-server-not-found4014)）|
 | 4015 | MCP Capability Not Supported | MCP Server 已注册但未声明所需 capability（见 [§MCP Capability Not Supported](#mcp-capability-not-supported4015)）|
 
-> **BundleID / exposed_tool_name 的配置问题不进协议错误码**：重复 `bundle_id`（[no-double-open](data-structures.md#no-double-open)）、非法 `bundle_id`、同 server 内 alias 撞出相同 `exposed_tool_name`——均在**配置加载期**由 Computer 检出，属 [Computer 本地配置诊断](data-structures.md#config-diagnostics)（日志 / 本地 UI），不由任何 `client:*` 事件触发（对齐 SKILL「物化失败 / 孤儿 / 跨 source 冲突不进协议错误码」先例）。仅 `client:tool_call` 的 `tool_name`（exposed_tool_name）在 [ExposedToolMapping](data-structures.md#exposedtoolmapping) 未命中属运行期客户端错误 → 复用 [`4001 Tool Not Found`](#工具调用错误码)。
+> **BundleID / exposed_tool_name 的配置问题不进协议错误码**：重复 `bundle_id`（[no-double-open](data-structures.md#no-double-open)）、非法 `bundle_id`、同 server 内 alias 撞出相同 `exposed_tool_name`——均在**配置加载期**由 Computer 检出，属 [Computer 本地配置诊断](data-structures.md#config-diagnostics)（日志 / 本地 UI），不由任何 `client:*` 事件触发（对齐 SKILL「物化失败 / 孤儿 / 跨 source 冲突不进协议错误码」先例）。畸形 ToolMeta Server 声明（非对象 / `tags` 类型错误）同属此模式——工具组装期由 Computer 检出并降级（[三层合并规则](data-structures.md#toolmeta-三层合并规则) + [配置诊断](data-structures.md#config-diagnostics)），不产生任何错误码。仅 `client:tool_call` 的 `tool_name`（exposed_tool_name）在 [ExposedToolMapping](data-structures.md#exposedtoolmapping) 未命中属运行期客户端错误 → 复用 [`4001 Tool Not Found`](#工具调用错误码)。
 
 ### SKILL 通道错误码
 
