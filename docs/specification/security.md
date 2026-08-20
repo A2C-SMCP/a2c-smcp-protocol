@@ -260,14 +260,14 @@ def handle_request(request):
 ### 沙箱边界（fail-closed）
 
 - **落点由 Computer 决断**：Agent 只能把字节写进 Computer 显式授权的 landing root，**不是**任意文件写原语
-- 路径穿越 / `name_hint` 消毒失败 / landing root 未配置或不可写 → [`4019 forbidden`](error-handling.md#blob-write-failed4019)，**零字节落盘**
+- `name_hint` 中的穿越组件 MUST 被消毒剥离或忽略（Computer 自定安全名），落点**构造上**严格落于 root 内；landing root 未配置 / 不可写 → [`4019 forbidden`](error-handling.md#blob-write-failed4019)，**零字节落盘**
 - `integrity`（sha256 不符）/ `too_large`（声明超限）路径下**零产物**：`.part` 丢弃、无部分文件可见
 
 ### 受信配置与 GC 边界
 
-- **`landingRoot` 仅 trusted / policy scope 可设**；project scope 提供该键 MUST 被拒绝——project settings 入 git 随仓库分发，clone 的仓库不得把写目标重定向到任意路径（[computer-management §7 不变量 #6](computer-management/protocol.md#7-安全不变量)）
+- **`landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设**；`project` scope 提供该键 MUST 被拒绝——project settings 入 git 随仓库分发，clone 的仓库不得把写目标重定向到任意路径（[computer-management §7 不变量 #6](computer-management/protocol.md#7-安全不变量)）
 - 上传会话**有界 MUST**：闲置超时 + 并发上限 + 孤儿 `.part` 回收（阈值 SDK 自治），防无界会话 DoS
-- GC 严格限于 landing root 内（canonicalize + realpath 围栏），不越授权边界（§7 不变量 #5）
+- GC 严格限于 landing root 内（canonicalize + realpath 围栏），不越授权边界（[computer-management §7 不变量 #5](computer-management/protocol.md#7-安全不变量)）
 
 ### 路径披露权衡
 

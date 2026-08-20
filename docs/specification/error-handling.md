@@ -658,7 +658,7 @@ CallToolResult(
 | `range` | `chunk_offset != 已收字节`（in-order 违反，无稀疏缓冲）；或末块 `chunk_offset + 本块字节数 != total_size` |
 | `too_large` | 首块声明 `total_size` 超 Computer 可配上限 → **拒绝且零字节落盘** |
 | `busy` | 并发上传会话数已达 Computer 可配上限——Agent **SHOULD** 退避后从 0 重传（新 `upload_id`） |
-| `forbidden` | landing root 未配置 / 不可写（fail-closed）；或 Computer 拒绝创建会话 |
+| `forbidden` | landing root 未配置 / 不可写（fail-closed，零字节落盘） |
 | `integrity` | 末块定稿时重算 sha256 与首块声明不符 → **丢弃 `.part`，不返回 `landing_path`** |
 | `io_error` | 落盘 IO 失败（磁盘满 / 权限 / 文件系统错误） |
 
@@ -685,11 +685,11 @@ CallToolResult(
 
 **复用与不使用**：上行写入期一律 `4019`，**不使用** [`4018`](#blob-not-accessible4018)（下行拉取期专属，方向相反）、**不使用** [`4017`](#skill-resource-not-accessible4017)（SKILL 铸造期专属）、**不使用** MCP `CallToolResult.isError`（本事件为 A2C 自有事件，非 MCP 事件）。
 
-**安全不变量**：`client:put_blob` **不是**任意文件写原语——落点由 Computer 决断（landing root，config-first），`name_hint` 消毒后采用或自定，路径穿越 MUST fail-closed；`landingRoot` 仅 trusted/policy scope 可设，project scope 提供 MUST 被拒绝（防 clone 仓库重定向写目标）。`integrity` / `too_large` / `forbidden` 路径下**零产物**：无 `.part` 残留、无部分文件可见。GC 严格限于 landing root（[computer-management §7 不变量 #5](computer-management/protocol.md#7-安全不变量)）。
+**安全不变量**：`client:put_blob` **不是**任意文件写原语——落点由 Computer 决断（landing root，config-first），`name_hint` 穿越组件 MUST 被消毒剥离或忽略（自定安全名），落点**构造上**严格落于 root 内；`landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设，`project` scope 提供 MUST 被拒绝（防 clone 仓库重定向写目标）。`integrity` / `too_large` / `forbidden` 路径下**零产物**：无 `.part` 残留、无部分文件可见。GC 严格限于 landing root（[computer-management §7 不变量 #5](computer-management/protocol.md#7-安全不变量)）。
 
 **Agent 行为建议**：`invalid_upload` → 新 `upload_id` 从 0 重传；`invalid_declaration` / `range` 属客户端构造错误，检查声明与偏移后重传（新会话）；`too_large` → 不重试，改用分治 / 压缩 / 留上下文策略；`busy` → 退避等待后重试；`forbidden` / `io_error` → 不重试，字节留上下文（Computer 侧状态问题，无法靠重传解决）；`integrity` → 检查本地字节（本地损坏 / 传输损坏）后从 0 重传。
 
-**版本错配叙述**：`4019` 是 0.4.0 新增码。旧 SDK 收到 4019 会按其既有「未知错误码」行为处理（如旧 rust-sdk 按成功形态误解析）——与既有加性错误码（4006-4018）的版本错配故事一致，随版本推进自然消解，非阻塞项。
+**版本错配叙述**：`4019` 是 0.4.0 新增码。旧 SDK 收到 4019 会按各自「未知错误码」策略处理（具体行为由各 SDK 定义）——加性错误码的版本错配随版本推进自然消解，非阻塞项。
 
 ## TODO
 

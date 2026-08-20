@@ -146,7 +146,7 @@ BlobHandle: TypeAlias = str
 **Computer 处理流程**：
 
 1. **首块**（无 `upload_id`、`chunk_offset=0`）：校验声明（字段齐备、`total_size ≥ 1`）→ 非法 → [`4019`](error-handling.md#blob-write-failed4019) `invalid_declaration`；`total_size` 超 Computer 可配上限 → `4019` `too_large`（**零字节落盘**）；并发上传会话已达上限 → `4019` `busy`；通过 → 创建会话（`.part` 临时文件 + 增量 hasher + 已收字节计数），分配 `upload_id` 回传
-2. **后续块**：`upload_id` 无法识别 / 已过期 → `4019` `invalid_upload`；`chunk_offset != 已收字节` → `4019` `range`（in-order 强制，无稀疏缓冲）。`total_size` / `sha256` / `name_hint` 仅首块携带，后续块 MUST NOT 携带
+2. **后续块**：`upload_id` 无法识别 / 已过期 → `4019` `invalid_upload`；`chunk_offset != 已收字节` → `4019` `range`（in-order 强制，无稀疏缓冲）。`total_size` / `sha256` / `name_hint` 仅首块携带，后续块 MUST NOT 携带（违反 → `4019` `invalid_declaration`）
 3. 每块 base64 解码 → 追加 `.part` → 增量 hasher 更新。单块序列化后 MUST ≤ Server `maxHttpBufferSize`（计入 base64 +33% 与 envelope；Agent 责任，参考预算 256 KiB 默认块）
 4. **末块**（`eof=true`，且 `chunk_offset + 本块字节数 == total_size`，否则 `4019` `range`）：关闭 `.part`，重算全量 sha256 与声明比对 → 不符 → `4019` `integrity`（**丢弃，不返回 path**）；通过 → 原子 rename 进 landing root（安全名 = `upload_id` 派生 + 消毒后的 `name_hint`），返回 `landing_path` / `total_size` / `sha256`
 5. 落盘 IO 失败（磁盘满 / 权限 / landing root 不可写）→ `4019` `io_error` / `forbidden`（见 [§7](#7-写入侧契约landing-沙箱)）
@@ -207,7 +207,7 @@ sequenceDiagram
 | **完整性** | 下行 | `sha256` = 全量资源 sha256（跨块恒定）；Agent `eof` 后 **SHOULD** 校验重组内容，不符即损坏并重读 |
 | **完整性** | 上行 | 镜像：`sha256` 由 **Agent 首块声明**，Computer 接收期增量计算、末块重算比对，不符 → `4019 integrity`（丢弃不落盘）；末块 ack 回显重算值，Agent **SHOULD** 比对声明 |
 | **读取中变更** | 下行 | `sha256` / `total_size` 一次逻辑读取内 **MUST** 稳定；Agent 跨块发现变化 ⇒ 源被改写，**MUST** 从 offset 0 重读，不拼接错配字节；Computer **SHOULD** 尽力一致快照 |
-| **读取中变更** | 上行 | 不适用——声明即契约：首块声明后不可变，后续块携带声明字段 MUST NOT（Computer 忽略） |
+| **读取中变更** | 上行 | 不适用——声明即契约：首块声明后不可变；后续块携带声明字段 MUST NOT，违反 → `4019 invalid_declaration` |
 | **绝对上限（DoS）** | 下行 | 由**铸造通道在铸造时**决断（SKILL → `total_size` 超 SDK 可配上限即 [`4017 too_large`](error-handling.md#skill-resource-not-accessible4017)，不铸造句柄）。`client:get_blob` 只服务已通过上限的句柄 |
 | **绝对上限（DoS）** | 上行 | 由 **Computer 在首块决断**：声明 `total_size` 超可配上限 → `4019 too_large`（**零字节落盘**）；叠加会话有界（闲置超时 + 并发上限，见 [§3](#3-事件-clientput_blob上行写入)） |
 
@@ -298,7 +298,7 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 ### landing root 配置（config-first）
 
 - landing root 是 **Computer 侧配置项**（settings 键 `landingRoot`，双 SDK 对齐），协议不向 Agent 暴露其位置；未配置 / 不可写 → `4019` `forbidden`（fail-closed，零字节落盘）
-- **scope 门控（协议 MUST）**：`landingRoot` 仅 **trusted / policy scope** 可设；**project scope 提供该键 MUST 被 Computer 拒绝**——project settings 入 git 随仓库分发，clone 的仓库不得把写目标重定向到任意路径（如 `~/.ssh`），否则掏空沙箱不变量（[computer-management §7 不变量 #6](computer-management/protocol.md#7-安全不变量)）
+- **scope 门控（协议 MUST）**：`landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；**`project` scope 提供该键 MUST 被 Computer 拒绝**——project settings 入 git 随仓库分发，clone 的仓库不得把写目标重定向到任意路径（如 `~/.ssh`），否则掏空沙箱不变量（[computer-management §7 不变量 #6](computer-management/protocol.md#7-安全不变量)）
 
 ### `landing_path` 语义
 

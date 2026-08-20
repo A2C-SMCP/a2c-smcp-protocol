@@ -486,7 +486,7 @@ Agent ←───────────────────────�
 **Computer 处理流程**：
 
 1. **首块**：校验声明（`total_size ≥ 1`）→ 非法 → [`4019 Blob Write Failed`](error-handling.md#blob-write-failed4019) `invalid_declaration`；超上限 → `4019` `too_large`（**零字节落盘**）；并发打满 → `4019` `busy`；通过 → 创建会话（`.part` + 增量 hasher + 已收字节），分配 `upload_id` 回传
-2. **后续块**：`upload_id` 未知 / 过期 → `4019` `invalid_upload`；`chunk_offset != 已收字节` → `4019` `range`；声明字段（`total_size`/`sha256`/`name_hint`）仅首块携带
+2. **后续块**：`upload_id` 未知 / 过期 → `4019` `invalid_upload`；`chunk_offset != 已收字节` → `4019` `range`；声明字段（`total_size`/`sha256`/`name_hint`）仅首块携带，后续块 MUST NOT 携带（违反 → `4019` `invalid_declaration`）
 3. 每块 base64 解码追加 `.part`、增量 hasher 更新；单块序列化后 MUST ≤ Server `maxHttpBufferSize`
 4. **末块**（`eof=true`，offset + 本块字节 == `total_size`）：重算 sha256 比对 → 不符 → `4019` `integrity`（丢弃不返回 path）；通过 → 原子 rename 进 landing root → 返回 `landing_path` / `total_size` / `sha256`
 5. landing root 未配置 / 不可写 → `4019` `forbidden`；磁盘 IO 失败 → `4019` `io_error`

@@ -760,7 +760,7 @@ class PutBlobRet(TypedDict, total=False):
     - **声明-校验镜像**：下行「Computer 声明、Agent 校验」；上行「Agent 首块声明 `total_size`/`sha256`，Computer 增量计算、末块重算比对」，不符 → [`4019 integrity`](error-handling.md#blob-write-failed4019)（丢弃不落盘）。
     - **有界会话**：`upload_id` 会话为 Computer 侧受限状态，MUST 有界（闲置超时 / 并发上限 / 孤儿 `.part` 由 landing GC 回收，阈值 SDK 自治）；过期 / 未知 → `4019 invalid_upload`，并发打满 → `4019 busy`。**无跨尝试断点**：失败重试 = 新 `upload_id` 从 0 重传。
     - **能力门控 = 版本握手**：v0.x MINOR 严格匹配 + 同房间传递 ⇒ Agent 以「自身 minor ≥ 0.4 且已连接」为门控，无协商字段；0.4.x Computer MUST 实现（详见 [通用二进制传输 §3](blob-transfer.md#3-事件-clientput_blob上行写入)）。
-    - **写入沙箱**：落点由 Computer 决断（landing root，config-first），`landing_path` 构造上严格落于 root 内；`landingRoot` 仅 trusted/policy scope 可设（project scope MUST 拒绝）；GC 严格限于 landing root（详见 [§7](blob-transfer.md#7-写入侧契约landing-沙箱)）。
+    - **写入沙箱**：落点由 Computer 决断（landing root，config-first），`landing_path` 构造上严格落于 root 内；`landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设（`project` scope MUST 拒绝）；GC 严格限于 landing root（详见 [§7](blob-transfer.md#7-写入侧契约landing-沙箱)）。
 
 ---
 
