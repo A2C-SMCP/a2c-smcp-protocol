@@ -385,7 +385,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
                                     # staging 落盘是所有 source 的统一第一步，故恒存在
                                     # 面向 Agent SDK（脚本执行/文件访问）；渲染期可经 ${TFROBOT_SKILL_DIR} 展开为 LLM-facing（§9.1/§9.4）
 
-    # ── SKILL.md frontmatter 派生（marketplace §3.1 的 7 字段，无 version）──
+    # ── SKILL.md frontmatter 派生（marketplace §3 的 7 字段，无 version）──
     description: str                # 必选：marketplace §3.1
     license: NotRequired[str]
     compatibility: NotRequired[str]
