@@ -565,11 +565,13 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
     path: str                       # 必选：Computer 本地绝对目录路径
                                     # staging 落盘是所有 source 的统一第一步，故恒存在
                                     # 面向 Agent SDK（脚本执行/文件访问）；渲染期可经 ${TFROBOT_SKILL_DIR} 展开为 LLM-facing（skill.md §9.4）
-    # ── SKILL.md frontmatter 派生（marketplace v1 §3.1 的 6 字段，无 version）──
+    # ── SKILL.md frontmatter 派生（marketplace v1 §3.1 的 7 字段，无 version）──
     description: str                # 必选：marketplace SKILL v1 §3.1
     license: NotRequired[str]
     compatibility: NotRequired[str]
     allowed_tools: NotRequired[list[str]]   # frontmatter "allowed-tools" 规范化为 list
+    tags: NotRequired[list[str]]            # frontmatter "tags" 透传（分类元数据）
+                                            # 纯透传不校验：非 list[str] → 省略该字段（SKILL 照常注册，见 skill.md §1.5）
     skill_metadata: NotRequired[dict]       # frontmatter.metadata 透传；A2C 不解释
     # ── 包元数据派生（非 frontmatter）────────────────────
     version: NotRequired[str]               # 来源各异（见下方 note）；user 源缺省/null
@@ -581,9 +583,9 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
     - `name` / `source`：协议主键与来源 provenance，每条 ref 必有。
     - `path`：staging 物化是所有 source 的统一第一步，进入 Registry 的 SKILL 必有可读本地目录（见下方 note）。
-    - `description`：SKILL.md frontmatter 强制字段（marketplace v1 §3.1 的 6 字段之一），任何合法 SKILL.md 必含。
+    - `description`：SKILL.md frontmatter 强制字段（marketplace v1 §3.1 的 7 字段之一），任何合法 SKILL.md 必含。
 
-    其余 6 个（`uri` / `license` / `compatibility` / `allowed_tools` / `skill_metadata` / `version`）为 `NotRequired`。Producer（Computer）**MUST** 发齐 4 个必选字段；Consumer（Agent）可假定其存在，但 **MUST NOT** 假定任一可选字段存在。SDK 用 PEP 655 跟进时，两种等价写法皆可——本规范取 house 约定（`total=True` 默认 + `NotRequired[]`），SDK 亦可用 `total=False` + `Required[]`。
+    其余 7 个（`uri` / `license` / `compatibility` / `allowed_tools` / `tags` / `skill_metadata` / `version`）为 `NotRequired`。Producer（Computer）**MUST** 发齐 4 个必选字段；Consumer（Agent）可假定其存在，但 **MUST NOT** 假定任一可选字段存在。SDK 用 PEP 655 跟进时，两种等价写法皆可——本规范取 house 约定（`total=True` 默认 + `NotRequired[]`），SDK 亦可用 `total=False` + `Required[]`。
 
 !!! note "`path` 恒存在；为何无 raw `mcp_server` 字段"
 
@@ -593,7 +595,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 
 !!! note "`version` 的 source-of-truth（不来自 frontmatter）"
 
-    marketplace SKILL v1 frontmatter 恰好 6 字段（`name` / `description` / `license` / `compatibility` / `metadata` / `allowed-tools`），**无 version**。`A2CSkillRef.version` 按来源取值，故为 `NotRequired`（无来源即省略）：
+    marketplace SKILL v1 frontmatter 恰好 7 字段（`name` / `description` / `license` / `compatibility` / `tags` / `metadata` / `allowed-tools`），**无 version**。`A2CSkillRef.version` 按来源取值，故为 `NotRequired`（无来源即省略）：
 
     | Source | `version` 来源 |
     |---|---|
