@@ -173,9 +173,9 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 `0.3.2` 已发布，两站 `latest` 均指向 `0.3.2`。它含一项**破坏性行为变更**：PickString `options` 结构化——`options: list[str]` 改为 `options: list[PickStringOption {label, value}]`，旧字符串数组形式**直接拒绝**（`validation` 错误，报错指路新结构），不提供 alias、不设迁移期（协议尚未正式上线，无存量兼容包袱，故不单独提供迁移指南）。另含一项**行为变更**：MCP server 实际 start / restart 从 raw config 重新解析 Input——用户改选后重启生效，运行中不热更新（[runtime-contract §5.13](computer-management/runtime-contract.md)）。发布前进入的其它变更一并折入 0.3.2。
 
-### 当前周期：0.4.0-dev
+### 最近发布：v0.4.0
 
-`0.4.0` 的 `-dev` 周期已开启。首项纳入为 `client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性变更）；随后纳入 SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；再后纳入 ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
+`0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`，当前**无开启中的 `-dev` 周期**。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
 
 ---
 
