@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2557,13 +2557,13 @@
 </table>
 <h3 id="tls-配置建议">TLS 配置建议<a class="headerlink" href="#tls-配置建议" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 推荐的 TLS 版本</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">TLS_VERSION</span> <span class="o">=</span> <span class="s2">"TLSv1.2+"</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">TLS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;TLSv1.2+&quot;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># 推荐的密码套件</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">CIPHER_SUITES</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">"TLS_AES_256_GCM_SHA384"</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">"TLS_CHACHA20_POLY1305_SHA256"</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"TLS_AES_128_GCM_SHA256"</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;TLS_AES_256_GCM_SHA384&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;TLS_CHACHA20_POLY1305_SHA256&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;TLS_AES_128_GCM_SHA256&quot;</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">]</span>
 </code></pre></div>
 <h3 id="mtls双向-tls">mTLS（双向 TLS）<a class="headerlink" href="#mtls双向-tls" title="Permanent link">&para;</a></h3>
@@ -2585,7 +2585,7 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">auth</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="sd">"""验证连接请求"""</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;验证连接请求&quot;&quot;&quot;</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="k">pass</span>
 </code></pre></div>
 <h3 id="认证策略">认证策略<a class="headerlink" href="#认证策略" title="Permanent link">&para;</a></h3>
@@ -2618,8 +2618,8 @@
 <h3 id="默认认证实现">默认认证实现<a class="headerlink" href="#默认认证实现" title="Permanent link">&para;</a></h3>
 <p>SDK 提供默认认证实现 <code>DefaultAuthenticationProvider</code>：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">auth</span> <span class="o">=</span> <span class="n">DefaultAuthenticationProvider</span><span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">admin_secret</span><span class="o">=</span><span class="s2">"your_admin_secret"</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">api_key_name</span><span class="o">=</span><span class="s2">"x-api-key"</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">admin_secret</span><span class="o">=</span><span class="s2">&quot;your_admin_secret&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">api_key_name</span><span class="o">=</span><span class="s2">&quot;x-api-key&quot;</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">)</span>
 </code></pre></div>
 <p><strong>注意</strong>: 默认实现仅适用于开发和测试，生产环境应实现自定义认证。</p>
@@ -2682,10 +2682,10 @@
 </table>
 <h3 id="环境变量安全">环境变量安全<a class="headerlink" href="#环境变量安全" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 推荐：使用环境变量</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">API_KEY</span><span class="o">=</span><span class="s2">"your_api_key"</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">API_KEY</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># 不推荐：硬编码</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"your_api_key"</span><span class="w">  </span><span class="c1"># 危险！</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your_api_key&quot;</span><span class="w">  </span><span class="c1"># 危险！</span>
 </code></pre></div>
 <h3 id="mcp-上游授权oauth-20-等">MCP 上游授权（OAuth 2.0 等）<a class="headerlink" href="#mcp-上游授权oauth-20-等" title="Permanent link">&para;</a></h3>
 <p>MCP 协议自身支持 OAuth 2.0 等授权机制以访问工具服务器的受保护资源。A2C-SMCP <strong>不</strong>在协议层介入该握手过程——这是"零凭证传播原则"在 MCP 集成上的直接推论。</p>
@@ -2741,10 +2741,10 @@
 <h4 id="工具元数据提示建议非强制">工具元数据提示（建议，非强制）<a class="headerlink" href="#工具元数据提示建议非强制" title="Permanent link">&para;</a></h4>
 <p>Computer 在向 Agent 暴露工具列表时，<strong>建议</strong>对需要授权的工具附加非敏感标注，便于 Agent 判断调用前置条件：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"github_create_issue"</span><span class="p">,</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">"requires_auth"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>        <span class="c1"># 建议字段</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="s2">"auth_provider"</span><span class="p">:</span> <span class="s2">"github"</span>     <span class="c1"># 建议字段，仅用于展示，禁止包含 scope 之外的敏感细节</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;github_create_issue&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">&quot;requires_auth&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>        <span class="c1"># 建议字段</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="s2">&quot;auth_provider&quot;</span><span class="p">:</span> <span class="s2">&quot;github&quot;</span>     <span class="c1"># 建议字段，仅用于展示，禁止包含 scope 之外的敏感细节</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">}</span>
 </code></pre></div>
 <p>该字段在当前版本中<strong>不是</strong>协议强制字段，Agent <strong>不应</strong>依赖其存在；Computer SDK 可根据实现粒度自行决定是否暴露。后续版本会评估将其纳入 <code>tool</code> 数据结构。</p>
@@ -2761,7 +2761,7 @@
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_room_access</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">target_office_id</span><span class="p">):</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">office_id</span> <span class="o">!=</span> <span class="n">target_office_id</span><span class="p">:</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="s2">"Cross-room access denied"</span><span class="p">)</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="s2">&quot;Cross-room access denied&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="输入验证">输入验证<a class="headerlink" href="#输入验证" title="Permanent link">&para;</a></h2>
 <h3 id="数据验证要求">数据验证要求<a class="headerlink" href="#数据验证要求" title="Permanent link">&para;</a></h3>
@@ -2801,10 +2801,10 @@
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span>
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">'timeout'</span><span class="p">)</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">)</span>
 <a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_timeout</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>        <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">3600</span><span class="p">:</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Timeout must be between 1 and 3600'</span><span class="p">)</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Timeout must be between 1 and 3600&#39;</span><span class="p">)</span>
 <a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="k">return</span> <span class="n">v</span>
 </code></pre></div>
 <h2 id="资源限制">资源限制<a class="headerlink" href="#资源限制" title="Permanent link">&para;</a></h2>
@@ -2898,12 +2898,12 @@
 <h3 id="日志格式">日志格式<a class="headerlink" href="#日志格式" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 推荐的安全日志格式</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">"Authentication failed"</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;Authentication failed&quot;</span><span class="p">,</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">"client_ip"</span><span class="p">:</span> <span class="n">client_ip</span><span class="p">,</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">"user_agent"</span><span class="p">:</span> <span class="n">user_agent</span><span class="p">,</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">"reason"</span><span class="p">:</span> <span class="s2">"Invalid API key"</span><span class="p">,</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>        <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">&quot;client_ip&quot;</span><span class="p">:</span> <span class="n">client_ip</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">&quot;user_agent&quot;</span><span class="p">:</span> <span class="n">user_agent</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid API key&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>        <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 <a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="p">}</span>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">)</span>
 </code></pre></div>
@@ -3030,7 +3030,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2151,24 +2151,24 @@
 <p>通用：Agent → Server → Computer，Server 按 <code>computer</code> 路由（与其它 <code>client:*</code> 同）。</p>
 <p><strong>请求数据 (GetBlobReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">"blob_handle"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 来自某通道响应的不透明句柄</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 可选：资源字节绝对偏移；缺省 0（无状态幂等）</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">"max_chunk_bytes"</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># 可选：客户建议单块上限；Computer clamp</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 来自某通道响应的不透明句柄</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 可选：资源字节绝对偏移；缺省 0（无状态幂等）</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">&quot;max_chunk_bytes&quot;</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># 可选：客户建议单块上限；Computer clamp</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetBlobRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">"blob_handle"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 回显</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">"mime_type"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数（首块即知；一次读取内恒定）</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（跨块恒定）</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 本块起始字节偏移</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">"eof"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>         <span class="c1"># ⟺ chunk_offset + 本块字节数 == total_size</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">"blob"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># base64，本块字节</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 回显</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;mime_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数（首块即知；一次读取内恒定）</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（跨块恒定）</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 本块起始字节偏移</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">&quot;eof&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>         <span class="c1"># ⟺ chunk_offset + 本块字节数 == total_size</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">&quot;blob&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># base64，本块字节</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -2185,26 +2185,26 @@
 <p>通用：Agent → Server → Computer，Server 按 <code>computer</code> 路由（与其它 <code>client:*</code> 同）。分块上行是 <code>client:get_blob</code> 的<strong>方向镜像</strong>：<code>chunk_offset</code> / <code>eof</code> 由 <strong>Agent 驱动推进</strong>，<code>sha256</code> / <code>total_size</code> 由 <strong>Agent 声明、Computer 校验</strong>（与下行「Computer 声明、Agent 校验」镜像）。</p>
 <p><strong>请求数据 (PutBlobReq)</strong>:</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">"upload_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 可选：缺省即首块（offset 0），Computer 分配并回传</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># 本块起始字节偏移；MUST == Computer 已收字节（in-order）</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">"eof"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>          <span class="c1"># 末块标志</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>    <span class="c1"># 仅首块：声明总字节（MUST ≥ 1）</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 仅首块：声明全量 sha256（十六进制）</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="s2">"name_hint"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 仅首块可选：建议文件名；Computer 消毒后采用或自定</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="s2">"blob"</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># base64，本块字节</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">&quot;upload_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 可选：缺省即首块（offset 0），Computer 分配并回传</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># 本块起始字节偏移；MUST == Computer 已收字节（in-order）</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">&quot;eof&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>          <span class="c1"># 末块标志</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>    <span class="c1"># 仅首块：声明总字节（MUST ≥ 1）</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 仅首块：声明全量 sha256（十六进制）</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="s2">&quot;name_hint&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 仅首块可选：建议文件名；Computer 消毒后采用或自定</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="s2">&quot;blob&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># base64，本块字节</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>响应数据 (PutBlobRet)</strong>:</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">"upload_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 首块 ack 回传；后续块回显</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 回显本块起始字节偏移</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">"landing_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 仅末块 ack：landing root 内绝对路径（安全名）</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅末块 ack：实际落盘字节（== 声明值才成功）</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅末块 ack：Computer 重算全量 sha256（== 声明值）</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">&quot;upload_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 首块 ack 回传；后续块回显</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 回显本块起始字节偏移</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;landing_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 仅末块 ack：landing root 内绝对路径（安全名）</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅末块 ack：实际落盘字节（== 声明值才成功）</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅末块 ack：Computer 重算全量 sha256（== 声明值）</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -2562,7 +2562,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

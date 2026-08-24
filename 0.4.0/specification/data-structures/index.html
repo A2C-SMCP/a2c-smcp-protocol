@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3558,45 +3558,45 @@
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">meta</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"meta"</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">if</span> <span class="s2">"a2c_tool_meta"</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">tool_meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">"a2c_tool_meta"</span><span class="p">])</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">tags</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tags"</span><span class="p">)</span>          <span class="c1"># list[str] | None</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">auto_apply</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"auto_apply"</span><span class="p">)</span>  <span class="c1"># bool | None</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">alias</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"alias"</span><span class="p">)</span>        <span class="c1"># str | None</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">meta</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">if</span> <span class="s2">&quot;a2c_tool_meta&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">tool_meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;a2c_tool_meta&quot;</span><span class="p">])</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">tags</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">)</span>          <span class="c1"># list[str] | None</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">auto_apply</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;auto_apply&quot;</span><span class="p">)</span>  <span class="c1"># bool | None</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">alias</span> <span class="o">=</span> <span class="n">tool_meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alias&quot;</span><span class="p">)</span>        <span class="c1"># str | None</span>
 </code></pre></div>
 <p><strong>canonical 出线形式</strong>：解析后 dict <strong>含 ToolMeta 全字段</strong>，未设置者为 <code>null</code>（如 <code>auto_apply: null</code>）——双 SDK 出线 MUST 同形（见下方场景 2 示例）。对拍判定面为<strong>解析后字段值逐字段一致</strong>；JSON 字符串内 key 顺序不参与判定（wire 层字符串化是既有既定行为，不属合并语义）。</p>
 <h4 id="完整-json-示例">完整 JSON 示例<a class="headerlink" href="#完整-json-示例" title="Permanent link">&para;</a></h4>
 <p><strong>场景 1</strong>: <code>default_tool_meta = null</code>（未配置元数据且 Server 未声明）</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hello"</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Say hello to someone."</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">"params_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"World"</span><span class="p">,</span><span class="w"> </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Name"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Say hello to someone.&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;params_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;World&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"helloArguments"</span><span class="p">,</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;helloArguments&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nt">"return_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">      </span><span class="nt">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Result"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nt">&quot;return_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">      </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Result&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="p">},</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"result"</span><span class="p">],</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"helloOutput"</span><span class="p">,</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;helloOutput&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
 <a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">  </span><span class="nt">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">  </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
 <a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>场景 2</strong>: <code>default_tool_meta = {"tags": ["browser"], "auto_apply": true}</code></p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"browser_navigate"</span><span class="p">,</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Navigate to a URL."</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">"params_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"..."</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">"return_schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"..."</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">"a2c_tool_meta"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{\"auto_apply\": true, \"alias\": null, \"tags\": [\"browser\"], \"ret_object_mapper\": null}"</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;browser_navigate&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Navigate to a URL.&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;params_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;...&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">&quot;return_schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;...&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">&quot;a2c_tool_meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{\&quot;auto_apply\&quot;: true, \&quot;alias\&quot;: null, \&quot;tags\&quot;: [\&quot;browser\&quot;], \&quot;ret_object_mapper\&quot;: null}&quot;</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
 </code></pre></div>
@@ -3605,10 +3605,10 @@
 <p><code>a2c_tool_meta</code> 的值是 <strong>JSON 字符串</strong>，不是嵌套对象。
 对其执行 <code>json.loads()</code> 后得到如下 dict：</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">"auto_apply"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">"alias"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"browser"</span><span class="p">],</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">"ret_object_mapper"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;auto_apply&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;browser&quot;</span><span class="p">],</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">&quot;ret_object_mapper&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">}</span>
 </code></pre></div>
 </div>
@@ -3760,9 +3760,9 @@
 </table>
 <p>被取消时，Computer 对原 <code>client:tool_call</code> 的 ack 返回（参考实现 python，reference impl）:</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">CallToolResult</span><span class="p">(</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"Tool call cancelled"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">"text"</span><span class="p">)],</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Tool call cancelled&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">)],</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">"a2c_cancelled"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"a2c_cancel_reason"</span><span class="p">:</span> <span class="s2">"agent_requested"</span><span class="p">},</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a2c_cancelled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;a2c_cancel_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;agent_requested&quot;</span><span class="p">},</span>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">)</span>
 </code></pre></div>
 <div class="admonition note">
@@ -3833,7 +3833,7 @@
 <h3 id="enterofficereq">EnterOfficeReq<a class="headerlink" href="#enterofficereq" title="Permanent link">&para;</a></h3>
 <p>加入房间请求。<strong>不再</strong>携带版本信息——版本校验已在连接建立前完成（HTTP 层）。客户端角色（<code>role</code>）即经本请求的 <code>role</code> 字段声明（连接握手 <code>auth</code> 不承载 <code>role</code>），由 Server 据此路由。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EnterOfficeReq</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"computer"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">]</span>  <span class="c1"># 角色类型</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">]</span>  <span class="c1"># 角色类型</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                           <span class="c1"># 名称</span>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 房间 ID</span>
 </code></pre></div>
@@ -3868,7 +3868,7 @@
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SessionInfo</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">sid</span><span class="p">:</span> <span class="nb">str</span>                                <span class="c1"># 会话 ID</span>
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                               <span class="c1"># 会话名称</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"computer"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">]</span>      <span class="c1"># 角色</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">]</span>      <span class="c1"># 角色</span>
 <a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">office_id</span><span class="p">:</span> <span class="nb">str</span>                          <span class="c1"># 所属房间 ID</span>
 <a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">a2c_version</span><span class="p">:</span> <span class="nb">str</span>                        <span class="c1"># 协议版本号（Server 在 HTTP 握手阶段从 URL query 记录）</span>
 </code></pre></div>
@@ -4049,8 +4049,8 @@
 <a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>                <span class="c1"># 必选：marketplace SKILL v1 §3.1</span>
 <a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a>    <span class="n">license</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>    <span class="n">compatibility</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>    <span class="n">allowed_tools</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>   <span class="c1"># frontmatter "allowed-tools" 规范化为 list</span>
-<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>    <span class="n">tags</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>            <span class="c1"># frontmatter "tags" 透传（分类元数据）</span>
+<a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>    <span class="n">allowed_tools</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>   <span class="c1"># frontmatter &quot;allowed-tools&quot; 规范化为 list</span>
+<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>    <span class="n">tags</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>            <span class="c1"># frontmatter &quot;tags&quot; 透传（分类元数据）</span>
 <a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a>                                            <span class="c1"># 纯透传不校验：非 list[str] → 省略该字段（SKILL 照常注册，见 skill.md §1.5）</span>
 <a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a>    <span class="n">skill_metadata</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>       <span class="c1"># frontmatter.metadata 透传；A2C 不解释</span>
 <a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>    <span class="c1"># ── 包元数据派生（非 frontmatter）────────────────────</span>
@@ -4119,13 +4119,13 @@
 <a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>    <span class="n">computer</span><span class="p">:</span> <span class="nb">str</span>               <span class="c1"># 目标 Computer 名称</span>
 <a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 必选：来自某 A2CSkillRef.name</span>
 <a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>    <span class="n">rel_path</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># 可选：SKILL 包根 POSIX 相对路径</span>
-<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a>                                <span class="c1"># 缺省 = "SKILL.md"；MUST 相对、无 ..、无绝对路径</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a>                                <span class="c1"># 缺省 = &quot;SKILL.md&quot;；MUST 相对、无 ..、无绝对路径</span>
 </code></pre></div>
 <h3 id="getskillret">GetSkillRet<a class="headerlink" href="#getskillret" title="Permanent link">&para;</a></h3>
 <p>获取 SKILL 包内单个资源响应。文本且可内联 → <code>body</code> 直接给出；二进制或过大文本 → <code>blob_handle</code> 转 <a href="../blob-transfer/"><code>client:get_blob</code></a> 拉取——<code>body</code> 与 <code>blob_handle</code> <strong>恰一存在</strong>。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">GetSkillRet</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 回显</span>
-<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>    <span class="n">rel_path</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 回显（缺省请求时为 "SKILL.md"）</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>    <span class="n">rel_path</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 回显（缺省请求时为 &quot;SKILL.md&quot;）</span>
 <a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>    <span class="n">mime_type</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># 资源 MIME，如 text/markdown / image/png（确定性推断，见 SKILL §6.4）</span>
 <a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>    <span class="n">total_size</span><span class="p">:</span> <span class="nb">int</span>                 <span class="c1"># 资源总字节数</span>
 <a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>    <span class="n">sha256</span><span class="p">:</span> <span class="nb">str</span>                     <span class="c1"># 全量资源 sha256 十六进制（完整性 + 变更检测）</span>
@@ -4286,12 +4286,12 @@
 <a id="__codelineno-43-14" name="__codelineno-43-14" href="#__codelineno-43-14"></a>    <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-43-15" name="__codelineno-43-15" href="#__codelineno-43-15"></a>    <span class="c1"># 文本编码，默认 utf-8</span>
 <a id="__codelineno-43-16" name="__codelineno-43-16" href="#__codelineno-43-16"></a>
-<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a>    <span class="n">encoding_error_handler</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"strict"</span><span class="p">,</span> <span class="s2">"ignore"</span><span class="p">,</span> <span class="s2">"replace"</span><span class="p">]</span>
+<a id="__codelineno-43-17" name="__codelineno-43-17" href="#__codelineno-43-17"></a>    <span class="n">encoding_error_handler</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">]</span>
 <a id="__codelineno-43-18" name="__codelineno-43-18" href="#__codelineno-43-18"></a>    <span class="c1"># 编码错误处理方式</span>
 <a id="__codelineno-43-19" name="__codelineno-43-19" href="#__codelineno-43-19"></a>
 <a id="__codelineno-43-20" name="__codelineno-43-20" href="#__codelineno-43-20"></a>
 <a id="__codelineno-43-21" name="__codelineno-43-21" href="#__codelineno-43-21"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPServerStdioConfig</span><span class="p">(</span><span class="n">BaseMCPServerConfig</span><span class="p">):</span>
-<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"stdio"</span><span class="p">]</span>
+<a id="__codelineno-43-22" name="__codelineno-43-22" href="#__codelineno-43-22"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;stdio&quot;</span><span class="p">]</span>
 <a id="__codelineno-43-23" name="__codelineno-43-23" href="#__codelineno-43-23"></a>    <span class="n">server_parameters</span><span class="p">:</span> <span class="n">MCPServerStdioParameters</span>
 </code></pre></div>
 <h3 id="mcpserverstreamablehttpconfig">MCPServerStreamableHttpConfig<a class="headerlink" href="#mcpserverstreamablehttpconfig" title="Permanent link">&para;</a></h3>
@@ -4314,7 +4314,7 @@
 <a id="__codelineno-44-16" name="__codelineno-44-16" href="#__codelineno-44-16"></a>
 <a id="__codelineno-44-17" name="__codelineno-44-17" href="#__codelineno-44-17"></a>
 <a id="__codelineno-44-18" name="__codelineno-44-18" href="#__codelineno-44-18"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPServerStreamableHttpConfig</span><span class="p">(</span><span class="n">BaseMCPServerConfig</span><span class="p">):</span>
-<a id="__codelineno-44-19" name="__codelineno-44-19" href="#__codelineno-44-19"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"streamable"</span><span class="p">]</span>
+<a id="__codelineno-44-19" name="__codelineno-44-19" href="#__codelineno-44-19"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;streamable&quot;</span><span class="p">]</span>
 <a id="__codelineno-44-20" name="__codelineno-44-20" href="#__codelineno-44-20"></a>    <span class="n">server_parameters</span><span class="p">:</span> <span class="n">MCPServerStreamableHttpParameters</span>
 </code></pre></div>
 <h3 id="mcpsseconfig">MCPSSEConfig<a class="headerlink" href="#mcpsseconfig" title="Permanent link">&para;</a></h3>
@@ -4334,7 +4334,7 @@
 <a id="__codelineno-45-13" name="__codelineno-45-13" href="#__codelineno-45-13"></a>
 <a id="__codelineno-45-14" name="__codelineno-45-14" href="#__codelineno-45-14"></a>
 <a id="__codelineno-45-15" name="__codelineno-45-15" href="#__codelineno-45-15"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPSSEConfig</span><span class="p">(</span><span class="n">BaseMCPServerConfig</span><span class="p">):</span>
-<a id="__codelineno-45-16" name="__codelineno-45-16" href="#__codelineno-45-16"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"sse"</span><span class="p">]</span>
+<a id="__codelineno-45-16" name="__codelineno-45-16" href="#__codelineno-45-16"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sse&quot;</span><span class="p">]</span>
 <a id="__codelineno-45-17" name="__codelineno-45-17" href="#__codelineno-45-17"></a>    <span class="n">server_parameters</span><span class="p">:</span> <span class="n">MCPSSEParameters</span>
 </code></pre></div>
 <h3 id="mcpserverconfig">MCPServerConfig<a class="headerlink" href="#mcpserverconfig" title="Permanent link">&para;</a></h3>
@@ -4459,7 +4459,7 @@
 </blockquote>
 <h3 id="exposed_tool_name">exposed_tool_name<a class="headerlink" href="#exposed_tool_name" title="Permanent link">&para;</a></h3>
 <p>聚合后对外暴露、进入 LLM 工具声明的工具名，即 <code>SMCPTool.name</code>（<a href="#gettoolsret">GetToolsRet</a>）：</p>
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>exposed_tool_name = bundle_id + "__" + (alias ?? original_tool_name)
+<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>exposed_tool_name = bundle_id + &quot;__&quot; + (alias ?? original_tool_name)
 </code></pre></div>
 <ul>
 <li>所有聚合工具<strong>恒</strong>以 <code>{bundle_id}__</code> 开头，归属一眼可辨。</li>
@@ -4556,7 +4556,7 @@
 <h3 id="mcpserverpromptstringinput">MCPServerPromptStringInput<a class="headerlink" href="#mcpserverpromptstringinput" title="Permanent link">&para;</a></h3>
 <p>字符串输入类型。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPServerPromptStringInput</span><span class="p">(</span><span class="n">MCPServerInputBase</span><span class="p">):</span>
-<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"promptString"</span><span class="p">]</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;promptString&quot;</span><span class="p">]</span>
 <a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>    <span class="n">default</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>        <span class="c1"># 默认值</span>
 <a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>    <span class="n">password</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>      <span class="c1"># 是否为密码（隐藏输入）</span>
 </code></pre></div>
@@ -4569,7 +4569,7 @@
 <h3 id="mcpserverpickstringinput">MCPServerPickStringInput<a class="headerlink" href="#mcpserverpickstringinput" title="Permanent link">&para;</a></h3>
 <p>选择输入类型。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPServerPickStringInput</span><span class="p">(</span><span class="n">MCPServerInputBase</span><span class="p">):</span>
-<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pickString"</span><span class="p">]</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;pickString&quot;</span><span class="p">]</span>
 <a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>    <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PickStringOption</span><span class="p">]</span>         <span class="c1"># 可选项列表（结构化 {label, value}）</span>
 <a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>    <span class="n">default</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>        <span class="c1"># 默认值（若存在且非 None，MUST 匹配至少一个 option.value）</span>
 </code></pre></div>
@@ -4587,7 +4587,7 @@
 <h3 id="mcpservercommandinput">MCPServerCommandInput<a class="headerlink" href="#mcpservercommandinput" title="Permanent link">&para;</a></h3>
 <p>命令输入类型（通过执行命令获取值）。</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MCPServerCommandInput</span><span class="p">(</span><span class="n">MCPServerInputBase</span><span class="p">):</span>
-<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"command"</span><span class="p">]</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;command&quot;</span><span class="p">]</span>
 <a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span>                            <span class="c1"># 要执行的命令</span>
 <a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a>    <span class="n">args</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># 命令参数</span>
 </code></pre></div>
@@ -4691,7 +4691,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

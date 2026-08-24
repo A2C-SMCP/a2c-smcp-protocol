@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -2773,7 +2773,7 @@
 <p>本文档定义了 A2C-SMCP 协议的所有事件，基于 <code>a2c_smcp/smcp.py</code> 中的实际实现。</p>
 <h2 id="命名空间">命名空间<a class="headerlink" href="#命名空间" title="Permanent link">&para;</a></h2>
 <p>所有事件在以下命名空间中传输：</p>
-<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SMCP_NAMESPACE</span> <span class="o">=</span> <span class="s2">"/smcp"</span>
+<div class="language-python highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SMCP_NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;/smcp&quot;</span>
 </code></pre></div>
 <h2 id="事件分类规则">事件分类规则<a class="headerlink" href="#事件分类规则" title="Permanent link">&para;</a></h2>
 <table>
@@ -2882,10 +2882,10 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="sa">f</span><span class="s2">"wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">socketio_path</span><span class="o">=</span><span class="s2">"/smcp"</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">"token"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">},</span>   <span class="c1"># 业务层认证数据；role 经 server:join_office 声明</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">"polling"</span><span class="p">,</span> <span class="s2">"websocket"</span><span class="p">],</span>   <span class="c1"># MUST：首个握手必须走 HTTP polling，4008 body 可读（versioning.md §5）</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">socketio_path</span><span class="o">=</span><span class="s2">&quot;/smcp&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>   <span class="c1"># 业务层认证数据；role 经 server:join_office 声明</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;polling&quot;</span><span class="p">,</span> <span class="s2">&quot;websocket&quot;</span><span class="p">],</span>   <span class="c1"># MUST：首个握手必须走 HTTP polling，4008 body 可读（versioning.md §5）</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">)</span>
 </code></pre></div>
 <blockquote>
@@ -2914,8 +2914,8 @@
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="sa">f</span><span class="s2">"wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">"token"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">},</span>   <span class="c1"># role 经 server:join_office 声明</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>   <span class="c1"># role 经 server:join_office 声明</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">)</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">except</span> <span class="n">socketio</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">raw</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -2923,12 +2923,12 @@
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="k">raise</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        <span class="k">raise</span> <span class="n">ProtocolVersionError</span><span class="p">(</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"client_version"</span><span class="p">),</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"server_version"</span><span class="p">),</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"min_supported"</span><span class="p">),</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_supported"</span><span class="p">),</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_supported&quot;</span><span class="p">),</span>
 <a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>        <span class="p">)</span>
 <a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>    <span class="k">raise</span>
 </code></pre></div>
@@ -3151,12 +3151,12 @@
 </code></pre></div></p>
 <p><strong>请求数据 (ToolCallReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID（用于去重和取消）</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">"tool_name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 工具名称</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">"params"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>     <span class="c1"># 工具调用参数</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">"timeout"</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># 超时时间（秒）</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID（用于去重和取消）</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">&quot;tool_name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 工具名称</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>     <span class="c1"># 工具调用参数</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="nb">int</span>      <span class="c1"># 超时时间（秒）</span>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition note">
@@ -3176,15 +3176,15 @@
 <p>获取指定 Computer 的可用工具列表。</p>
 <p><strong>请求数据 (GetToolsReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetToolsRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"tools"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SMCPTool</span><span class="p">],</span>  <span class="c1"># 工具列表</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>             <span class="c1"># 请求 ID</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;tools&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SMCPTool</span><span class="p">],</span>  <span class="c1"># 工具列表</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>             <span class="c1"># 请求 ID</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition note">
@@ -3202,17 +3202,17 @@
 <p>获取指定 Computer 的桌面信息（窗口资源聚合视图）。</p>
 <p><strong>请求数据 (GetDeskTopReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="s2">"desktop_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>    <span class="c1"># 可选：限制返回的桌面内容数量</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="s2">"window"</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 可选：指定获取的 WindowURI</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="s2">&quot;desktop_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>    <span class="c1"># 可选：限制返回的桌面内容数量</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="s2">&quot;window&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 可选：指定获取的 WindowURI</span>
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetDeskTopRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="s2">"desktops"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>  <span class="c1"># 桌面内容列表</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 请求 ID</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="s2">&quot;desktops&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>  <span class="c1"># 桌面内容列表</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 请求 ID</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>ack 语义</strong>：与 <a href="#clientget_tools"><code>client:get_tools</code></a> 一致——成功返回 <code>GetDeskTopRet</code>；协议级错误统一以扁平 ErrorPayload 投递，参见 <a href="../error-handling/#错误响应格式">error-handling.md §错误响应格式</a>。当前协议未为本路由分配专属错误码。</p>
@@ -3222,18 +3222,18 @@
 <p>支持 MCP 标准 cursor 翻页：Agent 首次调用不带 <code>cursor</code>，响应中含 <code>next_cursor</code> 时继续翻页；无 <code>next_cursor</code> 表示已到末尾。</p>
 <p><strong>请求数据 (GetResourcesReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="s2">"mcp_server"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 必填：目标 MCP Server 的 bundle_id（= client:get_config 返回的 servers 字典 key）</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="s2">"cursor"</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 可选：MCP 标准 cursor 翻页；首次不传或传 null</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Agent 标识</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># 请求 ID</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 必填：目标 MCP Server 的 bundle_id（= client:get_config 返回的 servers 字典 key）</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="s2">&quot;cursor&quot;</span><span class="p">:</span> <span class="nb">str</span>           <span class="c1"># 可选：MCP 标准 cursor 翻页；首次不传或传 null</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetResourcesRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">"resources"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Resource</span><span class="p">],</span>  <span class="c1"># MCP 标准 Resource 列表（含任意 scheme，业务自决过滤）</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">"next_cursor"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># 可选：有则继续翻页；无则结束</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Resource</span><span class="p">],</span>  <span class="c1"># MCP 标准 Resource 列表（含任意 scheme，业务自决过滤）</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;next_cursor&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># 可选：有则继续翻页；无则结束</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -3270,15 +3270,15 @@
 <p>获取指定 Computer 的完整配置信息。</p>
 <p><strong>请求数据 (GetComputerConfigReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetComputerConfigRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">"inputs"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServerInput</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 输入定义列表</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="s2">"servers"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">]</span>   <span class="c1"># key = bundle_id（server 唯一身份，非 name）</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServerInput</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 输入定义列表</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="s2">&quot;servers&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">]</span>   <span class="c1"># key = bundle_id（server 唯一身份，非 name）</span>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <blockquote>
@@ -3288,15 +3288,15 @@
 <p>获取 Computer 当前已安装且可用的 SKILL 清单。响应为轻量元数据列表，<strong>不含</strong> SKILL.md body；body 按需经 <code>client:get_skill</code> 拉取。</p>
 <p><strong>请求数据 (GetSkillsReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 目标 Computer 名称</span>
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetSkillsRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">"skills"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">A2CSkillRef</span><span class="p">],</span>  <span class="c1"># 已安装且可用 SKILL（排除孤儿；不排序、不去重）</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">&quot;skills&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">A2CSkillRef</span><span class="p">],</span>  <span class="c1"># 已安装且可用 SKILL（排除孤儿；不排序、不去重）</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：从 Skill Registry 读取所有可用 SKILL → 排除来源已断开的孤儿 → 按已 staged 的 SKILL.md frontmatter 填充 <code>A2CSkillRef</code> → 按发现顺序返回，<strong>不</strong>读取 body。</p>
@@ -3304,23 +3304,23 @@
 <p>获取 SKILL 包内单个资源。SKILL 本质是文件夹：<code>rel_path</code> 缺省取包根 <code>SKILL.md</code>（入口），Agent 读 SKILL.md 后按其披露的引用，用<strong>同一事件</strong>携带 <code>rel_path</code> 渐进式拉取包内其它资源。文本且可内联 → <code>body</code> 直接给出；二进制 / 过大文本 → 仅返 <code>blob_handle</code>，由 Agent 转 <a href="../blob-transfer/"><code>client:get_blob</code></a> 拉取。</p>
 <p><strong>请求数据 (GetSkillReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 来自某 A2CSkillRef.name 的合成全局唯一名</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="s2">"rel_path"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 可选：SKILL 包根 POSIX 相对路径；缺省 = "SKILL.md"</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>        <span class="c1"># 来自某 A2CSkillRef.name 的合成全局唯一名</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="s2">&quot;rel_path&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 可选：SKILL 包根 POSIX 相对路径；缺省 = &quot;SKILL.md&quot;</span>
 <a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetSkillRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 回显</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">"rel_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 回显（缺省请求时为 "SKILL.md"）</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="s2">"mime_type"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数</span>
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（完整性 + 变更检测）</span>
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>    <span class="s2">"body"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 可选：文本且 ≤ 内联预算的内容（与 blob_handle 恰一存在）</span>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="s2">"blob_handle"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 可选：转 client:get_blob 的不透明句柄（与 body 恰一存在）</span>
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 回显</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">&quot;rel_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># 回显（缺省请求时为 &quot;SKILL.md&quot;）</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="s2">&quot;mime_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（完整性 + 变更检测）</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>    <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 可选：文本且 ≤ 内联预算的内容（与 blob_handle 恰一存在）</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 可选：转 client:get_blob 的不透明句柄（与 body 恰一存在）</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -3337,24 +3337,24 @@
 <p>通用二进制传输：按生产者通道（如 SKILL）铸造的 <code>blob_handle</code> 分块拉取 Computer 字节资源。无状态绝对偏移（pull 即背压、可续传、可并行），<code>sha256</code> 自证完整性。</p>
 <p><strong>请求数据 (GetBlobReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>            <span class="c1"># Agent 标识</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># 请求 ID</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="s2">"blob_handle"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 来自某通道响应的不透明句柄</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 可选：资源字节绝对偏移；缺省 0（无状态幂等）</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="s2">"max_chunk_bytes"</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># 可选：客户建议单块上限；Computer clamp</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>            <span class="c1"># Agent 标识</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># 请求 ID</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 来自某通道响应的不透明句柄</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 可选：资源字节绝对偏移；缺省 0（无状态幂等）</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="s2">&quot;max_chunk_bytes&quot;</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># 可选：客户建议单块上限；Computer clamp</span>
 <a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (GetBlobRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">"blob_handle"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 回显</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="s2">"mime_type"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数（首块即知；一次读取内恒定）</span>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（跨块恒定）</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 本块起始字节偏移</span>
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="s2">"eof"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>         <span class="c1"># 本块抵末尾 ⟺ chunk_offset + 本块字节数 == total_size</span>
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="s2">"blob"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># base64，本块字节</span>
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">&quot;blob_handle&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># 回显</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="s2">&quot;mime_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>    <span class="c1"># 资源 MIME</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 资源总字节数（首块即知；一次读取内恒定）</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 全量资源 sha256 十六进制（跨块恒定）</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># 本块起始字节偏移</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="s2">&quot;eof&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>         <span class="c1"># 本块抵末尾 ⟺ chunk_offset + 本块字节数 == total_size</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="s2">&quot;blob&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># base64，本块字节</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -3369,26 +3369,26 @@
 <p>通用二进制传输上行：Agent 把（二进制 / 大文本）内容分块落盘到 Computer 授权 landing root，返回绝对 <code>landing_path</code> 供后续 <a href="#clienttool_call"><code>client:tool_call</code></a> 参数直接引用（Bash / MCP 工具二次分析）。<code>client:get_blob</code> 的方向镜像：<code>chunk_offset</code> / <code>eof</code> 由 Agent 驱动，<code>sha256</code> / <code>total_size</code> 由 <strong>Agent 声明、Computer 校验</strong>；会话有界（闲置超时 / 并发上限 / 孤儿 GC）；能力门控 = 版本握手（Agent 自身 minor ≥ 0.4 且已连接 ⇒ 房间内 Computer 同 minor ⇒ 必有本事件）。</p>
 <p><strong>请求数据 (PutBlobReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># Agent 标识</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 请求 ID</span>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 目标 Computer 名称</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="s2">"upload_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 可选：缺省即首块（offset 0），Computer 分配并回传</span>
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 本块起始字节偏移；MUST == Computer 已收字节（in-order）</span>
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="s2">"eof"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>           <span class="c1"># 末块标志</span>
-<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅首块：声明总字节（MUST ≥ 1）</span>
-<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅首块：声明全量 sha256（十六进制）</span>
-<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    <span class="s2">"name_hint"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 仅首块可选：建议文件名；Computer 消毒后采用或自定</span>
-<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="s2">"blob"</span><span class="p">:</span> <span class="nb">str</span>            <span class="c1"># base64，本块字节</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>          <span class="c1"># Agent 标识</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 请求 ID</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># 目标 Computer 名称</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="s2">&quot;upload_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 可选：缺省即首块（offset 0），Computer 分配并回传</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 本块起始字节偏移；MUST == Computer 已收字节（in-order）</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="s2">&quot;eof&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>           <span class="c1"># 末块标志</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅首块：声明总字节（MUST ≥ 1）</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅首块：声明全量 sha256（十六进制）</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    <span class="s2">&quot;name_hint&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 仅首块可选：建议文件名；Computer 消毒后采用或自定</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="s2">&quot;blob&quot;</span><span class="p">:</span> <span class="nb">str</span>            <span class="c1"># base64，本块字节</span>
 <a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (PutBlobRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">"upload_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 首块 ack 回传；后续块回显</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="s2">"chunk_offset"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 回显本块起始字节偏移</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">"landing_path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 仅末块 ack：landing root 内绝对路径（安全名）</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="s2">"total_size"</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅末块 ack：实际落盘字节（== 声明值才成功）</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="s2">"sha256"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅末块 ack：Computer 重算全量 sha256（== 声明值）</span>
-<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="s2">&quot;upload_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 首块 ack 回传；后续块回显</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="s2">&quot;chunk_offset&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>   <span class="c1"># 回显本块起始字节偏移</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">&quot;landing_path&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 仅末块 ack：landing root 内绝对路径（安全名）</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="s2">&quot;total_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>     <span class="c1"># 仅末块 ack：实际落盘字节（== 声明值才成功）</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="s2">&quot;sha256&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>         <span class="c1"># 仅末块 ack：Computer 重算全量 sha256（== 声明值）</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 处理流程</strong>：</p>
@@ -3428,8 +3428,8 @@
 <p>Agent 请求取消一次在途工具调用。<strong>本事件为 fire-and-forget：Server 收到后仅向房间广播 <code>notify:tool_call_cancel</code>，不回执（无 ack）</strong>——语义与 <code>server:update_*</code> 一致。Agent 端发出后收到的 ack 为 <code>None</code> 即为<strong>合规预期</strong>，<strong>不应</strong>据此判定"未实现 / 失败"。</p>
 <p><strong>请求数据 (AgentCallData)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent 名称</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 必须 == 被取消的原 client:tool_call 的 req_id</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent 名称</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 必须 == 被取消的原 client:tool_call 的 req_id</span>
 <a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition warning">
@@ -3444,9 +3444,9 @@
 <p>Agent 或 Computer 请求加入房间。</p>
 <p><strong>请求数据 (EnterOfficeReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">"role"</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"computer"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
-<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>  <span class="c1"># 角色类型</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                           <span class="c1"># 名称</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                       <span class="c1"># 房间 ID</span>
 <a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应</strong>: <code>(bool, str | None)</code> - 成功标志和错误信息。</p>
@@ -3457,31 +3457,31 @@
 <p>Agent 或 Computer 请求离开房间。</p>
 <p><strong>请求数据 (LeaveOfficeReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">{</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
 <a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverlist_room"><code>server:list_room</code><a class="headerlink" href="#serverlist_room" title="Permanent link">&para;</a></h4>
 <p>Agent 查询指定房间内的所有会话信息。</p>
 <p><strong>请求数据 (ListRoomReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
-<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
-<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>       <span class="c1"># Agent 标识</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>      <span class="c1"># 请求 ID</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># 房间 ID</span>
 <a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>响应数据 (ListRoomRet)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">"sessions"</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionInfo</span><span class="p">],</span>  <span class="c1"># 会话列表</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># 请求 ID</span>
 <a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p>其中 <code>SessionInfo</code>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">"sid"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>    <span class="s2">"name"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
-<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>    <span class="s2">"role"</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"computer"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">],</span>   <span class="c1"># 角色</span>
-<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>    <span class="s2">"a2c_version"</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                             <span class="c1"># 会话 ID</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                            <span class="c1"># 会话名称</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;computer&quot;</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">],</span>   <span class="c1"># 角色</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>                       <span class="c1"># 所属房间 ID</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>    <span class="s2">&quot;a2c_version&quot;</span><span class="p">:</span> <span class="nb">str</span>                      <span class="c1"># 协议版本号（Server 从 URL query 记录）</span>
 <a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="p">}</span>
 </code></pre></div></p>
 <div class="admonition info">
@@ -3499,14 +3499,14 @@
 <p>Computer 通知 Server 其配置已更新，Server 随后广播 <code>notify:update_config</code>。</p>
 <p><strong>请求数据 (UpdateComputerConfigReq)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
 <a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_tool_list"><code>server:update_tool_list</code><a class="headerlink" href="#serverupdate_tool_list" title="Permanent link">&para;</a></h4>
 <p>Computer 通知 Server 其工具列表已更新，Server 随后广播 <code>notify:update_tool_list</code>。</p>
 <p><strong>请求数据 (UpdateToolListNotification)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
 <a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="serverupdate_desktop"><code>server:update_desktop</code><a class="headerlink" href="#serverupdate_desktop" title="Permanent link">&para;</a></h4>
@@ -3518,7 +3518,7 @@
 </ul>
 <p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span>
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
 <a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_desktop</code>。</p>
@@ -3533,7 +3533,7 @@
 </ul>
 <p><strong>请求数据</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>server:update_config</code> 共享同一数据结构）:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">{</span>
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># Computer 名称</span>
 <a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Server 处理</strong>: 接收后向该 Computer 所在房间广播 <code>notify:update_skills</code>。</p>
@@ -3544,9 +3544,9 @@
 <p>Server 广播：有成员加入房间。</p>
 <p><strong>数据结构 (EnterOfficeNotification)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span>
-<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
-<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 加入的 Computer 名称（若为 Computer）</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 加入的 Agent 名称（若为 Agent）</span>
 <a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应自动调用 <code>client:get_tools</code> 获取新 Computer 的工具列表。</p>
@@ -3554,16 +3554,16 @@
 <p>Server 广播：有成员离开房间。</p>
 <p><strong>数据结构 (LeaveOfficeNotification)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span>
-<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="s2">"office_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
-<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="s2">&quot;office_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># 离开的 Computer 名称</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>      <span class="c1"># 离开的 Agent 名称</span>
 <a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="p">}</span>
 </code></pre></div></p>
 <h4 id="notifyupdate_config"><code>notify:update_config</code><a class="headerlink" href="#notifyupdate_config" title="Permanent link">&para;</a></h4>
 <p>Server 广播：某 Computer 的配置已更新。</p>
 <p><strong>数据结构 (UpdateMCPConfigNotification)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span>
-<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新配置的 Computer 名称</span>
 <a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，可调用 <code>client:get_config</code> 获取最新配置。</p>
@@ -3571,7 +3571,7 @@
 <p>Server 广播：某 Computer 的工具列表已更新。</p>
 <p><strong>数据结构 (UpdateToolListNotification)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">{</span>
-<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 更新工具列表的 Computer 名称</span>
 <a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，应调用 <code>client:get_tools</code> 刷新本地工具列表。</p>
@@ -3579,7 +3579,7 @@
 <p>Server 广播：某 Computer 的桌面内容已更新。</p>
 <p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="p">{</span>
-<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># 桌面发生变化的 Computer 名称</span>
 <a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:get_desktop</code> 获取最新桌面。</p>
@@ -3588,7 +3588,7 @@
 <p>Server 广播：某 Computer 的 SKILL 集合或内容已更新。</p>
 <p><strong>数据结构</strong>: 复用 <code>UpdateComputerConfigReq</code>（与 <code>notify:update_config</code> 结构一致）:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="p">{</span>
-<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>    <span class="s2">"computer"</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># SKILL 发生变化的 Computer 名称</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>    <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="nb">str</span>     <span class="c1"># SKILL 发生变化的 Computer 名称</span>
 <a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Agent 响应建议</strong>: 收到此通知后，推荐自动调用 <code>client:get_skills</code> 获取最新 SKILL 清单。</p>
@@ -3597,8 +3597,8 @@
 <p>Server 广播：某工具调用已被取消。由 <code>server:tool_call_cancel</code> 触发，广播至发起 Agent 所在房间的全部成员。</p>
 <p><strong>数据结构 (AgentCallData)</strong>:
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="p">{</span>
-<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    <span class="s2">"agent"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
-<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    <span class="s2">"req_id"</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID（== 原 client:tool_call 的 req_id）</span>
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>    <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>   <span class="c1"># 发起取消的 Agent</span>
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>    <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># 被取消的请求 ID（== 原 client:tool_call 的 req_id）</span>
 <a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Computer 行为</strong>:</p>
@@ -3824,7 +3824,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

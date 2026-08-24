@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -3067,7 +3067,7 @@
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 失败</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">"Room already has an agent"</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Room already has an agent&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="clienttool_call-响应">client:tool_call 响应<a class="headerlink" href="#clienttool_call-响应" title="Permanent link">&para;</a></h3>
 <p>工具调用使用 MCP 的 <code>CallToolResult</code> 结构返回结果：</p>
@@ -3112,8 +3112,8 @@
 <h3 id="agent-端超时">Agent 端超时<a class="headerlink" href="#agent-端超时" title="Permanent link">&para;</a></h3>
 <p>Agent 在发起工具调用时指定 <code>timeout</code>：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">emit_tool_call</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">computer</span><span class="o">=</span><span class="s2">"my-computer"</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">tool_name</span><span class="o">=</span><span class="s2">"slow_tool"</span><span class="p">,</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">computer</span><span class="o">=</span><span class="s2">&quot;my-computer&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">tool_name</span><span class="o">=</span><span class="s2">&quot;slow_tool&quot;</span><span class="p">,</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">params</span><span class="o">=</span><span class="p">{},</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>  <span class="c1"># 30 秒超时</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
@@ -3125,9 +3125,9 @@
 </ol>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 超时返回示例</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">CallToolResult</span><span class="p">(</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"Tool call timeout"</span><span class="p">)],</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Tool call timeout&quot;</span><span class="p">)],</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">"a2c_timeout"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>   <span class="c1"># 结果级标记：标识超时（区别于取消的 a2c_cancelled）</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a2c_timeout&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>   <span class="c1"># 结果级标记：标识超时（区别于取消的 a2c_cancelled）</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
 </code></pre></div>
 <blockquote>
@@ -3245,13 +3245,13 @@
 <h3 id="日志记录建议">日志记录建议<a class="headerlink" href="#日志记录建议" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 推荐的日志格式</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">"Tool call failed"</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">&quot;Tool call failed&quot;</span><span class="p">,</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">"req_id"</span><span class="p">:</span> <span class="n">req_id</span><span class="p">,</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">"tool_name"</span><span class="p">:</span> <span class="n">tool_name</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="s2">"computer"</span><span class="p">:</span> <span class="n">computer</span><span class="p">,</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="s2">"error_code"</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="s2">"error_message"</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">message</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">&quot;req_id&quot;</span><span class="p">:</span> <span class="n">req_id</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">&quot;tool_name&quot;</span><span class="p">:</span> <span class="n">tool_name</span><span class="p">,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="s2">&quot;computer&quot;</span><span class="p">:</span> <span class="n">computer</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="n">error</span><span class="o">.</span><span class="n">message</span>
 <a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="p">}</span>
 <a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">)</span>
 </code></pre></div>
@@ -3271,12 +3271,12 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>X-A2C-Error-Code: 4008
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>{
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  "code": 4008,
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>  "message": "Protocol version mismatch",
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  "server_version": "0.2.0",
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>  "client_version": "0.1.5",
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  "min_supported": "0.2.0",
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  "max_supported": "0.2.999"
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>  &quot;code&quot;: 4008,
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>  &quot;message&quot;: &quot;Protocol version mismatch&quot;,
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>  &quot;server_version&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>  &quot;client_version&quot;: &quot;0.1.5&quot;,
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>  &quot;min_supported&quot;: &quot;0.2.0&quot;,
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>  &quot;max_supported&quot;: &quot;0.2.999&quot;
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>}
 </code></pre></div>
 <p><code>X-A2C-Error-Code</code> 响应 header 是冗余诊断辅助：当客户端无法访问 body 时（罕见 transport 边角情况），可从 header 中识别错误类型。<strong>不替代</strong> body，body 是 single source of truth。</p>
@@ -3338,8 +3338,8 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="sa">f</span><span class="s2">"wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">"token"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">,</span> <span class="s2">"agent_id"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">},</span>   <span class="c1"># role 经 server:join_office 声明</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="sa">f</span><span class="s2">&quot;wss://server.example.com?a2c_version=</span><span class="si">{</span><span class="n">PROTOCOL_VERSION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="n">auth</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">},</span>   <span class="c1"># role 经 server:join_office 声明</span>
 <a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="p">)</span>
 <a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="k">except</span> <span class="n">socketio</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="c1"># python-socketio 在 HTTP 非 2xx 时把 body 放进异常 message</span>
@@ -3348,12 +3348,12 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
 <a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
 <a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="k">raise</span>  <span class="c1"># 非协议级错误，保持原异常</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"code"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4008</span><span class="p">:</span>
 <a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="k">raise</span> <span class="n">ProtocolVersionError</span><span class="p">(</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"client_version"</span><span class="p">),</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"server_version"</span><span class="p">),</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"min_supported"</span><span class="p">),</span>
-<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_supported"</span><span class="p">),</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>            <span class="n">client_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>            <span class="n">server_version</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;server_version&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>            <span class="n">min_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_supported&quot;</span><span class="p">),</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>            <span class="n">max_supported</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_supported&quot;</span><span class="p">),</span>
 <a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>        <span class="p">)</span>
 <a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    <span class="k">raise</span>
 </code></pre></div>
@@ -3370,15 +3370,15 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <h3 id="授权失败的响应结构">授权失败的响应结构<a class="headerlink" href="#授权失败的响应结构" title="Permanent link">&para;</a></h3>
 <p>当 Computer 调用 MCP 工具因上游授权问题失败时，使用 <code>CallToolResult</code> 返回错误，并在 <code>meta</code> 中携带结构化提示：</p>
 <div class="language-python highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">CallToolResult</span><span class="p">(</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">"此工具需要授权 GitHub 账号后方可使用"</span><span class="p">)],</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">content</span><span class="o">=</span><span class="p">[</span><span class="n">TextContent</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;此工具需要授权 GitHub 账号后方可使用&quot;</span><span class="p">)],</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">isError</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">"error_code"</span><span class="p">:</span> <span class="mi">4006</span><span class="p">,</span>  <span class="c1"># 或 4007</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">"mcp_server"</span><span class="p">:</span> <span class="s2">"github-mcp"</span><span class="p">,</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">"auth_hint"</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="mi">4006</span><span class="p">,</span>  <span class="c1"># 或 4007</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s2">&quot;mcp_server&quot;</span><span class="p">:</span> <span class="s2">&quot;github-mcp&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s2">&quot;auth_hint&quot;</span><span class="p">:</span> <span class="p">{</span>
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>            <span class="c1"># 可选：引导用户完成授权的提示信息</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>            <span class="s2">"action"</span><span class="p">:</span> <span class="s2">"user_authorization_required"</span><span class="p">,</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>            <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"请在 Computer 宿主环境完成 GitHub OAuth 登录后重试"</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>            <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;user_authorization_required&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;请在 Computer 宿主环境完成 GitHub OAuth 登录后重试&quot;</span>
 <a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>        <span class="p">}</span>
 <a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="p">}</span>
 <a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="p">)</span>
@@ -3538,9 +3538,9 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <p><strong>触发时机</strong>：客户端事件（<code>client:get_resources</code> / <code>client:tool_call</code> 等）引用的 <code>mcp_server</code>（bundle_id）在 Computer 上未注册。</p>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4014</span><span class="p">,</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MCP Server not registered"</span><span class="p">,</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">"mcp_server"</span><span class="p">:</span><span class="w"> </span><span class="s2">"office_docs"</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4014</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server not registered&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;office_docs&quot;</span>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3575,10 +3575,10 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <p><strong>触发时机</strong>：MCP Server 已注册，但未声明所请求事件依赖的 capability。例如 <code>client:get_resources</code> 调用时该 server 未声明 <code>resources</code> capability。</p>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4015</span><span class="p">,</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MCP Server does not support 'resources' capability"</span><span class="p">,</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">"mcp_server"</span><span class="p">:</span><span class="w"> </span><span class="s2">"office_docs"</span><span class="p">,</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">"capability"</span><span class="p">:</span><span class="w"> </span><span class="s2">"resources"</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4015</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MCP Server does not support &#39;resources&#39; capability&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;mcp_server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;office_docs&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;capability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;resources&quot;</span>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3618,9 +3618,9 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 <p><strong>触发时机</strong>：<code>client:get_skill</code> 入参 <code>name</code> 不符合 SKILL name lexer 规则（<a href="../skill/#14-命名-lexer-总表">skill.md §1.4</a>）——段数 ∉ {1, 2, 3}、3 段但首段 ≠ <code>mcp</code>、或某段字符集非法（leaf 段须符合 marketplace SKILL v1 §3.1）。<strong>注意 user 源裸名为合法 1 段、无 <code>:</code></strong>，不因「缺 <code>:</code>」判错。属<strong>参数校验类硬错</strong>：Computer 在进入 Skill Registry 查询路径<strong>之前</strong>即拒绝（防止从 name 推导 FS 路径越权）。</p>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4016</span><span class="p">,</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid skill name format"</span><span class="p">,</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bad name!!"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4016</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Invalid skill name format&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bad name!!&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3683,9 +3683,9 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 </table>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4017</span><span class="p">,</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Skill resource not accessible"</span><span class="p">,</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"traversal"</span><span class="p">,</span><span class="w"> </span><span class="nt">"rel_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"../../etc/passwd"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4017</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Skill resource not accessible&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;traversal&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;rel_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../etc/passwd&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3761,9 +3761,9 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 </table>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4018</span><span class="p">,</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Blob not accessible"</span><span class="p">,</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gone"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4018</span><span class="p">,</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Blob not accessible&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gone&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3842,9 +3842,9 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
 </table>
 <p><strong>响应结构</strong>（Socket.IO ack 数据）:</p>
 <div class="language-json highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4019</span><span class="p">,</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Blob write failed"</span><span class="p">,</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"invalid_upload"</span><span class="p">,</span><span class="w"> </span><span class="nt">"upload_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4019</span><span class="p">,</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Blob write failed&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;invalid_upload&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;upload_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>字段说明</strong>：</p>
@@ -3986,7 +3986,7 @@ SDK 实现 <strong>MUST NOT</strong> 把 <code>4008</code>（ErrorPayload.code�
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "announce.dismiss", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
