@@ -201,6 +201,8 @@ CallToolResult(
 
 > **命名空间收敛**: 历史示例曾用未加命名空间的 `meta={"timeout": True}`；现统一到 `a2c_*` 命名空间下的 `a2c_timeout`，与 `a2c_cancelled` 一致，均为**结果级 `meta`** 标记。详见 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
+> **本路径为 Agent 本地合成**：不等原 `client:tool_call` 的 ack，直接返回 `meta.a2c_timeout`。这是 Agent 少数可自行合成终态的路径之一（另一类是协议级错误，如目标 Computer 不存在）；除此之外 Agent **MUST NOT** 自行合成终态，尤其 **MUST NOT** 合成取消标记 —— `a2c_cancelled` **仅由 Computer 产出**，见 [事件 §server:tool_call_cancel](events.md#servertool_call_cancel)。
+
 ### Server 端超时
 
 Server 在转发请求时应设置合理的超时：
@@ -225,6 +227,16 @@ Computer 应在工具执行超时时：
 - Agent 端发出 `server:tool_call_cancel` 后收到的 ack 为 `None` 是**合规预期**，**MUST NOT** 据此判定"未实现 / 失败"。
 
 **取消的"结果"通过原 `client:tool_call` 的 ack 体现**，而非取消事件本身：被中断时 Computer 对原调用返回 `CallToolResult(isError=True, meta={"a2c_cancelled": True})`，见 [§client:tool_call 响应](#clienttool_call-响应)。
+
+**「已发出取消信号」不是「已取消」的充分条件**：取消为协作式（见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)），Computer 可能因 `req_id` 命中不到而静默忽略。宿主已请求取消、但该次调用**未被成功中断**时，终态按实际情况返回：
+
+| 场景 | 终态 | 结果级 `meta` |
+|------|------|--------------|
+| Computer 按 `req_id` 成功中断在途调用 | 取消 | `a2c_cancelled = true`（+ 可选 `a2c_cancel_reason`）|
+| 取消送达前原调用已完成 / 命中不到 | **正常结果**（照常交付）| 无取消标记 |
+| 未中断且 Agent 自身超时到点 | 超时 | `a2c_timeout = true` |
+
+判定「取消」 **MUST** 依据结果级 `meta.a2c_cancelled`（**当且仅当** Computer 成功中断）；**MUST NOT** 依据"本端已发出取消信号"判定取消，亦 **MUST NOT** 据此改写终态。Agent 侧对应约束见 [事件 §server:tool_call_cancel](events.md#servertool_call_cancel)。
 
 **错误码复用 / 不使用**：取消链路**不新增**错误码、亦**不复用**任何既有错误码（`4004 Tool Timeout` 仅用于超时，**不**用于取消）。`req_id` 命中不到在途调用时 Computer **静默忽略**（不回错误码），见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)。
 

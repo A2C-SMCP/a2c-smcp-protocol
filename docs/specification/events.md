@@ -539,6 +539,16 @@ Agent 请求取消一次在途工具调用。**本事件为 fire-and-forget：Se
 
 取消后原 `client:tool_call` 的标准响应形状（`CallToolResult(isError=True)` + 结果级 `meta.a2c_cancelled`）见 [§notify:tool_call_cancel](#notifytool_call_cancel) 与 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
+!!! note "Agent 侧主动取消的终态来源"
+
+    除 [Agent 自身超时](error-handling.md#agent-端超时) 与协议级错误（如目标 Computer 不存在）两类**本地合成**外，Agent **MUST NOT** 自行合成终态结果 —— 结果级 `a2c_cancelled` **仅由 Computer 产出**。Agent 发起**主动取消**（宿主 / 用户请求，区别于自身超时兜底）时：
+
+    1. **仅投递信号** —— 发出 `server:tool_call_cancel` 后**继续等待原 `client:tool_call` 的 ack**，以该 ack 的返回值为终态；**MUST NOT** 因已发出取消而本地提早返回。等待时长仍受该次调用自身 `timeout` 约束：**Computer 未中断时须等满超时**（协议不保证提前返回）。
+    2. **不冒充 Computer** —— Agent 自行终结的路径（自身超时、协议级错误）可本地合成终态，但 **MUST 如实标记**其成因：超时标 `meta.a2c_timeout`，**MUST NOT** 标 `meta.a2c_cancelled`。
+    3. **如实透出** —— 按 ack 的结果级 `meta.a2c_cancelled` / `meta.a2c_timeout` 做「取消 / 超时 / 普通失败」三态分类并透出给调用方；**MUST NOT** 依据"本端已发出取消信号"改写终态。
+
+    **取消是协作式的，协议不保证结果**：Computer 按 `req_id` **尝试**中断本机在途调用（见 [computer.md](computer.md)），远端 MCP 是否响应 `notifications/cancelled` 取决于该 Server 实现。故「已发出取消信号」**不是**「已取消」的充分条件 —— 判定取消 **MUST** 依据 ack 的结果级 `meta.a2c_cancelled`（**当且仅当** Computer 成功中断）。各终态分支见 [错误处理 §取消语义](error-handling.md#取消语义无-ack无错误码)。
+
 ---
 
 ### 房间管理事件
@@ -783,7 +793,7 @@ Server 广播：某工具调用已被取消。由 `server:tool_call_cancel` 触�
 
 **Computer 行为**:
 
-- Computer **SHOULD** 按 `req_id` 在在途调用表中定位并中断对应工具执行；并 **SHOULD** 向下游 MCP Server 发送 MCP `notifications/cancelled`（协作式取消，best-effort）。
+- Computer **MUST 尝试**按 `req_id` 在在途调用表中定位并中断对应工具执行（**尝试**为 MUST、**中断成功不保证** —— 协作式 best-effort，命中不到即静默忽略）；并 **SHOULD** 向下游 MCP Server 发送 MCP `notifications/cancelled`（协作式取消，远端可忽略）。
 - 若 `req_id` 命中不到在途调用（已完成 / 不存在 / 非本 Computer 承接）→ **静默忽略**（**MUST NOT** 视为错误、**MUST NOT** 回送错误码）。这是协作式取消的固有竞态：若原调用在取消送达前已返回，Agent 将正常收到结果。
 - 被成功中断时，Computer 对**原 `client:tool_call`** 的 ack 返回 `CallToolResult(isError=True)`，并在**结果级 `meta`** 写入取消标记 `a2c_cancelled=true`（+ 可选 `a2c_cancel_reason`），使 Agent 能区分"取消"与"普通失败/超时"。标记定义见 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
@@ -821,9 +831,13 @@ sequenceDiagram
     Note over A: 超时 / 主动取消
     A-)S: server:tool_call_cancel (req_id=X) [fire-and-forget, 无 ack]
     S-)C: notify:tool_call_cancel (req_id=X) [广播]
-    Note over C: 按 req_id 中断在途执行<br/>SHOULD 发 MCP notifications/cancelled
-    C->>S: CallToolResult(isError=True, meta.a2c_cancelled=true)
-    S->>A: 返回取消响应（原 req_id=X 的 ack）
+    Note over C: 按 req_id 尝试中断在途执行<br/>SHOULD 发 MCP notifications/cancelled
+    alt 命中在途调用（成功中断）
+        C->>S: CallToolResult(isError=True, meta.a2c_cancelled=true)
+    else 已完成 / 命中不到（静默忽略）
+        C->>S: 原调用结果照常交付（无取消标记）
+    end
+    S->>A: 返回原 req_id=X 的 ack
 ```
 
 ### 动态工具发现流程
@@ -933,7 +947,7 @@ sequenceDiagram
 - 所有 `client:*` 事件的处理（作为接收方）
 - 房间管理事件 (`server:join_office`, `server:leave_office`)
 - 维护 [ExposedToolMapping](data-structures.md#exposedtoolmapping)：`client:get_tools` 暴露 `exposed_tool_name`、`client:tool_call` 按**同一份**表路由；重复 `bundle_id` 按 [no-double-open](data-structures.md#no-double-open) 仅启动首个，冲突作 [Computer 本地配置诊断](data-structures.md#config-diagnostics)（非协议错误码）
-- （**SHOULD**）`notify:tool_call_cancel` - 按 `req_id` 中断在途工具执行，并向下游 MCP Server 发 `notifications/cancelled`
+- `notify:tool_call_cancel` - **MUST 尝试**按 `req_id` 中断在途工具执行（**尝试**为 MUST、**中断成功不保证**）；并（**SHOULD**）向下游 MCP Server 发 `notifications/cancelled`
 
 ### Agent 应该实现
 
@@ -942,7 +956,7 @@ sequenceDiagram
 - `notify:update_config` / `notify:update_tool_list` - 刷新工具列表
 - `notify:update_skills` - 刷新 SKILL 清单
 - `client:put_blob` - 上行落盘循环（首块声明 `total_size`/`sha256` → ack-paced 逐块发送 → 末块取 `landing_path`），能力门控 = 自身 minor ≥ 0.4（版本握手传递性，无需协商字段）
-- `server:tool_call_cancel` - 工具调用超时或需主动取消时发起（fire-and-forget，无 ack）；并据响应结果级 `meta.a2c_cancelled` 区分取消与普通失败/超时
+- `server:tool_call_cancel` - 工具调用超时或需主动取消时发起（fire-and-forget，无 ack）；并据响应结果级 `meta.a2c_cancelled` 区分取消与普通失败/超时（**主动取消**的终态来源与三态透出约束见 [§server:tool_call_cancel](#servertool_call_cancel)）
 - （集成层，条件 **MUST**）provider 长度适配：`exposed_tool_name` 可能超下游 provider 限长——超限时集成层 MUST 维护 `短名 ↔ exposed_tool_name` 双射（collision-safe，禁裸截断），仅用于 Agent↔LLM；SDK 保持 wire-faithful，A2C wire 恒传 `exposed_tool_name`（[长度与 provider 适配](data-structures.md#mcp-tool-命名与路由)）
 
 ---
