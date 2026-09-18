@@ -276,7 +276,14 @@ CallToolResult(
 
 !!! note "Producer / Consumer 约定"
 
-    Producer（Computer）**MUST** 把标记写在结果级 `meta`。Consumer（Agent）**SHOULD** 对 `meta` / `_meta` 两种线上 key 宽松读取（不同 SDK 序列化路径可能不同），并优先按本规范的结果级 `meta` 取值。配套时序见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)。
+    **产出方 MUST 把标记写在结果级 `meta`** —— 这是落位规则，与产出方身份无关。各标记的产出方如下：
+
+    | 标记 | 产出方 |
+    |------|-------|
+    | `meta.a2c_cancelled` / `meta.a2c_cancel_reason` | **仅 Computer** —— 标识该结果由 `notify:tool_call_cancel` 中断产生。Agent **MUST NOT** 本地合成该标记（见 [事件 §server:tool_call_cancel](events.md#servertool_call_cancel)）|
+    | `meta.a2c_timeout` | **Agent 或 Computer** —— Agent 在自身 [超时](error-handling.md#agent-端超时) 路径本地合成；Computer 在工具执行超时时写入 |
+
+    Consumer（Agent）**SHOULD** 对 `meta` / `_meta` 两种线上 key 宽松读取（不同 SDK 序列化路径可能不同），并优先按本规范的结果级 `meta` 取值。配套时序见 [事件 §notify:tool_call_cancel](events.md#notifytool_call_cancel)。
 
 ---
 
