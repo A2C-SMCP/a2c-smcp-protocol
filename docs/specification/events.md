@@ -20,19 +20,48 @@ SMCP_NAMESPACE = "/smcp"
 
 ---
 
+## 路由与广播通则
+
+### 房间广播类事件的目标来源
+
+**通则**：房间广播类事件（[`server:leave_office`](#serverleave_office) / [`server:update_config`](#serverupdate_config) / [`server:update_tool_list`](#serverupdate_tool_list) / [`server:update_desktop`](#serverupdate_desktop) / [`server:update_skills`](#serverupdate_skills) / [`server:tool_call_cancel`](#servertool_call_cancel)）的**广播目标 MUST 取自服务端会话状态，MUST NOT 取自客户端载荷**。
+
+这些事件的载荷**可能**包含 `office_id` / `computer` 等身份字段，但**均不具规范效力**——Server MUST 以发起者**会话自身的 `office_id`** 作为广播目标与作用对象。载荷与会话不一致时，Server **SHOULD** 记录告警后**按会话执行**，**MUST NOT** 拒绝：拒绝会惩罚无害行为，且会使漂移态无法自愈。
+
+> **为什么**：客户端载荷是**未经授权的主张**。若采信，任一**已连接**客户端都可把通知投递进**任意房间**（跨房注入），并在顺带清理自身状态时制造「会话仍在 A 房、却自称不在任何房间」的**成员关系漂移**，此后 `server:list_room` 与路由判断均与真实成员关系不一致。房间隔离是协议核心不变量，其目标只能由**服务端权威状态**决定。
+>
+> **载荷字段保留不删**：Server **MAY** 用它们做一致性校验与诊断告警，**MUST NOT** 用它们选择目标。
+>
+> **出向载荷的身份字段同样取会话状态**：由这些事件触发的 `notify:*` 广播，其载荷中的 `computer` / `agent` 等**身份字段 MUST 取自发起者会话**，MUST NOT 原样转发客户端自称的值——否则客户端可冒用他人身份构造通知（如以 `computer="peer"` 触发 `notify:update_config`，使接收方去刷新**另一个** Computer）。
+
+> **为什么本通则不含 `server:join_office` / `server:list_room`**：这两个事件的 `office_id` **不是**「房间冗余字段」，而是**请求的目标**——客户端本就在要求进入 / 查询某个房间。`server:join_office` 的 `office_id` 经服务端完整校验后才采信（房内唯一性、Agent 独占、`office_id` 取值域等）；`server:list_room` 的 `office_id` 用于与**会话自身所在房**比对，不一致即拒（[`4104`](error-handling.md#cross-room-access4104)）。二者均**不向载荷所指的房间投递任何广播**，故不属本通则的适用范围。
+>
+> 反之，本通则覆盖的六个事件，其房间由**会话状态**唯一确定，载荷中的房间 / 身份字段**纯属冗余**——这正是它们不可采信的原因。
+
+### ack 通道
+
+`server:*` 事件中，**协议定义了 ack 的只有三个**：[`server:join_office`](#serverjoin_office)、[`server:leave_office`](#serverleave_office)、[`server:list_room`](#serverlist_room)。其余 `server:*` 事件（[`server:tool_call_cancel`](#servertool_call_cancel) 与 `server:update_*` 四个）为 **fire-and-forget，无 ack 通道**。
+
+- **有 ack 的三个**：成功回各自的成功载荷（`join_office` / `leave_office` 为空 ack，`list_room` 为 `ListRoomRet`），失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)。
+- **无 ack 的五个**：**MUST NOT** 因载荷校验失败而改变「不回执」语义——载荷非法时静默丢弃即为合规；SDK **MUST NOT** 为它们新增 ack 通道。
+
+作用域声明见 [错误处理 §错误响应格式](error-handling.md#错误响应格式)，房间类错误的触发条件与 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
+
+---
+
 ## 连接握手
 
-Agent 或 Computer 在通过 Socket.IO 连接到 Server 时分两个位置携带参数：
+Agent 或 Computer 在通过 Socket.IO 连接到 Server 时携带**协议版本**。**客户端角色（`role`）不在握手 `auth` 中声明**，而经 [`server:join_office`](#serverjoin_office) 的 `EnterOfficeReq.role` 建立——见 [数据结构 §连接握手参数](data-structures.md#连接握手参数)。
 
 1. **URL query** 中的 `a2c_version`（协议版本号）—— 由 Server 在 **HTTP 中间件层**校验，先于 Socket.IO 处理
-2. **`auth` 对象**中的 `role`（业务身份）—— 由 Server 在 `connect` handler 中处理
+2. **`auth` 对象** —— **纯业务层认证数据**（如 `token`），协议**不设必需字段**；由 Server 在 `connect` handler 中按业务需要处理
 
 ### 参数位置
 
 | 位置 | 字段 | 必需 | 说明 |
 |---|---|---|---|
-| URL query | `a2c_version` | 是 | 协议版本号，如 `0.2.0` |
-| auth 对象 | `role` | 是 | `"agent"` 或 `"computer"` |
+| URL query | `a2c_version` | 是 | 协议版本号，如 `0.4.0` |
+| auth 对象 | *（业务自定义）* | 否 | 协议**不设必需字段**，**不含 `role`**——角色经 `server:join_office` 建立 |
 
 ### 为何选 URL query（trade-off 说明）
 
@@ -140,14 +169,14 @@ except socketio.exceptions.ConnectionError as e:
 
 | 事件常量 | 事件名称 | 发起方 | 描述 | 数据结构 |
 |---------|---------|-------|------|---------|
-| `JOIN_OFFICE_EVENT` | `server:join_office` | Agent/Computer | 加入房间 | `EnterOfficeReq` |
-| `LEAVE_OFFICE_EVENT` | `server:leave_office` | Agent/Computer | 离开房间 | `LeaveOfficeReq` |
-| `UPDATE_CONFIG_EVENT` | `server:update_config` | Computer | 配置更新通知请求 | `UpdateComputerConfigReq` |
-| `UPDATE_TOOL_LIST_EVENT` | `server:update_tool_list` | Computer | 工具列表更新通知请求 | `UpdateToolListNotification` |
-| `UPDATE_DESKTOP_EVENT` | `server:update_desktop` | Computer | 桌面更新通知请求 | `UpdateComputerConfigReq` |
-| `UPDATE_SKILLS_EVENT` | `server:update_skills` | Computer | SKILL 集合/内容更新通知请求 | `UpdateComputerConfigReq` |
+| `JOIN_OFFICE_EVENT` | `server:join_office` | Agent/Computer | 加入房间（**有 ack**：成功空 / 失败 flat `ErrorPayload`）| `EnterOfficeReq` |
+| `LEAVE_OFFICE_EVENT` | `server:leave_office` | Agent/Computer | 离开房间（**有 ack**：成功空 / 失败 flat `ErrorPayload`）| `LeaveOfficeReq` |
+| `UPDATE_CONFIG_EVENT` | `server:update_config` | Computer | 配置更新通知请求（**无 ack**）| `UpdateComputerConfigReq` |
+| `UPDATE_TOOL_LIST_EVENT` | `server:update_tool_list` | Computer | 工具列表更新通知请求（**无 ack**）| `UpdateToolListNotification` |
+| `UPDATE_DESKTOP_EVENT` | `server:update_desktop` | Computer | 桌面更新通知请求（**无 ack**）| `UpdateComputerConfigReq` |
+| `UPDATE_SKILLS_EVENT` | `server:update_skills` | Computer | SKILL 集合/内容更新通知请求（**无 ack**）| `UpdateComputerConfigReq` |
 | `CANCEL_TOOL_CALL_EVENT` | `server:tool_call_cancel` | Agent | 取消工具调用（**fire-and-forget，无 ack**）| `AgentCallData` |
-| `LIST_ROOM_EVENT` | `server:list_room` | Agent | 列出房间内所有会话 | `ListRoomReq` |
+| `LIST_ROOM_EVENT` | `server:list_room` | Agent | 列出房间内所有会话（**有 ack**：成功 `ListRoomRet` / 失败 flat `ErrorPayload`）| `ListRoomReq` |
 
 ### Notify 事件（Server → 广播）
 
@@ -535,7 +564,7 @@ Agent 请求取消一次在途工具调用。**本事件为 fire-and-forget：Se
 
     `req_id` **MUST** 等于被取消的原 `client:tool_call` 的 `req_id`——Computer 据此在在途调用表中定位目标调用。`AgentCallData` **不含** `computer` 字段，匹配完全依赖全局唯一、永不复用的 `req_id`。
 
-**Server 处理**: 校验发起方为 Agent 且在房间内后，向该房间广播 `notify:tool_call_cancel`（`skip_sid` 发起者）。**不**回执、**不**分配错误码——详见 [错误处理 §取消语义](error-handling.md#取消语义无-ack无错误码)。
+**Server 处理**: 校验发起方为 Agent 且在房间内后，向**发起者会话所在的房间**广播 `notify:tool_call_cancel`（`skip_sid` 发起者；广播目标取会话状态，见 [§房间广播类事件的目标来源](#房间广播类事件的目标来源)）。**不**回执、**不**分配错误码——详见 [错误处理 §取消语义](error-handling.md#取消语义无-ack无错误码)。
 
 取消后原 `client:tool_call` 的标准响应形状（`CallToolResult(isError=True)` + 结果级 `meta.a2c_cancelled`）见 [§notify:tool_call_cancel](#notifytool_call_cancel) 与 [数据结构 §CallToolResult 结果级 A2C 标记](data-structures.md#calltoolresult-结果级-a2c-标记)。
 
@@ -555,7 +584,7 @@ Agent 请求取消一次在途工具调用。**本事件为 fire-and-forget：Se
 
 #### `server:join_office`
 
-Agent 或 Computer 请求加入房间。
+Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack 通道](#ack-通道)）。
 
 **请求数据 (EnterOfficeReq)**:
 ```python
@@ -566,15 +595,35 @@ Agent 或 Computer 请求加入房间。
 }
 ```
 
-**响应**: `(bool, str | None)` - 成功标志和错误信息。
+**响应**：成功回**空 ack**；失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)，`code` 取 `400`（载荷 schema 校验失败 / `office_id` 取值非法）、`403`（role / name 与会话不符）、[`4101`](error-handling.md#room-full4101)、[`4105`](error-handling.md#name-conflict4105)、[`4106`](error-handling.md#already-in-room4106)。各码触发条件与完整 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
+
+!!! warning "`(bool, str | None)` 元组形态已废除"
+
+    本事件曾以 `(success, error_msg)` 元组返回，`error_msg` 为**自由文本**，客户端无法机器判定拒绝类别——也就无法「对瞬态冲突退避重试、对永久拒绝快速失败」。该形态已移除：失败一律为 flat `ErrorPayload`。
 
 **Server 处理规则**:
-- Agent: 检查房间是否已有其他 Agent，若有则拒绝
-- Computer: 若已在其他房间，自动离开旧房间
+
+- **Agent 换房**：会话已在其它房间（`office_id` 非空且 ≠ 目标房）⇒ 拒绝，`4106`。Agent **MUST** 先显式 [`server:leave_office`](#serverleave_office) 再入新房——**不**适用 Computer 的自动换房规则。
+- **Agent 独占**：目标房已有 Agent（**且非本会话**——同一会话重复 join 幂等放行）⇒ 拒绝，`4101`。
+- **Computer 换房**：若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`），再加入新房。
+- **房内同 role 同名**：目标房已有同 role 同名会话 ⇒ 拒绝，`4105`。
+- **身份声明一致性**：同一 sid 声明了与既有会话不同的 `role` / `name` ⇒ 拒绝，`403`。
+
+!!! note "名字唯一性的作用域"
+
+    唯一性是**房内**的，键空间为 **`(office_id, role, name)`**：
+
+    - **跨房同名允许**——不同 `office_id` 下的同名会话互不冲突。SDK **MUST NOT** 施加**全局**名字空间唯一性，那会把「按房分片部署」锁死。
+    - **同名但不同 role 允许**——同房内一个 Computer 与一个 Agent 可以同名（`client:*` 的路由地址已由字段区分 role）。
+    - **入典理由**：`name` 是 `client:*` 的路由地址（[`client:tool_call`](#clienttool_call) 的 `computer` 字段），房内重名会让路由目标不确定。
+
+!!! note "重连撞上尚未回收的旧会话"
+
+    静默断线后，服务端要等**传输层**超时（Socket.IO `ping_interval + ping_timeout`）才回收旧会话；客户端此时重连重放本事件，会撞上 `4101` / `4105` 的**瞬态**成因。服务端**无法**区分「本客户端的僵尸会话」与「另一真实同名客户端」（二者可观测信息完全相同），故 **MUST NOT** 收编 / 驱逐旧会话——那等价于「任何同名者可驱逐合法成员」。判定与有界退避重试**由客户端依自身状态做出**，见 [错误处理 §建议的重试策略](error-handling.md#建议的重试策略) 与 [房间模型 §静默断线与会话回收](room-model.md#静默断线与会话回收)。
 
 #### `server:leave_office`
 
-Agent 或 Computer 请求离开房间。
+Agent 或 Computer 请求离开房间。**本事件有 ack 通道**（见 [§ack 通道](#ack-通道)）。
 
 **请求数据 (LeaveOfficeReq)**:
 ```python
@@ -582,6 +631,18 @@ Agent 或 Computer 请求离开房间。
     "office_id": str    # 房间 ID
 }
 ```
+
+!!! warning "`office_id` 不具规范效力"
+
+    服务端 **MUST** 以**会话自身的 `office_id`** 作为退房目标与 `notify:leave_office` 的广播目标，**MUST NOT** 取自客户端载荷——这是 [§房间广播类事件的目标来源](#房间广播类事件的目标来源) 通则的直接适用。
+
+    载荷与实情不符**不是客户端错误**（该字段保留仅为诊断）：服务端 **SHOULD** 记录告警后按会话执行，**MUST NOT** 因此拒绝。
+
+**响应**：
+
+- 会话有房 ⇒ 先向**该房**广播 `notify:leave_office`，再移除成员，回**空 ack**。
+- 会话无房 ⇒ **幂等成功**（回空 ack）；**SHOULD** 按真实成员关系收敛一次（清理任何残留的房间成员关系），使漂移态可自愈、操作可重试。
+- 载荷 schema 校验失败 ⇒ 回 flat `ErrorPayload`，`code` = `400`。
 
 #### `server:list_room`
 
@@ -624,6 +685,20 @@ Agent 查询指定房间内的所有会话信息。
 
     详见 [协议版本与握手](versioning.md)。
 
+**ack 语义**：成功返回 `ListRoomRet`；协议级错误以 flat `ErrorPayload` 投递：
+
+| 场景 | `code` |
+|------|--------|
+| 载荷 schema 校验失败 | `400` |
+| 会话尚未加入任何房间 | [`4103`](error-handling.md#not-in-room4103) |
+| 请求的 `office_id` ≠ 会话自身所在房 | [`4104`](error-handling.md#cross-room-access4104) |
+
+**安全不变量**：`4104` 的拒绝 **MUST NOT** 泄露目标房的**存在性**或**成员信息**——「房间存在但无权访问」与「房间不存在」在对外响应上必须**不可区分**（见 [错误处理 §Cross Room Access](error-handling.md#cross-room-access4104)）。
+
+!!! warning "既有的两种不一致实现均已废除"
+
+    本事件的授权拒绝曾分叉为两条路径：**(a)** 静默不 ack（客户端挂起到自身超时）；**(b)** 返回空 `sessions` 列表（客户端误判「房间为空」）。二者均**不可机器判定**且互相分叉，现统一为**回 `4104`**。
+
 ---
 
 ### 配置与状态更新事件
@@ -631,6 +706,8 @@ Agent 查询指定房间内的所有会话信息。
 #### `server:update_config`
 
 Computer 通知 Server 其配置已更新，Server 随后广播 `notify:update_config`。
+
+**本事件无 ack 通道**；广播目标 MUST 取**发起者会话的 `office_id`**、MUST NOT 取载荷中的 `computer`（见 [§房间广播类事件的目标来源](#房间广播类事件的目标来源)）。
 
 **请求数据 (UpdateComputerConfigReq)**:
 ```python
@@ -642,6 +719,8 @@ Computer 通知 Server 其配置已更新，Server 随后广播 `notify:update_c
 #### `server:update_tool_list`
 
 Computer 通知 Server 其工具列表已更新，Server 随后广播 `notify:update_tool_list`。
+
+**本事件无 ack 通道**；广播目标 MUST 取**发起者会话的 `office_id`**、MUST NOT 取载荷中的 `computer`（见 [§房间广播类事件的目标来源](#房间广播类事件的目标来源)）。
 
 **请求数据 (UpdateToolListNotification)**:
 ```python
@@ -666,7 +745,9 @@ Computer 通知 Server 其桌面内容已更新，Server 随后广播 `notify:up
 }
 ```
 
-**Server 处理**: 接收后向该 Computer 所在房间广播 `notify:update_desktop`。
+**本事件无 ack 通道**。
+
+**Server 处理**: 广播目标 MUST 取**发起者会话的 `office_id`**、MUST NOT 取载荷中的 `computer`（见 [§房间广播类事件的目标来源](#房间广播类事件的目标来源)）；接收后向该房间广播 `notify:update_desktop`。
 
 详见 [Desktop 桌面系统](desktop.md) 中的 [更新机制](desktop.md#desktop-更新机制)。
 
@@ -687,7 +768,9 @@ Computer 通知 Server 其 SKILL 集合或内容已变化，Server 随后广播 
 }
 ```
 
-**Server 处理**: 接收后向该 Computer 所在房间广播 `notify:update_skills`。
+**本事件无 ack 通道**。
+
+**Server 处理**: 广播目标 MUST 取**发起者会话的 `office_id`**、MUST NOT 取载荷中的 `computer`（见 [§房间广播类事件的目标来源](#房间广播类事件的目标来源)）；接收后向该房间广播 `notify:update_skills`。
 
 详见 [SKILL 通道](skill.md) 中的 [变更检测](skill.md#8-变更检测)。
 
@@ -850,6 +933,7 @@ sequenceDiagram
 
     Note over C: Computer 加入房间
     C->>S: server:join_office
+    S-->>C: 空 ack（失败则 flat ErrorPayload）
     S->>A: notify:enter_office
     A->>S: client:get_tools
     S->>C: client:get_tools (转发)

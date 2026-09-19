@@ -185,6 +185,19 @@ Server **必须**实现以下隔离保障：
 1. **跨房间访问禁止**: 事件不能路由到其他房间
 2. **Agent 独占性**: 一个房间只能有一个 Agent
 3. **消息隔离**: 通知只广播给同一房间成员
+4. **房内名字唯一**: 同一房内「同 role + 同名」唯一，键空间为 `(office_id, role, name)`——`name` 是 `client:*` 的路由地址，重名会让路由目标不确定。**跨房同名必须允许**：SDK **禁止**施加全局名字空间唯一性，那会把房间隔离变成全局耦合，并锁死「按房分片部署」
+5. **广播目标只取会话状态**: 房间广播类事件的目标**必须**取自服务端权威会话状态，**禁止**取自客户端载荷（见 [事件 §房间广播类事件的目标来源](events.md#房间广播类事件的目标来源)）
+6. **`office_id` 取值域隔离**: `office_id` **禁止**与服务端连接标识（SID）的命名空间重叠——否则任何知道对端 SID 的客户端都能进入对端的私有 SID 房间并投递广播（见 [房间模型 §房间标识](room-model.md#房间标识)）
+
+### 成员关系不可被同名者改变
+
+协议**没有连接主体身份**：`role` 由客户端在 `server:join_office` 中自述建立，`ConnectAuth` 只承载业务层准入，不产出任何可比对的身份。因此：
+
+- Server **禁止**按 `(role, name)` **收编 / 驱逐**同名会话。服务端无法区分「同一客户端的僵尸会话」与「另一个真实的同名客户端」——二者可观测信息**完全相同**，该语义等价于「任何同名者都可驱逐合法成员」。
+- Server **必须**如实拒绝（返回 [`4101`](error-handling.md#room-full4101) / [`4105`](error-handling.md#name-conflict4105)），由**客户端**在传输层重连后的恢复路径上做有界退避重试。
+- 若未来需要收编，**必须**先立独立协议提案，定义**凭据标识 / 比对方式 / 比对责任方**（`AuthenticationProvider` 还是 namespace）——协议当前**不预留**该能力。
+
+详见 [房间模型 §静默断线与会话回收](room-model.md#静默断线与会话回收)。
 
 ### 实现检查清单
 
@@ -192,8 +205,11 @@ Server **必须**实现以下隔离保障：
 # Server 必须验证
 def validate_room_access(sid, target_office_id):
     session = get_session(sid)
+    if not session.office_id:
+        raise SMCPError(4103, "Not in any room")
     if session.office_id != target_office_id:
-        raise PermissionError("Cross-room access denied")
+        # 「不存在」与「不在同房」对外必须不可区分，避免泄露房间存在性
+        raise SMCPError(4104, "Cross-room access denied")
 ```
 
 ## 输入验证
@@ -208,6 +224,12 @@ def validate_room_access(sid, target_office_id):
 | 长度限制 | 防止缓冲区溢出 |
 | 格式校验 | 验证 URL、ID 等格式 |
 | 范围检查 | 验证数值在合理范围内 |
+
+**载荷 schema 校验是 MUST，且禁止依赖语言的类型标注。**
+
+协议给出的数据结构定义（TypedDict / struct / interface 等）**不构成校验**。类型标注在多数语言里**不产生运行期约束**——例如 Python 的 `TypedDict` 完全不做运行期检查，`{"office_id": None}` 会原样穿过，直到下游把 `None` 当成合法房间号使用（Socket.IO 的 `room=None` 表示**整个命名空间**，即一次全量广播）。Rust 等语言的强类型反序列化会天然拒绝 `null`，但那是**该语言的默认行为**，不是协议赋予的保证——实现**必须**在边界显式校验，不得依赖语言差异。
+
+**校验失败必须可感。** 对**具备 ack 通道**的事件，校验失败时 Server **必须**在 ack 通道返回 flat `ErrorPayload`（`code` = `400`），**禁止**静默不 ack——「客户端挂起到自身超时」与「立即收到结构化错误」是两种客户端可感行为。该要求**覆盖校验的触发时机**：若校验发生在进入业务 handler **之前**（框架层参数提取器 / 中间件 / 序列化层），该处的失败路径同样必须回写 ack。详见 [错误处理 §错误响应格式](error-handling.md#错误响应格式)。
 
 ### 工具参数验证
 
@@ -310,6 +332,10 @@ logger.warning(
 - 密码
 - 个人身份信息（PII）
 - 信用卡号等金融信息
+
+**错误响应同样受此约束。** 回给对端的失败 reason（`ErrorPayload.message` / `details`）**禁止**包含**其它会话的内部标识**——尤其是 Socket.IO 的 `sid`。
+
+理由不是「SID 是凭据」（它不是），而是：知道对端 SID 即**取得向该连接的私有 SID 房间投递广播的能力**（见 [房间模型 §房间标识](room-model.md#房间标识)）——SID 属于**能力性标识**，其泄露面必须收敛。房间类错误只暴露**与发起者自身相关**的上下文（自己所在的房、自己声明的 role / name、被拒的目标房），见 [错误处理 §各错误码标准字段总表](error-handling.md#各错误码标准字段总表)。
 
 ## 安全更新
 

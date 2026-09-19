@@ -103,7 +103,7 @@ SMCP_NAMESPACE = "/smcp"
 1. Agent 发送 client:tool_call，指定目标 computer
 2. Server 接收事件
 3. Server 验证 Agent 和 Computer 在同一房间
-4. Server 通过 name → sid 映射找到目标 Computer
+4. Server 在 **Agent 所在房内**解析 computer 名 → sid（键空间 `(office_id, role, name)`，**非**全局裸名）
 5. Server 转发事件到 Computer
 6. Computer 执行并返回结果
 7. Server 将结果返回给 Agent
@@ -196,9 +196,10 @@ Server 通过 name 映射系统实现 Agent/Computer 的定位：
 ├─────────────────────────────────────────────┤
 │                                              │
 │  name_to_sid: dict[str, str]                │
-│    "agent-1"    → "abc123..."               │
-│    "computer-1" → "def456..."               │
-│    "computer-2" → "ghi789..."               │
+│    # 键为 (office_id, role, name)，非裸名    │
+│    ("office-a", "agent",    "agent-1")    → "abc123..." │
+│    ("office-a", "computer", "computer-1") → "def456..." │
+│    ("office-b", "computer", "computer-1") → "ghi789..." │
 │                                              │
 │  sessions: dict[str, Session]               │
 │    "abc123..." → {name, role, office_id}    │
@@ -209,9 +210,11 @@ Server 通过 name 映射系统实现 Agent/Computer 的定位：
 
 ### 映射生命周期
 
-1. **注册**: 客户端加入房间时，注册 name → sid 映射
-2. **查询**: 路由事件时，通过 name 查找目标 sid
+1. **注册**: 客户端加入房间时，注册 `(office_id, role, name)` → sid 映射
+2. **查询**: 路由事件时，在**会话所在房内**按 `role` + `name` 查找目标 sid；解析不到回 `404`，**禁止**退化为全局裸名解析或区分「存在于其它房」
 3. **注销**: 客户端断开连接或离开房间时，清除映射
+
+> 唯一性作用域即注册表键空间：**房内同 role 同名唯一**；**跨房同名允许**（上面示例中 `computer-1` 在两个房各有一条）。详见 [房间模型 §房间成员](room-model.md#房间成员)。
 
 ---
 
