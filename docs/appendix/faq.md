@@ -152,15 +152,21 @@ MCP Server 参与 Desktop 需满足以下条件：
 
 ### Q: 加入房间失败
 
-**可能原因**:
-- 房间已有 Agent（Agent 独占规则）
-- office_id 格式错误
-- 未连接到 Server
+`server:join_office` 失败时返回 flat [`ErrorPayload`](../specification/error-handling.md#错误响应格式)，**按 `code` 定位原因**（不再依赖自由文本）：
 
-**解决方案**:
-1. 确认房间内没有其他 Agent
-2. 检查 office_id 格式
-3. 先执行 `socket connect`
+| `code` | 含义 | 处理 |
+|--------|------|------|
+| [`4101`](../specification/error-handling.md#room-full4101) | 目标房已有 Agent | 若本端**刚自动重连**：属**瞬态**冲突（服务端尚未回收本端的旧会话），可做有界退避重试；否则另一真实 Agent 已占房，放弃并上报 |
+| [`4105`](../specification/error-handling.md#name-conflict4105) | 房内已有**同 role 同名**会话 | 同上——重连恢复路径可重试，否则**改名**或放弃。注意**跨房同名是允许的**，只有同一房内才冲突 |
+| [`4106`](../specification/error-handling.md#already-in-room4106) | 本 **Agent** 已在其它房间 | 先 `server:leave_office` 退房，再入新房。Agent **不能**像 Computer 那样自动换房 |
+| [`403`](../specification/error-handling.md#通用错误码) | role / name 与会话不符 | 同一 sid 声明了与既有会话不同的 role / name ⇒ 本端状态错乱，重连或换 sid |
+| `400` | 载荷 schema 校验失败 | 检查 `role` / `name` / `office_id` 的类型与取值。注意**类型标注不做运行期校验**——`null` 会被送达并在服务端被拒 |
+
+**其它排查**:
+
+- **未连接到 Server**: `server:join_office` 须在 Socket.IO 已连接后发出
+- **`office_id` 取值**: 可为任意字符串（**无需预先建房**，房间由首次成功入房隐式创建），但**不得**与服务端 SID 命名空间重叠
+- **静默断线窗口**: 拔网线 / 代理被 kill / NAT 超时等场景下，服务端要等**传输层心跳超时**才回收旧会话，此间的重连会撞上 `4101` / `4105` —— 见 [房间模型 §静默断线与会话回收](../specification/room-model.md#静默断线与会话回收)
 
 ---
 
