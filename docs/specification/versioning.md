@@ -1,6 +1,6 @@
 # 协议版本与握手
 
-**当前协议版本**: `0.4.1-dev`
+**当前协议版本**: `0.5.0-dev`
 
 A2C-SMCP 作为三方参与（Agent / Server / Computer）的协议，必须保证同一房间内的成员以兼容的协议版本通信。本规范定义协议版本号语义、兼容性判定规则，以及在 **Socket.IO 连接的 HTTP 层**完成的版本校验流程。
 
@@ -175,7 +175,7 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 ### 最近发布：v0.4.0
 
-`0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`（其后的 **`0.4.1-dev` 周期已开启**，含房间成员语义裁决落地——属**破坏性** ack 形态变更，发布时见本节新增的 `### 最近发布：v0.4.1`）。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
+`0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`（其后的 **`0.5.0-dev` 周期已开启**，含房间成员语义裁决落地——属**破坏性** ack 形态变更，故目标位定在 **MINOR**；发布时见本节新增的 `### 最近发布：v0.5.0`）。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
 
 ---
 

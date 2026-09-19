@@ -1,7 +1,7 @@
 # A2C-SMCP 协议概述
 
-> **版本**: 0.4.1-dev
-> **状态**: In Development（0.4.1-dev，未发布；两站 `latest` 仍为 0.4.0）
+> **版本**: 0.5.0-dev
+> **状态**: In Development（0.5.0-dev，未发布；两站 `latest` 仍为 0.4.0）
 > **最后更新**: 2026-09
 
 ## 什么是 A2C-SMCP
