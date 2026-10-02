@@ -164,7 +164,7 @@ BlobHandle: TypeAlias = str
 
 ### 能力门控（版本握手，无协商字段）
 
-`client:put_blob` 无独立能力协商机制。协议 v0.x 兼容性判定为 **MINOR 严格匹配**（[versioning.md](versioning.md#兼容性判定规则)）且同房间传递（Agent.minor == Server.minor == Computer.minor）：**Agent 以「自身 minor ≥ 0.4 且已连接」为能力门控**——连上即保证房间内所有 Computer 均为同 minor；PATCH 只出 bugfix、功能只随 MINOR，故 0.4.x Computer 必有 put_blob（本事件为 0.4.0 起 Computer **MUST** 实现）。超时探测仅作**防御性兜底**（`-dev` 周期内双 SDK 实现进度不同步 / 不合规实现的边界场景）：首块超时视为不支持，字节留上下文不落盘；**不是**正式回退路径。
+`client:put_blob` 无独立能力协商机制。协议 v0.x 兼容性判定为 **MINOR 严格匹配**（[versioning.md](versioning.md#兼容性判定规则)）且同房间传递（Agent.minor == Server.minor == Computer.minor）：**Agent 以「自身 minor ≥ 0.4 且已连接」为能力门控**——连上即保证房内 Computer 为同 minor；PATCH 只出 bugfix、功能只随 MINOR，故 0.4.x Computer 必有 put_blob（本事件为 0.4.0 起 Computer **MUST** 实现）。超时探测仅作**防御性兜底**（`-dev` 周期内双 SDK 实现进度不同步 / 不合规实现的边界场景）：首块超时视为不支持，字节留上下文不落盘；**不是**正式回退路径。
 
 ### 时序
 

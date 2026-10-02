@@ -16,7 +16,7 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 |------|------|------|-------------|
 | 400 | Bad Request | 无效请求格式 | 事件载荷 schema 校验失败、字段缺失或类型错误（**含校验在进入业务 handler 之前即失败**的场景）；HTTP 握手期 `a2c_version` 缺失或非法 |
 | 401 | Unauthorized | 未授权 | 认证失败、Token 无效 |
-| 403 | Forbidden | 权限违规 | **role / name 与会话不符**（`EnterOfficeReq` 声明的身份与既有会话冲突）；业务层未授权操作（由业务层 / `AuthenticationProvider` 判定，**非房间语义**）。跨房间访问走 [`4104`](#cross-room-access4104)、Agent 独占冲突走 [`4101`](#room-full4101)——**不**复用本码 |
+| 403 | Forbidden | 权限违规 | **role / name 与会话不符**（`EnterOfficeReq` 声明的身份与既有会话冲突）；业务层未授权操作（由业务层 / `AuthenticationProvider` 判定，**非房间语义**）。跨房间访问走 [`4104`](#cross-room-access4104)、席位冲突（Agent / Computer 独占）走 [`4101`](#room-full4101)——**不**复用本码 |
 | 404 | Not Found | 资源不存在 | 工具或 Computer 不存在（**含 `client:*` 路由目标不在会话所在房**——与「该名字存在于其它房」对外不可区分）、MCP 配置缺失 |
 | 408 | Timeout | 请求超时 | 工具调用超过约定超时时间未返回 |
 | 500 | Internal Error | 内部错误 | Server 或 Computer 端逻辑异常 |
@@ -65,18 +65,20 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 代码 | 名称 | 含义 |
 |------|------|------|
 | 4008 | Protocol Version Mismatch | HTTP 握手阶段，URL query 中的 `a2c_version` 与 Server 不兼容 |
-| 4101 | Room Full | 加入时目标房已有 Agent（见 [§Room Full](#room-full4101)）|
+| 4101 | Room Full | 加入时目标房**该 role 的席位**已被其它会话占据（已有 Agent / 已有 Computer，v0.5.0 起覆盖 Computer；见 [§Room Full](#room-full4101)）|
 | 4102 | Room Not Found | 房间不存在（**预留码，当前无触发**；见 [§Room Not Found](#room-not-found4102)）|
 | 4103 | Not In Room | 会话无 `office_id` 时发起需要房间上下文的操作（见 [§Not In Room](#not-in-room4103)）|
 | 4104 | Cross Room Access | 跨房间访问被拒绝：调用方**显式指定了非自己所在房**的操作（如 `server:list_room` 查询他房）（见 [§Cross Room Access](#cross-room-access4104)）|
-| 4105 | Name Conflict | 同一房内已有同 role 同名会话（见 [§Name Conflict](#name-conflict4105)）|
+| 4105 | Name Conflict | 同一房内已有同 role 同名会话（**v0.5.0 起转为预留码，无触发**；见 [§Name Conflict](#name-conflict4105)）|
 | 4106 | Already In Room | **Agent** 已在其它房又请求加入新房间（见 [§Already In Room](#already-in-room4106)）|
 
 > **复用与不使用**：房间相关拒绝**均**走本组码，**不**复用通用 `403`——`403` 保留给「role / name 与会话不符」这一**身份声明冲突**，二者语义不同（`403` 是自述身份与会话不符，本组码是房间成员关系冲突）。
 >
 > `4102` 为**预留码**：房间由首次 `server:join_office` 隐式创建，当前协议**任何路径都不产生** `4102`；保留号码以维持 `4101`–`4106` 语义连续，SDK **MUST NOT** 主动返回该码。
 >
-> `4101` / `4105` 是同一类**瞬态冲突**的两种形态——静默断线后服务端尚未回收旧会话时，客户端重连重放 `server:join_office` 会撞上它们。客户端在**传输层重连后的恢复路径**上可对其做有界退避重试，见 [§建议的重试策略](#建议的重试策略)。
+> `4105` 自 v0.5.0 起亦为**预留码**：「每 role 一席」（[房间模型 §成员类型](room-model.md#成员类型)）使同 role 的第二个会话无论是否同名都先撞 `4101`，`4105` 再无可达路径；保留号码维持语义连续，SDK **MUST NOT** 返回该码（收到时按协议违规记录）。
+>
+> `4101` 含**瞬态冲突**形态——静默断线后服务端尚未回收旧会话时，客户端（Agent 或 Computer）重连重放 `server:join_office` 会撞上它。客户端在**传输层重连后的恢复路径**上可对其做有界退避重试，见 [§建议的重试策略](#建议的重试策略)。
 >
 > `4106` **不属于瞬态冲突**：重连产生的是**新会话**（`office_id` 为空），不可能「已在其它房」。它只由客户端的状态错误产生，**不可重试**——须先显式退房再入新房。
 >
@@ -137,11 +139,11 @@ class ErrorPayload(TypedDict, total=False):
 | `4017` | — | `reason` / `rel_path` / `total_size` |
 | `4018` | — | `reason` |
 | `4019` | — | `reason` / `upload_id` / `chunk_offset` / `total_size` |
-| `4101` | — | `office_id` |
+| `4101` | — | `office_id` / `role`（被占席位的 role）|
 | `4102` | — | `office_id` |
 | `4103` | — | — |
 | `4104` | — | `office_id`（被拒的目标房）|
-| `4105` | — | `office_id` / `role` |
+| `4105` | — | —（预留码，无触发）|
 | `4106` | — | `office_id`（会话当前所在房）|
 
 各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015) / [§房间管理错误响应](#房间管理错误响应)）。
@@ -183,7 +185,7 @@ class ErrorPayload(TypedDict, total=False):
 None
 
 # 失败（示例：目标房已有 Agent）
-{"code": 4101, "message": "Room already has an agent", "details": {"office_id": "office-a"}}
+{"code": 4101, "message": "Room already has an agent", "details": {"office_id": "office-a", "role": "agent"}}
 ```
 
 **`server:list_room`** —— 成功回 `ListRoomRet`，失败回 flat `ErrorPayload`：
@@ -231,18 +233,20 @@ class CallToolResult:
 
 ### Room Full（4101）
 
-**触发时机**：`server:join_office` 因**目标房已存在 Agent** 被拒。两类成因，**服务端无法区分**：
+**触发时机**：`server:join_office` 因**目标房该 role 的席位已被其它会话占据**被拒（[房间模型](room-model.md#成员类型) 的「每 role 一席」：一房至多 1 Agent、至多 1 Computer）。`details.role` 标明被占的席位——`agent`（目标房已有 Agent）或 `computer`（目标房已有 Computer，v0.5.0 起）。两类成因，**服务端无法区分**：
 
-1. **永久**——另一真实 Agent 已占据该房（[房间模型](room-model.md#房间成员) 的一房一 Agent 规则）；
-2. **瞬态**——本会话在**静默断线**后重连（新 sid），而服务端尚未回收其**旧会话**，旧会话仍占着 Agent 位。
+1. **永久**——另一真实的同 role 会话已占据该席（另一 Agent / 另一台 Computer）；
+2. **瞬态**——本会话在**静默断线**后重连（新 sid），而服务端尚未回收其**旧会话**，旧会话仍占着席位。
+
+席位判定**与 `name` 无关**：同名与否都回 `4101`（`4105` 已转为预留码）。协议**不提供**替换 / 驱逐语义——换绑 Computer 须旧 Computer 先离房，见 [房间模型 §换绑 Computer](room-model.md#换绑-computer)。
 
 **响应结构**（Socket.IO ack 数据）:
 
 ```json
 {
   "code": 4101,
-  "message": "Room already has an agent",
-  "details": { "office_id": "office-a" }
+  "message": "Room already has a computer",
+  "details": { "office_id": "office-a", "role": "computer" }
 }
 ```
 
@@ -253,8 +257,9 @@ class CallToolResult:
 | `code` | 是 | 固定 `4101` |
 | `message` | 是 | 人类可读 |
 | `details.office_id` | 否 | 目标房 ID（诊断用）|
+| `details.role` | 否 | 被占席位的 role（`agent` / `computer`）；即发起者自己声明的 role，不泄露对端信息 |
 
-**Agent 行为建议**：**依本端状态区分两种成因**——若本端**刚经历传输层重连**（由 Socket.IO 自动重连触发）、且此前已确认在房，则属瞬态冲突，可做**有界退避重试**（见 [§建议的重试策略](#建议的重试策略)）；否则属永久冲突，**放弃并如实报错**，**MUST NOT** 静默假装仍在房。协议**不规定**服务端回收旧会话的时刻（归传输层），故重试预算须覆盖部署方的回收窗口。
+**Agent / Computer 行为建议**：**依本端状态区分两种成因**——若本端**刚经历传输层重连**（由 Socket.IO 自动重连触发）、且此前已确认在房，则属瞬态冲突，可做**有界退避重试**（见 [§建议的重试策略](#建议的重试策略)）；否则属永久冲突，**放弃并如实报错**，**MUST NOT** 静默假装仍在房。协议**不规定**服务端回收旧会话的时刻（归传输层），故重试预算须覆盖部署方的回收窗口。
 
 ### Room Not Found（4102）
 
@@ -331,34 +336,10 @@ class CallToolResult:
 
 ### Name Conflict（4105）
 
-**触发时机**：`server:join_office` 因**目标房内已存在同 role 同名**的会话被拒（[房间模型](room-model.md#房间成员) 的房内同名唯一不变量）。
+**预留码（无触发）**。本码仅在 0.5.0-dev 草案期（Discussion#61 / PR#62）表示过「目标房内已存在同 role 同名会话」，**从未进入已发布版本**；发布前协议收紧为「每 role 一席」（[房间模型 §成员类型](room-model.md#成员类型)，protocol#66）后，同 role 的第二个会话**无论是否同名**都先被席位检查以 [`4101`](#room-full4101) 拒绝，本码再无可达路径。
 
-`name` 是 `client:*` 的路由地址（[`client:tool_call`](events.md#clienttool_call) 的 `computer` 字段），房内重名会让**路由目标不确定**，故「房内 + 同 role + 同名」唯一是协议不变量。
-
-与 `4101` 同理，含**永久**（另一真实同名客户端占位）与**瞬态**（重连时旧会话未回收）两种成因，服务端无法区分。
-
-**响应结构**:
-
-```json
-{
-  "code": 4105,
-  "message": "Name already taken in room",
-  "details": { "office_id": "office-a", "role": "computer" }
-}
-```
-
-**字段说明**：
-
-| 字段 | 必需 | 说明 |
-|------|------|------|
-| `code` | 是 | 固定 `4105` |
-| `message` | 是 | 人类可读 |
-| `details.office_id` | 否 | 目标房 ID |
-| `details.role` | 否 | 冲突的 role（`computer` / `agent`）|
-
-**边界**：本不变量**只约束房内**——**跨房同名是允许的**，不同 `office_id` 下的同名会话互不冲突。SDK **MUST NOT** 以**全局**名字空间施加唯一性（那会把「按房分片部署」锁死），唯一的键空间是 **(office_id, role, name)**。
-
-**Agent / Computer 行为建议**：与 [`4101`](#room-full4101) 同一处置——传输层重连后的恢复路径上可做有界退避重试，否则放弃并如实报错。
+- 房内名字唯一不变量 **`(office_id, role, name)`** 仍成立，由「每 role 一席」蕴含；**跨房同名仍允许**，SDK **MUST NOT** 施加全局名字空间唯一性。
+- 保留号码以维持 `4101`–`4106` 语义连续；SDK **MUST NOT** 返回该码，收到时按协议违规记录并放弃。
 
 ### Already In Room（4106）
 
@@ -493,11 +474,11 @@ Agent 发出 `client:*` 事件后，在 Server 转发 / Computer 处理 / 响应
 | 404 Not Found | 否 | 不重试 |
 | 408 Timeout | 可选 | 指数退避重试 |
 | 500 Internal Error | 可选 | 指数退避重试 |
-| 4101 Room Full / 4105 Name Conflict | **条件可选** | **仅当本端刚经历传输层重连**时可做**有界**退避重试；首次入房撞上时视为永久冲突，**不重试** |
-| 4102 Room Not Found | 否 | 当前版本不该产生，按协议违规记录并放弃 |
+| 4101 Room Full | **条件可选** | **仅当本端刚经历传输层重连**时可做**有界**退避重试；首次入房撞上时视为永久冲突，**不重试** |
+| 4102 Room Not Found / 4105 Name Conflict | 否 | 预留码，当前版本不该产生，按协议违规记录并放弃 |
 | 4103 Not In Room / 4104 Cross Room Access / 4106 Already In Room | 否 | 重试不改变结果；按错误指引纠正本端状态（先入房、或先退房再换房）|
 
-> **为什么房间类冲突要区分「首次入房」与「重连恢复」**：[`4101`](#room-full4101) / [`4105`](#name-conflict4105) 的**瞬态**成因**只可能出现在传输层重连后的恢复路径上**——静默断线使服务端仍持有本客户端的旧会话，新会话必然撞上同名 / 一房一 Agent 检查；首次入房不存在这一窗口（本客户端此前无会话）。
+> **为什么房间类冲突要区分「首次入房」与「重连恢复」**：[`4101`](#room-full4101) 的**瞬态**成因**只可能出现在传输层重连后的恢复路径上**——静默断线使服务端仍持有本客户端的旧会话，新会话必然撞上每 role 一席检查；首次入房不存在这一窗口（本客户端此前无会话）。
 >
 > 故重试判定**由客户端依自身状态做出**，协议**不要求服务端区分**两种成因——服务端仅凭 `(role, name)` 无法区分「本客户端的僵尸会话」与「另一真实同名客户端」，二者的可观测信息完全相同。反过来说：**服务端 MUST NOT 收编 / 驱逐旧会话**（见 [房间模型](room-model.md#静默断线与会话回收)），因为那等价于「任何同名者可驱逐合法成员」。
 >

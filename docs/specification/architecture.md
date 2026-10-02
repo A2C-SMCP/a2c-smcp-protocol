@@ -32,13 +32,14 @@ A2C-SMCP 协议定义了三个核心角色：
 |------|------|---------|
 | **Agent** | 工具调用发起方，通常为智能体、机器人等业务系统 | 每个房间最多 1 个 |
 | **Server** | 信令中枢，负责连接管理、房间管理、消息路由和通知广播 | 全局 1 个（逻辑） |
-| **Computer** | MCP Server 宿主，统一管理多个 MCP 服务并对外暴露工具 | 每个房间可多个 |
+| **Computer** | MCP Server 宿主，统一管理多个 MCP 服务并对外暴露工具 | 每个房间最多 1 个（v0.5.0 起）|
 
 ### 角色关系约束
 
 1. **Agent 独占性**: 一个房间内最多只能有一个 Agent
-2. **Computer 绑定性**: 一个 Computer 在同一时刻只能属于一个房间
-3. **Server 中心性**: 所有 Agent 和 Computer 之间的通信必须经过 Server
+2. **Computer 独占性**（v0.5.0 起）: 一个房间内最多只能有一个 Computer——结合 Agent 只能在一个房间，即**一个 Agent 同一时刻至多与一台 Computer 连接**（见 [房间模型 §成员类型](room-model.md#成员类型)）
+3. **Computer 绑定性**: 一个 Computer 在同一时刻只能属于一个房间
+4. **Server 中心性**: 所有 Agent 和 Computer 之间的通信必须经过 Server
 
 ---
 
@@ -230,9 +231,8 @@ Server 通过 name 映射系统实现 Agent/Computer 的定位：
 │                                              │
 │  Agent: agent-1 (sid: abc123)               │
 │                                              │
-│  Computers:                                  │
-│    - computer-1 (sid: def456)               │
-│    - computer-2 (sid: ghi789)               │
+│  Computer: computer-1 (sid: def456)         │
+│    （至多 1 个，v0.5.0 起）                  │
 │                                              │
 └─────────────────────────────────────────────┘
 ```
@@ -242,6 +242,7 @@ Server 通过 name 映射系统实现 Agent/Computer 的定位：
 | 约束 | 说明 |
 |------|------|
 | Agent 独占 | 房间已有 Agent 时，拒绝新 Agent 加入 |
+| Computer 独占 | 房间已有 Computer 时，拒绝新 Computer 加入（不替换；换绑须旧 Computer 先离房）|
 | Computer 绑定 | Computer 加入新房间时，自动离开旧房间 |
 | 跨房间禁止 | 不允许访问其他房间的资源 |
 

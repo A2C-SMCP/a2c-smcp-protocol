@@ -595,7 +595,7 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 }
 ```
 
-**响应**：成功回**空 ack**；失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)，`code` 取 `400`（载荷 schema 校验失败 / `office_id` 取值非法）、`403`（role / name 与会话不符）、[`4101`](error-handling.md#room-full4101)、[`4105`](error-handling.md#name-conflict4105)、[`4106`](error-handling.md#already-in-room4106)。各码触发条件与完整 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
+**响应**：成功回**空 ack**；失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)，`code` 取 `400`（载荷 schema 校验失败 / `office_id` 取值非法）、`403`（role / name 与会话不符）、[`4101`](error-handling.md#room-full4101)、[`4106`](error-handling.md#already-in-room4106)。各码触发条件与完整 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
 
 !!! warning "`(bool, str | None)` 元组形态已废除"
 
@@ -605,9 +605,16 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 
 - **Agent 换房**：会话已在其它房间（`office_id` 非空且 ≠ 目标房）⇒ 拒绝，`4106`。Agent **MUST** 先显式 [`server:leave_office`](#serverleave_office) 再入新房——**不**适用 Computer 的自动换房规则。
 - **Agent 独占**：目标房已有 Agent（**且非本会话**——同一会话重复 join 幂等放行）⇒ 拒绝，`4101`。
-- **Computer 换房**：若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`），再加入新房。
-- **房内同 role 同名**：目标房已有同 role 同名会话 ⇒ 拒绝，`4105`。
+- **Computer 独占**（v0.5.0 起）：目标房已有 Computer（**且非本会话**）⇒ 拒绝，`4101`（`details.role = "computer"`）。**不替换**旧 Computer；本校验 **MUST** 先于下述自动换房（校验先于副作用）。
+- **Computer 换房**：席位检查通过后，若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`），再加入新房。
+- **房内同 role 同名**：由上述「每 role 一席」蕴含，不再单独产生错误码（[`4105`](error-handling.md#name-conflict4105) 已转为预留码）。
 - **身份声明一致性**：同一 sid 声明了与既有会话不同的 `role` / `name` ⇒ 拒绝，`403`。
+- **幂等重入**：会话已在目标房再次 join ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`。
+- **原子性**：席位检查与占席对同一 `office_id` **MUST** 原子（并发加入空房只能有一者成功）。
+
+!!! note "每 role 一席 = 一个 Agent 同一时刻只连一台 Computer"
+
+    房间内 Agent ≤ 1、Computer ≤ 1（[房间模型 §成员类型](room-model.md#成员类型)，protocol#66）。换绑 Computer 由「旧 Computer 离房 → 新 Computer 入房」表达，**无新事件**，见 [房间模型 §换绑 Computer](room-model.md#换绑-computer)。该约束随 v0.5 MINOR 版本握手生效（[版本即能力](versioning.md#兼容性判定规则)），**无** `single_computer` 一类能力声明字段。
 
 !!! note "名字唯一性的作用域"
 
@@ -619,7 +626,7 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 
 !!! note "重连撞上尚未回收的旧会话"
 
-    静默断线后，服务端要等**传输层**超时（Socket.IO `ping_interval + ping_timeout`）才回收旧会话；客户端此时重连重放本事件，会撞上 `4101` / `4105` 的**瞬态**成因。服务端**无法**区分「本客户端的僵尸会话」与「另一真实同名客户端」（二者可观测信息完全相同），故 **MUST NOT** 收编 / 驱逐旧会话——那等价于「任何同名者可驱逐合法成员」。判定与有界退避重试**由客户端依自身状态做出**，见 [错误处理 §建议的重试策略](error-handling.md#建议的重试策略) 与 [房间模型 §静默断线与会话回收](room-model.md#静默断线与会话回收)。
+    静默断线后，服务端要等**传输层**超时（Socket.IO `ping_interval + ping_timeout`）才回收旧会话；客户端此时重连重放本事件，会撞上 `4101` 的**瞬态**成因。服务端**无法**区分「本客户端的僵尸会话」与「另一真实的同 role 客户端」（二者可观测信息完全相同），故 **MUST NOT** 收编 / 驱逐旧会话——那等价于「任何同 role 者可驱逐合法成员」。判定与有界退避重试**由客户端依自身状态做出**，见 [错误处理 §建议的重试策略](error-handling.md#建议的重试策略) 与 [房间模型 §静默断线与会话回收](room-model.md#静默断线与会话回收)。
 
 #### `server:leave_office`
 
@@ -805,6 +812,8 @@ Server 广播：有成员离开房间。
     "agent": str | None      # 离开的 Agent 名称
 }
 ```
+
+**Agent 响应建议**: 收到 Computer 离开通知后，清理该 Computer 的工具 / Desktop / SKILL 缓存。房间至多一台 Computer（v0.5.0 起），故「`leave_office`（旧 Computer）→ `enter_office`（新 Computer）」即**换绑**，见 [房间模型 §换绑 Computer](room-model.md#换绑-computer)。
 
 #### `notify:update_config`
 
@@ -1036,7 +1045,7 @@ sequenceDiagram
 ### Agent 应该实现
 
 - `notify:enter_office` - 自动获取新 Computer 的工具
-- `notify:leave_office` - 清理离开 Computer 的工具
+- `notify:leave_office` - 清理离开 Computer 的工具（房内至多一台 Computer，leave→enter 即换绑；Agent 侧可假定任一时刻至多一台在房 Computer）
 - `notify:update_config` / `notify:update_tool_list` - 刷新工具列表
 - `notify:update_skills` - 刷新 SKILL 清单
 - `client:put_blob` - 上行落盘循环（首块声明 `total_size`/`sha256` → ack-paced 逐块发送 → 末块取 `landing_path`），能力门控 = 自身 minor ≥ 0.4（版本握手传递性，无需协商字段）
