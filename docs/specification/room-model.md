@@ -47,13 +47,21 @@ office_id: str  # 房间唯一标识符
 | 成员类型 | 数量限制 | 说明 |
 |---------|---------|------|
 | Agent | 每个房间最多 1 个 | 工具调用发起方 |
-| Computer | 无限制（**同 role 同名除外**）| 工具提供方 |
+| Computer | 每个房间最多 1 个（v0.5.0 起）| 工具提供方 / Agent 的运行环境 |
 
-**房内名字唯一性**：同一 `office_id` 内，**同一 role 下同名会话唯一**——唯一性键空间为 **`(office_id, role, name)`**。违反时拒绝加入，返回 [`4105 Name Conflict`](error-handling.md#name-conflict4105)。
+**每 role 一席（v0.5.0 起）**：房间内每个 role **各至多一个**会话——即「1 Agent : ≤1 Computer」。目标房该 role 的席位已被**其它会话**占据时拒绝加入，返回 [`4101 Room Full`](error-handling.md#room-full4101)（`details.role` 标明被占席位）。
+
+由于 Agent 同一时刻只能在**一个**房间（[`4106`](error-handling.md#already-in-room4106)），本规则直接给出 **「一个 Agent 同一时刻至多与一台 Computer 连接」**——协议**不另设**「Agent ↔ Computer 绑定」概念，**房间即绑定**。
+
+!!! info "为什么收紧为单 Computer（protocol#66）"
+
+    宿主把 Computer 当作 Robot 的**运行环境**来解析（bash 封装、普通文件路径都落到「当前这台 Computer」，持久引用形如 `computer://<computer_id>/<path>`）。这一模型的前提是 Agent 任意时刻只面对**一台** Computer；否则每条路径、每次命令都要附带 Computer 选择，或在多台之间猜测，把歧义推给 LLM。多 MCP 服务的聚合在**单个 Computer 内部**完成（一个 Computer 宿主多个 MCP Server），横向扩展通过**多房间**完成。
+
+**房内名字唯一性**：同一 `office_id` 内，**同一 role 下同名会话唯一**——唯一性键空间为 **`(office_id, role, name)`**。v0.5.0 起该不变量由「每 role 一席」**蕴含**（同 role 的第二个会话无论是否同名都先撞 `4101`），故不再有独立错误码；[`4105 Name Conflict`](error-handling.md#name-conflict4105) 转为**预留码**。
 
 - **跨房同名允许**：不同 `office_id` 下的同名会话互不冲突。SDK **MUST NOT** 施加**全局**名字空间唯一性——那会把「按房分片部署」锁死，且让房间隔离不再自包含。
 - **不同 role 同名允许**：同房内一个 Computer 与一个 Agent 可以同名（`client:*` 的路由地址已由字段区分 role）。
-- **入典理由**：`name` 是 `client:*` 的路由地址（[`client:tool_call`](events.md#clienttool_call) 的 `computer` 字段），房内重名会让**路由目标不确定**。详见 [错误处理 §Name Conflict](error-handling.md#name-conflict4105)。
+- **路由地址不变**：`client:*` 仍携带 `computer` 字段（[`client:tool_call`](events.md#clienttool_call) 等）作为路由地址，Server 仍按 `(office_id, "computer", name)` 解析并校验；单 Computer 不意味着可省略或忽略该字段。
 
 ### 成员状态
 
@@ -116,7 +124,8 @@ if role == "agent":
     # 注：sid 比较只是「同一会话重复 join」的幂等守卫，
     # 不是「新 sid 一律拒绝」的规范陈述 —— 见下方说明。
     if existing_agent and existing_agent.sid != sid:
-        return ErrorPayload(4101, "Room already has an agent")
+        return ErrorPayload(4101, "Room already has an agent",
+                            details={"office_id": office_id, "role": "agent"})
 
     return  # 成功：空 ack
 ```
@@ -129,32 +138,39 @@ if role == "agent":
 
 #### Computer 加入规则
 
-1. **同名检查**：目标房已有**同 role 同名**会话 ⇒ 拒绝（[`4105`](error-handling.md#name-conflict4105)）。**本次校验必须先于换房**（见下方伪代码注记）。
+1. **席位检查**：目标房已有 Computer 且**不是本会话** ⇒ 拒绝（[`4101`](error-handling.md#room-full4101)，`details.role = "computer"`）。**本次校验必须先于换房**（见下方伪代码注记）。同名与否不影响结论——同 role 的第二个会话一律先撞席位。
 2. **换房**：若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`）。
 3. 加入新房间。
+
+**幂等重入（Agent / Computer 通用）**：会话已在目标房时再次 `server:join_office` ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`。
 
 ```python
 # Server 端处理逻辑（伪代码）
 if role == "computer":
     # 先把目标房的闸门查完，再动旧房 —— 顺序不可颠倒，理由见下
-    conflict = any(s.role == "computer" and s.name == name and s.sid != sid
-                   for s in get_sessions_in_room(office_id))
-    if conflict:
-        return ErrorPayload(4105, "Name already taken in room")
+    existing_computer = get_computer_in_room(office_id)
+    # 自会话守卫：同一会话重复 join 幂等，不把自己当成冲突方
+    if existing_computer and existing_computer.sid != sid:
+        return ErrorPayload(4101, "Room already has a computer",
+                            details={"office_id": office_id, "role": "computer"})
 
     current_room = get_current_room(sid)
-    if current_room and current_room != office_id:
+    if current_room == office_id:
+        return  # 同一会话重复 join：幂等，空 ack，不重复广播
+
+    if current_room:
         await leave_room(sid, current_room)   # 向旧房广播 notify:leave_office
 
-    await join_room(sid, office_id)
+    await join_room(sid, office_id)           # 广播 notify:enter_office
     return  # 成功：空 ack
 ```
 
-!!! warning "三处本次补齐 / 修正的点"
+!!! warning "实现要点"
 
-    1. **「新 sid 同名入房」在旧版本文档中无任何规定**——原伪代码只处理「同一 sid 换房」，对重连产生的新 sid 同名入房未置一词。现已补入同名检查。
-    2. **同名检查必须带自会话守卫**（`s.sid != sid`）——否则**同一会话重复 join** 时，`current_room == office_id` 跳过退房分支，随后的同名检查会把**发起者自己**算作冲突方并误报 `4105`。Agent 分支历来有此守卫（见上方 `existing_agent.sid != sid`），Computer 分支属本次补齐。
-    3. **校验必须先于副作用**——把目标房的闸门检查**前置**到 `leave_room` 之前。若按「先退旧房、再查目标房」的顺序，一旦同名检查失败，该 Computer 已离开原房且**原房成员已收到 `notify:leave_office`**，落成「无房」的中间态却无任何补救语义。这与 [`4106`](error-handling.md#already-in-room4106) 拒绝「静默迁房使对端在未预期时刻失去成员」的理由同源：**任何会改变既有成员关系的动作，都必须排在所有可能失败的校验之后**。
+    1. **席位检查必须带自会话守卫**（`existing_computer.sid != sid`）——否则**同一会话重复 join** 时，`current_room == office_id` 跳过退房分支，随后的席位检查会把**发起者自己**算作冲突方并误报 `4101`。与 Agent 分支的 `existing_agent.sid != sid` 同构。
+    2. **新 sid 一律按冲突处理**——与 Agent 分支相同，服务端无法区分「本客户端的僵尸会话」与「另一台真实 Computer」，**不收编、不驱逐**（见 [§静默断线与会话回收](#静默断线与会话回收)）。
+    3. **席位检查与占席 MUST 原子**——上述伪代码为可读性写成「查 → 改」两步；实现 **MUST** 保证「席位检查 + 占席」对同一 `office_id` 原子（如按房加锁 / compare-and-set），否则两台 Computer 并发加入空房会同时通过检查、落成两台同房，破坏「每 role 一席」。Agent 席位同此。
+    4. **校验必须先于副作用**——把目标房的闸门检查**前置**到 `leave_room` 之前。若按「先退旧房、再查目标房」的顺序，一旦席位检查失败，该 Computer 已离开原房且**原房成员已收到 `notify:leave_office`**，落成「无房」的中间态却无任何补救语义。这与 [`4106`](error-handling.md#already-in-room4106) 拒绝「静默迁房使对端在未预期时刻失去成员」的理由同源：**任何会改变既有成员关系的动作，都必须排在所有可能失败的校验之后**。
 
 !!! note "自动换房规则仅适用于 Computer"
 
@@ -191,6 +207,21 @@ class LeaveOfficeReq(TypedDict):
 2. **房间切换**: Computer 加入新房间时（自动离开旧房间）
 3. **服务器关闭**: Server 关闭时
 
+### 换绑 Computer
+
+「一房一 Computer」下，Agent 换用另一台 Computer（**换绑**）**不引入新事件**，由既有成员事件表达：
+
+1. 旧 Computer 离房（显式 `server:leave_office`、断连、或自动换往其它房）→ 房内广播 [`notify:leave_office`](events.md#notifyleave_office)；
+2. 新 Computer `server:join_office` 成功 → 房内广播 [`notify:enter_office`](events.md#notifyenter_office)。
+
+**顺序约束**：旧 Computer 的席位**释放之前**，新 Computer 的加入 **MUST** 被 `4101` 拒绝——协议**不提供**「替换」语义（与 [§静默断线与会话回收](#静默断线与会话回收) 的不收编同源）。因此 Agent 观察到的通知序恒为「`leave_office`（旧）→ `enter_office`（新）」，不会出现两台 Computer 同时在房的中间态。
+
+**Agent 处理**：沿用 [§成员变更通知](#成员变更通知) 的既有建议——收到 leave 清理旧 Computer 的工具 / Desktop / SKILL 缓存，收到 enter 重新拉取。
+
+!!! note "旧引用失效属宿主语义（非规范）"
+
+    宿主若以 `computer://<computer_id>/<path>` 持久引用 Computer 资源，换绑后对**非当前 Computer** 的引用如何呈现（如向 LLM 报 `offline`、提示切回原 Computer）由宿主依据「当前在房 Computer 的身份」自行决断；这类引用**不会**被协议转发到新 Computer（协议只路由到房内唯一的 Computer，且按 `computer` 名校验）。Computer 稳定身份 `computer_id` 的定义与在成员通知中的携带见 protocol#64。
+
 ### 静默断线与会话回收
 
 **协议姿态**：房间成员关系的**回收时刻由传输层决定**，协议**不规定**其上限，也**不引入** grace period、收编（takeover）或驱逐（evict）概念。
@@ -201,9 +232,9 @@ class LeaveOfficeReq(TypedDict):
 
     服务端仅凭 `(role, name)` **无法区分**「同一客户端的僵尸会话」与「另一个真实的同名客户端」——两者的可观测信息**完全相同**。按 `(role, name)` 收编等价于「**任何同名者都可驱逐合法成员**」，故协议**不采纳**该语义。
 
-    收编另有独立的反证：**它与房内同名唯一互斥**——两个真实同名客户端会无限互踢（A 入房驱逐 B → B 自动重连驱逐 A → …），且**双方都无法自愈**（每次重连即被对方驱逐）。
+    收编另有独立的反证：**它与每 role 一席互斥**——两个真实的同 role 客户端会无限互踢（A 入房驱逐 B → B 自动重连驱逐 A → …），且**双方都无法自愈**（每次重连即被对方驱逐）。
 
-**对客户端的影响**：静默断线后客户端自动重连，重放 `server:join_office` 时很可能撞上**尚未回收的旧会话**，被 [`4101`](error-handling.md#room-full4101) / [`4105`](error-handling.md#name-conflict4105) 拒绝。
+**对客户端的影响**：静默断线后客户端自动重连，重放 `server:join_office` 时很可能撞上**尚未回收的旧会话**，被 [`4101`](error-handling.md#room-full4101) 拒绝（Agent 与 Computer 同此）。
 
 **部署约束（SHOULD）**：服务端传输层的 **`ping_interval + ping_timeout`（即最长回收窗口）SHOULD 与客户端可接受的恢复时延相称**。
 
@@ -225,8 +256,8 @@ class LeaveOfficeReq(TypedDict):
 |---------|---------|------------|--------|
 | Agent 独占 | 房间已有 Agent，新 Agent 尝试加入 | 拒绝请求 | [`4101`](error-handling.md#room-full4101) |
 | Agent 换房 | Agent 已在其它房间，又请求入新房 | 拒绝请求（须先显式退房）| [`4106`](error-handling.md#already-in-room4106) |
-| 房内同名 | 房内已有同 role 同名会话 | 拒绝请求 | [`4105`](error-handling.md#name-conflict4105) |
-| Computer 绑定 | Computer 尝试加入新房间 | 自动离开旧房间 | — |
+| Computer 独占 | 房间已有 Computer，新 Computer 尝试加入（v0.5.0 起）| 拒绝请求（不替换）| [`4101`](error-handling.md#room-full4101) |
+| Computer 换房 | Computer 尝试加入新房间（目标房席位空闲）| 自动离开旧房间 | — |
 | 跨房间访问 | 调用方**显式指定**了非自己所在房（如 `server:list_room` 查他房）| 拒绝 | [`4104`](error-handling.md#cross-room-access4104) |
 | 路由目标不存在 | `client:*` 目标名在**会话所在房内**解析不到 | 拒绝路由 | [`404`](error-handling.md#通用错误码)（与「存在于其它房」**统一**，不泄露存在性）|
 | 权限校验 | 未加入房间就发送事件 | 拒绝处理 | [`4103`](error-handling.md#not-in-room4103) |
@@ -320,6 +351,22 @@ class ListRoomRet(TypedDict):
     req_id: str
 ```
 
+## 一致性测试场景
+
+Server 实现 **MUST** 覆盖以下房间成员场景（双 SDK 对拍）。记号：`A` = Agent，`C1` / `C2` = 两台不同 Computer，`R1` / `R2` = 两个房间。
+
+| # | 前置 | 动作 | 期望 |
+|---|------|------|------|
+| 1 | `A`、`C1` 在 `R1` | `C2` join `R1` | ack = `4101`，`details = {office_id: "R1", role: "computer"}`；`R1` 成员不变，**无**任何 `notify:*` 广播 |
+| 2 | 同 #1，且 `C2` 与 `C1` **同名** | `C2` join `R1` | 同 #1（`4101`，不得回 `4105`）|
+| 3 | `C1` 在 `R1` | `C1`（同一会话）再次 join `R1` | 空 ack（幂等），**不**重复广播 `notify:enter_office` |
+| 4 | `C1` 在 `R1`，`C2` 在 `R2` | `C2` join `R1` | ack = `4101`；`C2` **仍在** `R2`，`R2` **未**收到 `notify:leave_office`（校验先于副作用）|
+| 5 | `A`、`C1` 在 `R1` | `C1` leave `R1` → `C2` join `R1` | `A` 依次收到 `notify:leave_office(computer=C1)`、`notify:enter_office(computer=C2)`；此后 `client:tool_call(computer=C2)` 可路由，`computer=C1` 回 `404` |
+| 6 | `A`、`C1` 在 `R1`，`C2` 在 `R2` | `C1` join `R2` | ack = `4101`（`R2` 已有 `C2`）；`C1` 仍在 `R1` |
+| 7 | `A` 在 `R1` | 另一 Agent join `R1` | ack = `4101`，`details = {office_id: "R1", role: "agent"}` |
+| 8 | `R1` 为空，`C1`、`C2` 不在任何房 | `C1`、`C2` **并发** join `R1` | 恰一者空 ack，另一者 `4101 {role: "computer"}`；`R1` 至多一台 Computer（席位检查与占席原子）|
+| 9 | `A`、`C1` 在 `R1`，`R2` 为空 | `C1` join `R2` | 空 ack；`R1` 收到 `notify:leave_office(computer=C1)`，`R2` 收到 `notify:enter_office(computer=C1)` |
+
 ## 最佳实践
 
 ### 房间 ID 设计
@@ -338,12 +385,11 @@ office_id = "room-1"  # 安全风险
 ### Agent 连接管理
 
 ```python
-# 推荐：连接前检查房间状态
-sessions = await agent.get_computers_in_office(office_id)
-if any(s.role == "agent" for s in sessions):
+# 推荐：直接入房，按 4101 的 details.role 判定席位冲突
+# （预检查 server:list_room 需先在房内，且存在竞态，不能替代 ack 判定）
+err = await agent.join_office(office_id)
+if err and err["code"] == 4101:
     raise Exception("Room already has an agent")
-
-await agent.join_office(office_id)
 ```
 
 ### 资源清理
