@@ -349,6 +349,8 @@ Input 值的解析遵循**责任链模式**，按顺序尝试多个提供者（P
 | `token` | `MyServer` + tool `auth` | `A2C_SMCP_token_MyServer_auth` |
 | `frontend@team/figma_token`（带前缀池条目） | 无 | `A2C_SMCP_frontend_team_figma_token` |
 
+**规范夹具**：[`fixtures/env_segment_conformance_vectors.json`](../specification/fixtures/env_segment_conformance_vectors.json)（python-sdk 首版、rust-sdk 对拍锁定）。任一 SDK 的 `env_var_name(input_id, bundle_id, tool_name)` **MUST** 对每条向量产出 `expected_env_var_name`。该向量为**数据向量**：SDK **MUST** 以协议仓版本的**逐字节 vendored 副本**接入，**MUST NOT** 各自维护或改写向量内容；本地副本与协议仓不一致即 conformance 失败。
+
 环境变量会根据 Input 类型自动进行类型转换：
 
 | Input 类型 | 转换规则 |
