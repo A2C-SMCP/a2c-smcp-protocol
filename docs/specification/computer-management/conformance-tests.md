@@ -200,6 +200,16 @@ fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 
 - Server 声明的值在任何配置下都不进入 canonical 终值——`auto_apply` 等白名单外字段的字段值被过滤（字段本身仍按配置出线，无配置时为 `null`）；
 - 畸形声明不产生公开错误——Agent 看到的错误与诊断不含 Server 声明原始内容。
 
+### 2.7 ENV_SEGMENT 环境变量命名
+
+环境变量命名（[guide §环境变量命名规则（双端统一规范）](../../guides/computer-mcp-config-guide.md#环境变量命名规则双端统一规范)）的跨 SDK 一致性由协议仓托管的数据向量强制（[protocol#68](https://github.com/A2C-SMCP/a2c-smcp-protocol/issues/68)）：
+
+- **规范夹具**：[`fixtures/env_segment_conformance_vectors.json`](../fixtures/env_segment_conformance_vectors.json)（python-sdk 首版、rust-sdk 对拍锁定）。
+- 任一 SDK 的 `env_var_name(input_id, bundle_id, tool_name)` **MUST** 对每条向量产出 `expected_env_var_name`。
+- 该向量为**数据向量**：SDK **MUST** 以协议仓版本的**逐字节 vendored 副本**接入，**MUST NOT** 各自维护或改写；本地副本与协议仓不一致即 conformance 失败。
+- 向量覆盖分叉点：bundle_id 段缺省/存在、大小写保留对照对、`no-fold-consecutive` / `no-trim-edges`（与 bundle_id `normalize_name` 的关键差异）、`collision-pair-*`（已知坍缩对，注册期 fail-fast）、CJK 逐码点、astral 单码点。
+- 文件内 `algorithm` 段与规范正文一致；两者冲突时以规范正文为准，并回改夹具（不得只改一方）。
+
 ## 3. Runtime Contract Checklist
 
 ### 3.1 Create From Config
