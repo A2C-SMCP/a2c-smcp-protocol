@@ -342,9 +342,17 @@ class ConnectAuth(TypedDict, total=False):
 ```python
 class EnterOfficeReq(TypedDict):
     role: Literal["computer", "agent"]  # 角色类型
-    name: str                           # 名称
+    name: str                           # 名称（展示名 + 房内路由地址；不承担身份）
     office_id: str                      # 房间 ID
+    computer_id: NotRequired[str]       # Computer 稳定身份（v0.5.0 起）：role="computer" 时 MUST 携带，role="agent" 时 MUST NOT 携带
 ```
+
+!!! note "`computer_id` 字段（v0.5.0 起，protocol#64）"
+
+    - **形态**：小写、带连字符的规范 UUID 文本（RFC 9562，`8-4-4-4-12`，共 36 字符），即匹配 `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`。由 Computer 以 UUID v4 或 v7 生成；**接收方 MUST 视为不透明字符串**（按字节相等比较，不解析版本位、不据此推断时间）。
+    - **Server 校验**：`role = "computer"` 时缺失或不匹配上式，或 `role = "agent"` 时携带 ⇒ 拒绝，`400`。
+    - **连接内不可变**：同一会话（sid）再次 join 时 `computer_id` 与已记录值不同 ⇒ 拒绝，`403`（与 `role` / `name` 的身份声明一致性同规则）。
+    - **语义**（生成、持久化、重置、克隆风险）见 [房间模型 §Computer 身份](room-model.md#computer-身份)。`name` 只作展示与 `client:*` 路由地址，**不**承担身份。
 
 ### LeaveOfficeReq
 
@@ -363,8 +371,11 @@ class LeaveOfficeReq(TypedDict):
 class EnterOfficeNotification(TypedDict, total=False):
     office_id: str              # 房间 ID
     computer: str | None        # 加入的 Computer 名称（若为 Computer）
+    computer_id: str | None     # 加入的 Computer 稳定身份（若为 Computer；v0.5.0 起）
     agent: str | None           # 加入的 Agent 名称（若为 Agent）
 ```
+
+成员为 Computer 时，Server **MUST** 以该会话入房时记录的 `computer_id` 填充本字段；成员为 Agent 时不携带（或为 `null`）。`LeaveOfficeNotification` 同此。
 
 ### LeaveOfficeNotification
 
@@ -374,6 +385,7 @@ class EnterOfficeNotification(TypedDict, total=False):
 class LeaveOfficeNotification(TypedDict, total=False):
     office_id: str              # 房间 ID
     computer: str | None        # 离开的 Computer 名称
+    computer_id: str | None     # 离开的 Computer 稳定身份（若为 Computer；v0.5.0 起）
     agent: str | None           # 离开的 Agent 名称
 ```
 
@@ -399,6 +411,7 @@ class SessionInfo(TypedDict, total=False):
     role: Literal["computer", "agent"]      # 角色
     office_id: str                          # 所属房间 ID
     a2c_version: str                        # 协议版本号（Server 在 HTTP 握手阶段从 URL query 记录）
+    computer_id: str                        # Computer 稳定身份（v0.5.0 起）：role="computer" 时 MUST 存在，role="agent" 时不出现
 ```
 
 !!! note "a2c_version 字段"
