@@ -325,16 +325,16 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 1. `n = normalize_path(path)` 失败 → [`4020`](error-handling.md#path-not-accessible4020) `invalid_path`。**`..` 在此按词法消解**（先于符号链接解析）——后续步骤一律以 `n` 为准，**MUST NOT** 对原始 `path` 做 realpath
 2. `readRoots` 为空 → `4020` `forbidden`
 3. **词法围栏**：`n` 不落在任一 root 的**配置形态或 realpath 形态**内（见 [§readRoots](#readroots读取授权根config-first)）→ `4020` `forbidden`（**不**访问文件系统）
-4. **非严格 realpath**：对 `native(n)` 做 realpath——解析**最长已存在前缀**上的全部符号链接，再原样拼接其余（尚不存在的）分量；Windows realpath 若返回 `\\?\` 前缀形态一并剥离。结果经 `normalize_path` 得 `canonical_path`。`native(n)`：POSIX 为 `n` 本身；Windows 为 `/X:/a/b` → `X:\a\b`
+4. **非严格 realpath**：对 `native(n)` 做 realpath——逐分量以 `lstat` 判定：凡是符号链接（**含悬空链接**）一律经 `readlink` 解析其目标并继续，直到遇到第一个 `lstat` 报不存在的分量为止，其余分量原样拼接（等价于 Python `os.path.realpath(strict=False)`）；**MUST NOT** 以跟随链接的 `stat` / `exists()` 判定「已存在」——否则悬空链接会被当作普通不存在路径留在围栏内；Windows realpath 若返回 `\\?\` 前缀形态一并剥离。结果经 `normalize_path` 得 `canonical_path`。`native(n)`：POSIX 为 `n` 本身；Windows 为 `/X:/a/b` → `X:\a\b`
 5. **realpath 围栏**：`canonical_path` 不落在任一 root 的 realpath 形态内（如符号链接越界）→ `4020` `forbidden`；realpath 结果无法以 Unicode 字符串表示或无法规范化（如解析到 UNC）→ `4020` `forbidden`。**本步通过之前**，任何文件系统错误（含 realpath / stat 失败）一律 → `4020` `forbidden`，**MUST NOT** 回 `not_found`
 6. **固定拒绝集**：`canonical_path` 命中 [§固定拒绝集](#固定拒绝集) → `4020` `forbidden`（不因 `readRoots` 授权而放行）
-7. 打开文件（**SHOULD** 不跟随末级符号链接）：`ENOENT` / `ENOTDIR` → `4020` `not_found`；`EACCES` / `EPERM` 等权限类错误 → `4020` `forbidden`
-8. 对**已打开的句柄**校验：非普通文件（目录 / 设备 / FIFO / socket 等）→ `4020` `not_a_file`；Computer **SHOULD** 取该句柄的最终路径（如 `/proc/self/fd`、`F_GETPATH`、`GetFinalPathNameByHandle`）重跑第 5–6 步，不符 → `4020` `forbidden`
-9. 从**同一打开句柄**取 `total_size` / `mtime` 并计算 `sha256`（**MUST NOT** 关闭后按路径重新打开）；按 [SKILL §6.4 (1)](skill.md#64-mime_type-确定性与文本-mime判据) 的确定性映射推断 `mime_type`；铸造 `blob_handle`（MUST 足以在拉取期确定性回到 `canonical_path`）
+7. **类型预检**（打开之前）：`lstat(canonical_path)` 不存在（`ENOENT` / `ENOTDIR`）→ `4020` `not_found`；非普通文件（目录 / 设备 / FIFO / socket 等）→ `4020` `not_a_file`——**MUST** 先于打开，避免打开 FIFO 阻塞或打开设备产生副作用
+8. **打开并复核**：打开 **MUST** 非阻塞（POSIX `O_NONBLOCK`；**SHOULD** `O_NOFOLLOW`）。打开失败：`ENOENT` / `ENOTDIR` → `not_found`；`EISDIR`（及 Windows 打开目录失败）→ `not_a_file`；**其余一切错误**（权限类、`ELOOP`、`ENAMETOOLONG`、`EIO` 等）→ `forbidden`。对已打开的句柄 `fstat`：非普通文件 → `not_a_file`。Computer **SHOULD** 取该句柄的最终路径（如 `/proc/self/fd`、`F_GETPATH`、`GetFinalPathNameByHandle`）重跑第 5–6 步，不符 → `forbidden`
+9. 从**同一打开句柄**取 stat 键 `(total_size, mtime, 文件身份)`（文件身份 = inode / file-id，平台不提供时省略）并计算 `sha256`（**MUST NOT** 关闭后按路径重新打开）；计算后 **SHOULD** 再次 `fstat`，stat 键变化 ⇒ 内容在计算中被改写，**MUST NOT** 缓存该摘要并 **SHOULD** 重算一次；按 [SKILL §6.4 (1)](skill.md#64-mime_type-确定性与文本-mime判据) 的确定性映射推断 `mime_type`；铸造 `blob_handle`：**MUST** 编码 `canonical_path` 与**计算前**的 stat 键及 `sha256`（句柄仍不透明、无状态，Computer 不保留服务端状态）
 
 **`sha256` 计算口径**（owner 裁决）：协议**不设**文件大小上限，`client:resolve_path` 受常规请求超时约束（超时按常规超时处理，不另设错误码）；`sha256` **MUST** 返回。Computer **MAY** 缓存摘要，键 **MUST** 至少含 `(canonical_path, total_size, mtime)`，**SHOULD** 再含文件身份（inode / file-id）与 ctime（若平台提供）——缓存的强度只等于其键：同尺寸且 mtime 粒度内的改写可能命中旧摘要，键有任何疑义时 **MUST** 重算。为使大文件可读，Computer **SHOULD** 在请求超时后**继续完成**该摘要计算并写入缓存（重试即可命中），并 **SHOULD** 对同一键的并发计算去重。
 
-**拉取期**：`client:get_blob` 解析 path 句柄时 **MUST** 按**当前** `readRoots` 与当前文件系统状态重跑第 3–8 步（防御纵深，覆盖 resolve 之后被换掉的符号链接与撤权），并从本次打开的句柄读取字节：第 3 / 5 / 6 步或权限类失败 → [`4018`](error-handling.md#blob-not-accessible4018) `forbidden`；`ENOENT` / `ENOTDIR` 或已非普通文件 → `4018` `gone`。`get_blob` 的 `sha256` / `total_size` **MUST** 描述本次实际提供的字节所属的文件状态：文件身份 / 尺寸 / mtime 与该句柄已知摘要的键不符时 **MUST** 重算，否则 **SHOULD** 复用（避免每块 O(N)）。与 `ResolvePathRet` 不同 ⇒ 文件在 resolve 之后被改写，Agent **SHOULD** 重新 `client:resolve_path`；**同一文件**重组校验连续失败时 Agent **SHOULD** 有界重试（如 1 次）后如实报错，**MUST NOT** 无界循环。
+**拉取期**：`client:get_blob` 解析 path 句柄时 **MUST** 按**当前** `readRoots` 与当前文件系统状态重跑第 3–8 步（防御纵深，覆盖 resolve 之后被换掉的符号链接与撤权），并从本次打开的句柄读取字节：第 3 / 5 / 6 步或第 8 步归 `forbidden` 的失败 → [`4018`](error-handling.md#blob-not-accessible4018) `forbidden`；`not_found` / `not_a_file` 类结果 → `4018` `gone`。随后比对打开句柄的 stat 键与句柄内编码的 stat 键：**不符 ⇒ 文件在 resolve 之后被改写 ⇒ `4018` `gone`**（Agent 回到 `client:resolve_path` 重新取句柄）；相符则以句柄内编码的 `sha256` / `total_size` 回填 `GetBlobRet`——**不**在拉取期重算全量摘要（每块 O(1)），也不需要服务端缓存。若同尺寸、同 mtime 粒度内的改写逃过 stat 键，Agent 的重组校验会失败：此时 **SHOULD** 重新 resolve 并有界重试（如 1 次）后如实报错，**MUST NOT** 无界循环。
 
 #### 固定拒绝集
 
@@ -343,6 +343,8 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 - 末级分量为 `.skillenv` 的文件（任何位置）
 - Computer 自身的配置与状态目录内的文件：settings、`computer_id` 存储、input 值缓存、secret / 凭据存储（目录位置 SDK 自治，SDK **MUST** 把自己实际使用的位置纳入本集）
 - 上行写入中的未定稿文件（landing root 内的 `.part`）
+
+判定以 `canonical_path` 为准（第 6 步），并在打开后的最终路径复核中重跑（第 8 步）。名称判定挡不住**硬链接**（`ln ~/.config/a2c/settings.json root/x`）：Computer **SHOULD** 另以打开句柄的文件身份（`(dev, inode)` / file-id）比对拒绝集中由本 SDK 自身管理的文件。
 
 拒绝集与 `readRoots` 互不替代：`readRoots` 决定「用户愿意给 Robot 读什么」，拒绝集决定「无论用户怎么配都不得经读取通道外流什么」。
 

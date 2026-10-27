@@ -713,7 +713,7 @@ A2C-SMCP SKILL 通道继承 [marketplace SKILL v1 §1.2 三条强制安全原则
 | **name 寻址防越权** | Computer 用 name 在 Registry 内做 O(1) 精确匹配；**禁止**从 name 推导 FS 路径再读文件。Registry 是唯一的 name→path 映射来源 |
 | **rel_path 沙箱** | 包根绝对路径**仅**由 Registry 经 name 解析得到；`rel_path` MUST 相对，`safe_join(包根, rel_path)` 后 `realpath` 必须仍在包根内。绝对路径 / `..` / 符号链接逃逸 → [`4017`](error-handling.md#skill-resource-not-accessible4017) `traversal`；命中 `.skillenv` 等敏感文件 → `forbidden`（不泄漏存在性）；包内不存在 → `not_found` |
 | **铸造期边界** | 资源总字节超 SDK 可配绝对上限 → `4017` `too_large`（不铸造句柄、零字节传输，防 DoS）；`.skillenv` 等敏感文件在铸造期已被 `forbidden` 拦截，**永不**会有指向它的 `blob_handle` |
-| **句柄解析重施鉴权** | `blob_handle` 不透明、Computer 铸造、无状态。[`client:get_blob`](blob-transfer.md) 每次解析**MUST 重跑本节沙箱**（防御纵深，不信任句柄内容）；源已 orphan/删除 → [`4018`](error-handling.md#blob-not-accessible4018)。`get_blob` **不是**任意文件读原语：只服务生产者已授权的源——SKILL 源的边界即本节沙箱；按路径读取（[`client:resolve_path`](blob-transfer.md#生产者三按路径读取)）的边界是 Computer 用户配置的 `readRoots`，二者互不放宽；`.skillenv` 在该通道属[固定拒绝集](blob-transfer.md#固定拒绝集)，即便位于 `readRoots` 内也 `forbidden`，故「永不会有指向 `.skillenv` 的 `blob_handle`」对所有生产者成立 |
+| **句柄解析重施鉴权** | `blob_handle` 不透明、Computer 铸造、无状态。[`client:get_blob`](blob-transfer.md) 每次解析**MUST 重跑本节沙箱**（防御纵深，不信任句柄内容）；源已 orphan/删除 → [`4018`](error-handling.md#blob-not-accessible4018)。`get_blob` **不是**任意文件读原语：只服务生产者已授权的源——SKILL 源的边界即本节沙箱；按路径读取（[`client:resolve_path`](blob-transfer.md#生产者三按路径读取)）的边界是 Computer 用户配置的 `readRoots`，二者互不放宽；`.skillenv` 在该通道属[固定拒绝集](blob-transfer.md#固定拒绝集)，即便位于 `readRoots` 内也 `forbidden`（按规范路径名判定；硬链接等别名由 SDK 以文件身份比对兜底，SHOULD 级）|
 
 ### 9.3 与 Claude Code 安全模型的差异
 

@@ -846,7 +846,7 @@ CallToolResult(
 |---|---|
 | `invalid_handle` | `blob_handle` 格式非法 / 非本 Computer 铸造 / 无法识别 |
 | `forbidden` | 句柄可解析，但**重施铸造通道鉴权失败**（如 SKILL 现已 orphan、`.skillenv` 等仍禁止；path 源现已越出当前 `readRoots` / OS 拒绝读取）——防御纵深，句柄内容**绝不**被直接信任 |
-| `gone` | 源已不可达：SKILL 卸载 / 文件删除（含 path 源被删除或已非普通文件）/ 内容已无法服务 |
+| `gone` | 源已不可达：SKILL 卸载 / 文件删除（含 path 源被删除、已非普通文件，或 stat 键与句柄不符即 resolve 后被改写）/ 内容已无法服务 |
 | `range` | `chunk_offset < 0` 或 `> total_size` |
 
 **响应结构**（Socket.IO ack 数据）:
@@ -926,9 +926,9 @@ CallToolResult(
 | `details.reason` | 触发 |
 |---|---|
 | `invalid_path` | `path` 不符合 [`normalize_path`](blob-transfer.md#canonical_path-规范化) 的输入形态：空串 / 含 U+0000 / 相对路径 / `~` / Windows 裸盘符、盘符相对、UNC、`\\.\` 设备前缀、非法字符或以 `.` / 空格结尾的分量 |
-| `forbidden` | `readRoots` 为空；`path` 词法上或 realpath 后（符号链接越界）不在任一 root 内；realpath 围栏通过前的任何文件系统错误；命中[固定拒绝集](blob-transfer.md#固定拒绝集)（`.skillenv` / Computer 配置·状态·凭据目录 / `.part`）；权限类错误（`EACCES` / `EPERM`）|
-| `not_found` | 通过 realpath 围栏后打开失败且为 `ENOENT` / `ENOTDIR` |
-| `not_a_file` | 位于 `readRoots` 内、存在，但不是普通文件（目录 / 设备 / FIFO / socket 等）|
+| `forbidden` | `readRoots` 为空；`path` 词法上或 realpath 后（符号链接越界，含悬空链接）不在任一 root 内；realpath 围栏通过前的任何文件系统错误；命中[固定拒绝集](blob-transfer.md#固定拒绝集)（`.skillenv` / Computer 配置·状态·凭据目录 / `.part`）；打开时除 `ENOENT` / `ENOTDIR` / `EISDIR` 外的一切错误（权限类、`ELOOP`、`EIO` 等）|
+| `not_found` | 通过 realpath 围栏后 `lstat` 预检或打开为 `ENOENT` / `ENOTDIR` |
+| `not_a_file` | 位于 `readRoots` 内、存在，但不是普通文件（目录 / 设备 / FIFO / socket 等；打开前 `lstat` 预检判定，或打开报 `EISDIR`）|
 
 **响应结构**（Socket.IO ack 数据）:
 

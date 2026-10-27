@@ -514,10 +514,11 @@ Agent ←───────────────────────�
 2. `readRoots` 为空，或 `n` 词法上不在任一 root（配置形态或 realpath 形态）内 → `4020` `forbidden`（不访问文件系统）
 3. 对 `native(n)` 做**非严格** realpath → `canonical_path`；越出 root 的 realpath 形态（如符号链接越界）→ `4020` `forbidden`；本步通过前任何文件系统错误一律 `forbidden`
 4. 命中固定拒绝集（`.skillenv` / Computer 配置·状态·凭据目录 / `.part`）→ `4020` `forbidden`
-5. 打开：`ENOENT` / `ENOTDIR` → `4020` `not_found`；权限类错误 → `4020` `forbidden`；非普通文件 → `4020` `not_a_file`
-6. 自**同一打开句柄** stat + `sha256`（不设大小上限，受常规请求超时约束；MAY 缓存，键至少 `(canonical_path, total_size, mtime)`）+ 确定性 `mime_type` → 铸造 `blob_handle`
+5. 打开前 `lstat` 类型预检：不存在 → `4020` `not_found`；非普通文件 → `4020` `not_a_file`（FIFO / 设备不得被打开）
+6. 非阻塞打开：`ENOENT` / `ENOTDIR` → `not_found`；`EISDIR` → `not_a_file`；其余一切错误 → `forbidden`
+7. 自**同一打开句柄** stat + `sha256`（不设大小上限，受常规请求超时约束；MAY 缓存，键至少 `(canonical_path, total_size, mtime)`）+ 确定性 `mime_type` → 铸造 `blob_handle`（编码 `canonical_path` + stat 键 + `sha256`）
 
-拉取期 `client:get_blob` 对 path 句柄 **MUST** 按当前 `readRoots` 重跑围栏 / 拒绝集 / 权限校验：越界 / 撤权 → `4018` `forbidden`；文件已删除或已非普通文件 → `4018` `gone`。**持久引用 = `computer_id` + `canonical_path`**（宿主存），不是 `blob_handle`。
+拉取期 `client:get_blob` 对 path 句柄 **MUST** 按当前 `readRoots` 重跑围栏 / 拒绝集 / 权限校验：越界 / 撤权 → `4018` `forbidden`；文件已删除、已非普通文件或 stat 键与句柄不符（resolve 后被改写）→ `4018` `gone`。**持久引用 = `computer_id` + `canonical_path`**（宿主存），不是 `blob_handle`。
 
 ```mermaid
 sequenceDiagram
