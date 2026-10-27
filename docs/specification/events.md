@@ -590,12 +590,13 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 ```python
 {
     "role": Literal["computer", "agent"],  # 角色类型
-    "name": str,                           # 名称
-    "office_id": str                       # 房间 ID
+    "name": str,                           # 名称（展示名 + 路由地址，不承担身份）
+    "office_id": str,                      # 房间 ID
+    "computer_id": NotRequired[str]        # Computer 稳定身份（v0.5.0 起）：role="computer" MUST 携带，role="agent" MUST NOT 出现该键（含 null）
 }
 ```
 
-**响应**：成功回**空 ack**；失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)，`code` 取 `400`（载荷 schema 校验失败 / `office_id` 取值非法）、`403`（role / name 与会话不符）、[`4101`](error-handling.md#room-full4101)、[`4106`](error-handling.md#already-in-room4106)。各码触发条件与完整 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
+**响应**：成功回**空 ack**；失败回 [flat `ErrorPayload`](error-handling.md#错误响应格式)，`code` 取 `400`（载荷 schema 校验失败 / `office_id` 取值非法 / `computer_id` 缺失、形态非法或 Agent 携带）、`403`（role / name / computer_id 与会话不符）、[`4101`](error-handling.md#room-full4101)、[`4106`](error-handling.md#already-in-room4106)。各码触发条件与完整 payload 见 [错误处理 §房间管理错误响应](error-handling.md#房间管理错误响应)。
 
 !!! warning "`(bool, str | None)` 元组形态已废除"
 
@@ -608,8 +609,12 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 - **Computer 独占**（v0.5.0 起）：目标房已有 Computer（**且非本会话**）⇒ 拒绝，`4101`（`details.role = "computer"`）。**不替换**旧 Computer；本校验 **MUST** 先于下述自动换房（校验先于副作用）。
 - **Computer 换房**：席位检查通过后，若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`），再加入新房。
 - **房内同 role 同名**：由上述「每 role 一席」蕴含，不再单独产生错误码（[`4105`](error-handling.md#name-conflict4105) 已转为预留码）。
-- **身份声明一致性**：同一 sid 声明了与既有会话不同的 `role` / `name` ⇒ 拒绝，`403`。
-- **幂等重入**：会话已在目标房再次 join ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`。
+- **校验顺序**：`400`（载荷，含 `computer_id`）→ `403`（身份声明一致性）→ `4106` / `4101`（成员关系）→ 副作用（自动离开旧房、占席、广播）。前序校验失败时**不得**产生任何后序副作用。
+- **`computer_id` 校验**（v0.5.0 起）：`role = "computer"` 时缺失、不符合[规范 UUID 形态](data-structures.md#enterofficereq)或为 nil / max UUID，或 `role = "agent"` 时出现该键（含 `null`）⇒ 拒绝，`400`。
+- **身份声明一致性**：同一 sid 声明了与既有会话不同的 `role` / `name` / `computer_id` ⇒ 拒绝，`403`。会话记录随**连接**存续，`server:leave_office` 不清除；故 `computer_id` 在一条连接内不可变——Computer 重置身份后须断连、以新连接入房（见 [房间模型 §Computer 身份](room-model.md#computer-身份)）。「一致性校验 + 记录」对同一 sid **MUST** 原子。
+- **记录与回显**：入房成功后 Server 将 `computer_id` 记入会话，并在 `notify:enter_office` / `notify:leave_office` 与 `server:list_room` 的 `SessionInfo` 中原样回显。
+- **不做 `computer_id` 冲突检测**：Server **MUST NOT** 因 `computer_id` 与其它会话（含其它房间）重复而拒绝加入——房内第二台 Computer 已由席位检查（`4101`）拒绝，跨房重复（克隆）的识别归宿主。
+- **幂等重入**：会话已在目标房、且以**与既有记录一致**的身份声明（`role` / `name` / `computer_id`）再次 join ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`（身份不一致先按上条回 `403`）。
 - **原子性**：席位检查与占席对同一 `office_id` **MUST** 原子（并发加入空房只能有一者成功）。
 
 !!! note "每 role 一席 = 一个 Agent 同一时刻只连一台 Computer"
@@ -679,7 +684,8 @@ Agent 查询指定房间内的所有会话信息。
     "name": str,                            # 会话名称
     "role": Literal["computer", "agent"],   # 角色
     "office_id": str,                       # 所属房间 ID
-    "a2c_version": str                      # 协议版本号（Server 从 URL query 记录）
+    "a2c_version": str,                     # 协议版本号（Server 从 URL query 记录）
+    "computer_id": str                      # Computer 稳定身份（role="computer" 时 MUST 存在；v0.5.0 起）
 }
 ```
 
@@ -793,12 +799,13 @@ Server 广播：有成员加入房间。
 ```python
 {
     "office_id": str,
-    "computer": str | None,  # 加入的 Computer 名称（若为 Computer）
-    "agent": str | None      # 加入的 Agent 名称（若为 Agent）
+    "computer": str | None,     # 加入的 Computer 名称（若为 Computer）
+    "computer_id": str,         # 加入的 Computer 稳定身份（仅成员为 Computer 时出现，Agent 时省略该键；v0.5.0 起）
+    "agent": str | None         # 加入的 Agent 名称（若为 Agent）
 }
 ```
 
-**Agent 响应建议**: 收到此通知后，应自动调用 `client:get_tools` 获取新 Computer 的工具列表。
+**Agent 响应建议**: 收到此通知后，应自动调用 `client:get_tools` 获取新 Computer 的工具列表。`computer_id` 标识「当前在房的是哪台 Computer」，宿主可据此判断持久引用是否指向当前 Computer（见 [房间模型 §Computer 身份](room-model.md#computer-身份)）。
 
 #### `notify:leave_office`
 
@@ -808,8 +815,9 @@ Server 广播：有成员离开房间。
 ```python
 {
     "office_id": str,
-    "computer": str | None,  # 离开的 Computer 名称
-    "agent": str | None      # 离开的 Agent 名称
+    "computer": str | None,     # 离开的 Computer 名称
+    "computer_id": str,         # 离开的 Computer 稳定身份（仅成员为 Computer 时出现，Agent 时省略该键；v0.5.0 起）
+    "agent": str | None         # 离开的 Agent 名称
 }
 ```
 

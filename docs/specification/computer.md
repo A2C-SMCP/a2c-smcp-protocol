@@ -25,7 +25,9 @@ Computer MAY 在 `auth` 中携带业务鉴权字段。协议不规定这些字�
 
 ### 2.2 加入与离开 Office
 
-Computer MUST 使用 `server:join_office` 发送 `EnterOfficeReq`，其中 `role` MUST 为 `"computer"`，`name` 是该 Computer 在 Server 路由中的标识。Server 负责单 Office 绑定与跨房间隔离，见 [房间隔离模型](room-model.md)。
+Computer MUST 使用 `server:join_office` 发送 `EnterOfficeReq`，其中 `role` MUST 为 `"computer"`，`name` 是该 Computer 在 Server 路由中的标识（展示名，不承担身份），`computer_id` MUST 为该 Computer 持久化的稳定身份（v0.5.0 起）。Server 负责单 Office 绑定与跨房间隔离，见 [房间隔离模型](room-model.md)。
+
+Computer SDK MUST 在首次启动时生成并持久化 `computer_id`（MUST NOT 为 nil / max UUID）、跨重启复用，并提供显式「重置身份」入口；持久化状态无法读写或已损坏时 MUST 以明确错误终止启动，MUST NOT 静默改用临时值；重置后的新 `computer_id` 只能经**新连接**生效（同一连接内改变 `computer_id` 会被 `403` 拒绝）。完整语义见 [房间模型 §Computer 身份](room-model.md#computer-身份)。
 
 Computer SHOULD 在成功加入 Office 后才发送 `server:update_config`、`server:update_tool_list`、`server:update_desktop` 或 `server:update_skills`。未加入 Office 时，本地变化可以被记录或合并，但不应产生跨房间可见通知。
 

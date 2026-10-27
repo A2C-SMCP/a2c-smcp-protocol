@@ -14,9 +14,9 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 
 | 代码 | 名称 | 含义 | 典型触发场景 |
 |------|------|------|-------------|
-| 400 | Bad Request | 无效请求格式 | 事件载荷 schema 校验失败、字段缺失或类型错误（**含校验在进入业务 handler 之前即失败**的场景）；HTTP 握手期 `a2c_version` 缺失或非法 |
+| 400 | Bad Request | 无效请求格式 | 事件载荷 schema 校验失败、字段缺失或类型错误（**含校验在进入业务 handler 之前即失败**的场景）；`EnterOfficeReq.computer_id` 在 `role = "computer"` 时缺失或形态非法、在 `role = "agent"` 时出现；HTTP 握手期 `a2c_version` 缺失或非法 |
 | 401 | Unauthorized | 未授权 | 认证失败、Token 无效 |
-| 403 | Forbidden | 权限违规 | **role / name 与会话不符**（`EnterOfficeReq` 声明的身份与既有会话冲突）；业务层未授权操作（由业务层 / `AuthenticationProvider` 判定，**非房间语义**）。跨房间访问走 [`4104`](#cross-room-access4104)、席位冲突（Agent / Computer 独占）走 [`4101`](#room-full4101)——**不**复用本码 |
+| 403 | Forbidden | 权限违规 | **role / name / computer_id 与会话不符**（`EnterOfficeReq` 声明的身份与既有会话冲突）；业务层未授权操作（由业务层 / `AuthenticationProvider` 判定，**非房间语义**）。跨房间访问走 [`4104`](#cross-room-access4104)、席位冲突（Agent / Computer 独占）走 [`4101`](#room-full4101)——**不**复用本码 |
 | 404 | Not Found | 资源不存在 | 工具或 Computer 不存在（**含 `client:*` 路由目标不在会话所在房**——与「该名字存在于其它房」对外不可区分）、MCP 配置缺失 |
 | 408 | Timeout | 请求超时 | 工具调用超过约定超时时间未返回 |
 | 500 | Internal Error | 内部错误 | Server 或 Computer 端逻辑异常 |
@@ -72,7 +72,9 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 | 4105 | Name Conflict | 同一房内已有同 role 同名会话（**v0.5.0 起转为预留码，无触发**；见 [§Name Conflict](#name-conflict4105)）|
 | 4106 | Already In Room | **Agent** 已在其它房又请求加入新房间（见 [§Already In Room](#already-in-room4106)）|
 
-> **复用与不使用**：房间相关拒绝**均**走本组码，**不**复用通用 `403`——`403` 保留给「role / name 与会话不符」这一**身份声明冲突**，二者语义不同（`403` 是自述身份与会话不符，本组码是房间成员关系冲突）。
+> **复用与不使用**：房间相关拒绝**均**走本组码，**不**复用通用 `403`——`403` 保留给「role / name / computer_id 与会话不符」这一**身份声明冲突**，二者语义不同（`403` 是自述身份与会话不符，本组码是房间成员关系冲突）。
+>
+> **`computer_id`（v0.5.0 起，protocol#64）不新增错误码**：缺失 / 形态非法 / Agent 携带复用 `400`，同一会话改变 `computer_id` 复用 `403`；**不存在**「`computer_id` 冲突」类错误码——房内第二台 Computer 由 `4101` 拒绝，跨房重复（克隆）不是协议错误，Server **MUST NOT** 据此拒绝（见 [房间模型 §Computer 身份](room-model.md#computer-身份)）。
 >
 > `4102` 为**预留码**：房间由首次 `server:join_office` 隐式创建，当前协议**任何路径都不产生** `4102`；保留号码以维持 `4101`–`4106` 语义连续，SDK **MUST NOT** 主动返回该码。
 >
@@ -122,7 +124,7 @@ class ErrorPayload(TypedDict, total=False):
 | 层 | 错误码 | 承载方式 |
 |----|--------|----------|
 | HTTP 握手层 | `400` / `4008` | HTTP 400 响应 body（JSON）+ `X-A2C-Error-Code` header（冗余诊断，仅 `4008`）|
-| Socket.IO ack 层 | `400` / `4014`–`4019` / `4101`–`4106` | ack callback 第一参（dict）|
+| Socket.IO ack 层 | `400` / `403` / `4014`–`4019` / `4101`–`4106` | ack callback 第一参（dict）|
 
 两层使用**同一种** flat shape，差别仅在传输通道。
 
@@ -148,7 +150,7 @@ class ErrorPayload(TypedDict, total=False):
 
 各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015) / [§房间管理错误响应](#房间管理错误响应)）。
 
-> **`details` MUST NOT 携带其它会话的内部标识**（`sid`、对端连接元数据等）。房间类错误只暴露**与发起者自身相关**的上下文（自己所在的房、自己声明的 role / name、被拒的目标房），见 [安全考虑 §敏感信息过滤](security.md#敏感信息过滤)。
+> **`details` MUST NOT 携带其它会话的内部标识**（`sid`、其它会话的 `computer_id`、对端连接元数据等）。房间类错误只暴露**与发起者自身相关**的上下文（自己所在的房、自己声明的 role / name、被拒的目标房），见 [安全考虑 §敏感信息过滤](security.md#敏感信息过滤)。
 
 ### `details` 字段约束（协议级）
 
