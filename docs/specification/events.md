@@ -612,7 +612,7 @@ Agent 或 Computer 请求加入房间。**本事件有 ack 通道**（见 [§ack
 - **校验顺序**：`400`（载荷，含 `computer_id`）→ `403`（身份声明一致性）→ `4106` / `4101`（成员关系）→ 副作用（自动离开旧房、占席、广播）。前序校验失败时**不得**产生任何后序副作用。
 - **`computer_id` 校验**（v0.5.0 起）：`role = "computer"` 时缺失、不符合[规范 UUID 形态](data-structures.md#enterofficereq)或为 nil / max UUID，或 `role = "agent"` 时出现该键（含 `null`）⇒ 拒绝，`400`。
 - **身份声明一致性**：同一 sid 声明了与既有会话不同的 `role` / `name` / `computer_id` ⇒ 拒绝，`403`。会话记录随**连接**存续，`server:leave_office` 不清除；故 `computer_id` 在一条连接内不可变——Computer 重置身份后须断连、以新连接入房（见 [房间模型 §Computer 身份](room-model.md#computer-身份)）。「一致性校验 + 记录」对同一 sid **MUST** 原子。
-- **记录与回显**：入房成功后 Server 将 `computer_id` 记入会话，并在 `notify:enter_office` / `notify:leave_office` 与 `server:list_room` 的 `SessionInfo` 中原样回显。
+- **记录与回显**：Server 在该 sid **首次通过身份校验**（`400` / `403` 之后、`4106` / `4101` 之前）时把身份声明（含 `computer_id`）记入会话——本次 join 随后被 `4106` / `4101` 拒绝也**保留**记录；入房成功后在 `notify:enter_office` / `notify:leave_office` 与 `server:list_room` 的 `SessionInfo` 中原样回显。
 - **不做 `computer_id` 冲突检测**：Server **MUST NOT** 因 `computer_id` 与其它会话（含其它房间）重复而拒绝加入——房内第二台 Computer 已由席位检查（`4101`）拒绝，跨房重复（克隆）的识别归宿主。
 - **幂等重入**：会话已在目标房、且以**与既有记录一致**的身份声明（`role` / `name` / `computer_id`）再次 join ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`（身份不一致先按上条回 `403`）。
 - **原子性**：席位检查与占席对同一 `office_id` **MUST** 原子（并发加入空房只能有一者成功）。
