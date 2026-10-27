@@ -124,7 +124,7 @@ class ErrorPayload(TypedDict, total=False):
 | 层 | 错误码 | 承载方式 |
 |----|--------|----------|
 | HTTP 握手层 | `400` / `4008` | HTTP 400 响应 body（JSON）+ `X-A2C-Error-Code` header（冗余诊断，仅 `4008`）|
-| Socket.IO ack 层 | `400` / `4014`–`4019` / `4101`–`4106` | ack callback 第一参（dict）|
+| Socket.IO ack 层 | `400` / `403` / `4014`–`4019` / `4101`–`4106` | ack callback 第一参（dict）|
 
 两层使用**同一种** flat shape，差别仅在传输通道。
 
@@ -150,7 +150,7 @@ class ErrorPayload(TypedDict, total=False):
 
 各错误码完整 payload 示例与触发时机详见对应章节（[§4008](#协议版本不匹配4008) / [§4014](#mcp-server-not-found4014) / [§4015](#mcp-capability-not-supported4015) / [§房间管理错误响应](#房间管理错误响应)）。
 
-> **`details` MUST NOT 携带其它会话的内部标识**（`sid`、对端连接元数据等）。房间类错误只暴露**与发起者自身相关**的上下文（自己所在的房、自己声明的 role / name、被拒的目标房），见 [安全考虑 §敏感信息过滤](security.md#敏感信息过滤)。
+> **`details` MUST NOT 携带其它会话的内部标识**（`sid`、其它会话的 `computer_id`、对端连接元数据等）。房间类错误只暴露**与发起者自身相关**的上下文（自己所在的房、自己声明的 role / name、被拒的目标房），见 [安全考虑 §敏感信息过滤](security.md#敏感信息过滤)。
 
 ### `details` 字段约束（协议级）
 

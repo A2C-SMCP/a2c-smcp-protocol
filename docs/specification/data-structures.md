@@ -350,8 +350,8 @@ class EnterOfficeReq(TypedDict):
 !!! note "`computer_id` 字段（v0.5.0 起，protocol#64）"
 
     - **形态**：小写、带连字符的规范 UUID 文本（RFC 9562，`8-4-4-4-12`，共 36 字符），即匹配 `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`。由 Computer 以 UUID v4 或 v7 生成；**接收方 MUST 视为不透明字符串**（按字节相等比较，不解析版本位、不据此推断时间）。
-    - **Server 校验**：`role = "computer"` 时缺失或不匹配上式，或 `role = "agent"` 时携带 ⇒ 拒绝，`400`。
-    - **连接内不可变**：同一会话（sid）再次 join 时 `computer_id` 与已记录值不同 ⇒ 拒绝，`403`（与 `role` / `name` 的身份声明一致性同规则）。
+    - **Server 校验**：`role = "computer"` 时缺失、不匹配上式、或为 nil / max UUID（`00000000-0000-0000-0000-000000000000` / `ffffffff-ffff-ffff-ffff-ffffffffffff`）；或 `role = "agent"` 时**出现该键**（含值为 `null`）⇒ 拒绝，`400`。Computer **MUST NOT** 发出 nil / max UUID。
+    - **连接内不可变**：Server 在该会话（sid）**首次 join 通过身份校验**时记录 `computer_id`，记录随连接存续，**不因 `server:leave_office` 清除**；此后同一 sid 的任何 join 携带不同值 ⇒ 拒绝，`403`（与 `role` / `name` 的身份声明一致性同规则）。「一致性校验 + 记录」对同一 sid **MUST** 原子：同一 sid 并发 join 携带不同值时，至多一者被记录，其余 ⇒ `403`。
     - **语义**（生成、持久化、重置、克隆风险）见 [房间模型 §Computer 身份](room-model.md#computer-身份)。`name` 只作展示与 `client:*` 路由地址，**不**承担身份。
 
 ### LeaveOfficeReq
@@ -371,11 +371,11 @@ class LeaveOfficeReq(TypedDict):
 class EnterOfficeNotification(TypedDict, total=False):
     office_id: str              # 房间 ID
     computer: str | None        # 加入的 Computer 名称（若为 Computer）
-    computer_id: str | None     # 加入的 Computer 稳定身份（若为 Computer；v0.5.0 起）
+    computer_id: str            # 加入的 Computer 稳定身份（仅成员为 Computer 时出现；v0.5.0 起）
     agent: str | None           # 加入的 Agent 名称（若为 Agent）
 ```
 
-成员为 Computer 时，Server **MUST** 以该会话入房时记录的 `computer_id` 填充本字段；成员为 Agent 时不携带（或为 `null`）。`LeaveOfficeNotification` 同此。
+成员为 Computer 时，Server **MUST** 以该会话记录的 `computer_id` 填充本字段；成员为 Agent 时 **MUST** 省略该键（**不得**发 `null`，与 `SessionInfo` 一致）。`LeaveOfficeNotification` 同此。
 
 ### LeaveOfficeNotification
 
@@ -385,7 +385,7 @@ class EnterOfficeNotification(TypedDict, total=False):
 class LeaveOfficeNotification(TypedDict, total=False):
     office_id: str              # 房间 ID
     computer: str | None        # 离开的 Computer 名称
-    computer_id: str | None     # 离开的 Computer 稳定身份（若为 Computer；v0.5.0 起）
+    computer_id: str            # 离开的 Computer 稳定身份（仅成员为 Computer 时出现；v0.5.0 起）
     agent: str | None           # 离开的 Agent 名称
 ```
 

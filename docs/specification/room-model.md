@@ -71,7 +71,8 @@ office_id: str  # 房间唯一标识符
 |------|------|
 | **生成** | Computer 首次启动时生成随机 UUID（v4 或 v7），以小写规范文本表示（形态见 [数据结构 §EnterOfficeReq](data-structures.md#enterofficereq)）。**MUST NOT** 由 MAC 地址、OS machine-id 或硬件指纹派生——它们在克隆镜像中重复、在私有地址随机化与多网卡下漂移，且属设备标识、有隐私合规负担 |
 | **持久化** | Computer 侧持久化，跨重启、跨重连**不变**。存储位置属 SDK 自治（线上不可观测，协议不规定）。从备份恢复该持久化状态 = **同一台电脑**（预期行为）|
-| **重置** | Computer SDK **MUST** 提供显式「重置身份」入口（等价于「换了一台新电脑」），生成新的 UUID 并持久化。`computer_id` 在一条连接内不可变（同一会话改变它 ⇒ `403`），故新值**只能经新连接生效**：已连接时重置须断连后重新入房 |
+| **持久化失败** | 无法读取或写入持久化状态时，Computer SDK **MUST NOT** 静默退化为「每次启动临时生成」——那会让宿主的持久引用无信号地全部失效。**MUST** 以明确错误终止启动（不入房）；已持久化的值损坏（非合法形态）同此，**不得**自动覆写 |
+| **重置** | Computer SDK **MUST** 提供显式「重置身份」入口（等价于「换了一台新电脑」），生成新的 UUID 并持久化。Server 对 `computer_id` 的记录随**连接**存续、`server:leave_office` 不清除，同一连接内改变它 ⇒ `403`；故新值**只能经新连接生效**：已连接时重置须断连后重新入房 |
 | **携带** | `EnterOfficeReq`（`role = "computer"` 时 **MUST** 携带，`role = "agent"` 时 **MUST NOT** 携带）；Server 记入会话后在 `notify:enter_office` / `notify:leave_office` 与 `SessionInfo` 中原样回显 |
 | **用途** | 让 Agent / 宿主知道「当前在房的是哪台 Computer」，作为持久引用（如宿主自定的 `computer://<computer_id>/<path>`）中的机器身份。**不是**路由地址：`client:*` 仍按 `computer` 名路由（[§成员类型](#成员类型)）|
 | **不做** | 协议级冲突检测（房内第二台 Computer 已由 `4101` 拒绝；Server **MUST NOT** 因 `computer_id` 重复——含跨房——拒绝加入，也无需建立跨房身份索引）、凭据绑定注册、按 `computer_id` 寻址 |
@@ -128,7 +129,33 @@ class EnterOfficeReq(TypedDict):
     computer_id: NotRequired[str]       # Computer 稳定身份（role="computer" 时 MUST，role="agent" 时 MUST NOT；见 §Computer 身份）
 ```
 
-**载荷校验（先于下列席位规则）**：`computer_id` 缺失 / 形态非法 / Agent 携带 ⇒ `400`；同一会话以不同的 `role` / `name` / `computer_id` 再次 join ⇒ `403`。
+**公共校验（Agent / Computer 通用，先于下列成员规则与任何副作用）**：
+
+```python
+# Server 端公共校验（伪代码）—— 两个 role 分支之前执行
+def validate_enter_office(sid, data):
+    if not schema_ok(data):                                   # 含 office_id 取值域
+        return ErrorPayload(400, "Invalid payload")
+    if data["role"] == "computer":
+        cid = data.get("computer_id")
+        if not is_canonical_uuid(cid) or is_nil_or_max(cid):
+            return ErrorPayload(400, "Invalid computer_id")
+    elif "computer_id" in data:                               # 键出现即拒，含 null
+        return ErrorPayload(400, "computer_id not allowed for agent")
+
+    # 身份声明一致性：记录随连接存续（leave_office 不清除）；
+    # 「比对 + 首次记录」对同一 sid MUST 原子
+    with session_lock(sid):
+        rec = get_identity(sid)            # (role, name, computer_id) | None
+        claim = (data["role"], data["name"], data.get("computer_id"))
+        if rec is not None and rec != claim:
+            return ErrorPayload(403, "Identity mismatch with session")
+        if rec is None:
+            set_identity(sid, claim)       # 首次记录；本次 join 若随后被 4101 / 4106 拒绝也保留
+    return None
+```
+
+`validate_enter_office` 返回错误时直接作为 ack 返回，下列分支**不执行**。
 
 ### 验证规则
 
@@ -163,12 +190,12 @@ if role == "agent":
 
 #### Computer 加入规则
 
-0. **身份字段**：已通过上述载荷校验（`computer_id` 存在且形态合法；与本会话既有记录一致）。**不**检查 `computer_id` 是否与其它会话重复。
+0. **公共校验**：已通过上方 `validate_enter_office`（`400` / `403`）。**不**检查 `computer_id` 是否与其它会话重复。
 1. **席位检查**：目标房已有 Computer 且**不是本会话** ⇒ 拒绝（[`4101`](error-handling.md#room-full4101)，`details.role = "computer"`）。**本次校验必须先于换房**（见下方伪代码注记）。同名与否不影响结论——同 role 的第二个会话一律先撞席位。
 2. **换房**：若已在其它房间，**先自动离开旧房**（向旧房广播 `notify:leave_office`）。
 3. 加入新房间。
 
-**幂等重入（Agent / Computer 通用）**：会话已在目标房时再次 `server:join_office` ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`。
+**幂等重入（Agent / Computer 通用）**：会话已在目标房、且身份声明与记录一致（公共校验已通过）时再次 `server:join_office` ⇒ 空 ack，**MUST NOT** 重复广播 `notify:enter_office`。
 
 ```python
 # Server 端处理逻辑（伪代码）
@@ -187,8 +214,7 @@ if role == "computer":
     if current_room:
         await leave_room(sid, current_room)   # 向旧房广播 notify:leave_office
 
-    record_computer_id(sid, computer_id)      # 连接内首次记录；与既有记录不同已在载荷校验阶段回 403
-    await join_room(sid, office_id)           # 广播 notify:enter_office（携带 computer_id）
+    await join_room(sid, office_id)           # 广播 notify:enter_office（携带会话记录的 computer_id）
     return  # 成功：空 ack
 ```
 
@@ -327,7 +353,7 @@ async def on_client_tool_call(sid, data):
 class EnterOfficeNotification(TypedDict, total=False):
     office_id: str
     computer: str | None     # 加入的 Computer 名称
-    computer_id: str | None  # 加入的 Computer 稳定身份（v0.5.0 起）
+    computer_id: str         # 加入的 Computer 稳定身份（仅成员为 Computer 时出现；v0.5.0 起）
     agent: str | None        # 加入的 Agent 名称
 ```
 
@@ -344,7 +370,7 @@ class EnterOfficeNotification(TypedDict, total=False):
 class LeaveOfficeNotification(TypedDict, total=False):
     office_id: str
     computer: str | None     # 离开的 Computer 名称
-    computer_id: str | None  # 离开的 Computer 稳定身份（v0.5.0 起）
+    computer_id: str         # 离开的 Computer 稳定身份（仅成员为 Computer 时出现；v0.5.0 起）
     agent: str | None        # 离开的 Agent 名称
 ```
 
@@ -402,13 +428,18 @@ Server 实现 **MUST** 覆盖以下房间成员场景（双 SDK 对拍）。记�
 
 | # | 前置 | 动作 | 期望 |
 |---|------|------|------|
-| 10 | `R1` 为空 | `C1` join `R1`，`computer_id` 缺失；或为大写 / 无连字符 / 非 UUID 文本 | ack = `400`；`C1` 未入房，**无**广播 |
-| 11 | `R1` 为空 | `A` join `R1` 并携带 `computer_id` | ack = `400`；`A` 未入房 |
-| 12 | `A` 在 `R1` | `C1` join `R1`（`X`）| 空 ack；`A` 收到 `notify:enter_office(computer=C1, computer_id=X)`；`server:list_room` 中 `C1` 的 `SessionInfo.computer_id = X`，`A` 的 `SessionInfo` **无** `computer_id` |
+| 10 | `R1` 为空 | `C1` join `R1`，`computer_id` 缺失；或为大写 / 无连字符 / 非 UUID 文本 / nil UUID | ack = `400`；`C1` 未入房，**无**广播 |
+| 11 | `R1` 为空 | `A` join `R1` 并携带 `computer_id`（任意值，含 `null`）| ack = `400`；`A` 未入房 |
+| 12 | `A` 在 `R1` | `C1` join `R1`（`X`）| 空 ack；`A` 收到 `notify:enter_office(computer=C1, computer_id=X)`；`server:list_room` 中 `C1` 的 `SessionInfo.computer_id = X`，`A` 的 `SessionInfo` **无** `computer_id` 键 |
 | 13 | `C1` 在 `R1`（`X`）| `C1` 同一会话以 `Y` 再次 join `R1` | ack = `403`；`C1` 仍在 `R1`，记录仍为 `X`，**无**广播 |
 | 14 | `C1` 在 `R1`（`X`）| 另一会话 `C2` 以同一 `X` join `R2`（克隆）| 空 ack（协议不做 `computer_id` 冲突检测）|
 | 15 | `A`、`C1` 在 `R1`（`X`）| `C1` leave `R1`（或断连）| `A` 收到 `notify:leave_office(computer=C1, computer_id=X)` |
 | 16 | `A`、`C1` 在 `R1`（`X`），`R2` 为空 | `C1` join `R2`（自动换房）| `R1` 收到 `notify:leave_office(computer=C1, computer_id=X)`，`R2` 收到 `notify:enter_office(computer=C1, computer_id=X)` |
+| 17 | `C1` 在 `R1`（`X`）| `C1` 同一会话以 `X` 再次 join `R1` | 空 ack（幂等），**无**广播（#13 的正对照）|
+| 18 | `C1` 在 `R1`（`X`）| `C1` leave `R1`（不断连）→ 同一会话以 `Y` join `R1` | ack = `403`（记录不因 leave 清除）；`C1` 不在任何房 |
+| 19 | `C1` 在 `R1`（`X`），`C2` 在 `R2` | `C1` 同一会话以 `Y` join `R2` | ack = `403`（**非** `4101`）；`C1` 仍在 `R1`，`R1` **未**收到 `notify:leave_office` |
+| 20 | `A` 在 `R1` | `A` join `R2` 并携带 `computer_id` | ack = `400`（**非** `4106`）；`A` 仍在 `R1` |
+| 21 | `C1` 在 `R1`（`X`）| `A` join `R1` | `C1` 收到的 `notify:enter_office(agent=A)` **无** `computer_id` 键（不得为 `null`）|
 
 ## 最佳实践
 
