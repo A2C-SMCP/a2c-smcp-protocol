@@ -749,6 +749,7 @@ BlobHandle: TypeAlias = str   # 不透明、Computer 铸造、无状态可重解
 |---|---|---|
 | `GetSkillRet`（A2C 可变） | 顶层 [`blob_handle`](#getskillret) | 顶层 `total_size` / `sha256` / `mime_type` |
 | MCP `CallToolResult`（标准不可变） | content item `_meta.a2c_blob_handle` | item `_meta.a2c_total_size` / `_meta.a2c_sha256` + 既有 `mimeType` |
+| [`ResolvePathRet`](#resolvepathret)（A2C 可变，v0.5.0 起） | 顶层 `blob_handle` | 顶层 `total_size` / `sha256` / `mime_type`（另含 `canonical_path` / `mtime`）|
 
 `_meta` 旁路与 [`SMCPTool.meta` 命名空间约定](#smcptoolmeta-序列化规范)（`a2c_tool_meta` 等）同构——A2C 在不可变 MCP 结构上扩展的既定手法。
 
@@ -788,6 +789,38 @@ class GetBlobRet(TypedDict, total=False):
     - `sha256` / `total_size` 一次逻辑读取内 **MUST** 稳定；跨块变化 ⇒ 源被改写，Agent **MUST** 从 offset 0 重读。Computer **SHOULD** 尽力一致快照。
     - `GetBlobReq` / `GetBlobRet` 为开放 TypedDict，未来可**非破坏**追加 `content_encoding`（gzip 等，缺省 identity）/ `etag`；offset / total_size / sha256 基于**解码后**资源字节，加压缩不致歧义。
     - 句柄失效 / 源消失 / 范围越界 → [`4018`](error-handling.md#blob-not-accessible4018)。
+
+### ResolvePathReq
+
+按路径读取的生产者事件 [`client:resolve_path`](events.md#clientresolve_path) 的请求（v0.5.0 起，protocol#65）。
+
+```python
+class ResolvePathReq(AgentCallData, total=True):
+    agent: str                          # Agent 名称
+    req_id: str                         # 请求 ID
+    computer: str                       # 目标 Computer 名称
+    path: str                           # Computer 本地绝对路径：原生形态或 canonical_path 形态（"/C:/..."）
+```
+
+### ResolvePathRet
+
+```python
+class ResolvePathRet(TypedDict, total=True):
+    canonical_path: str         # 规范路径（realpath 后经 normalize_path；可直接回用作 path）
+    blob_handle: str            # 现铸不透明句柄，转 client:get_blob 拉取字节
+    mime_type: str              # 确定性推断（同 SKILL §6.4 (1)）
+    total_size: int             # 文件字节数（≥ 0）
+    sha256: str                 # 全量 sha256 十六进制（小写）
+    mtime: int                  # 最后修改时间，Unix epoch 毫秒（向下取整；仅作提示，内容一致性以 sha256 为准）
+    req_id: str                 # 请求 ID
+```
+
+!!! note "按路径读取语义"
+
+    - **授权边界 = `readRoots`**：Computer settings 键 `readRoots: list[str]`，默认空 = 不可读（fail-closed）；仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设，`project` scope MUST 拒绝。越界判定先于存在性探测。
+    - **`canonical_path`**：纯函数 `normalize_path` 定义表示形态（POSIX 绝对路径；Windows `/C:/...`、盘符大写、分隔符 `/`；不做百分号编码），由 [数据向量](blob-transfer.md#canonical_path-规范化) 钉住。
+    - **持久引用 = `computer_id` + `canonical_path`**，不是 `blob_handle`；每次读取重新 resolve 现铸句柄。
+    - 失败 → [`4020`](error-handling.md#path-not-accessible4020)（`invalid_path` / `forbidden` / `not_found` / `not_a_file`）；拉取期撤权 / 删除 → `4018` `forbidden` / `gone`。完整语义见 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取)。
 
 ### PutBlobReq
 

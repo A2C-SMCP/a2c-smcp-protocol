@@ -132,5 +132,6 @@ nav:
       - v0.3.0 plugin install/enable 分离: migrations/v0.3.0-plugin-install-enable-separation.md
       - v0.5.0 一房单 Computer: migrations/v0.5.0-single-computer-room.md
       - v0.5.0 Computer 稳定身份: migrations/v0.5.0-computer-id.md
+      - v0.5.0 按路径读取: migrations/v0.5.0-resolve-path.md
   - 附录:
       - 常见问题: appendix/faq.md

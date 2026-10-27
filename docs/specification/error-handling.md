@@ -57,7 +57,10 @@ A2C-SMCP 协议定义了统一的错误处理机制，确保 Agent、Server、Co
 |------|------|------|
 | 4018 | Blob Not Accessible | `client:get_blob` 句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（见 [§Blob Not Accessible](#blob-not-accessible4018)）|
 | 4019 | Blob Write Failed | `client:put_blob` 会话无效 / 声明非法 / 顺序错乱 / 超上限 / 会话繁忙 / 沙箱不可写 / 完整性不符 / IO 失败（见 [§Blob Write Failed](#blob-write-failed4019)）|
+| 4020 | Path Not Accessible | `client:resolve_path` 路径非法 / 越出 `readRoots` / 不存在 / 非普通文件（v0.5.0 起；见 [§Path Not Accessible](#path-not-accessible4020)）|
 
+> **`4020` 与 `4018` 的分界**：`4020` 属按路径读取的**铸造期**（`client:resolve_path` 失败，不铸造句柄）；resolve 成功后、拉取期的撤权 / 删除仍走 `4018`（`forbidden` / `gone`），**`4018` 枚举不变**。
+>
 > **边界**：`4018` 属传输**下行拉取期**；`4019` 属传输**上行写入期**，二者方向相反、互不重叠。下行资源的鉴权与绝对上限由**铸造句柄的生产者通道**在铸造期决断（SKILL → `4017`，不通过则不铸造句柄）；上行资源的绝对上限由 **Computer 在首块决断**（`total_size` 超限 → `4019 too_large`，零字节落盘）。`4017`（SKILL 铸造期专属）与 MCP `CallToolResult.isError`（MCP 事件专属）**均不用于上行**。详见 [通用二进制传输](blob-transfer.md)。
 
 ### 连接与房间管理错误码
@@ -124,7 +127,7 @@ class ErrorPayload(TypedDict, total=False):
 | 层 | 错误码 | 承载方式 |
 |----|--------|----------|
 | HTTP 握手层 | `400` / `4008` | HTTP 400 响应 body（JSON）+ `X-A2C-Error-Code` header（冗余诊断，仅 `4008`）|
-| Socket.IO ack 层 | `400` / `403` / `4014`–`4019` / `4101`–`4106` | ack callback 第一参（dict）|
+| Socket.IO ack 层 | `400` / `403` / `4014`–`4020` / `4101`–`4106` | ack callback 第一参（dict）|
 
 两层使用**同一种** flat shape，差别仅在传输通道。
 
@@ -141,6 +144,7 @@ class ErrorPayload(TypedDict, total=False):
 | `4017` | — | `reason` / `rel_path` / `total_size` |
 | `4018` | — | `reason` |
 | `4019` | — | `reason` / `upload_id` / `chunk_offset` / `total_size` |
+| `4020` | — | `reason` |
 | `4101` | — | `office_id` / `role`（被占席位的 role）|
 | `4102` | — | `office_id` |
 | `4103` | — | — |
@@ -841,8 +845,8 @@ CallToolResult(
 | `details.reason` | 触发 |
 |---|---|
 | `invalid_handle` | `blob_handle` 格式非法 / 非本 Computer 铸造 / 无法识别 |
-| `forbidden` | 句柄可解析，但**重施铸造通道鉴权失败**（如 SKILL 现已 orphan、`.skillenv` 等仍禁止）——防御纵深，句柄内容**绝不**被直接信任 |
-| `gone` | 源已不可达：SKILL 卸载 / 文件删除 / 内容已无法服务 |
+| `forbidden` | 句柄可解析，但**重施铸造通道鉴权失败**（如 SKILL 现已 orphan、`.skillenv` 等仍禁止；path 源现已越出当前 `readRoots` / OS 拒绝读取）——防御纵深，句柄内容**绝不**被直接信任 |
+| `gone` | 源已不可达：SKILL 卸载 / 文件删除（含 path 源被删除或已非普通文件）/ 内容已无法服务 |
 | `range` | `chunk_offset < 0` 或 `> total_size` |
 
 **响应结构**（Socket.IO ack 数据）:
@@ -865,7 +869,7 @@ CallToolResult(
 
 **安全不变量**：`client:get_blob` **不是**任意文件读原语。Computer 每次解析句柄 **MUST** 重跑铸造通道的边界校验（SKILL → [§9 沙箱](skill.md#9-安全模型)）；句柄即便编码了路径也**绝不**被直接信任。`.skillenv` 等敏感文件因在铸造期已被 `4017 forbidden` 拦截，**永不**会有指向它的句柄。
 
-**Agent 行为建议**：`invalid_handle` / `forbidden` 不重试；`gone` 回到生产者通道重新获取（如重新 `client:get_skill` 取新 `blob_handle`）；`range` 修正 `chunk_offset` 后重试。跨块若 `sha256` / `total_size` 变化，从 offset 0 重读。
+**Agent 行为建议**：`invalid_handle` / `forbidden` 不重试；`gone` 回到生产者通道重新获取（如重新 `client:get_skill` / `client:resolve_path` 取新 `blob_handle`）；`range` 修正 `chunk_offset` 后重试。跨块若 `sha256` / `total_size` 变化，从 offset 0 重读。
 
 ### Blob Write Failed（4019）
 
@@ -912,6 +916,45 @@ CallToolResult(
 **Agent 行为建议**：`invalid_upload` → 新 `upload_id` 从 0 重传；`invalid_declaration` / `range` 属客户端构造错误，检查声明与偏移后重传（新会话）；`too_large` → 不重试，改用分治 / 压缩 / 留上下文策略；`busy` → 退避等待后重试；`forbidden` / `io_error` → 不重试，字节留上下文（Computer 侧状态问题，无法靠重传解决）；`integrity` → 检查本地字节（本地损坏 / 传输损坏）后从 0 重传。
 
 **版本错配叙述**：`4019` 是 0.4.0 新增码。旧 SDK 收到 4019 会按各自「未知错误码」策略处理（具体行为由各 SDK 定义）——加性错误码的版本错配随版本推进自然消解，非阻塞项。
+
+### Path Not Accessible（4020）
+
+**触发时机**：`client:resolve_path` 铸造阶段（v0.5.0 起，protocol#65）——给定路径无法解析为一个**位于 `readRoots` 内、存在、可读的普通文件**。失败时**不铸造句柄**。处理顺序与完整语义见 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取)。
+
+**判定**（按处理顺序；**越界判定先于存在性探测**）：
+
+| `details.reason` | 触发 |
+|---|---|
+| `invalid_path` | `path` 不符合 [`normalize_path`](blob-transfer.md#canonical_path-规范化) 的输入形态：空串 / 含 U+0000 / 相对路径 / `~` / Windows 裸盘符或盘符相对 / UNC；或 realpath 结果无法以 Unicode 字符串表示 |
+| `forbidden` | `readRoots` 为空；规范化路径词法上或 realpath 后（符号链接越界）不在任一 root 内；OS 拒绝读取 |
+| `not_found` | 位于 `readRoots` 内但不存在 |
+| `not_a_file` | 位于 `readRoots` 内、存在，但不是普通文件（目录 / 设备 / FIFO / socket 等）|
+
+**响应结构**（Socket.IO ack 数据）:
+
+```json
+{
+  "code": 4020,
+  "message": "Path not accessible",
+  "details": { "reason": "forbidden" }
+}
+```
+
+**字段说明**：
+
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `code` | 是 | 固定 `4020` |
+| `message` | 是 | 人类可读 |
+| `details.reason` | 是 | `invalid_path` / `forbidden` / `not_found` / `not_a_file`（开放枚举，未来可非破坏新增）|
+
+**复用与不使用**：铸造期一律 `4020`；拉取期（句柄已铸造后）的撤权 / 删除走 [`4018`](#blob-not-accessible4018) `forbidden` / `gone`，`4018` 枚举**不**为本生产者新增值。**不使用** [`4017`](#skill-resource-not-accessible4017)（SKILL 铸造期专属）、**不使用** `404`（`not_found` 只对授权边界内的文件可达，语义是「授权内的文件不存在」而非路由目标不存在）。按路径读取**不设**绝对上限，故**无** `too_large`；`sha256` 计算超时按常规请求超时处理。
+
+**安全不变量**：`client:resolve_path` **不是**任意文件读原语——授权边界由 Computer 用户配置的 `readRoots` 决定，默认空即全部 `forbidden`；越界判定先于存在性探测，`readRoots` 之外的文件**不**因 `not_found` / `forbidden` 的差异泄露存在性；`readRoots` 仅受信 scope 可设，`project` scope MUST 拒绝。
+
+**Agent 行为建议**：`invalid_path` 属客户端构造错误，修正路径后重试；`forbidden` 不重试，向用户说明「该路径未被 Computer 授权读取」（需用户在 Computer 端配置 `readRoots`）；`not_found` / `not_a_file` 不重试，如实告知（宿主可据此把持久引用呈现为「文件已不存在」）。
+
+**版本错配叙述**：`4020` 是 0.5.0 新增码；v0.x MINOR 严格握手下 0.5 Agent 只会遇到 0.5 Computer，不存在跨 MINOR 错配。
 
 ## TODO
 

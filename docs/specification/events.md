@@ -162,6 +162,7 @@ except socketio.exceptions.ConnectionError as e:
 | `GET_SKILL_EVENT` | `client:get_skill` | 获取 SKILL 包内资源：文本内联 `body`，二进制/过大返 `blob_handle` | `GetSkillReq` | `GetSkillRet` |
 | `GET_BLOB_EVENT` | `client:get_blob` | 通用：按 `blob_handle` 分块拉取 Computer 字节资源 | `GetBlobReq` | `GetBlobRet` |
 | `PUT_BLOB_EVENT` | `client:put_blob` | 通用：分块上行落盘到 Computer 授权 landing root，返回绝对 `landing_path` | `PutBlobReq` | `PutBlobRet` |
+| `RESOLVE_PATH_EVENT` | `client:resolve_path` | 按路径读取（v0.5.0 起）：规范化 + `readRoots` 校验 + stat，返回 `canonical_path` 与元数据并现铸 `blob_handle` | `ResolvePathReq` | `ResolvePathRet` |
 
 ### Server 事件（客户端 → Server）
 
@@ -479,6 +480,64 @@ Agent ←───────────────────────�
 4. 从 `chunk_offset`（缺省 0）取 `min(max_chunk_bytes, Computer cap)` 字节，恒保证序列化 ≤ Server `maxHttpBufferSize`；base64 → `blob`，回填 `total_size`/`sha256`/`chunk_offset`/`eof`
 
 详见 [通用二进制传输](blob-transfer.md)。
+
+#### `client:resolve_path`
+
+按路径读取（v0.5.0 起，protocol#65）：Agent 给出 Computer 本地文件路径，Computer 规范化 → 校验 `readRoots`（默认空 = 不可读）→ stat，返回规范路径与元数据，并**现铸** `blob_handle`；字节经 [`client:get_blob`](#clientget_blob) 拉取。本事件是 `blob_handle` 的第三个生产者，**不**让 Agent 构造句柄。
+
+**请求数据 (ResolvePathReq)**:
+```python
+{
+    "agent": str,       # Agent 标识
+    "req_id": str,      # 请求 ID
+    "computer": str,    # 目标 Computer 名称
+    "path": str         # 本地绝对路径：原生形态或 canonical_path 形态（"/C:/..."）
+}
+```
+
+**响应数据 (ResolvePathRet)**:
+```python
+{
+    "canonical_path": str,  # 规范路径（realpath 后）
+    "blob_handle": str,     # 现铸句柄 → client:get_blob
+    "mime_type": str,       # 确定性推断（同 SKILL §6.4 (1)）
+    "total_size": int,      # 文件字节数
+    "sha256": str,          # 全量 sha256 十六进制
+    "mtime": int,           # Unix epoch 毫秒（仅作提示）
+    "req_id": str
+}
+```
+
+**Computer 处理流程**（顺序 MUST；越界判定先于存在性探测）：
+
+1. `normalize_path(path)` 失败 → [`4020 Path Not Accessible`](error-handling.md#path-not-accessible4020) `details.reason="invalid_path"`
+2. `readRoots` 为空，或规范化后的 `path` 词法上不在任一 root 内 → `4020` `forbidden`（不访问文件系统）
+3. realpath → `canonical_path`；越出 `readRoots`（如符号链接越界）→ `4020` `forbidden`
+4. 不存在 → `4020` `not_found`；非普通文件 → `4020` `not_a_file`；OS 拒绝读取 → `4020` `forbidden`
+5. stat + `sha256`（不设大小上限，受常规请求超时约束；MAY 按 `(canonical_path, total_size, mtime)` 缓存）+ 确定性 `mime_type` → 铸造 `blob_handle`
+
+拉取期 `client:get_blob` 对 path 句柄 **MUST** 按当前 `readRoots` 重施围栏：越界 / 撤权 → `4018` `forbidden`；文件已删除 → `4018` `gone`。**持久引用 = `computer_id` + `canonical_path`**（宿主存），不是 `blob_handle`。
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant S as Server
+    participant C as Computer
+
+    A->>S: client:resolve_path(path)
+    S->>C: 转发
+    C->>C: normalize → readRoots 围栏 → realpath 围栏 → stat / sha256 → 铸造 blob_handle
+    C->>S: ResolvePathRet
+    S->>A: ResolvePathRet
+    loop 直至 eof
+        A->>S: client:get_blob(blob_handle, chunk_offset)
+        S->>C: 转发
+        C->>S: GetBlobRet
+        S->>A: GetBlobRet
+    end
+```
+
+详见 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取)。
 
 #### `client:put_blob`
 
@@ -1057,6 +1116,7 @@ sequenceDiagram
 - `notify:update_config` / `notify:update_tool_list` - 刷新工具列表
 - `notify:update_skills` - 刷新 SKILL 清单
 - `client:put_blob` - 上行落盘循环（首块声明 `total_size`/`sha256` → ack-paced 逐块发送 → 末块取 `landing_path`），能力门控 = 自身 minor ≥ 0.4（版本握手传递性，无需协商字段）
+- `client:resolve_path` - 按路径读取（v0.5.0 起）：持久引用存 `computer_id` + `canonical_path`，每次读取先 resolve 现铸句柄再 `client:get_blob` 拉取；`ResolvePathRet.sha256` 可用于不拉字节的变更检测；能力门控 = 自身 minor ≥ 0.5（版本握手传递性）
 - `server:tool_call_cancel` - 工具调用超时或需主动取消时发起（fire-and-forget，无 ack）；并据响应结果级 `meta.a2c_cancelled` 区分取消与普通失败/超时（**主动取消**的终态来源与三态透出约束见 [§server:tool_call_cancel](#servertool_call_cancel)）
 - （集成层，条件 **MUST**）provider 长度适配：`exposed_tool_name` 可能超下游 provider 限长——超限时集成层 MUST 维护 `短名 ↔ exposed_tool_name` 双射（collision-safe，禁裸截断），仅用于 Agent↔LLM；SDK 保持 wire-faithful，A2C wire 恒传 `exposed_tool_name`（[长度与 provider 适配](data-structures.md#mcp-tool-命名与路由)）
 

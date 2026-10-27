@@ -210,6 +210,17 @@ fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 
 - 向量覆盖分叉点：bundle_id 段缺省/存在、大小写保留对照对、`no-fold-consecutive` / `no-trim-edges`（与 bundle_id `normalize_name` 的关键差异）、`collision-pair-*`（已知坍缩对，注册期 fail-fast）、CJK 逐码点、astral 单码点。
 - 文件内 `algorithm` 段与规范正文一致；两者冲突时以规范正文为准，并回改夹具（不得只改一方）。
 
+### 2.8 canonical_path 路径规范化
+
+按路径读取（[blob-transfer §canonical_path 规范化](../blob-transfer.md#canonical_path-规范化)，[protocol#65](https://github.com/A2C-SMCP/a2c-smcp-protocol/issues/65)）的路径表示形态由协议仓托管的数据向量强制：
+
+- **规范夹具**：[`fixtures/canonical_path_conformance_vectors.json`](../fixtures/canonical_path_conformance_vectors.json)（协议仓首版）。
+- 任一 SDK 的纯函数 `normalize_path(input, platform)` **MUST** 对每条向量产出 `expected`，或在向量给出 `error` 时以 `invalid_path` 失败；`platform` ∈ `posix` / `windows`，**MUST** 与宿主 OS 无关地可测（Windows 形态在任意 CI 上以纯函数测试）。
+- 该向量为**数据向量**：SDK **MUST** 以协议仓版本的**逐字节 vendored 副本**接入，**MUST NOT** 各自维护或改写。
+- 覆盖分叉点：重复分隔 / `.` / `..`（含在根时钳制）/ 尾随分隔、不做 `~` 展开与百分号编解码、POSIX 下 `\` 为普通字符、Windows 盘符大写与 `\` → `/`、canonical 形态往返、`\\?\` 前缀剥离、裸盘符 / 盘符相对 / 无盘符根 / UNC 拒绝。
+- 文件内 `algorithm` 段与规范正文一致；两者冲突时以规范正文为准，并回改夹具。
+- realpath（符号链接解析）依赖文件系统，**不**在本向量内；由 SDK 以真实文件系统用例覆盖（见 §4.5）。
+
 ## 3. Runtime Contract Checklist
 
 ### 3.1 Create From Config
@@ -295,6 +306,9 @@ fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 
 - Out-of-range offset 返回 `4018`，并带 `range` 或等价信息。
 - `total_size` 和 `sha256` 在一次 logical read 内保持稳定。
 - Blob access 不能读取任意本地文件。
+- `client:resolve_path`（v0.5.0 起）：`readRoots` 为空 → `4020 forbidden`；授权内文件 resolve 成功并经 `get_blob` 分块拉取、`sha256` 与 `ResolvePathRet.sha256` 一致；越界（含符号链接越界）→ `4020 forbidden`；授权内不存在 → `not_found`；目录 → `not_a_file`；授权外不存在的路径同样回 `forbidden`（不泄露存在性）。
+- path 句柄在 resolve 后文件被删除 → `get_blob` `4018 gone`；`readRoots` 移除该 root 后拉取 → `4018 forbidden`。
+- `readRoots` 由 `project` scope 提供时不生效（整字段拒绝）；`canonical_path` 回用作 `path` 再次 resolve 得同一值。
 
 ### 4.6 Desktop
 

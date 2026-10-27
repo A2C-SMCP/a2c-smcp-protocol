@@ -277,6 +277,16 @@ def handle_request(request):
     pass
 ```
 
+## 读取通道安全（readRoots 授权）
+
+`client:resolve_path` 按路径读取能力（v0.5.0 起，完整契约见 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取)）的安全边界：
+
+- **默认不可读（fail-closed）**：`readRoots` 默认空，未配置时一律 [`4020 forbidden`](error-handling.md#path-not-accessible4020)。Robot 能读用户机器上的哪些文件，**必须**由 Computer 端用户显式授权
+- **受信配置**：`readRoots` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；`project` scope 提供该键 **必须**被拒绝——clone 的仓库不得把读授权扩到任意路径（[computer-management §7 不变量 #7](computer-management/protocol.md#7-安全不变量)）
+- **围栏**：canonicalize + realpath 后按**路径分量**判定落在 root 内；符号链接越界 → `forbidden`；拉取期 `client:get_blob` 按**当前** `readRoots` 重施围栏（覆盖 resolve 后被换掉的符号链接与撤权）
+- **不泄露存在性**：越界判定先于存在性探测——`readRoots` 之外的路径一律 `forbidden`，不区分存在与否
+- **路径披露**：`canonical_path` 为绝对路径，与 [`landing_path`](#路径披露权衡) 同属有意披露——它只对已授权的文件返回，不带来新能力
+
 ## 写入通道安全（Landing 沙箱）
 
 `client:put_blob` 的上行写入落盘能力，安全边界如下（完整契约见 [通用二进制传输 §3 / §7](blob-transfer.md)）：
