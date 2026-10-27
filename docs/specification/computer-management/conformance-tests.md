@@ -309,6 +309,11 @@ fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 
 - `client:resolve_path`（v0.5.0 起）：`readRoots` 为空 → `4020 forbidden`；授权内文件 resolve 成功并经 `get_blob` 分块拉取、`sha256` 与 `ResolvePathRet.sha256` 一致；越界（含符号链接越界）→ `4020 forbidden`；授权内不存在 → `not_found`；目录 → `not_a_file`；授权外不存在的路径同样回 `forbidden`（不泄露存在性）。
 - path 句柄在 resolve 后文件被删除 → `get_blob` `4018 gone`；`readRoots` 移除该 root 后拉取 → `4018 forbidden`。
 - `readRoots` 由 `project` scope 提供时不生效（整字段拒绝）；`canonical_path` 回用作 `path` 再次 resolve 得同一值。
+- 符号链接越界且目标**不存在**（`root/link → /outside`，`/outside/x` 缺失）→ `forbidden`（**非** `not_found`）。
+- `..` 词法先消解：`root/link/../a.txt`（`link → root/sub/deep`）解析为 `root/a.txt`。
+- 经符号链接配置的 root（macOS `/tmp/share`）以配置路径访问可成功。
+- `readRoots` 覆盖 SKILL 安装目录或 Computer 配置目录时，`.skillenv` / settings / `computer_id` 存储 → `forbidden`；拉取期同为 `4018 forbidden`。
+- root 内父目录不可搜索（`EACCES`）→ `forbidden`；root 内不存在 → `not_found`。
 
 ### 4.6 Desktop
 

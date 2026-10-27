@@ -811,7 +811,7 @@ class ResolvePathRet(TypedDict, total=True):
     mime_type: str              # 确定性推断（同 SKILL §6.4 (1)）
     total_size: int             # 文件字节数（≥ 0）
     sha256: str                 # 全量 sha256 十六进制（小写）
-    mtime: int                  # 最后修改时间，Unix epoch 毫秒（向下取整；仅作提示，内容一致性以 sha256 为准）
+    mtime: int                  # 最后修改时间，Unix epoch 毫秒（向负无穷取整，1970 前为负；仅作提示，内容一致性以 sha256 为准）
     req_id: str                 # 请求 ID
 ```
 
@@ -820,6 +820,7 @@ class ResolvePathRet(TypedDict, total=True):
     - **授权边界 = `readRoots`**：Computer settings 键 `readRoots: list[str]`，默认空 = 不可读（fail-closed）；仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设，`project` scope MUST 拒绝。越界判定先于存在性探测。
     - **`canonical_path`**：纯函数 `normalize_path` 定义表示形态（POSIX 绝对路径；Windows `/C:/...`、盘符大写、分隔符 `/`；不做百分号编码），由 [数据向量](blob-transfer.md#canonical_path-规范化) 钉住。
     - **持久引用 = `computer_id` + `canonical_path`**，不是 `blob_handle`；每次读取重新 resolve 现铸句柄。
+    - **固定拒绝集**：`.skillenv`、Computer 自身配置 / 状态 / 凭据目录、未定稿 `.part` 即便在 `readRoots` 内也 `forbidden`（[§固定拒绝集](blob-transfer.md#固定拒绝集)）。
     - 失败 → [`4020`](error-handling.md#path-not-accessible4020)（`invalid_path` / `forbidden` / `not_found` / `not_a_file`）；拉取期撤权 / 删除 → `4018` `forbidden` / `gone`。完整语义见 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取)。
 
 ### PutBlobReq

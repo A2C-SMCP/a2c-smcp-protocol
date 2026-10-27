@@ -925,9 +925,9 @@ CallToolResult(
 
 | `details.reason` | 触发 |
 |---|---|
-| `invalid_path` | `path` 不符合 [`normalize_path`](blob-transfer.md#canonical_path-规范化) 的输入形态：空串 / 含 U+0000 / 相对路径 / `~` / Windows 裸盘符或盘符相对 / UNC；或 realpath 结果无法以 Unicode 字符串表示 |
-| `forbidden` | `readRoots` 为空；规范化路径词法上或 realpath 后（符号链接越界）不在任一 root 内；OS 拒绝读取 |
-| `not_found` | 位于 `readRoots` 内但不存在 |
+| `invalid_path` | `path` 不符合 [`normalize_path`](blob-transfer.md#canonical_path-规范化) 的输入形态：空串 / 含 U+0000 / 相对路径 / `~` / Windows 裸盘符、盘符相对、UNC、`\\.\` 设备前缀、非法字符或以 `.` / 空格结尾的分量 |
+| `forbidden` | `readRoots` 为空；`path` 词法上或 realpath 后（符号链接越界）不在任一 root 内；realpath 围栏通过前的任何文件系统错误；命中[固定拒绝集](blob-transfer.md#固定拒绝集)（`.skillenv` / Computer 配置·状态·凭据目录 / `.part`）；权限类错误（`EACCES` / `EPERM`）|
+| `not_found` | 通过 realpath 围栏后打开失败且为 `ENOENT` / `ENOTDIR` |
 | `not_a_file` | 位于 `readRoots` 内、存在，但不是普通文件（目录 / 设备 / FIFO / socket 等）|
 
 **响应结构**（Socket.IO ack 数据）:
@@ -950,7 +950,7 @@ CallToolResult(
 
 **复用与不使用**：铸造期一律 `4020`；拉取期（句柄已铸造后）的撤权 / 删除走 [`4018`](#blob-not-accessible4018) `forbidden` / `gone`，`4018` 枚举**不**为本生产者新增值。**不使用** [`4017`](#skill-resource-not-accessible4017)（SKILL 铸造期专属）、**不使用** `404`（`not_found` 只对授权边界内的文件可达，语义是「授权内的文件不存在」而非路由目标不存在）。按路径读取**不设**绝对上限，故**无** `too_large`；`sha256` 计算超时按常规请求超时处理。
 
-**安全不变量**：`client:resolve_path` **不是**任意文件读原语——授权边界由 Computer 用户配置的 `readRoots` 决定，默认空即全部 `forbidden`；越界判定先于存在性探测，`readRoots` 之外的文件**不**因 `not_found` / `forbidden` 的差异泄露存在性；`readRoots` 仅受信 scope 可设，`project` scope MUST 拒绝。
+**安全不变量**：`client:resolve_path` **不是**任意文件读原语——授权边界由 Computer 用户配置的 `readRoots` 决定，默认空即全部 `forbidden`；越界判定先于存在性探测（非严格 realpath，围栏通过前一切错误归 `forbidden`），`readRoots` 之外的文件**不**因 `not_found` / `forbidden` 的差异泄露存在性；固定拒绝集不因 `readRoots` 放行，`.skillenv` 永不经任何通道铸出句柄；`readRoots` 仅受信 scope 可设，`project` scope MUST 拒绝。
 
 **Agent 行为建议**：`invalid_path` 属客户端构造错误，修正路径后重试；`forbidden` 不重试，向用户说明「该路径未被 Computer 授权读取」（需用户在 Computer 端配置 `readRoots`）；`not_found` / `not_a_file` 不重试，如实告知（宿主可据此把持久引用呈现为「文件已不存在」）。
 

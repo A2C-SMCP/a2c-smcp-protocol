@@ -101,8 +101,8 @@ BlobHandle: TypeAlias = str
 **Computer 处理流程**：
 
 1. 解析 `blob_handle` 回源（不透明 → 源描述符）；无法识别 / 格式非法 → [`4018`](error-handling.md#blob-not-accessible4018) `invalid_handle`
-2. **重施铸造通道鉴权**：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)（Registry 仍含、未孤儿、`.skillenv` 等仍 forbidden）。失败 → `4018` `forbidden`
-3. 源已不可达（SKILL 卸载 / 文件删除 / 内容已变得无法服务）→ `4018` `gone`
+2. **重施铸造通道鉴权**：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)（Registry 仍含、未孤儿、`.skillenv` 等仍 forbidden）；path 源 → 按**当前** `readRoots` 重跑 [resolve 第 3–8 步](#computer-处理流程)（围栏 / 固定拒绝集 / 权限）。失败 → `4018` `forbidden`
+3. 源已不可达（SKILL 卸载 / 文件删除 / path 源被删除或已非普通文件 / 内容已变得无法服务）→ `4018` `gone`
 4. `chunk_offset < 0` 或 `> total_size` → `4018` `range`
 5. 从 `chunk_offset` 起取 `min(max_chunk_bytes, Computer cap)` 字节；`max_chunk_bytes` 缺省时 Computer 自定，**恒保证序列化后 ≤ Server `maxHttpBufferSize`**（计入 base64 +33% 与 envelope）
 6. 回填 `total_size` / `sha256`（全量资源）/ `chunk_offset` / `eof`；本块字节 base64 → `blob`
@@ -322,25 +322,37 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 
 顺序 **MUST** 如下（前序失败即返回，不执行后序；**越界判定先于任何存在性探测**，不泄露授权边界外文件的存在性）：
 
-1. `normalize_path(path)` 失败 → [`4020`](error-handling.md#path-not-accessible4020) `invalid_path`
+1. `n = normalize_path(path)` 失败 → [`4020`](error-handling.md#path-not-accessible4020) `invalid_path`。**`..` 在此按词法消解**（先于符号链接解析）——后续步骤一律以 `n` 为准，**MUST NOT** 对原始 `path` 做 realpath
 2. `readRoots` 为空 → `4020` `forbidden`
-3. 词法围栏：规范化后的 `path` 不落在任一 `readRoot` 内 → `4020` `forbidden`（**不**访问文件系统）
-4. 对原生路径做 realpath（解析全部符号链接；悬空链接按其目标处理），结果再经 `normalize_path` 得 `canonical_path`；`canonical_path` 不落在任一 `readRoot` 内（如符号链接越界）→ `4020` `forbidden`；结果无法以 Unicode 字符串表示 → `4020` `invalid_path`
-5. `canonical_path` 不存在 → `4020` `not_found`
-6. 非普通文件（目录 / 设备 / FIFO / socket 等）→ `4020` `not_a_file`
-7. OS 拒绝读取（权限不足）→ `4020` `forbidden`
-8. stat 取 `total_size` / `mtime`；计算 `sha256`；按 [SKILL §6.4 (1)](skill.md#64-mime_type-确定性与文本-mime判据) 的确定性映射推断 `mime_type`；铸造 `blob_handle`（MUST 足以在拉取期确定性回到 `canonical_path`）
+3. **词法围栏**：`n` 不落在任一 root 的**配置形态或 realpath 形态**内（见 [§readRoots](#readroots读取授权根config-first)）→ `4020` `forbidden`（**不**访问文件系统）
+4. **非严格 realpath**：对 `native(n)` 做 realpath——解析**最长已存在前缀**上的全部符号链接，再原样拼接其余（尚不存在的）分量；Windows realpath 若返回 `\\?\` 前缀形态一并剥离。结果经 `normalize_path` 得 `canonical_path`。`native(n)`：POSIX 为 `n` 本身；Windows 为 `/X:/a/b` → `X:\a\b`
+5. **realpath 围栏**：`canonical_path` 不落在任一 root 的 realpath 形态内（如符号链接越界）→ `4020` `forbidden`；realpath 结果无法以 Unicode 字符串表示或无法规范化（如解析到 UNC）→ `4020` `forbidden`。**本步通过之前**，任何文件系统错误（含 realpath / stat 失败）一律 → `4020` `forbidden`，**MUST NOT** 回 `not_found`
+6. **固定拒绝集**：`canonical_path` 命中 [§固定拒绝集](#固定拒绝集) → `4020` `forbidden`（不因 `readRoots` 授权而放行）
+7. 打开文件（**SHOULD** 不跟随末级符号链接）：`ENOENT` / `ENOTDIR` → `4020` `not_found`；`EACCES` / `EPERM` 等权限类错误 → `4020` `forbidden`
+8. 对**已打开的句柄**校验：非普通文件（目录 / 设备 / FIFO / socket 等）→ `4020` `not_a_file`；Computer **SHOULD** 取该句柄的最终路径（如 `/proc/self/fd`、`F_GETPATH`、`GetFinalPathNameByHandle`）重跑第 5–6 步，不符 → `4020` `forbidden`
+9. 从**同一打开句柄**取 `total_size` / `mtime` 并计算 `sha256`（**MUST NOT** 关闭后按路径重新打开）；按 [SKILL §6.4 (1)](skill.md#64-mime_type-确定性与文本-mime判据) 的确定性映射推断 `mime_type`；铸造 `blob_handle`（MUST 足以在拉取期确定性回到 `canonical_path`）
 
-**`sha256` 计算口径**：协议**不设**文件大小上限，`client:resolve_path` 受常规请求超时约束（超时按常规超时处理，不另设错误码）；`sha256` **MUST** 返回。Computer **MAY** 以 `(canonical_path, total_size, mtime)` 为键缓存摘要以避免重复全量计算。
+**`sha256` 计算口径**（owner 裁决）：协议**不设**文件大小上限，`client:resolve_path` 受常规请求超时约束（超时按常规超时处理，不另设错误码）；`sha256` **MUST** 返回。Computer **MAY** 缓存摘要，键 **MUST** 至少含 `(canonical_path, total_size, mtime)`，**SHOULD** 再含文件身份（inode / file-id）与 ctime（若平台提供）——缓存的强度只等于其键：同尺寸且 mtime 粒度内的改写可能命中旧摘要，键有任何疑义时 **MUST** 重算。为使大文件可读，Computer **SHOULD** 在请求超时后**继续完成**该摘要计算并写入缓存（重试即可命中），并 **SHOULD** 对同一键的并发计算去重。
 
-**拉取期**：`client:get_blob` 解析 path 句柄时 **MUST** 重跑第 3–7 步的围栏与可读性校验（按**当前** `readRoots` 与当前文件系统状态；防御纵深，覆盖 resolve 之后被换掉的符号链接）：现已越界 / 撤权 → [`4018`](error-handling.md#blob-not-accessible4018) `forbidden`；文件已删除或已非普通文件 → `4018` `gone`。`get_blob` 返回的 `sha256` / `total_size` 反映拉取时的文件；与 `ResolvePathRet` 不同 ⇒ 文件在 resolve 之后被改写，Agent **SHOULD** 重新 `client:resolve_path`。
+**拉取期**：`client:get_blob` 解析 path 句柄时 **MUST** 按**当前** `readRoots` 与当前文件系统状态重跑第 3–8 步（防御纵深，覆盖 resolve 之后被换掉的符号链接与撤权），并从本次打开的句柄读取字节：第 3 / 5 / 6 步或权限类失败 → [`4018`](error-handling.md#blob-not-accessible4018) `forbidden`；`ENOENT` / `ENOTDIR` 或已非普通文件 → `4018` `gone`。`get_blob` 的 `sha256` / `total_size` **MUST** 描述本次实际提供的字节所属的文件状态：文件身份 / 尺寸 / mtime 与该句柄已知摘要的键不符时 **MUST** 重算，否则 **SHOULD** 复用（避免每块 O(N)）。与 `ResolvePathRet` 不同 ⇒ 文件在 resolve 之后被改写，Agent **SHOULD** 重新 `client:resolve_path`；**同一文件**重组校验连续失败时 Agent **SHOULD** 有界重试（如 1 次）后如实报错，**MUST NOT** 无界循环。
+
+#### 固定拒绝集
+
+`readRoots` 是**用户授权**，但下列文件即便落在授权根内也 **MUST** 拒绝（`4020` `forbidden`；拉取期 `4018` `forbidden`），以保住[零凭证传播](security.md#零凭证传播原则)与 [SKILL `.skillenv` 不变量](skill.md#92-a2c-层补充约束)：
+
+- 末级分量为 `.skillenv` 的文件（任何位置）
+- Computer 自身的配置与状态目录内的文件：settings、`computer_id` 存储、input 值缓存、secret / 凭据存储（目录位置 SDK 自治，SDK **MUST** 把自己实际使用的位置纳入本集）
+- 上行写入中的未定稿文件（landing root 内的 `.part`）
+
+拒绝集与 `readRoots` 互不替代：`readRoots` 决定「用户愿意给 Robot 读什么」，拒绝集决定「无论用户怎么配都不得经读取通道外流什么」。
 
 #### `readRoots`（读取授权根，config-first）
 
-- **配置项**：Computer settings 键 `readRoots: list[str]`，每项为绝对路径（POSIX `/` 开头或 Windows 盘符）；非绝对项按配置诊断丢弃（不生效）。各 root 在加载时经 realpath + `normalize_path` 规范化，不存在的 root 不匹配任何路径。跨受信 scope 的合并沿用 settings 数组默认语义（拼接去重）
+- **配置项**：Computer settings 键 `readRoots: list[str]`，每项为绝对路径（POSIX `/` 开头或 Windows 盘符）；非绝对项或 `normalize_path` 失败的项按配置诊断丢弃（不生效）。跨受信 scope 的合并沿用 settings 数组默认语义（拼接去重）
+- **两种形态**：每个 root 在加载时保留 **配置形态** `normalize_path(配置值)` 与 **realpath 形态** `normalize_path(realpath(配置值))`（如 macOS `/tmp/share` → `/private/tmp/share`；realpath 失败或结果无法规范化（如映射盘解析到 UNC）的 root 只保留配置形态并记配置诊断）。**词法围栏**（第 3 步）对两种形态任一命中即通过；**realpath 围栏**（第 5 步）只认 realpath 形态——安全性只由后者保证，前者仅用于免于访问授权外的文件系统
 - **默认空 = 不可读**（fail-closed）：未配置时 `client:resolve_path` 一律 `4020 forbidden`。Robot 能读用户机器上的哪些文件，**由 Computer 端用户决定**
 - **scope 门控（协议 MUST）**：与 [`landingRoot`](#landing-root-配置config-first) 对称，仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；**`project` scope 提供该键 MUST 被 Computer 拒绝**（整字段不生效，属本地配置校验，不产生线上错误码）——clone 的仓库不得把读授权扩到任意路径（如 `~/.ssh`）
-- **围栏判定**：`p` 落在 root `r` 内 ⟺ `p == r`，或 `p` 以 `r` 为**路径分量前缀**（`r` 以 `/` 结尾时为 `p.startswith(r)`，否则为 `p.startswith(r + "/")`）。**MUST NOT** 用裸字符串前缀（`/data` 不包含 `/database`）
+- **围栏判定**：`p` 落在 root `r` 内 ⟺ `p == r`，或 `p` 以 `r` 为**路径分量前缀**（`r` 以 `/` 结尾时为 `p.startswith(r)`，否则为 `p.startswith(r + "/")`）。**MUST NOT** 用裸字符串前缀（`/data` 不包含 `/database`）。比较按码点逐一进行（Windows 上除已大写的盘符外**区分大小写**，见下文已知限制）
 
 #### `canonical_path` 规范化
 
@@ -351,13 +363,16 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 | 通用 | 空串或含 U+0000 → `invalid_path`。**不**做 `~` 展开、**不**做百分号编解码、**不**做 Unicode 归一（NFC / NFD）、**不**改变非盘符部分的大小写 |
 | POSIX | MUST 以 `/` 开头；`\` 为普通字符。按 `/` 切段 → 丢弃空段与 `.` → `..` 弹出上一段（已在根时忽略）→ `/` ‖ 段以 `/` 连接。根即 `/`，其余无尾随 `/` |
 | Windows | 剥去 `\\?\` 前缀（其后为 `UNC\` → `invalid_path`）→ `\` 一律换 `/` → canonical 形态 `/X:` 剥去开头 `/`（恰为 `X:` 时补 `/`）→ 此时 MUST 以 `X:/` 开头（否则 `invalid_path`：相对路径、裸 `C:` / `C:foo`、无盘符 `/x`、UNC）→ **盘符大写** → 余部同 POSIX 切段 → `/X:/` ‖ 段以 `/` 连接。盘符根即 `/C:/` |
-| 管线 | 词法预检 = `normalize_path(input)`；产出 `canonical_path = normalize_path(realpath(原生路径))`。Windows realpath 若返回 `\\?\` 前缀形态，同样经本函数剥离 |
+| Windows 分量限制 | 剥去 `\\.\` 设备前缀不支持（`invalid_path`）；盘符之后任一分量含 `<` `>` `:` `"` `|` `?` `*` 或 U+0001–U+001F（含备用数据流 `a.txt:s`），或以 `.` / 空格结尾（`.` 与 `..` 本身除外；Win32 会静默剥除，形态不唯一）→ `invalid_path` |
+| 管线 | 词法 `n = normalize_path(input)`；产出 `canonical_path = normalize_path(realpath_nonstrict(native(n)))`（见上文处理流程第 1 / 4 步）。Windows realpath 若返回 `\\?\` 前缀形态，同样经本函数剥离 |
 
 `canonical_path` 是原始路径字符串，可直接作为下一次 `client:resolve_path` 的 `path`（往返稳定：文件未变时再次 resolve 得同一 `canonical_path`）。
 
 !!! note "已知限制（v0.5.0）"
 
-    - **大小写不敏感文件系统**（Windows / 默认 macOS）上同一文件的异形大小写写法，协议**不承诺**归一到同一 `canonical_path`（取决于各 OS realpath 是否返回磁盘上的真实大小写）。宿主应以 Computer 返回的 `canonical_path` 为准存储，而非用户输入。
+    - **大小写不敏感文件系统**（Windows / 默认 macOS）上同一文件的异形大小写写法，协议**不承诺**归一到同一 `canonical_path`（取决于各 OS realpath 是否返回磁盘上的真实大小写），且词法围栏区分大小写——与 root 配置大小写不同的输入可能在第 3 步即被拒。宿主应以 Computer 返回的 `canonical_path` 为准存储，而非用户输入；Windows 8.3 短名同此。
+    - **`..` 词法消解**：`..` 先于符号链接解析按词法消解，与 POSIX shell 的物理语义（`cd link/..`）不同——这是有意的跨 SDK 确定性选择。
+    - **Windows 保留设备名**（`CON` / `NUL` 等）不在 `normalize_path` 内拦截，由 realpath / 打开阶段按普通失败处理。
     - **Unicode 归一**：不做 NFC / NFD 归一，保留 OS 返回的码点序列。
     - **UNC / 网络共享路径**（`\\server\share`）本版不支持（`invalid_path`）；POSIX 上无法以 UTF-8 表示的文件名不可解析（`invalid_path`）。
 

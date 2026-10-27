@@ -475,8 +475,8 @@ Agent ←───────────────────────�
 **Computer 处理流程**：
 
 1. 解析 `blob_handle` 回源；无法识别 / 格式非法 → [`4018 Blob Not Accessible`](error-handling.md#blob-not-accessible4018) `details.reason="invalid_handle"`
-2. **重施铸造通道鉴权**（防御纵深）：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)；失败 → `4018` `forbidden`
-3. 源已不可达（SKILL 卸载 / 文件删除）→ `4018` `gone`；`chunk_offset` 越界 → `4018` `range`
+2. **重施铸造通道鉴权**（防御纵深）：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)；path 源（[`client:resolve_path`](#clientresolve_path) 铸造）→ 按**当前** `readRoots` 重跑围栏 / 固定拒绝集 / 权限校验；失败 → `4018` `forbidden`
+3. 源已不可达（SKILL 卸载 / 文件删除 / path 源被删除或已非普通文件）→ `4018` `gone`；`chunk_offset` 越界 → `4018` `range`
 4. 从 `chunk_offset`（缺省 0）取 `min(max_chunk_bytes, Computer cap)` 字节，恒保证序列化 ≤ Server `maxHttpBufferSize`；base64 → `blob`，回填 `total_size`/`sha256`/`chunk_offset`/`eof`
 
 详见 [通用二进制传输](blob-transfer.md)。
@@ -508,15 +508,16 @@ Agent ←───────────────────────�
 }
 ```
 
-**Computer 处理流程**（顺序 MUST；越界判定先于存在性探测）：
+**Computer 处理流程**（顺序 MUST；越界判定先于存在性探测；完整步骤见 [通用二进制传输 §Computer 处理流程](blob-transfer.md#computer-处理流程)）：
 
-1. `normalize_path(path)` 失败 → [`4020 Path Not Accessible`](error-handling.md#path-not-accessible4020) `details.reason="invalid_path"`
-2. `readRoots` 为空，或规范化后的 `path` 词法上不在任一 root 内 → `4020` `forbidden`（不访问文件系统）
-3. realpath → `canonical_path`；越出 `readRoots`（如符号链接越界）→ `4020` `forbidden`
-4. 不存在 → `4020` `not_found`；非普通文件 → `4020` `not_a_file`；OS 拒绝读取 → `4020` `forbidden`
-5. stat + `sha256`（不设大小上限，受常规请求超时约束；MAY 按 `(canonical_path, total_size, mtime)` 缓存）+ 确定性 `mime_type` → 铸造 `blob_handle`
+1. `n = normalize_path(path)` 失败 → [`4020 Path Not Accessible`](error-handling.md#path-not-accessible4020) `details.reason="invalid_path"`；`..` 在此词法消解
+2. `readRoots` 为空，或 `n` 词法上不在任一 root（配置形态或 realpath 形态）内 → `4020` `forbidden`（不访问文件系统）
+3. 对 `native(n)` 做**非严格** realpath → `canonical_path`；越出 root 的 realpath 形态（如符号链接越界）→ `4020` `forbidden`；本步通过前任何文件系统错误一律 `forbidden`
+4. 命中固定拒绝集（`.skillenv` / Computer 配置·状态·凭据目录 / `.part`）→ `4020` `forbidden`
+5. 打开：`ENOENT` / `ENOTDIR` → `4020` `not_found`；权限类错误 → `4020` `forbidden`；非普通文件 → `4020` `not_a_file`
+6. 自**同一打开句柄** stat + `sha256`（不设大小上限，受常规请求超时约束；MAY 缓存，键至少 `(canonical_path, total_size, mtime)`）+ 确定性 `mime_type` → 铸造 `blob_handle`
 
-拉取期 `client:get_blob` 对 path 句柄 **MUST** 按当前 `readRoots` 重施围栏：越界 / 撤权 → `4018` `forbidden`；文件已删除 → `4018` `gone`。**持久引用 = `computer_id` + `canonical_path`**（宿主存），不是 `blob_handle`。
+拉取期 `client:get_blob` 对 path 句柄 **MUST** 按当前 `readRoots` 重跑围栏 / 拒绝集 / 权限校验：越界 / 撤权 → `4018` `forbidden`；文件已删除或已非普通文件 → `4018` `gone`。**持久引用 = `computer_id` + `canonical_path`**（宿主存），不是 `blob_handle`。
 
 ```mermaid
 sequenceDiagram

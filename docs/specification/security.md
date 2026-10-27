@@ -284,7 +284,9 @@ def handle_request(request):
 - **默认不可读（fail-closed）**：`readRoots` 默认空，未配置时一律 [`4020 forbidden`](error-handling.md#path-not-accessible4020)。Robot 能读用户机器上的哪些文件，**必须**由 Computer 端用户显式授权
 - **受信配置**：`readRoots` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；`project` scope 提供该键 **必须**被拒绝——clone 的仓库不得把读授权扩到任意路径（[computer-management §7 不变量 #7](computer-management/protocol.md#7-安全不变量)）
 - **围栏**：canonicalize + realpath 后按**路径分量**判定落在 root 内；符号链接越界 → `forbidden`；拉取期 `client:get_blob` 按**当前** `readRoots` 重施围栏（覆盖 resolve 后被换掉的符号链接与撤权）
-- **不泄露存在性**：越界判定先于存在性探测——`readRoots` 之外的路径一律 `forbidden`，不区分存在与否
+- **不泄露存在性**：越界判定先于存在性探测——非严格 realpath，realpath 围栏通过前的一切文件系统错误归 `forbidden`；`readRoots` 之外的路径一律 `forbidden`，不区分存在与否
+- **固定拒绝集**：`.skillenv`、Computer 自身配置 / 状态 / 凭据目录、未定稿 `.part` 即便在 `readRoots` 内也**必须**拒绝——用户授权不得打穿[零凭证传播原则](#零凭证传播原则)
+- **检查与读取同源**：stat / 摘要 / 字节**必须**来自同一打开句柄，**应**在打开后的句柄上复核最终路径，压缩「检查后替换符号链接」的 TOCTOU 窗口
 - **路径披露**：`canonical_path` 为绝对路径，与 [`landing_path`](#路径披露权衡) 同属有意披露——它只对已授权的文件返回，不带来新能力
 
 ## 写入通道安全（Landing 沙箱）
