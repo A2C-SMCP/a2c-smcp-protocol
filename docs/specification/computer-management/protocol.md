@@ -132,6 +132,7 @@ Computer Management Plane 是高权限表面。合规 Computer MUST 保持这些
 4. 被 policy-rejected、disabled、removed、orphaned 或 invalid 的能力 MUST NOT 作为可用能力暴露。
 5. Management cleanup MUST NOT 允许删除或读取 Computer 授权本地边界之外的文件。
 6. 写入通道落盘目标属受信配置：settings 的 `landingRoot` 仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；**`project` scope 提供该键 MUST 被 Computer 拒绝**（防 clone 仓库把 Agent 写目标重定向到任意路径）。`client:put_blob` 落盘是协议事件明确定义的本地状态影响（同不变量 #2 的允许形态），其落点由本不变量约束。
+7. 读取通道授权根属受信配置：settings 的 `readRoots`（v0.5.0 起）仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；**`project` scope 提供该键 MUST 被 Computer 拒绝**（防 clone 仓库把读授权扩到任意路径）。默认空 = 不可读；`client:resolve_path` / `client:get_blob` 的 path 源 MUST 严格限于 `readRoots` 内（canonicalize + realpath 围栏），且 MUST 排除固定拒绝集（`.skillenv`、Computer 自身配置 / 状态 / 凭据目录、未定稿 `.part`）——管理面的 settings 与凭据不得经读取通道外流（同不变量 #3）。
 
 ## 8. 证据摘要
 

@@ -59,7 +59,7 @@ BlobHandle: TypeAlias = str
 | Computer 铸造 | **MUST** | 仅由生产者通道在其成功且已授权的响应中产生 |
 | 无状态可重解析 | **MUST** | Computer 每次调用从句柄确定性解析回源；**禁止**服务端会话 / 游标 / TTL |
 | 鉴权随源 | **MUST** | 解析时**重新施加铸造通道的授权与边界**（SKILL → [§9 沙箱](skill.md#9-安全模型)）；句柄解码出的路径**绝不**被直接信任 |
-| 非任意文件读 | **MUST** | `client:get_blob` **不是**"读 Computer 任意文件"的原语；只服务生产者通道已授权的源 |
+| 非任意文件读 | **MUST** | `client:get_blob` **不是**"读 Computer 任意文件"的原语；只服务**生产者通道已授权**的源。按路径读取的生产者 [`client:resolve_path`](#生产者三按路径读取) 同样受此约束：其授权边界 = Computer 用户配置的 `readRoots`（默认空 = 不可读）|
 | 仅下行 | — | 上行 `client:put_blob` **不铸造句柄**，返回绝对 `landing_path`（[§3](#3-事件-clientput_blob上行写入)）；句柄契约（不透明 / 可重解析 / 重施鉴权）只适用于下行 |
 
 !!! danger "句柄不是绕过鉴权的后门"
@@ -101,8 +101,8 @@ BlobHandle: TypeAlias = str
 **Computer 处理流程**：
 
 1. 解析 `blob_handle` 回源（不透明 → 源描述符）；无法识别 / 格式非法 → [`4018`](error-handling.md#blob-not-accessible4018) `invalid_handle`
-2. **重施铸造通道鉴权**：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)（Registry 仍含、未孤儿、`.skillenv` 等仍 forbidden）。失败 → `4018` `forbidden`
-3. 源已不可达（SKILL 卸载 / 文件删除 / 内容已变得无法服务）→ `4018` `gone`
+2. **重施铸造通道鉴权**：SKILL 源 → 重跑 [§9 沙箱](skill.md#9-安全模型)（Registry 仍含、未孤儿、`.skillenv` 等仍 forbidden）；path 源 → 按**当前** `readRoots` 重跑 [resolve 第 3–8 步](#computer-处理流程)（围栏 / 固定拒绝集 / 权限）。失败 → `4018` `forbidden`
+3. 源已不可达（SKILL 卸载 / 文件删除 / path 源被删除或已非普通文件 / 内容已变得无法服务）→ `4018` `gone`
 4. `chunk_offset < 0` 或 `> total_size` → `4018` `range`
 5. 从 `chunk_offset` 起取 `min(max_chunk_bytes, Computer cap)` 字节；`max_chunk_bytes` 缺省时 Computer 自定，**恒保证序列化后 ≤ Server `maxHttpBufferSize`**（计入 base64 +33% 与 envelope）
 6. 回填 `total_size` / `sha256`（全量资源）/ `chunk_offset` / `eof`；本块字节 base64 → `blob`
@@ -208,7 +208,7 @@ sequenceDiagram
 | **完整性** | 上行 | 镜像：`sha256` 由 **Agent 首块声明**，Computer 接收期增量计算、末块重算比对，不符 → `4019 integrity`（丢弃不落盘）；末块 ack 回显重算值，Agent **SHOULD** 比对声明 |
 | **读取中变更** | 下行 | `sha256` / `total_size` 一次逻辑读取内 **MUST** 稳定；Agent 跨块发现变化 ⇒ 源被改写，**MUST** 从 offset 0 重读，不拼接错配字节；Computer **SHOULD** 尽力一致快照 |
 | **读取中变更** | 上行 | 不适用——声明即契约：首块声明后不可变；后续块携带声明字段 MUST NOT，违反 → `4019 invalid_declaration` |
-| **绝对上限（DoS）** | 下行 | 由**铸造通道在铸造时**决断（SKILL → `total_size` 超 SDK 可配上限即 [`4017 too_large`](error-handling.md#skill-resource-not-accessible4017)，不铸造句柄）。`client:get_blob` 只服务已通过上限的句柄 |
+| **绝对上限（DoS）** | 下行 | 由**铸造通道在铸造时**决断（SKILL → `total_size` 超 SDK 可配上限即 [`4017 too_large`](error-handling.md#skill-resource-not-accessible4017)，不铸造句柄）。`client:get_blob` 只服务已通过上限的句柄。按路径读取（`client:resolve_path`）**不设**绝对上限：文件由 Computer 用户显式授权，`total_size` 先于任何字节告知 Agent，拉取多少由 Agent 依 pull 模型自决 |
 | **绝对上限（DoS）** | 上行 | 由 **Computer 在首块决断**：声明 `total_size` 超可配上限 → `4019 too_large`（**零字节落盘**）；叠加会话有界（闲置超时 + 并发上限，见 [§3](#3-事件-clientput_blob上行写入)） |
 
 !!! note "「资源字节」基准"
@@ -250,10 +250,11 @@ sequenceDiagram
 |---|---|---|
 | [`4017`](error-handling.md#skill-resource-not-accessible4017) | **生产者 SKILL（下行铸造期）** | 铸造前解析失败：`rel_path` 穿越 / `.skillenv` forbidden / 不存在 / `too_large`。**不**铸造句柄 |
 | MCP `CallToolResult.isError` | **生产者 tool_call（下行铸造期）** | 工具自身失败沿用 MCP 错误惯例（**不**引入 A2C 事件级码——既有协议不变量）|
+| [`4020`](error-handling.md#path-not-accessible4020) | **生产者 path（下行铸造期）** | `client:resolve_path` 解析失败：路径非法 / 越出 `readRoots` / 不存在 / 非普通文件（`details.reason` ∈ `invalid_path` / `forbidden` / `not_found` / `not_a_file`）。**不**铸造句柄 |
 | [`4018`](error-handling.md#blob-not-accessible4018) | **本通道（下行拉取期）** | 句柄无效 / 重施鉴权失败 / 源消失 / 范围越界（`details.reason` ∈ `invalid_handle` / `forbidden` / `gone` / `range`）|
 | [`4019`](error-handling.md#blob-write-failed4019) | **本通道（上行写入期）** | 会话无效 / 声明非法 / 顺序错乱 / 超上限 / 会话繁忙 / 沙箱不可写 / 完整性不符 / IO 失败（`details.reason` ∈ `invalid_upload` / `invalid_declaration` / `range` / `too_large` / `busy` / `forbidden` / `integrity` / `io_error`）|
 
-边界清晰：下行**铸造期**失败按各生产者自身错误惯例（SKILL→`4017`；tool_call→MCP `isError`）；下行**拉取期**的句柄/源/范围一律 `4018`；上行**写入期**的一切失败一律 `4019`。**4018 与 4019 方向相反、互不重叠；4017 与 MCP `isError` 不用于上行。**
+边界清晰：下行**铸造期**失败按各生产者自身错误惯例（SKILL→`4017`；tool_call→MCP `isError`；path→`4020`）；下行**拉取期**的句柄/源/范围一律 `4018`；上行**写入期**的一切失败一律 `4019`。**4018 与 4019 方向相反、互不重叠；4017 与 MCP `isError` 不用于上行。**
 
 ---
 
@@ -274,6 +275,7 @@ sequenceDiagram
 |---|---|---|---|---|
 | `client:get_skill` | `GetSkillRet`（A2C 自有，可改） | **顶层** `blob_handle` | 顶层 `total_size` / `sha256` / `mime_type` | A2C [`4017`](error-handling.md#skill-resource-not-accessible4017) |
 | `client:tool_call` | MCP `CallToolResult`（**标准不可变**） | content item `_meta.`**`a2c_blob_handle`** | item `_meta.a2c_total_size` / `_meta.a2c_sha256` + item 既有 `mimeType` | MCP `CallToolResult.isError` |
+| `client:resolve_path` | `ResolvePathRet`（A2C 自有，可改） | **顶层** `blob_handle` | 顶层 `total_size` / `sha256` / `mime_type`（另含 `canonical_path` / `mtime`）| A2C [`4020`](error-handling.md#path-not-accessible4020) |
 
 > CallToolResult 走 `_meta` 旁路与 `SMCPTool.meta` 的 `a2c_tool_meta` / `MCP_TOOL_ANNOTATION` 命名空间旁路**同构**——这是 A2C 在不可变 MCP 结构上扩展的既定手法，不是新约定。
 
@@ -288,6 +290,124 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 ### 生产者二：tool_call
 
 `client:tool_call` 返回原生 `CallToolResult`；超内联预算的二进制 content item 清空内联 `data`/`blob`、在其 `_meta` 写 `a2c_blob_handle`（+`a2c_total_size`/`a2c_sha256`）。CallToolResult 仍是合法 MCP 结构；工具自身失败仍走 MCP `isError`。详见 [事件定义 §client:tool_call](events.md#clienttool_call)。
+
+### 生产者三：按路径读取
+
+**`client:resolve_path`（v0.5.0 起，protocol#65）**：Agent 给出 Computer 本地文件路径，Computer 规范化 → 校验 `readRoots` → stat，返回该文件的规范路径与元数据，并**现铸**一个 `blob_handle`；字节仍经 `client:get_blob` 拉取（分块 / `sha256` / `4018` 全部复用）。本事件**不**新增 handle kind，也**不**让 Agent 构造句柄——句柄仍由 Computer 在已授权的生产者响应中铸造（[§1](#1-blobhandle-契约)）。
+
+**请求数据 (ResolvePathReq)**:
+```python
+{
+    "agent": str,
+    "req_id": str,
+    "computer": str,
+    "path": str          # Computer 本地绝对路径：原生形态（POSIX "/..."；Windows "C:\..." / "C:/..."）或 canonical_path 形态（"/C:/..."）
+}
+```
+
+**响应数据 (ResolvePathRet)**:
+```python
+{
+    "canonical_path": str,  # 规范路径（realpath 后，见下文 §canonical_path 规范化）
+    "blob_handle": str,     # 现铸的不透明句柄（转 client:get_blob 拉字节）
+    "mime_type": str,       # 确定性推断（同 SKILL §6.4 (1)）
+    "total_size": int,      # 文件字节数
+    "sha256": str,          # 全量 sha256 十六进制
+    "mtime": int,           # 最后修改时间：Unix epoch 毫秒（向下取整，仅作提示）
+    "req_id": str
+}
+```
+
+#### Computer 处理流程
+
+顺序 **MUST** 如下（前序失败即返回，不执行后序；**越界判定先于任何存在性探测**，不泄露授权边界外文件的存在性）：
+
+1. `n = normalize_path(path)` 失败 → [`4020`](error-handling.md#path-not-accessible4020) `invalid_path`。**`..` 在此按词法消解**（先于符号链接解析）——后续步骤一律以 `n` 为准，**MUST NOT** 对原始 `path` 做 realpath
+2. `readRoots` 为空 → `4020` `forbidden`
+3. **词法围栏**：`n` 不落在任一 root 的**配置形态或 realpath 形态**内（见 [§readRoots](#readroots读取授权根config-first)）→ `4020` `forbidden`（**不**访问文件系统）
+4. **非严格 realpath**：对 `native(n)` 做 realpath——逐分量以 `lstat` 判定：凡是符号链接（**含悬空链接**）一律经 `readlink` 解析其目标并继续，直到遇到第一个 `lstat` 报不存在的分量为止，其余分量原样拼接（等价于 Python `os.path.realpath(strict=False)`）；**MUST NOT** 以跟随链接的 `stat` / `exists()` 判定「已存在」——否则悬空链接会被当作普通不存在路径留在围栏内；Windows realpath 若返回 `\\?\` 前缀形态一并剥离。结果经 `normalize_path` 得 `canonical_path`。`native(n)`：POSIX 为 `n` 本身；Windows 为 `/X:/a/b` → `X:\a\b`
+5. **realpath 围栏**：`canonical_path` 不落在任一 root 的 realpath 形态内（如符号链接越界）→ `4020` `forbidden`；realpath 结果无法以 Unicode 字符串表示或无法规范化（如解析到 UNC）→ `4020` `forbidden`。**本步通过之前**，任何文件系统错误（含 realpath / stat 失败）一律 → `4020` `forbidden`，**MUST NOT** 回 `not_found`
+6. **固定拒绝集**：`canonical_path` 命中 [§固定拒绝集](#固定拒绝集) → `4020` `forbidden`（不因 `readRoots` 授权而放行）
+7. **类型预检**（打开之前）：`lstat(canonical_path)` 不存在（`ENOENT` / `ENOTDIR`）→ `4020` `not_found`；非普通文件（目录 / 设备 / FIFO / socket 等）→ `4020` `not_a_file`——**MUST** 先于打开，避免打开 FIFO 阻塞或打开设备产生副作用
+8. **打开并复核**：打开 **MUST** 非阻塞（POSIX `O_NONBLOCK`；**SHOULD** `O_NOFOLLOW`）。打开失败：`ENOENT` / `ENOTDIR` → `not_found`；`EISDIR`（及 Windows 打开目录失败）→ `not_a_file`；**其余一切错误**（权限类、`ELOOP`、`ENAMETOOLONG`、`EIO` 等）→ `forbidden`。对已打开的句柄 `fstat`：非普通文件 → `not_a_file`。Computer **SHOULD** 取该句柄的最终路径（如 `/proc/self/fd`、`F_GETPATH`、`GetFinalPathNameByHandle`）重跑第 5–6 步，不符 → `forbidden`
+9. 从**同一打开句柄**取 stat 键 `(total_size, mtime, 文件身份)`（文件身份 = inode / file-id，平台不提供时省略）并计算 `sha256`（**MUST NOT** 关闭后按路径重新打开）；计算后 **SHOULD** 再次 `fstat`，stat 键变化 ⇒ 内容在计算中被改写，**MUST NOT** 缓存该摘要并 **SHOULD** 重算一次；按 [SKILL §6.4 (1)](skill.md#64-mime_type-确定性与文本-mime判据) 的确定性映射推断 `mime_type`；铸造 `blob_handle`：**MUST** 编码 `canonical_path` 与**计算前**的 stat 键及 `sha256`（句柄仍不透明、无状态，Computer 不保留服务端状态）
+
+**`sha256` 计算口径**（owner 裁决）：协议**不设**文件大小上限，`client:resolve_path` 受常规请求超时约束（超时按常规超时处理，不另设错误码）；`sha256` **MUST** 返回。Computer **MAY** 缓存摘要，键 **MUST** 至少含 `(canonical_path, total_size, mtime)`，**SHOULD** 再含文件身份（inode / file-id）与 ctime（若平台提供）——缓存的强度只等于其键：同尺寸且 mtime 粒度内的改写可能命中旧摘要，键有任何疑义时 **MUST** 重算。为使大文件可读，Computer **SHOULD** 在请求超时后**继续完成**该摘要计算并写入缓存（重试即可命中），并 **SHOULD** 对同一键的并发计算去重。
+
+**拉取期**：`client:get_blob` 解析 path 句柄时 **MUST** 按**当前** `readRoots` 与当前文件系统状态重跑第 3–8 步（防御纵深，覆盖 resolve 之后被换掉的符号链接与撤权），并从本次打开的句柄读取字节：第 3 / 5 / 6 步或第 8 步归 `forbidden` 的失败 → [`4018`](error-handling.md#blob-not-accessible4018) `forbidden`；`not_found` / `not_a_file` 类结果 → `4018` `gone`。随后比对打开句柄的 stat 键与句柄内编码的 stat 键：**不符 ⇒ 文件在 resolve 之后被改写 ⇒ `4018` `gone`**（Agent 回到 `client:resolve_path` 重新取句柄）；相符则以句柄内编码的 `sha256` / `total_size` 回填 `GetBlobRet`——**不**在拉取期重算全量摘要（每块 O(1)），也不需要服务端缓存。若同尺寸、同 mtime 粒度内的改写逃过 stat 键，Agent 的重组校验会失败：此时 **SHOULD** 重新 resolve 并有界重试（如 1 次）后如实报错，**MUST NOT** 无界循环。
+
+#### 固定拒绝集
+
+`readRoots` 是**用户授权**，但下列文件即便落在授权根内也 **MUST** 拒绝（`4020` `forbidden`；拉取期 `4018` `forbidden`），以保住[零凭证传播](security.md#零凭证传播原则)与 [SKILL `.skillenv` 不变量](skill.md#92-a2c-层补充约束)：
+
+- 末级分量为 `.skillenv` 的文件（任何位置）
+- Computer 自身的配置与状态目录内的文件：settings、`computer_id` 存储、input 值缓存、secret / 凭据存储（目录位置 SDK 自治，SDK **MUST** 把自己实际使用的位置纳入本集）
+- 上行写入中的未定稿文件（landing root 内的 `.part`）
+
+判定以 `canonical_path` 为准（第 6 步），并在打开后的最终路径复核中重跑（第 8 步）。名称判定挡不住**硬链接**（`ln ~/.config/a2c/settings.json root/x`）：Computer **SHOULD** 另以打开句柄的文件身份（`(dev, inode)` / file-id）比对拒绝集中由本 SDK 自身管理的文件。
+
+拒绝集与 `readRoots` 互不替代：`readRoots` 决定「用户愿意给 Robot 读什么」，拒绝集决定「无论用户怎么配都不得经读取通道外流什么」。
+
+#### `readRoots`（读取授权根，config-first）
+
+- **配置项**：Computer settings 键 `readRoots: list[str]`，每项为绝对路径（POSIX `/` 开头或 Windows 盘符）；非绝对项或 `normalize_path` 失败的项按配置诊断丢弃（不生效）。跨受信 scope 的合并沿用 settings 数组默认语义（拼接去重）
+- **两种形态**：每个 root 在加载时保留 **配置形态** `normalize_path(配置值)` 与 **realpath 形态** `normalize_path(realpath(配置值))`（如 macOS `/tmp/share` → `/private/tmp/share`；realpath 失败或结果无法规范化（如映射盘解析到 UNC）的 root 只保留配置形态并记配置诊断）。**词法围栏**（第 3 步）对两种形态任一命中即通过；**realpath 围栏**（第 5 步）只认 realpath 形态——安全性只由后者保证，前者仅用于免于访问授权外的文件系统
+- **默认空 = 不可读**（fail-closed）：未配置时 `client:resolve_path` 一律 `4020 forbidden`。Robot 能读用户机器上的哪些文件，**由 Computer 端用户决定**
+- **scope 门控（协议 MUST）**：与 [`landingRoot`](#landing-root-配置config-first) 对称，仅受信 scope（`user` / `local` / `flag` / `policy` / `embed`）可设；**`project` scope 提供该键 MUST 被 Computer 拒绝**（整字段不生效，属本地配置校验，不产生线上错误码）——clone 的仓库不得把读授权扩到任意路径（如 `~/.ssh`）
+- **围栏判定**：`p` 落在 root `r` 内 ⟺ `p == r`，或 `p` 以 `r` 为**路径分量前缀**（`r` 以 `/` 结尾时为 `p.startswith(r)`，否则为 `p.startswith(r + "/")`）。**MUST NOT** 用裸字符串前缀（`/data` 不包含 `/database`）。比较按码点逐一进行（Windows 上除已大写的盘符外**区分大小写**，见下文已知限制）
+
+#### `canonical_path` 规范化
+
+`canonical_path` 的目标是「**同一文件恒得同一路径**」，作为宿主持久引用的路径部分。表示形态由纯函数 `normalize_path(input, platform)` 定义，跨 SDK 由数据向量 [`fixtures/canonical_path_conformance_vectors.json`](fixtures/canonical_path_conformance_vectors.json) 逐字节钉住：
+
+| 规则 | 说明 |
+|---|---|
+| 通用 | 空串或含 U+0000 → `invalid_path`。**不**做 `~` 展开、**不**做百分号编解码、**不**做 Unicode 归一（NFC / NFD）、**不**改变非盘符部分的大小写 |
+| POSIX | MUST 以 `/` 开头；`\` 为普通字符。按 `/` 切段 → 丢弃空段与 `.` → `..` 弹出上一段（已在根时忽略）→ `/` ‖ 段以 `/` 连接。根即 `/`，其余无尾随 `/` |
+| Windows | 剥去 `\\?\` 前缀（其后为 `UNC\` → `invalid_path`）→ `\` 一律换 `/` → canonical 形态 `/X:` 剥去开头 `/`（恰为 `X:` 时补 `/`）→ 此时 MUST 以 `X:/` 开头（否则 `invalid_path`：相对路径、裸 `C:` / `C:foo`、无盘符 `/x`、UNC）→ **盘符大写** → 余部同 POSIX 切段 → `/X:/` ‖ 段以 `/` 连接。盘符根即 `/C:/` |
+| Windows 分量限制 | 剥去 `\\.\` 设备前缀不支持（`invalid_path`）；盘符之后任一分量含 `<` `>` `:` `"` `|` `?` `*` 或 U+0001–U+001F（含备用数据流 `a.txt:s`），或以 `.` / 空格结尾（`.` 与 `..` 本身除外；Win32 会静默剥除，形态不唯一）→ `invalid_path` |
+| 管线 | 词法 `n = normalize_path(input)`；产出 `canonical_path = normalize_path(realpath_nonstrict(native(n)))`（见上文处理流程第 1 / 4 步）。Windows realpath 若返回 `\\?\` 前缀形态，同样经本函数剥离 |
+
+`canonical_path` 是原始路径字符串，可直接作为下一次 `client:resolve_path` 的 `path`（往返稳定：文件未变时再次 resolve 得同一 `canonical_path`）。
+
+!!! note "已知限制（v0.5.0）"
+
+    - **大小写不敏感文件系统**（Windows / 默认 macOS）上同一文件的异形大小写写法，协议**不承诺**归一到同一 `canonical_path`（取决于各 OS realpath 是否返回磁盘上的真实大小写），且词法围栏区分大小写——与 root 配置大小写不同的输入可能在第 3 步即被拒。宿主应以 Computer 返回的 `canonical_path` 为准存储，而非用户输入；Windows 8.3 短名同此。
+    - **`..` 词法消解**：`..` 先于符号链接解析按词法消解，与 POSIX shell 的物理语义（`cd link/..`）不同——这是有意的跨 SDK 确定性选择。
+    - **Windows 保留设备名**（`CON` / `NUL` 等）不在 `normalize_path` 内拦截，由 realpath / 打开阶段按普通失败处理。
+    - **Unicode 归一**：不做 NFC / NFD 归一，保留 OS 返回的码点序列。
+    - **UNC / 网络共享路径**（`\\server\share`）本版不支持（`invalid_path`）；POSIX 上无法以 UTF-8 表示的文件名不可解析（`invalid_path`）。
+
+!!! info "`computer://` URI 编码属宿主（非规范）"
+
+    协议只产出原始 `canonical_path`。宿主若组装 `computer://<computer_id><canonical_path>`，**应**按 RFC 3986 对每个路径段做百分号编码（保留分隔 `/`；`:` 属 `pchar` 可不编码，故 `/C:/x` 组装为 `computer://<computer_id>/C:/x`），解析时逐段解码后作为 `path` 交给 `client:resolve_path`。
+
+#### 持久引用 = `computer_id` + `canonical_path`
+
+宿主持久化的是 [`computer_id`](room-model.md#computer-身份) 与 `canonical_path`，**不是** `blob_handle`——句柄短时、不可持久化的规则不变（[§1](#1-blobhandle-契约)）。每次读取：确认当前在房 Computer 的 `computer_id` 与引用一致 → `client:resolve_path(canonical_path)` 现铸句柄 → `client:get_blob` 拉字节。宿主只需校验内容是否变化时，可只比对 `ResolvePathRet.sha256` 而不拉字节。
+
+#### 时序
+
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant S as Server
+    participant C as Computer
+
+    A->>S: client:resolve_path(path)
+    S->>C: 转发
+    C->>C: normalize → readRoots 词法围栏 → realpath 围栏 → stat / sha256 → 铸造 blob_handle
+    C->>S: ResolvePathRet { canonical_path, total_size, sha256, mime_type, mtime, blob_handle }
+    S->>A: ResolvePathRet
+    loop 直至 eof（pull 即背压）
+        A->>S: client:get_blob(blob_handle, chunk_offset)
+        S->>C: 转发
+        C->>C: 解析句柄 → 重施 readRoots 围栏 → 切片
+        C->>S: GetBlobRet { blob, chunk_offset, eof, sha256 }
+        S->>A: GetBlobRet
+    end
+    Note over A: 重组后校验 sha256
+```
 
 ---
 
@@ -316,8 +436,9 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 ## 8. 实现要求
 
 - **Computer MUST 实现** `client:get_blob`（作为接收方），并对每个句柄解析重施铸造通道鉴权
+- **Computer MUST 实现** `client:resolve_path`（0.5.0 起，作为接收方）：`normalize_path` 逐字节符合数据向量 / `readRoots` 默认空 fail-closed / 越界判定先于存在性 / 拉取期重施围栏
 - **Computer MUST 实现** `client:put_blob`（0.4.0 起，作为接收方）：声明校验 / in-order / `.part` + 增量 sha256 / 原子 rename / 有界会话（闲置超时 + 并发上限 + 孤儿 GC）/ landing root 沙箱 fail-closed
-- **Server MUST 路由** `client:get_blob` / `client:put_blob`（与其它 `client:*` 一致，按 `computer`）
+- **Server MUST 路由** `client:get_blob` / `client:put_blob` / `client:resolve_path`（与其它 `client:*` 一致，按 `computer`）
 - **Agent SDK SHOULD 封装** 句柄拉取循环（`while not eof: get_blob(handle, offset)`），并在 `eof` 后校验 `sha256`——可与生产者通道工具封装在同一抽象后，对上层透明
 - **Agent SDK SHOULD 封装** 上行落盘循环（首块声明 → ack-paced 逐块发送 → 末块取 `landing_path`），能力门控 = 自身 minor ≥ 0.4（版本握手传递性，见 [§3](#3-事件-clientput_blob上行写入)）
 
@@ -327,7 +448,8 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 
 ## 9. 参考
 
-- 数据结构：[`GetBlobReq` / `GetBlobRet` / `BlobHandle` / `PutBlobReq` / `PutBlobRet`](data-structures.md#通用二进制传输结构)
-- 错误码：[`4018 Blob Not Accessible`](error-handling.md#blob-not-accessible4018)、[`4019 Blob Write Failed`](error-handling.md#blob-write-failed4019)
+- 数据结构：[`GetBlobReq` / `GetBlobRet` / `BlobHandle` / `PutBlobReq` / `PutBlobRet` / `ResolvePathReq` / `ResolvePathRet`](data-structures.md#通用二进制传输结构)
+- 错误码：[`4018 Blob Not Accessible`](error-handling.md#blob-not-accessible4018)、[`4019 Blob Write Failed`](error-handling.md#blob-write-failed4019)、[`4020 Path Not Accessible`](error-handling.md#path-not-accessible4020)
+- 一致性向量：[`fixtures/canonical_path_conformance_vectors.json`](fixtures/canonical_path_conformance_vectors.json)
 - 首个下行生产者：[SKILL 通道](skill.md)
 - 安全边界：[computer-management §7 安全不变量](computer-management/protocol.md#7-安全不变量)、[安全性考虑 §写入通道安全](security.md#写入通道安全landing-沙箱)

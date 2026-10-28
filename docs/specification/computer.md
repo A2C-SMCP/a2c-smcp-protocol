@@ -47,6 +47,7 @@ Computer MUST 实现下列 Server 路由来的 `client:*` 事件：
 | `client:get_skills` | 返回当前活跃 SKILL 元数据清单 | `GetSkillsRet` | flat `ErrorPayload` |
 | `client:get_skill` | 返回单个 SKILL 包内资源 | `GetSkillRet` | `4016` / `4014` / `4017` flat `ErrorPayload` |
 | `client:get_blob` | 按 `blob_handle` 分块拉取字节 | `GetBlobRet` | `4018` flat `ErrorPayload` |
+| `client:resolve_path` | 按路径规范化 + `readRoots` 校验 + stat，现铸 `blob_handle`（v0.5.0 起）| `ResolvePathRet` | `4020` flat `ErrorPayload` |
 
 所有 `client:*` 事件中的 `computer` 字段 MUST 与接收方 Computer 的协议名一致。不一致时 Computer MUST NOT 执行目标行为；实现可以返回协议级错误或让路由层失败。Server 仍 MUST 执行同房间路由校验，Computer 侧校验只是防御纵深。
 
@@ -134,6 +135,8 @@ Computer 每次处理 `client:get_blob` 时 MUST：
 5. 对无效句柄、重施鉴权失败、源消失或范围错误返回 `4018`。
 
 Computer MUST NOT 把 `client:get_blob` 实现为任意本地文件读取接口。
+
+Computer MUST 实现 `client:resolve_path`（v0.5.0 起）：按 [通用二进制传输 §生产者三](blob-transfer.md#生产者三按路径读取) 的顺序规范化路径、校验 `readRoots`（默认空 = 不可读；`project` scope 提供 MUST 拒绝）、stat 并现铸 `blob_handle`；`normalize_path` MUST 逐字节符合 [数据向量](fixtures/canonical_path_conformance_vectors.json)。path 句柄在 `client:get_blob` 拉取期 MUST 按当前 `readRoots` 重施围栏。
 
 ## 9. 更新通知
 

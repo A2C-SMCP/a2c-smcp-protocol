@@ -510,7 +510,7 @@ ASGI 把**直连 WebSocket**（客户端 `transports=["websocket"]`，跳过 pol
 
 !!! note "为什么 close code 取 `4900` 而非 `4008`"
 
-    `4900` 是 RFC 6455 私有段（4000–4999）的 **WebSocket close code**，**不是** `ErrorPayload.code`，且**有意取与 `4008` 不同的值**——遵守"4008 是 HTTP body code，MUST NOT 与 WS close code 混淆"的既有铁律：不是禁止在 WS 路径拒绝，而是要求该路径用一个**独立、可区分**的标识。`4900` 选自当前 `ErrorPayload.code` 未占用区间（避免与 4006–4019 / 4101–4106 数值视觉混淆），仅表意"A2C 版本握手被拒"，**不**携带结构化 body（WS close reason ≤123 字节，仅放简短文案）。
+    `4900` 是 RFC 6455 私有段（4000–4999）的 **WebSocket close code**，**不是** `ErrorPayload.code`，且**有意取与 `4008` 不同的值**——遵守"4008 是 HTTP body code，MUST NOT 与 WS close code 混淆"的既有铁律：不是禁止在 WS 路径拒绝，而是要求该路径用一个**独立、可区分**的标识。`4900` 选自当前 `ErrorPayload.code` 未占用区间（避免与 4006–4020 / 4101–4106 数值视觉混淆），仅表意"A2C 版本握手被拒"，**不**携带结构化 body（WS close reason ≤123 字节，仅放简短文案）。
 
 #### R4 客户端收到 close code `4900`
 
