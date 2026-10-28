@@ -428,7 +428,7 @@ Server 实现 **MUST** 覆盖以下房间成员场景（双 SDK 对拍）。记�
 
 | # | 前置 | 动作 | 期望 |
 |---|------|------|------|
-| 10 | `R1` 为空 | `C1` join `R1`，`computer_id` 缺失；或为大写 / 无连字符 / 非 UUID 文本 / nil UUID | ack = `400`；`C1` 未入房，**无**广播 |
+| 10 | `R1` 为空 | `C1` join `R1`，`computer_id` 缺失；或为大写 / 无连字符 / 非 UUID 文本 / nil UUID / 合法值带结尾换行或首尾空白 | ack = `400`；`C1` 未入房，**无**广播 |
 | 11 | `R1` 为空 | `A` join `R1` 并携带 `computer_id`（任意值，含 `null`）| ack = `400`；`A` 未入房 |
 | 12 | `A` 在 `R1` | `C1` join `R1`（`X`）| 空 ack；`A` 收到 `notify:enter_office(computer=C1, computer_id=X)`；`server:list_room` 中 `C1` 的 `SessionInfo.computer_id = X`，`A` 的 `SessionInfo` **无** `computer_id` 键 |
 | 13 | `C1` 在 `R1`（`X`）| `C1` 同一会话以 `Y` 再次 join `R1` | ack = `403`；`C1` 仍在 `R1`，记录仍为 `X`，**无**广播 |
