@@ -315,6 +315,7 @@ fixture server（`fixture-echo-server`）在工具 `safe_read` 的 `Tool._meta` 
 - path 句柄 resolve 后文件被改写（尺寸或 mtime 变化）→ `get_blob` `4018 gone`。
 - （SHOULD）root 内指向 Computer 配置文件的硬链接 → `forbidden`。
 - `..` 词法先消解：`root/link/../a.txt`（`link → root/sub/deep`）解析为 `root/a.txt`。
+- 缺失分量**不终止**解析：`root/link → missing/../sub/evil/id`、`root/sub/evil → /outside`（`/outside/id` 存在）、`root/missing` 不存在 → `forbidden`（`canonical_path` 应为 `/outside/id`；在缺失分量处原样拼接得 `root/sub/evil/id` 而放行即为不合规）。
 - 经符号链接配置的 root（macOS `/tmp/share`）以配置路径访问可成功。
 - `readRoots` 覆盖 SKILL 安装目录或 Computer 配置目录时，`.skillenv` / settings / `computer_id` 存储 → `forbidden`；拉取期同为 `4018 forbidden`。
 - root 内父目录不可搜索（`EACCES`）→ `forbidden`；root 内不存在 → `not_found`。
