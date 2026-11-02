@@ -344,7 +344,7 @@ Agent SDK 因此只有"**去哪找句柄**"一处分支（顶层字段 vs 遍历
 - Computer 自身的配置与状态目录内的文件：settings、`computer_id` 存储、input 值缓存、secret / 凭据存储（目录位置 SDK 自治，SDK **MUST** 把自己实际使用的位置纳入本集）
 - 上行写入中的未定稿文件（landing root 内的 `.part`）
 
-判定以 `canonical_path` 为准（第 6 步），并在打开后的最终路径复核中重跑（第 8 步）。**大小写**：`canonical_path` 不保证是磁盘上的真实大小写（见 §canonical_path 规范化已知限制），在大小写不敏感的文件系统上 `root/.SKILLENV` 打开的就是 `.skillenv`——因此在 **Windows 与 macOS** 上，拒绝集的名称判定（`.skillenv` / `.part`）与目录判定 **MUST** 大小写不敏感（Unicode casefold）；其他平台 **MAY** 同样折叠（更严，仍合规）。Windows 8.3 短名等名称别名不经名称判定可见，由第 8 步最终路径复核兜底。名称判定挡不住**硬链接**（`ln ~/.config/a2c/settings.json root/x`）：Computer **SHOULD** 另以打开句柄的文件身份（`(dev, inode)` / file-id）比对拒绝集中由本 SDK 自身管理的文件。
+判定以 `canonical_path` 为准（第 6 步），并在打开后的最终路径复核中重跑（第 8 步）。**大小写**：`canonical_path` 不保证是磁盘上的真实大小写（见 §canonical_path 规范化已知限制），在大小写不敏感的文件系统上 `root/.SKILLENV` 打开的就是 `.skillenv`——因此在 **Windows 与 macOS** 上，拒绝集的名称判定（`.skillenv` / `.part`）与目录判定 **MUST** 大小写不敏感；**最低要求**为 ASCII 大小写不敏感（当前拒绝集名称均为 ASCII），实现 **MAY** 采用 Unicode casefold（更严，仍合规）；其他平台 **MAY** 同样折叠。一致性向量 **MUST NOT** 要求非 ASCII 折叠；若拒绝集未来引入非 ASCII 名称，本口径失效、须重新裁决并同步向量。Windows 8.3 短名等名称别名不经名称判定可见，由第 8 步最终路径复核兜底。名称判定挡不住**硬链接**（`ln ~/.config/a2c/settings.json root/x`）：Computer **SHOULD** 另以打开句柄的文件身份（`(dev, inode)` / file-id）比对拒绝集中由本 SDK 自身管理的文件。
 
 拒绝集与 `readRoots` 互不替代：`readRoots` 决定「用户愿意给 Robot 读什么」，拒绝集决定「无论用户怎么配都不得经读取通道外流什么」。
 
