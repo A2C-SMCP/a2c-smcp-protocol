@@ -1,6 +1,6 @@
 # 协议版本与握手
 
-**当前协议版本**: `0.5.0-dev`
+**当前协议版本**: `0.5.0`
 
 A2C-SMCP 作为三方参与（Agent / Server / Computer）的协议，必须保证同一房间内的成员以兼容的协议版本通信。本规范定义协议版本号语义、兼容性判定规则，以及在 **Socket.IO 连接的 HTTP 层**完成的版本校验流程。
 
@@ -175,7 +175,19 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 
 ### 最近发布：v0.4.0
 
-`0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`（其后的 **`0.5.0-dev` 周期已开启**，含房间成员语义裁决落地——属**破坏性** ack 形态变更，以及「一房至多一台 Computer」（protocol#66，**破坏性**成员规则收紧，`4105` 转预留，见 [迁移指南](../migrations/v0.5.0-single-computer-room.md)），故目标位定在 **MINOR**；发布时见本节新增的 `### 最近发布：v0.5.0`）。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
+`0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
+
+### 最近发布：v0.5.0
+
+`0.5.0` 已发布，两站 `latest` 均指向 `0.5.0`。目标位为 **MINOR**（含破坏性变更）。它含：
+
+- **房间成员语义裁决**：同房同 role 同名唯一入典、跨房禁止，`join` 失败改 flat `ErrorPayload` 并新增 `4105`——属**破坏性** ack 形态变更。
+- **一房至多一台 Computer**（protocol#66）：成员规则收紧，`4105` 转预留——属**破坏性**变更，见 [迁移指南](../migrations/v0.5.0-single-computer-room.md)。
+- **Computer 稳定唯一身份**（protocol#64）：持久化随机 UUID、入房携带、Server 校验回显与重置；`computer_id` 形态校验整串匹配、长度恰 36。
+- **按路径读取 + 授权读根**（protocol#65）：新增 `client:resolve_path` 与 path 句柄、`readRoots`（默认空 = 不可读）、`canonical_path` 规范化与固定拒绝集；含 protocol#75（非严格 realpath 遇缺失分量续解）与 protocol#76（Windows/macOS 拒绝集大小写不敏感，最低要求 ASCII）订正。
+- **Agent 侧在途工具调用取消**（protocol#58）：冻结「仅投递信号 / 不本地合成终态 / 三态如实透出」口径并修正 Producer 注记，无事件 / 字段 / 错误码变更。
+
+发布前进入的其它变更一并折入 0.5.0。
 
 ---
 
