@@ -618,7 +618,8 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
                                     # marketplace: acme-audit:audit / user: my-helper
                                     # mcp: mcp:<bundle_id>:<skill>，如 mcp:tfrobot-tools:code-review
     # ── 来源元数据 ───────────────────────────────────────
-    source: str                     # 必选：完整来源 provenance（含 marketplace 名等）
+    source: str                     # 必选：完整来源 provenance（marketplace:<name> / mcp:<bundle_id> / user）
+                                    # marketplace 的 name = 本地注册身份（唯一性见 skill.md §1.2 / runtime-contract §5.14）
                                     # 例：mcp:<bundle_id>（如 mcp:tfrobot-tools）/ marketplace:acme-skills / user
     uri: NotRequired[str]           # 仅 MCP 来源：skill://host/skill-name
                                     # 来源追溯用次要身份，Agent 非权威（见 skill.md §2）

@@ -361,6 +361,7 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - Explicit prune 会移除 marketplace materialization，并注销其 active SKILLs。
 - Plugin install 校验 `<plugin>@<marketplace>` shape。
 - marketplace unknown 时，Plugin install 失败。
+- **Marketplace 身份唯一性**（[runtime-contract §5.14](runtime-contract.md)）：① 两个不同 source 注册为同名 marketplace → 第二个注册 MUST 失败（`validation`），既有注册、其物化内容与运行时能力保持不变；② 已注册 source refresh 后 name 变化 → MUST 返回结构化失败（MUST NOT 报 `unchanged`），旧注册 / 旧内容 / 旧能力保留，既有 `<plugin>@<old-name>` 引用不被静默重写。无本地清单且无可用缓存的 `no_clone` / 离线注册 MAY 以 `validation` 拒绝。
 - Plugin install 对声明依赖的 MCP Server 按 `bundle_id` 依赖预检（数据源 = 运行期权威配置集）：同 `bundle_id` 已存在 → **提示「依赖已满足」并正常安装**（MUST NOT 拒绝）；display 同名、`bundle_id` 不同 → 正常安装（合法共存，MUST NOT 误拒）。
 - 同一声明文件内两个 key 归一到同一 `bundle_id` → 注册边界 fail-fast（提示改名或显式 `bundleId`）。
 - plugin 声明的 MCP Server 的 reinstall/enable 是幂等的。
