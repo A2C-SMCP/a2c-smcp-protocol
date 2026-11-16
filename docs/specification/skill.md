@@ -100,7 +100,7 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 
 !!! note "marketplace `<name>`：身份唯一性由协议约束，派生规则不由协议约束"
 
-    `source = marketplace:<name>` 的 `<name>` 是该 source 在**持久化 home（`RuntimeOptions.home`）**的 marketplace 注册作用域内的注册身份，也是 Plugin id `<plugin>@<marketplace>` 的 `<marketplace>` 段。`<name>` **MUST** 为严格 kebab-case（`[a-z0-9-]`，不以 `-` 始末、无连续 `--`），MUST NOT 含 `@` `:` `/` 空白或 URL userinfo / query。协议**不规定** name 的派生来源（清单顶层 `name`、URL 派生或显式参数由 SDK 自治），但规定：同一持久化 home 内一个 name **MUST** 至多绑定一个已注册 source；**同名不同源**的注册 **MUST** 失败（`validation`），MUST NOT 静默覆盖；refresh 遇 name 变化 **MUST** 拒绝并保留旧注册不变（不静默改名、不静默改写既有引用）；本条只约束新注册与 refresh，存量注册不追溯改名（由 SDK 迁移方案负责）。判定时点、同源判定、remove/re-add 与存量迁移细则见 [runtime-contract §5.14](computer-management/runtime-contract.md)。
+    `source = marketplace:<name>` 的 `<name>` 是该 source 在**持久化 home（`RuntimeOptions.home`，未配置时为 SDK 默认持久化作用域）**的 marketplace 注册作用域内的注册身份，也是 Plugin id `<plugin>@<marketplace>` 的 `<marketplace>` 段。`<name>` **MUST** 为严格 kebab-case（`[a-z0-9-]`，不以 `-` 始末、无连续 `--`），MUST NOT 含 `@` `:` `/` 空白或 URL userinfo / query。协议**不规定** name 的派生来源（清单顶层 `name`、URL 派生或显式参数由 SDK 自治），但规定：同一持久化 home 内一个 name **MUST** 至多绑定一个已注册 source；**同名不同源**的注册 **MUST** 失败（`validation`），MUST NOT 静默覆盖；refresh 遇 name 变化 **MUST** 拒绝并保留旧注册不变（不静默改名、不静默改写既有引用）；本条只约束新注册与 refresh，存量注册不追溯改名（由 SDK 迁移方案负责）。判定时点、同源判定、remove/re-add 与存量迁移细则见 [runtime-contract §5.14](computer-management/runtime-contract.md)。
 
 ### 1.3 mcp `<server>` 段 = bundle_id
 

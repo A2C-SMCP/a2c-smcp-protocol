@@ -355,7 +355,7 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 ## 5. Marketplace And Plugin Checklist
 
 - Marketplace reconcile 会安装 missing declared marketplace sources。
-- 同一 source 的内容 refresh 会在 reconcile 后替换旧 source projection；source 声明本身（URL / ref / sparse）变更按 §5.14 处理：同名不同源 MUST 拒绝，需显式 remove / re-add。
+- 同一 source 的内容 refresh（注册名不变）会在 reconcile 后替换旧 source projection；注册名变化或 source 声明本身（URL / ref / sparse）变更按 §5.14 处理：同名不同源 MUST 拒绝，需显式 remove / re-add。
 - `autoUpdate` 或 explicit refresh 会更新 declared source。
 - Undeclared materialized marketplaces 不会在 additive startup reconcile 期间被删除。
 - Explicit prune 会移除 marketplace materialization，并注销其 active SKILLs。
