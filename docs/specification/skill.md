@@ -17,7 +17,7 @@ SKILL 通道是 A2C-SMCP 协议中工具调用之外的**可执行能力包通�
 │   │ Marketplace       │ install │  │   ├── references/                    │  │
 │   │ (用户配置 git 源) │────────▶│  │   └── ...                            │  │
 │   └──────────────────┘         │  │                                       │  │
-│                                │  └── marketplace/<repo>/<plugin>/<skill>/│  │
+│                                │  └── marketplace/<name>/<plugin>/<skill>/│  │
 │   ┌──────────────────┐         │                                          │  │
 │   │ 用户手动 drop     │────────▶│  (...更多 source namespace)              │  │
 │   └──────────────────┘         └─────────────────┬───────────────────────┘  │
@@ -83,7 +83,7 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 
 | Source | `source` 字段 | `name` 合成规则 | 示例 |
 |---|---|---|---|
-| Marketplace | `marketplace:<repo>` | `<plugin>:<skill>`（**裸 2 段**，不含 marketplace 名） | `acme-audit:audit` |
+| Marketplace | `marketplace:<name>` | `<plugin>:<skill>`（**裸 2 段**，不含 marketplace 名） | `acme-audit:audit` |
 | 用户手动 | `user` | `<skill>`（**裸 1 段**） | `my-helper` |
 | MCP Server | `mcp:<bundle_id>` | `mcp:<bundle_id>:<frontmatter.name>` | `mcp:tfrobot-tools:code-review` |
 
@@ -91,12 +91,16 @@ name 按 source **分形态**，对齐 tfrobot-marketplace §6.1 与 Claude Code
 
     判断基准是**最终用户（SKILL 作者）跨工具互操作体验最优**：同一 SKILL 在 Claude Code / Cursor / A2C 看到的可见 ID 一致，作者文档/提示里引用的名字不因工具而漂移。故 marketplace / user 形态**直接采用 tfrobot-marketplace §6.1 的裸名**。
 
-    - **marketplace 名不进可见 ID**：跨 marketplace 的 `<plugin>` 重名在**安装层**用 `<plugin>@<marketplace>` 拦截（tfrobot §2.3），已装集合内 `<plugin>` 唯一 ⇒ `<plugin>:<skill>` 唯一。完整 marketplace 溯源仍由 `source = marketplace:<repo>` 承载
+    - **marketplace 名不进可见 ID**：跨 marketplace 的 `<plugin>` 重名在**安装层**按 `<plugin>` 裸名跨 marketplace 全局唯一拒绝第二个（`<plugin>@<marketplace>` 是该 plugin 的完整安装 id，用于配置键；已装集合内同一 `<plugin>` 只能来自一个 marketplace）⇒ `<plugin>:<skill>` 唯一。完整 marketplace 溯源仍由 `source = marketplace:<name>` 承载（`<name>` 的注册身份语义见下方 note）
     - **mcp 源保留 `mcp:` 前缀**：多 source 共享场所中，这是把 mcp 与 2 段 marketplace 区分开的**最小**结构标记（见 §1.1 note）；CC 的 mcp skill 是 `<server>:<skill>`，A2C 多加 `mcp:` 是有意的、**唯一**保留的前缀
     - **mcp 段用 `bundle_id` 而非 display `name`**：post-BundleID 模型，MCP Server 的 `name` 是**纯 display、允许碰撞、永不做键/寻址**（见 [数据结构 §身份正交性](data-structures.md#identity-orthogonality)），A2C server 的**唯一身份是 `bundle_id`**（`get_config.servers` key、`get_resources.mcp_server`、`4014/4015` 的 `meta.mcp_server` 全用它）。若 mcp 段仍取 display server 名，两个 `name` 巧合相同、`bundle_id` 不同的合法 Server 会撞出相同 `mcp:<name>:<skill>` → §1.5 被迫拒绝其一、令合法 SKILL 对 Agent 隐身。取 `bundle_id`（[缺省生成](data-structures.md#bundleid-缺省生成)恒有值、[no-double-open](data-structures.md#no-double-open) 保证唯一）则 mcp 形态 name **构造上不碰撞**，且 SKILL 的 server 身份与全协议其余处**统一**。auto-derive 情形下 `bundle_id ≈ 规范化 name`，可读性基本保留（`mcp:tfrobot-tools:code-review`）；仅 hash-fallback 情形退化为不透明串——而这恰是 display 名本就不可靠的情形。mcp 段本就由部署方配置决定、非 SKILL 作者控制，故不损「作者可见 ID 跨工具一致」（该理念保护的是 marketplace / user 两种作者可见形态）
     - **碰撞防护模型**：marketplace / user 段由「段数 + `mcp:` 字面 + Computer 安装层唯一性」协同；mcp 段由 `bundle_id` 唯一性**从构造上**保证（校验见 §1.5）
 
     > SDK 若扩展自定义 source，其 name 形态 **MUST** 与上述 1/2/3 段 canonical 形态**不相交**（如采用 ≥4 段并带文档化首段标记）且 **MUST** 文档化——否则击穿段数消歧。
+
+!!! note "marketplace `<name>`：身份唯一性由协议约束，派生规则不由协议约束"
+
+    `source = marketplace:<name>` 的 `<name>` 是该 source 在**持久化 home（`RuntimeOptions.home`，未配置时为 SDK 默认持久化作用域）**的 marketplace 注册作用域内的注册身份，也是 Plugin id `<plugin>@<marketplace>` 的 `<marketplace>` 段。`<name>` **MUST** 为严格 kebab-case（`[a-z0-9-]`，不以 `-` 始末、无连续 `--`），MUST NOT 含 `@` `:` `/` 空白或 URL userinfo / query。协议**不规定** name 的派生来源（清单顶层 `name`、URL 派生或显式参数由 SDK 自治），但规定：同一持久化 home 内一个 name **MUST** 至多绑定一个已注册 source；**同名不同源**的注册 **MUST** 失败（`validation`），MUST NOT 静默覆盖；refresh 遇 name 变化 **MUST** 拒绝并保留旧注册不变（不静默改名、不静默改写既有引用）；本条只约束新注册与 refresh，存量注册不追溯改名（由 SDK 迁移方案负责）。判定时点、同源判定、remove/re-add 与存量迁移细则见 [runtime-contract §5.14](computer-management/runtime-contract.md)。
 
 ### 1.3 mcp `<server>` 段 = bundle_id
 
@@ -133,7 +137,7 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 | 情形 | Computer 行为 |
 |---|---|
 | `<skill>` leaf 段不符合 marketplace §3.1 格式 | 拒绝该 SKILL 注册；记 ERROR |
-| 两个不同 marketplace 提供同名 `<plugin>`（合成 `<plugin>:<skill>` 碰撞） | **安装层**按 `<plugin>@<marketplace>` 唯一性拒绝第二个（tfrobot §2.3）；已装集合内 `<plugin>` 唯一 |
+| 两个不同 marketplace 提供同名 `<plugin>`（合成 `<plugin>:<skill>` 碰撞） | **安装层**按 `<plugin>` 裸名跨 marketplace 全局唯一拒绝第二个（`<plugin>@<marketplace>` 是完整安装 id）；已装集合内 `<plugin>` 唯一 |
 | 同 source（含同一 mcp Server）内 frontmatter `name` 重复（违反 marketplace §2.1） | 拒绝第二注册者；记 ERROR |
 
 !!! note "mcp `<server>` 段（= bundle_id）不会撞名"
@@ -154,8 +158,8 @@ Computer 在装配 Skill Registry 时执行校验，失败的 SKILL **不进入*
 
 | 原始信息 | `A2CSkillRef.name` | `A2CSkillRef.source` |
 |---|---|---|
-| Marketplace repo=`acme-skills` + plugin=`acme-audit` + skill `audit` | `acme-audit:audit` | `marketplace:acme-skills` |
-| Marketplace repo=`acme-skills` + plugin=`pylint-tools` + skill `lint` | `pylint-tools:lint` | `marketplace:acme-skills` |
+| Marketplace name=`acme-skills`（source: git URL）+ plugin=`acme-audit` + skill `audit` | `acme-audit:audit` | `marketplace:acme-skills` |
+| Marketplace name=`acme-skills`（source: git URL）+ plugin=`pylint-tools` + skill `lint` | `pylint-tools:lint` | `marketplace:acme-skills` |
 | 用户手动 drop + skill `my-helper` | `my-helper` | `user` |
 | MCP server name=`tfrobot-tools`（bundle_id auto=`tfrobot-tools`）+ frontmatter.name=`code-review` | `mcp:tfrobot-tools:code-review` | `mcp:tfrobot-tools` |
 | MCP server name=`my.api`（bundle_id auto=`my_api`）+ frontmatter.name=`csv-aggregator` | `mcp:my_api:csv-aggregator` | `mcp:my_api` |
@@ -195,7 +199,7 @@ skill://host/skill-name
 | Source | `A2CSkillRef.uri` |
 |---|---|
 | `mcp:<bundle_id>` | 必有；MCP Server 在 `resources/list` 声明 |
-| `marketplace:<repo>` | 无 |
+| `marketplace:<name>` | 无 |
 | `user` | 无 |
 
 Agent 不应基于 `uri` 字段做协议逻辑判断；它仅是来源追溯用的元数据。
@@ -375,7 +379,8 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
                                     # mcp: mcp:tfrobot-tools:code-review
 
     # ── 来源元数据 ────────────────────────────────────
-    source: str                     # 必选：完整来源 provenance（含 marketplace 名等）
+    source: str                     # 必选：完整来源 provenance（schema 单一来源见 data-structures.md）
+                                    # marketplace:<name>（name = 本地注册身份，§1.2）/ mcp:<bundle_id> / user
                                     # 例：mcp:tfrobot-tools / marketplace:acme-skills / user
     uri: NotRequired[str]           # 仅 MCP 来源时存在：skill://host/skill-name
                                     # 来源追溯用次要身份，Agent 非权威（见 §2）
@@ -403,7 +408,7 @@ class A2CSkillRef(TypedDict):       # 默认 total=True：裸字段 = 必选，N
 | 字段 | 类型 | required? | 含义 / source-of-truth |
 |---|---|:---:|---|
 | `name` | `str` | ✅ **必选** | 合成全局唯一名，跨工具对齐裸名（marketplace `<plugin>:<skill>` / user `<skill>` / mcp `mcp:<bundle_id>:<skill>`，§1）。协议主键，Agent 当不透明可比较字符串 |
-| `source` | `str` | ✅ **必选** | 完整来源 provenance（`mcp:tfrobot-tools` / `marketplace:acme-skills` / `user`） |
+| `source` | `str` | ✅ **必选** | 完整来源 provenance（`mcp:tfrobot-tools` / `marketplace:acme-skills` / `user`）；marketplace 的 `<name>` 为本地注册身份（§1.2），schema 单一来源见 data-structures |
 | `path` | `str` | ✅ **必选** | Computer 本地绝对目录路径；staging 物化为所有 source 统一第一步，恒存在（§4 / §5）。面向 Agent SDK 脚本/文件访问；可执行分叉下经 `${TFROBOT_SKILL_DIR}` 渲染期展开 MAY LLM-facing（§9.1/§9.4） |
 | `description` | `str` | ✅ **必选** | SKILL.md frontmatter 强制字段（marketplace §3.1）；跨三 source 均存在 |
 | `uri` | `str` | ⬜ 可选 | **仅 MCP 来源**：`skill://host/skill-name`，次要身份（§2） |
