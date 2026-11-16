@@ -355,13 +355,14 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 ## 5. Marketplace And Plugin Checklist
 
 - Marketplace reconcile 会安装 missing declared marketplace sources。
-- Source change 会在 reconcile 后替换旧 source projection。
+- 同一 source 的内容 refresh 会在 reconcile 后替换旧 source projection；source 声明本身（URL / ref / sparse）变更按 §5.14 处理：同名不同源 MUST 拒绝，需显式 remove / re-add。
 - `autoUpdate` 或 explicit refresh 会更新 declared source。
 - Undeclared materialized marketplaces 不会在 additive startup reconcile 期间被删除。
 - Explicit prune 会移除 marketplace materialization，并注销其 active SKILLs。
 - Plugin install 校验 `<plugin>@<marketplace>` shape。
 - marketplace unknown 时，Plugin install 失败。
-- **Marketplace 身份唯一性**（[runtime-contract §5.14](runtime-contract.md)）：① 两个不同 source 注册为同名 marketplace → 第二个注册 MUST 失败（`validation`），既有注册、其物化内容与运行时能力保持不变；② 已注册 source refresh 后 name 变化 → MUST 返回结构化失败（MUST NOT 报 `unchanged`），旧注册 / 旧内容 / 旧能力保留，既有 `<plugin>@<old-name>` 引用不被静默重写。无本地清单且无可用缓存的 `no_clone` / 离线注册 MAY 以 `validation` 拒绝。
+- **Marketplace 身份唯一性**（[runtime-contract §5.14](runtime-contract.md)；通过公开 `add-marketplace` / refresh 操作构造，不检查私有 registry）：① 先后 add 两个不同 source 且注册名相同 → 第二次 MUST 以 `validation` 失败，既有注册、其物化内容与运行时能力保持不变；② 同名同源重复 add / reconcile → MUST 幂等，不产生第二个注册；③ 已注册 source refresh 后 name 变化 → MUST 返回 `validation` 结构化失败（MUST NOT 报成功 / no-op），旧注册 / 旧内容 / 旧能力保留，既有 `<plugin>@<old-name>` 引用不被静默重写；④ remove 后以同名不同源 re-add，且仍存在 `<plugin>@<name>` 意图引用 → MUST 拒绝，引用不静默重绑定；⑤ 同一仓库的 ssh / https 等价写法在 SDK canonical 无法判定为同源时 → MUST fail-closed 拒绝（不要求归一）；⑥ 无本地清单且无可用缓存的 `no_clone` / 离线注册 → SHOULD 以 `validation` 拒绝。
+- **跨 marketplace 同名 plugin 安装**：已安装 `alpha@mp-a` 后 install `alpha@mp-b` → MUST 在安装层拒绝（`<plugin>` 裸名跨 marketplace 全局唯一），`alpha@mp-a` 及其 SKILL 保持原 source，`installedPlugins` 不新增 `alpha@mp-b`。
 - Plugin install 对声明依赖的 MCP Server 按 `bundle_id` 依赖预检（数据源 = 运行期权威配置集）：同 `bundle_id` 已存在 → **提示「依赖已满足」并正常安装**（MUST NOT 拒绝）；display 同名、`bundle_id` 不同 → 正常安装（合法共存，MUST NOT 误拒）。
 - 同一声明文件内两个 key 归一到同一 `bundle_id` → 注册边界 fail-fast（提示改名或显式 `bundleId`）。
 - plugin 声明的 MCP Server 的 reinstall/enable 是幂等的。

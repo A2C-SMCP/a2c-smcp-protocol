@@ -253,7 +253,7 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 暴露 marketplace/plugin management 的 SDK SHOULD 对齐以下语义：
 
 1. Marketplace reconcile 默认 additive：声明的 sources 会被 installed/updated/refreshed；未声明但已物化的 sources 不会被删除，直到 explicit prune/gc。
-2. Marketplace sync failure 是 degraded：其它 sources 可以继续；如果 failed source 物化失败，其能力不会作为 active 暴露。
+2. Marketplace sync failure 是 degraded：其它 sources 可以继续；如果 failed source 物化失败，其能力不会作为 active 暴露（**例外**：§5.14 的 refresh 改名失败——旧注册的既有能力保持 active，见 §5.14）。
 3. 为跨 SDK fixture 目的，Plugin id 使用语义形式 `<plugin>@<marketplace>`。SDK MAY 把它包装为 typed IDs。
 4. **Enabling** plugin 会把它的 SKILL、MCP Server、input 和 tool metadata contributions reconcile 到既有 projection surfaces（skills 与 bundled server 原子一并，见 §2.4）。**Installing** 只物化并写 `installedPlugins`，MUST NOT 进入 projection。
 5. Disabling/removing plugin 会让它贡献的 capabilities 变为不可见或不可调用。
@@ -271,13 +271,15 @@ SDK SHOULD 提供一个稳定语义入口，等价于 `from_config(config, runti
 11. **Plugin input 解析序**。渲染绑定 plugin `P@M`（P = plugin、M = marketplace，语义形式见第 3 条）的 MCP server config 时，裸引用 `${input:<id>}` 的解析序 **MUST** 为：① 先尝试 plugin-scoped id `<P>@<M>/<id>`；② 若未命中、且存在**同 kind**（value / secret 一致）的全局 input `<id>` → 回退全局；③ 若仍不可解析 → SDK **MUST** 产出**结构化缺失错误**（§6 `missing_input`），其 `id` = 完整 scoped id `<P>@<M>/<id>`（补救方式由 embedding client 决定，协议不规定）。补充：**显式完整引用** `${input:<P>@<M>/<id>}` 直接命中 scoped、**不**回退全局；**未绑定 plugin** 的 server（用户自定义）裸引用**仅**解析全局 `<id>`、无 scoped 步（行为不变）；**跨 kind 不回退**——scoped secret 缺失时 **MUST NOT** 回退全局 value（反之亦然），直接产出 scoped 缺失错误；scoped 缺失错误 **MUST NOT** 透露 global 侧是否命中。本条 **resolver-agnostic**：规定"SDK 用哪个 id 去问 resolver"、不规定 resolver 实现（交互式 prompt 与运行期 client 注入两条路径套用同一序）。本条与第 7 条对偶——第 7 条禁止串值、本条规定取值序。
 12. **PickString 取值与失效语义**。本条适用于**所有** MCP server 的 input 解析（含未绑定 plugin 的用户自定义 server），不限于 plugin 绑定的 server。`pickString` input 的候选值匹配任一 `option.value` 即合法（schema 约束见 [MCPServerPickStringInput](../data-structures.md#mcpserverpickstringinput)）。**已存值（resolver / 用户实际值）不匹配任一 `option.value` → SDK MUST 产出结构化 `invalid_selection` 错误（§6），该错误 MUST 至少携带 `id` 字段（= input id）**，**MUST NOT** 回退 `default` 或首项——失效即报错，静默改值会掩盖用户改选意图。**真正无用户值**（resolver 从未供给过值）时沿解析链：先尝试 `default`；仍无值时 SDK **MAY** 选择首项（**不反向持久化**——不写回任何存储，下次解析仍从解析链开始；该回退行为双 SDK 既有实现一致，自 0.3.2 起明确入典）。本条与第 11 条同精神：resolver-agnostic，规定"什么值合法、失效给什么错误"，不规定 resolver 实现。
 13. **Input 重解析时机**。本条适用于**所有** MCP server（含未绑定 plugin 的用户自定义 server）。SDK **MUST 分别保留**含 `${input:<id>}` 占位的 **raw config** 与当前进程实际使用的 **rendered config**（raw/rendered 术语与 connection-identity 摘要条款同源，见 data-structures 摘要输入条款）。每次把 MCP server 从 `stopped` 状态**实际启动**（含 stop→start、restart 语义、批量启动操作中每个实际启动的 server），SDK **MUST 从 raw config 重新解析 Input 再创建 client**——已存的 rendered 品 MAY 作为缓存，但 MUST NOT 作为实际启动时的解析结果来源。**运行中进程不热更新**：resolver 返回值或 input 定义在运行中变化，MUST NOT 打断已运行实例，留待下一次实际启动吸收（与 §4.9 第 3 条"改配置后再启动确定"一致）。对已运行 server 的幂等 start **MAY no-op**（不重复解析）。实际启动时的重解析失败 **MUST** 产出结构化错误，并**尽量保留仍在运行的旧进程**（restart 场景）。**不新增**单独的 rematerialize API。
-14. **Marketplace 身份唯一性**。`<plugin>@<marketplace>` 的 `<marketplace>` 段与 `A2CSkillRef.source = marketplace:<name>` 的 `<name>` 是同一身份：marketplace source 在**持久化治理存储（Skill Home）**内的注册名。派生规则（清单顶层 `name` / URL 派生 / 显式参数）不在本契约管辖，但下列不变量 **MUST** 成立：
+14. **Marketplace 身份唯一性**。`<plugin>@<marketplace>` 的 `<marketplace>` 段与 `A2CSkillRef.source = marketplace:<name>` 的 `<name>` 是同一身份：marketplace source 在**持久化 home（`RuntimeOptions.home`）**的 marketplace 注册作用域内的注册名。权威声明为 config-first 的 `marketplaces`；`known_marketplaces` / 物化账本 / clone 缓存均为派生物，删除可重建。注册名的派生规则（清单顶层 `name` / URL 派生 / 显式参数及优先级）不在本契约管辖，由 SDK 定义并在文档中声明；下列不变量 **MUST** 成立：
 
-    - **唯一性**：同一 Skill Home 内，一个 marketplace name **MUST** 至多绑定一个已注册 source；**同名不同源**的注册 **MUST** 失败（结构化 `validation`），MUST NOT 静默覆盖、合并或替换既有注册。
-    - **判定时点**：唯一性判定 **MUST** 发生在清单 name 已解析后的**注册提交点**（不是 URL 解析时）；无本地清单且无可用缓存（如 `no_clone` / 离线）时，SDK **MAY** 以 `validation` 失败拒绝注册。
+    - **名称语法**：注册名 **MUST** 为严格 kebab-case（`[a-z0-9-]`，不以 `-` 始末、无连续 `--`），MUST NOT 含 `@` `:` `/` 空白或 URL userinfo / query；派生结果不合语法时 **MUST** 以 `validation` 拒绝。
+    - **唯一性**：同一持久化 home 内，一个 marketplace name **MUST** 至多绑定一个已注册 source；**同名不同源**的注册 **MUST** 失败（结构化 `validation`），MUST NOT 静默覆盖、合并或替换既有注册。本条不约束同一 source 以多个 name 注册；其 plugin / SKILL 名冲突由安装层 `<plugin>` 裸名跨 marketplace 唯一性（[skill.md §1.5](../skill.md)）兜底。
+    - **判定时点**：唯一性判定 **MUST** 发生在**注册名确定后的注册提交点**（若注册名来自清单，则清单已解析——不是 URL 解析时）；若注册名无法在注册前确定（无本地清单、无可用缓存，且 SDK 不使用 URL 等注册前可确定的派生来源），SDK **SHOULD** 以 `validation` 失败拒绝注册（登记一个后续无法 refresh 的注册不构成合规替代）。
     - **同源判定**：判断两次注册是否同一 source 的 canonical 规则由 SDK 定义（如 URL + ref + sparse）；协议**不要求**把同一仓库的不同写法（如 `ssh://` / `https://` / scp-like / `.git` 后缀）归一为同源。**无法确定时 MUST fail-closed**（视为不同源并发起拒绝），任何情况下 MUST NOT 静默替换。
-    - **refresh 改名**：已注册 source 在 refresh 后解析出不同 name 时，**MUST** 拒绝并保留旧注册、旧物化内容与旧运行时能力不变；失败 **MUST** 是结构化错误，MUST NOT 报告 `unchanged` 或静默重命名。对 `installedPlugins` / `enabledPlugins` 中既有的 `<plugin>@<old-name>` 引用 **MUST NOT** 静默重写；显式 remove / re-add 是新注册，旧引用不自动改指向（SDK MAY 提供诊断 / 迁移工具）。
-    - **存量 grandfather**：历史注册可保留其旧 name；**本条只约束新注册与 refresh**，不要求对存量注册、既有 `<plugin>@<name>` 引用、受信 marketplace 列表或 SKILL `source` 做追溯改名——存量一致性由 SDK 迁移方案（含冲突检测、幂等与回滚）负责。refresh 遇 name 变化 **MUST** 拒绝并给出迁移指引。
+    - **refresh 改名**：已注册 source 在 refresh 后解析出不同 name 时，**MUST** 以 `validation` 拒绝并保留旧注册、旧物化内容与旧运行时能力不变（不适用 §5.2 的 degraded——旧能力保持 active）。失败 **MUST** 是结构化错误，MUST NOT 报告成功 / no-op 或静默重命名；**SHOULD** 在错误 diagnostic 中给出迁移指引（字段形状由 SDK 定义）。对 `installedPlugins` / `enabledPlugins` 中既有的 `<plugin>@<old-name>` 引用 **MUST NOT** 静默重写。
+    - **remove / re-add**：显式 remove 后以同名不同源 re-add 时，若仍存在指向该 name 的 `<plugin>@<name>` 意图引用（`installedPlugins` / `enabledPlugins`），**MUST** 拒绝，直到这些引用被显式移除；MUST NOT 让既有引用按名称静默重绑定到新 source。无引用时，re-add 是新注册。
+    - **存量 grandfather**：历史注册可保留其旧 name；**本条只约束新注册与 refresh**，不要求对存量注册、既有 `<plugin>@<name>` 引用、受信 marketplace 列表或 SKILL `source` 做追溯改名——存量一致性由 SDK 迁移方案（含冲突检测、幂等与回滚）负责。refresh 遇 name 变化 **MUST** 拒绝（迁移指引为 SHOULD，见上）。
 
 ## 6. 错误类别
 
@@ -285,7 +287,7 @@ SDK SHOULD 暴露等价的公开错误类别：
 
 | 类别 | 典型触发 | 可重试性 |
 |---|---|---|
-| `validation` | config shape 非法、plugin id 非法、marketplace name 非法、scope 非法 | 修复 config 后重试 |
+| `validation` | config shape 非法、plugin id 非法、marketplace name 非法 / 同名不同源冲突 / refresh 改名（§5.14）、scope 非法 | 修复 config 后重试 |
 | `missing_input` | plugin input 解析序（§5.11）耗尽仍不可解析 | embedding client 注入值后重试 |
 | `invalid_selection` | 已存 PickString 值不匹配任一 `option.value`（§5.12） | 用户改选合法值后重试 |
 | `policy` | Source blocked、permission denied、policy-only field in user scope | policy 变更后重试 |
