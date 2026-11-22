@@ -334,8 +334,14 @@
     {
       "id": "posix-reserved-char-legal",
       "platform": "posix",
-      "input": "/a/<b>|c\"d*e.txt",
-      "expected": "/a/<b>|c\"d*e.txt"
+      "input": "/a/<b>|c\"d*e?f.txt",
+      "expected": "/a/<b>|c\"d*e?f.txt"
+    },
+    {
+      "id": "win-reserved-mid-component",
+      "platform": "windows",
+      "input": "C:\\a\\b<c\\d.txt",
+      "error": "invalid_path"
     }
   ]
 }

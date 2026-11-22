@@ -29,6 +29,9 @@
     {"desc": "首尾 '-_' 混合裁剪", "name": "-_x_-", "config": {"type": "stdio", "command": "x", "args": [], "env": {}}, "expected_bundle_id": "x"},
     {"desc": "显式 bundle_id 原样采用（不裁剪首尾 '_'）", "name": "whatever", "config": {"type": "stdio", "command": "x", "args": [], "env": {}, "bundle_id": "_custom"}, "expected_bundle_id": "_custom"},
     {"desc": "无名 + args 保序（['b','a'] 不得排序）", "name": "", "config": {"type": "stdio", "command": "x", "args": ["b", "a"], "env": {}}, "expected_bundle_id": "bundle_3ee6b893b908ffac"},
-    {"desc": "无名 + args 对照（已排序 ['a','b']，与上条哈希不同）", "name": "", "config": {"type": "stdio", "command": "x", "args": ["a", "b"], "env": {}}, "expected_bundle_id": "bundle_b7fa4ce988ca0e0b"}
+    {"desc": "无名 + args 对照（已排序 ['a','b']，与上条哈希不同）", "name": "", "config": {"type": "stdio", "command": "x", "args": ["a", "b"], "env": {}}, "expected_bundle_id": "bundle_b7fa4ce988ca0e0b"},
+    {"desc": "replace 后折叠：连续非法字符 → 单个 '_'（顺序不可反）", "name": "a!!b", "config": {"type": "stdio", "command": "x", "args": [], "env": {}}, "expected_bundle_id": "a_b"},
+    {"desc": "显式 bundle_id 原样采用（不裁剪首尾 '-'）", "name": "whatever", "config": {"type": "stdio", "command": "x", "args": [], "env": {}, "bundle_id": "-custom"}, "expected_bundle_id": "-custom"},
+    {"desc": "无名 + 非 ASCII 连接身份（TLV 长度按 UTF-8 字节，非字符数）", "name": "", "config": {"type": "stdio", "command": "x", "args": ["你好"], "env": {}}, "expected_bundle_id": "bundle_8897335851935828"}
   ]
 }
