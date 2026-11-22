@@ -132,7 +132,7 @@
 
 - `audit@acme` 出现在已安装列表（installed），但其 SKILLs **不**出现在 `client:get_skills`、bundled MCP server **不**出现在活跃 config/tool projection——即 `install` ≠ activate；
 - **重启恢复保持惰性**：以相同 `home` 重建、boot/reconcile 后，`audit@acme` 仍在已安装列表且仍**不**投影任何能力（不会因重启被激活）；
-- 随后 `enable`（`enabledPlugins: {"audit@acme": true}`）后，其 SKILLs 与 bundled server **一并**出现；若 enable 期间 bundled server 挂载失败，MUST 回滚到 `installed_disabled`（不留「skill 亮、server 未挂」的半态）。
+- 随后 `enable`（`enabledPlugins: {"audit@acme": true}`）后，其 SKILLs 与 bundled server **一并**出现；若 enable 期间 bundled server 挂载失败，MUST 回滚到 `installed_disabled`（prior-false 场景；不留「skill 亮、server 未挂」的半态）。
 
 ### 2.5 Secret Inputs
 
@@ -376,7 +376,8 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - **Input 重解析时机向量**（[runtime-contract §5.13](runtime-contract.md)）六景 MUST 双端对拍：① stopped → 实际 start → resolver 最新值生效；② 实际 restart → resolver 最新值生效（改选后重启不再静默沿用旧渲染品）；③ 运行中修改 resolver 返回值 → 运行实例不热更新，值保持；④ 已运行 server 幂等 start MAY no-op（不重复解析，同一次解析结果复用）；⑤ 单次 server 渲染中相同 id 只解析一次；⑥ 实际启动重解析失败 → 结构化错误，且尽量保留仍在运行的旧进程（若有）。
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
 - **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。
-- **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；enable 时 bundled server 挂载失败 MUST 回滚到 `installed_disabled`（不留半态）。
+- **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；失败 MUST 回滚到操作前状态（不留半态）。
+- **prior-true 重复 enable 失败**（[runtime-contract §2.4](runtime-contract.md)，[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）：① 从 `installed_disabled` 出发预检失败 → `enabledPlugins` 落 false、投影不出现、无半态；② prior-true 重复 enable 预检失败 → `enabledPlugins` 保持 true、既有 skills / server / 能力不变、结构化诊断可见（不吞原异常）。两景双端对拍。
 - 重启恢复（enabled）：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
 - 重启恢复（installed_disabled）：仅 `install`（未 `enable`）后以相同 `home` 重建，boot 后该 plugin 仍在已安装列表但保持惰性——不出现在活跃 skills/servers。
 - disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。

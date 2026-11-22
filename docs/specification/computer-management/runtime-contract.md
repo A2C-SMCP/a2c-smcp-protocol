@@ -97,11 +97,17 @@ Plugin 有两个正交、独立生命周期的状态维度：**是否安装**（
 | 操作 | 意图写入 | 物化 / 投影副作用 | 结果态 |
 |---|---|---|---|
 | `install` | `installedPlugins` 增 | 物化（clone / 账本）、校验 manifest、**依赖预检**（plugin 声明依赖的 MCP Server 按 `bundle_id` 与运行期权威配置集比对：已存在 = 依赖已满足 → 提示并正常安装，交 reconcile 收敛，**MUST NOT 以此拒绝安装**；见 §2.5）；**MUST NOT 激活**、MUST NOT 写 `enabledPlugins` | `installed_disabled` |
-| `enable` | `enabledPlugins[scope] = true` | 把 skills 与 bundled MCP server **原子**并入投影（见下）；失败 MUST 回滚到 `installed_disabled` | `installed_enabled` |
+| `enable` | `enabledPlugins[scope] = true` | 把 skills 与 bundled MCP server **原子**并入投影（见下）；失败 MUST 回滚到**操作前状态**（`installed_disabled` 或 `installed_enabled`），MUST NOT 产生半态 | `installed_enabled`（成功）；失败按下方回滚语义 |
 | `disable` | `enabledPlugins[scope] = false` | 从投影移除其贡献；保留 `installedPlugins` 与物化 | `installed_disabled` |
 | `uninstall` | `installedPlugins` 删、清其 `enabledPlugins` 条目 | teardown 物化；其声明依赖的 MCP Server 按 §4.9.1 回收判据处理（无人再依赖 ∧ 非用户声明才回收） | `available` |
 
-> **enable 原子性（消除“半态”）。** `enable` MUST 把该 plugin 的 skills 与 bundled MCP server **条目**作为整体一并纳入投影。被禁止的“半态”锚定在**投影面不一致**——skill 已在 `client:get_skills`、而 bundled server 条目缺席于 config/tool 投影（此即 rust-sdk#102）。在 client-owns-MCP-config 下，把 bundled server 记为 **enabled-可查询条目**即已满足原子性——其**进程拉起**是客户端职责（见 §4.8 边界，不算半态），skills 照常一并投影、无需等待其就绪。仅当 server 连投影条目都无法建立（manifest / 物化失败）时，才整体保持 `installed_disabled` 并给出公开诊断。
+> **enable 原子性（消除“半态”）。** `enable` MUST 把该 plugin 的 skills 与 bundled MCP server **条目**作为整体一并纳入投影。被禁止的“半态”锚定在**投影面不一致**——skill 已在 `client:get_skills`、而 bundled server 条目缺席于 config/tool 投影（此即 rust-sdk#102）。在 client-owns-MCP-config 下，把 bundled server 记为 **enabled-可查询条目**即已满足原子性——其**进程拉起**是客户端职责（见 §4.8 边界，不算半态），skills 照常一并投影、无需等待其就绪。仅当 server 连投影条目都无法建立（manifest / 物化失败）时，才按下方「回滚语义」恢复到操作前状态并给出公开诊断。
+
+> **enable 失败的回滚语义（[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）。** 「回滚」= **恢复到操作前状态（pre-state）**，不是一律 `false`：
+>
+> - **起点 `installed_disabled`（prior-false）** → 失败落 `installed_disabled`；撤销本次尝试新挂的 server 条目，其中无其他 plugin 依赖 ∧ 非用户声明者按 §2.5-1 回收。不得留下「skill 亮 / server 未挂」半态。
+> - **起点 `installed_enabled`（prior-true，重复 enable）** → 失败**保持 `enabledPlugins[scope] = true`**；既有 skills / bundled server / 能力不变，不因失败的重复操作摘除既有 server。MUST 返回结构化诊断且不吞原异常，diagnostic SHOULD 明示「既有启用状态已保留」。
+> - 两端 MUST 对拍 [conformance-tests §5](conformance-tests.md) 两景。
 
 ### 2.5 Plugin 与 MCP Server：依赖关系与来源优先序
 
