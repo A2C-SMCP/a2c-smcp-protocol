@@ -132,7 +132,7 @@
 
 - `audit@acme` 出现在已安装列表（installed），但其 SKILLs **不**出现在 `client:get_skills`、bundled MCP server **不**出现在活跃 config/tool projection——即 `install` ≠ activate；
 - **重启恢复保持惰性**：以相同 `home` 重建、boot/reconcile 后，`audit@acme` 仍在已安装列表且仍**不**投影任何能力（不会因重启被激活）；
-- 随后 `enable`（`enabledPlugins: {"audit@acme": true}`）后，其 SKILLs 与 bundled server **一并**出现；若 enable 期间 bundled server 挂载失败，MUST 回滚到 `installed_disabled`（prior-false 场景；不留「skill 亮、server 未挂」的半态）。
+- 随后 `enable`（`enabledPlugins: {"audit@acme": true}`）后，其 SKILLs 与 bundled server **一并**出现；若 enable 期间 bundled server 挂载失败，MUST 回滚到操作前状态（prior-false 场景：`installed_disabled`；scope 级精确断言见 §5「enable 失败回滚」场景 ①；不留「skill 亮、server 未挂」的半态）。
 
 ### 2.5 Secret Inputs
 
@@ -365,7 +365,7 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - **跨 marketplace 同名 plugin 安装**：已安装 `alpha@mp-a` 后 install `alpha@mp-b` → MUST 在安装层拒绝（`<plugin>` 裸名跨 marketplace 全局唯一），`alpha@mp-a` 及其 SKILL 保持原 source，`installedPlugins` 不新增 `alpha@mp-b`。
 - Plugin install 对声明依赖的 MCP Server 按 `bundle_id` 依赖预检（数据源 = 运行期权威配置集）：同 `bundle_id` 已存在 → **提示「依赖已满足」并正常安装**（MUST NOT 拒绝）；display 同名、`bundle_id` 不同 → 正常安装（合法共存，MUST NOT 误拒）。
 - 同一声明文件内两个 key 归一到同一 `bundle_id` → 注册边界 fail-fast（提示改名或显式 `bundleId`）。
-- plugin 声明的 MCP Server 的 reinstall/enable 是幂等的。
+- plugin 声明的 MCP Server 的 reinstall/enable 是幂等的（幂等指**成功路径终态不变**；重复 enable MUST 仍执行预检 / reconcile，MAY 失败并按 §2.4 回滚语义处理，不得以「成功 no-op」短路预检）。
 - Plugin disable 会使贡献的 SKILLs/tools/MCP resources 不可见或不可调用。
 - Plugin uninstall 按 §4.9.1 回收判据处理其声明依赖的 server：无其他 plugin 依赖 ∧ 非用户声明 → 回收；用户声明的同 `bundle_id` server 永不连坐；另一 plugin 仍依赖时保留、最后一个依赖者卸载时回收（无泄漏）。
 - **回收判据 origin 向量**（[Discussion #32 裁决](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/32)）：「非用户声明」MUST 评估在带 `origin` 的运行期权威配置集上（runtime-contract §2.5 第 5 条）。四景 MUST 双端对拍：① X 经 flag（`--mcp-config`）挂载（`origin=flag`）→ 卸载声明依赖 X 的 plugin **不回收** X；② X 经宿主构造入参挂载（`origin=embed`）→ 同上**不回收**；③ X 仅由 plugin 声明（`origin=plugin`、无其他 plugin 依赖）→ **回收**；④ 同 `bundle_id` 混源碰撞（plugin 声明 + flag 声明并存，flag > plugin）→ **不回收**。夹具遵 §2.0 name/bundle_id 分叉条款。
@@ -377,7 +377,10 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
 - **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。
 - **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；失败 MUST 回滚到操作前状态（不留半态）。
-- **enable 失败回滚（scope 精确）**（[runtime-contract §2.4](runtime-contract.md)，[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）：① 有效 `installed_disabled` 出发预检失败 → 本次写入 scope 恢复 `absent` / `false`、投影不出现、无半态；② 同一 scope 原为 `true` 的重复 enable 预检失败 → 该 scope 保持 `true`、既有 skills / server / 能力不变、结构化诊断可见（不吞原异常）；③ 有效 prior-true 来自更低 scope、本次写入更高 scope（原 `absent`）→ 失败后该 scope 键回到 `absent`、合并视图仍 true、origin / 激活来源不变、既有能力不变。三景双端对拍。
+- **enable 失败回滚（scope 精确 + 写后失败）**（[runtime-contract §2.4](runtime-contract.md)，[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)；通过公开 `enable(scope=...)` 构造，注入预检 / apply 阶段失败后断言公开投影，不检查私有 registry）：
+  - **预检失败**（写 `enabledPlugins` / stage / mount 之前）：① 有效 `installed_disabled` 出发，被写 scope pre-state `absent` → 失败后该 key 不存在（不得写 `false`）；pre-state `false` → 精确恢复 `false`；投影不出现、无半态。② 同 scope 原为 `true` 的重复 enable → 该 scope 保持 `true`；`client:get_config` / `client:get_skills` 与操作前一致；结构化诊断可见（不吞原异常）。③ 有效 prior-true 来自更低 scope（如 user=true）、在更高 scope（project）enable 且该 scope 原 `absent` → 失败后该 scope key 不存在；`client:get_config` / `client:get_skills` 与操作前一致；bundled server 审批 verdict 回到 `ENABLED`（非 `PENDING`，见 runtime-contract §5 第 10 条）。
+  - **写后失败**（已写 `enabledPlugins[scope]=true`、已 stage skill 或建立 bundled server 条目后失败，如 manifest / 物化失败）：④ 被写 scope 的 key 精确恢复 pre-state（`absent` → 删除 / `false` → `false` / `true` → `true`）；本次已 stage 的 skill 与 server 条目撤销；`client:get_config` / `client:get_skills` 回到操作前；本次新挂且无其他依赖、非用户声明的 server 按 §4.9.1-2 回收，用户声明或其他 plugin 仍依赖的条目只移除本 plugin 贡献、不回收条目本身。
+  - 预检 ①②③ 与写后 ④ 均双端对拍；预检景用于已裁决的 false/true 终态，写后景用于 scope 精确恢复与 server 撤销。
 - 重启恢复（enabled）：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
 - 重启恢复（installed_disabled）：仅 `install`（未 `enable`）后以相同 `home` 重建，boot 后该 plugin 仍在已安装列表但保持惰性——不出现在活跃 skills/servers。
 - disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。
