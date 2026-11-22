@@ -377,7 +377,7 @@ MCP 上游授权失败的 surfacing 属协议投影硬约束（[error-handling.m
 - 命令式操作 config-first：`install` 写 `installedPlugins`（全局安装意图）、`enable`/`disable` 写 `enabledPlugins`（per-scope 启用意图）；物化账本只作为下游派生物出现，不被直接编辑。
 - **install ≠ activate**：仅 `install`（未 `enable`）后，该 plugin 处于 `installed_disabled`——在已安装列表，但其 SKILLs **不**在 `client:get_skills`、bundled MCP server **不**在活跃 config/tool projection。
 - **enable 原子激活**：`enable` 后 skills 与 bundled server 一并出现；失败 MUST 回滚到操作前状态（不留半态）。
-- **prior-true 重复 enable 失败**（[runtime-contract §2.4](runtime-contract.md)，[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）：① 从 `installed_disabled` 出发预检失败 → `enabledPlugins` 落 false、投影不出现、无半态；② prior-true 重复 enable 预检失败 → `enabledPlugins` 保持 true、既有 skills / server / 能力不变、结构化诊断可见（不吞原异常）。两景双端对拍。
+- **enable 失败回滚（scope 精确）**（[runtime-contract §2.4](runtime-contract.md)，[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）：① 有效 `installed_disabled` 出发预检失败 → 本次写入 scope 恢复 `absent` / `false`、投影不出现、无半态；② 同一 scope 原为 `true` 的重复 enable 预检失败 → 该 scope 保持 `true`、既有 skills / server / 能力不变、结构化诊断可见（不吞原异常）；③ 有效 prior-true 来自更低 scope、本次写入更高 scope（原 `absent`）→ 失败后该 scope 键回到 `absent`、合并视图仍 true、origin / 激活来源不变、既有能力不变。三景双端对拍。
 - 重启恢复（enabled）：install+enable 后以相同 `home` 重建 runtime，boot/reconcile 后 bundled MCP servers、bundled SKILLs、派生 MCP-source SKILLs 与归属元数据重新出现。
 - 重启恢复（installed_disabled）：仅 `install`（未 `enable`）后以相同 `home` 重建，boot 后该 plugin 仍在已安装列表但保持惰性——不出现在活跃 skills/servers。
 - disable/uninstall 后以相同 `home` 重建 runtime，boot/reconcile 不再恢复该 plugin 的 MCP servers、SKILLs 及其派生 MCP-source SKILLs。
