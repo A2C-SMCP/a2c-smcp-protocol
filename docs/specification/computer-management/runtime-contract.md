@@ -97,11 +97,26 @@ Plugin 有两个正交、独立生命周期的状态维度：**是否安装**（
 | 操作 | 意图写入 | 物化 / 投影副作用 | 结果态 |
 |---|---|---|---|
 | `install` | `installedPlugins` 增 | 物化（clone / 账本）、校验 manifest、**依赖预检**（plugin 声明依赖的 MCP Server 按 `bundle_id` 与运行期权威配置集比对：已存在 = 依赖已满足 → 提示并正常安装，交 reconcile 收敛，**MUST NOT 以此拒绝安装**；见 §2.5）；**MUST NOT 激活**、MUST NOT 写 `enabledPlugins` | `installed_disabled` |
-| `enable` | `enabledPlugins[scope] = true` | 把 skills 与 bundled MCP server **原子**并入投影（见下）；失败 MUST 回滚到 `installed_disabled` | `installed_enabled` |
+| `enable` | `enabledPlugins[scope] = true` | 把 skills 与 bundled MCP server **原子**并入投影（见下）；失败 MUST 回滚到**本次写入 scope 的精确 pre-state**（absent / false / true），投影面 MUST NOT 产生半态，合并视图 MUST 与操作前状态一致（按本节合并序计算） | `installed_enabled`（成功）；失败按下方回滚语义 |
 | `disable` | `enabledPlugins[scope] = false` | 从投影移除其贡献；保留 `installedPlugins` 与物化 | `installed_disabled` |
 | `uninstall` | `installedPlugins` 删、清其 `enabledPlugins` 条目 | teardown 物化；其声明依赖的 MCP Server 按 §4.9.1 回收判据处理（无人再依赖 ∧ 非用户声明才回收） | `available` |
 
-> **enable 原子性（消除“半态”）。** `enable` MUST 把该 plugin 的 skills 与 bundled MCP server **条目**作为整体一并纳入投影。被禁止的“半态”锚定在**投影面不一致**——skill 已在 `client:get_skills`、而 bundled server 条目缺席于 config/tool 投影（此即 rust-sdk#102）。在 client-owns-MCP-config 下，把 bundled server 记为 **enabled-可查询条目**即已满足原子性——其**进程拉起**是客户端职责（见 §4.8 边界，不算半态），skills 照常一并投影、无需等待其就绪。仅当 server 连投影条目都无法建立（manifest / 物化失败）时，才整体保持 `installed_disabled` 并给出公开诊断。
+> **enable 原子性（消除“半态”）。** `enable` MUST 把该 plugin 的 skills 与 bundled MCP server **条目**作为整体一并纳入投影。被禁止的“半态”锚定在**投影面不一致**——skill 已在 `client:get_skills`、而 bundled server 条目缺席于 config/tool 投影（此即 rust-sdk#102）。在 client-owns-MCP-config 下，把 bundled server 记为 **enabled-可查询条目**即已满足原子性——其**进程拉起**是客户端职责（见 §4.8 边界，不算半态），skills 照常一并投影、无需等待其就绪。仅当 server 连投影条目都无法建立（manifest / 物化失败）时，才按下方「回滚语义」恢复到操作前状态并给出公开诊断。
+
+> **enable 失败的回滚语义（[Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）。** `enable` 写的是**某个具体 scope** 的 `enabledPlugins[scope]`。回滚分两层，不得混同：
+>
+> 1. **被写 scope 的 raw 状态**：MUST 恢复为本次写入前的精确值——pre-state 为 `absent` 时删除本次写入的 key（不得写 `false` 或 `true` 替代）；为 `false` / `true` 时精确写回。
+> 2. **合并视图与投影**：MUST 与操作前状态一致——按本节 `user < project < local` 合并序重新计算，**不得由被写 scope 的 raw 值单独推断**。例：`user: false` + `project: true` 时有效状态为 enabled，在 user scope 的 enable 失败后合并视图仍为 enabled；`user: true` + `project: false` 时有效状态为 disabled，回滚后仍为 disabled。
+>
+> 典型路径：
+> - 被写 scope `absent` → 删键；合并视图按合并序重新计算（若有效 prior-true 来自更低 scope 且无更高 scope 覆盖，则保持 enabled）。
+> - 被写 scope `false` / `true` → 精确恢复该值；合并视图按上述合并序计算。
+>
+> 失败 MUST 返回结构化诊断且不吞原异常；回滚前后有效状态均为 enabled 时，diagnostic SHOULD 明示「既有启用状态已保留」。
+>
+> 任何路径 MUST NOT 产生**投影半态**（定义见上）：本次尝试已写入的 skill / server 贡献 MUST 按意图 reconcile 恢复到操作前投影。**回滚基线 = 操作前快照**：操作前已存在的 orphan / 已活跃条目保持其 pre-state，不得当作本次新增而撤销或注销。本次尝试新挂的 server 条目中，无其他 plugin 依赖 ∧ 非用户声明者按 §4.9.1-2 回收，用户声明或其他 plugin 仍依赖的条目只移除本 plugin 贡献、不回收条目本身。提供 `enabledPlugins=true` 的**激活来源 scope** 不得因失败而改变（raw pre-state 精确恢复保证）；上句的「激活来源 scope」与 MCP server 的 `origin`（§2.5 第 5 条）不是同一概念，不要混用。
+>
+> 两端 MUST 对拍 [conformance-tests §5](conformance-tests.md) 场景。
 
 ### 2.5 Plugin 与 MCP Server：依赖关系与来源优先序
 
