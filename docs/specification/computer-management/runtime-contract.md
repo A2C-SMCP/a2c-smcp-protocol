@@ -114,7 +114,7 @@ Plugin 有两个正交、独立生命周期的状态维度：**是否安装**（
 >
 > 失败 MUST 返回结构化诊断且不吞原异常；回滚前后有效状态均为 enabled 时，diagnostic SHOULD 明示「既有启用状态已保留」。
 >
-> 任何路径 MUST NOT 产生**投影半态**（定义见上）：本次尝试已写入的 skill / server 贡献 MUST 按意图 reconcile 恢复到操作前投影；本次尝试新挂的 server 条目中，无其他 plugin 依赖 ∧ 非用户声明者按 §4.9.1-2 回收，用户声明或其他 plugin 仍依赖的条目只移除本 plugin 贡献、不回收条目本身。提供 `enabledPlugins=true` 的**激活来源 scope** 不得因失败而改变（raw pre-state 精确恢复保证）；此处的 `origin` 专指 MCP server 来源（§2.5 第 5 条），两者不要混用。
+> 任何路径 MUST NOT 产生**投影半态**（定义见上）：本次尝试已写入的 skill / server 贡献 MUST 按意图 reconcile 恢复到操作前投影。**回滚基线 = 操作前快照**：操作前已存在的 orphan / 已活跃条目保持其 pre-state，不得当作本次新增而撤销或注销。本次尝试新挂的 server 条目中，无其他 plugin 依赖 ∧ 非用户声明者按 §4.9.1-2 回收，用户声明或其他 plugin 仍依赖的条目只移除本 plugin 贡献、不回收条目本身。提供 `enabledPlugins=true` 的**激活来源 scope** 不得因失败而改变（raw pre-state 精确恢复保证）；上句的「激活来源 scope」与 MCP server 的 `origin`（§2.5 第 5 条）不是同一概念，不要混用。
 >
 > 两端 MUST 对拍 [conformance-tests §5](conformance-tests.md) 场景。
 
