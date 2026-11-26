@@ -1,6 +1,6 @@
 # 协议版本与握手
 
-**当前协议版本**: `0.5.0`
+**当前协议版本**: `0.5.1`
 
 A2C-SMCP 作为三方参与（Agent / Server / Computer）的协议，必须保证同一房间内的成员以兼容的协议版本通信。本规范定义协议版本号语义、兼容性判定规则，以及在 **Socket.IO 连接的 HTTP 层**完成的版本校验流程。
 
@@ -176,6 +176,16 @@ PATCH 仅允许：实现 bug 修复、错误信息文案打磨、文档勘误、
 ### 最近发布：v0.4.0
 
 `0.4.0` 已发布，两站 `latest` 均指向 `0.4.0`。它含三项变更：`client:put_blob` Agent→Computer 写入通道（protocol#12，新增事件 + 新错误码 `4019`，加性）；SKILL frontmatter `tags` 元数据（protocol#50，`A2CSkillRef.tags` 加性字段，无新事件/错误码）；ToolMeta Server 声明 tags（protocol#51，`Tool._meta["a2c_tool_meta"]` 声明层转正 + [§ToolMeta 三层合并规则](data-structures.md#toolmeta-三层合并规则)，无 wire 结构变化；对「Server 声明存在」场景从偶然透传改为白名单 reconcile，属 Computer 行为变更）。发布前进入的其它变更一并折入 0.4.0。
+
+### 最近发布：v0.5.1
+
+`0.5.1` 已发布，两站 `latest` 均指向 `0.5.1`。目标位为 **PATCH**（无 wire 变更），含三项收口：
+
+- **Marketplace 身份唯一性澄清**（protocol#79）：`source = marketplace:<name>`（订正原 `<repo>` 措辞）；同一 Computer 内一个 marketplace name 唯一对应一个 source，同名不同源注册 MUST 拒绝，refresh 改名 MUST 拒绝并保留旧注册；安装层校正为按 `<plugin>` 裸名跨 marketplace 全局唯一拒绝。
+- **prior-true 重复 enable 失败回滚语义**（protocol#83 / [Discussion #82](https://github.com/A2C-SMCP/a2c-smcp-protocol/discussions/82)）：回滚 = 恢复本次写入 scope 的精确 pre-state（absent/false/true），合并视图按 `user < project < local` 重算；prior-true 失败保持既有能力 + 结构化诊断。
+- **一致性向量补强**（protocol#78）：bundle_id 16→25、canonical_path 49→56，覆盖首尾 `-` 裁剪、显式 bundle_id 原样、args 保序、replace→fold、非 ASCII TLV 字节长度、Windows 保留字符与 POSIX 对照。
+
+发布前进入的其它变更一并折入 0.5.1。
 
 ### 最近发布：v0.5.0
 
